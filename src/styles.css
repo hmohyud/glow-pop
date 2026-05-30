@@ -257,19 +257,19 @@
     .float-1 {
       width: 100px; height: 100px;
       background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
-      top: 10%; right: -30px;
+      top: 4%; right: 36px;
       animation: floatCircle 6s ease-in-out infinite;
     }
     .float-2 {
       width: 80px; height: 80px;
       background: linear-gradient(135deg, var(--pink-700), var(--pink-600));
-      bottom: 20%; left: -20px;
+      bottom: 14%; left: 28px;
       animation: floatCircle 5s ease-in-out infinite 1s;
     }
     .float-3 {
       width: 70px; height: 70px;
       background: linear-gradient(135deg, var(--pink-400), var(--pink-300));
-      top: 55%; right: -40px;
+      top: 52%; right: 52px;
       animation: floatCircle 7s ease-in-out infinite 0.5s;
     }
     .float-stick {
@@ -338,10 +338,6 @@
       position: absolute; width: 18px; height: 18px; border-radius: 50%;
       background: var(--pink-400); box-shadow: 0 0 15px rgba(255,105,180,0.4);
     }
-    .orbit-dot::after {
-      content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      width: 3px; height: 14px; background: var(--pink-200); border-radius: 0 0 2px 2px;
-    }
     .orbit-dot:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
     .orbit-dot:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
     .orbit-dot:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
@@ -360,10 +356,6 @@
       padding: 20px; border-radius: 16px;
       background: var(--pink-50); border: 1px solid var(--pink-100);
       transition: all 0.3s ease;
-    }
-    .callout:hover {
-      transform: translateX(8px); border-color: var(--pink-300);
-      box-shadow: 0 8px 30px rgba(255, 20, 147, 0.06);
     }
     .callout-icon {
       width: 48px; height: 48px; border-radius: 50%;
@@ -396,18 +388,6 @@
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative; overflow: hidden;
     }
-    .ingredient-card::before {
-      content: ''; position: absolute; top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(255,20,147,0.03) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.4s ease;
-    }
-    .ingredient-card:hover::before { opacity: 1; }
-    .ingredient-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(255, 20, 147, 0.1);
-      border-color: var(--pink-300);
-    }
     .ingredient-circle {
       width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 8px;
       display: flex; align-items: center; justify-content: center;
@@ -416,11 +396,6 @@
       font-size: 36px;
       transition: all 0.4s ease;
       position: relative;
-    }
-    .ingredient-card:hover .ingredient-circle {
-      border-color: var(--pink-400);
-      box-shadow: 0 0 30px rgba(255, 20, 147, 0.15);
-      transform: scale(1.05);
     }
     .ingredient-stick {
       width: 4px; height: 30px; margin: 0 auto 16px;
@@ -547,11 +522,6 @@
       border: 1px solid var(--pink-100);
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .sugar-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 50px rgba(255, 20, 147, 0.1);
-      border-color: var(--pink-300);
-    }
     .sugar-card-icon {
       width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 8px;
       display: flex; align-items: center; justify-content: center;
@@ -559,11 +529,6 @@
       background: linear-gradient(135deg, var(--pink-100), var(--pink-50));
       border: 3px solid var(--pink-200);
       transition: all 0.4s ease;
-    }
-    .sugar-card:hover .sugar-card-icon {
-      border-color: var(--pink-400);
-      box-shadow: 0 0 26px rgba(255, 20, 147, 0.15);
-      transform: scale(1.06);
     }
     .sugar-card-stick {
       width: 4px; height: 26px; margin: 0 auto 16px;
@@ -829,6 +794,3 @@
       z-index: 10001; transition: width 0.1s linear;
     }
     .hero-bg-circle, .hero-image-wrapper { transition: transform 0.25s ease-out; }
-    .ingredient-card, .sugar-card {
-      transition: transform 0.2s ease-out, box-shadow 0.4s ease, border-color 0.4s ease;
-    }

@@ -271,14 +271,27 @@ new ResizeObserver(() => {
       if (imgWrap) imgWrap.style.transform = '';
     });
   }
+})();
 
-  document.querySelectorAll('.ingredient-card, .sugar-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      card.style.transform = `perspective(720px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg) translateY(-8px)`;
-    });
-    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
-  });
+/* ─── ANNOUNCEMENT MARQUEE: fill width so the loop never gaps on wide screens ─── */
+(function fillMarquee() {
+  const track = document.querySelector('.announcement-track');
+  if (!track) return;
+  const base = Array.from(track.children).map(n => n.cloneNode(true));
+  if (!base.length) return;
+  const setN = (n) => {
+    track.innerHTML = '';
+    for (let i = 0; i < n; i++) base.forEach(b => track.appendChild(b.cloneNode(true)));
+  };
+  const build = () => {
+    let sets = 1;
+    setN(sets);
+    while (track.scrollWidth < window.innerWidth && sets < 40) { sets++; setN(sets); }
+    const halfWidth = track.scrollWidth;
+    setN(sets * 2);
+    track.style.animationDuration = Math.max(12, halfWidth / 70) + 's';
+  };
+  build();
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(build, 250); });
 })();
