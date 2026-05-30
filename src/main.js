@@ -234,3 +234,51 @@ new ResizeObserver(() => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(resizeCanvas, 200);
 }).observe(document.body);
+
+/* ─── INTERACTIONS (scroll progress, hero parallax, card tilt) ─── */
+(function enhancements() {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const progress = document.getElementById('scrollProgress');
+  if (progress) {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      progress.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  if (reduce) return;
+
+  const hero = document.getElementById('hero');
+  if (hero) {
+    const imgWrap = hero.querySelector('.hero-image-wrapper');
+    const circles = hero.querySelectorAll('.hero-bg-circle');
+    hero.addEventListener('mousemove', (e) => {
+      const r = hero.getBoundingClientRect();
+      const cx = (e.clientX - r.left) / r.width - 0.5;
+      const cy = (e.clientY - r.top) / r.height - 0.5;
+      circles.forEach((el, i) => {
+        const d = (i + 1) * 16;
+        el.style.transform = `translate(${cx * d}px, ${cy * d}px)`;
+      });
+      if (imgWrap) imgWrap.style.transform = `translate(${cx * -12}px, ${cy * -12}px)`;
+    });
+    hero.addEventListener('mouseleave', () => {
+      circles.forEach(el => { el.style.transform = ''; });
+      if (imgWrap) imgWrap.style.transform = '';
+    });
+  }
+
+  document.querySelectorAll('.ingredient-card, .sugar-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `perspective(720px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+})();

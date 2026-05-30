@@ -820,3 +820,15 @@
       }
       #lollipopCanvas { display: none; }
     }
+
+    /* ─── SCROLL PROGRESS + INTERACTIONS ─── */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 4px; width: 0;
+      background: linear-gradient(90deg, var(--pink-400), var(--pink-600));
+      box-shadow: 0 0 12px rgba(255, 20, 147, 0.45);
+      z-index: 10001; transition: width 0.1s linear;
+    }
+    .hero-bg-circle, .hero-image-wrapper { transition: transform 0.25s ease-out; }
+    .ingredient-card, .sugar-card {
+      transition: transform 0.2s ease-out, box-shadow 0.4s ease, border-color 0.4s ease;
+    }
