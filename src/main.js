@@ -235,63 +235,15 @@ new ResizeObserver(() => {
   resizeTimer = setTimeout(resizeCanvas, 200);
 }).observe(document.body);
 
-/* ─── INTERACTIONS (scroll progress, hero parallax, card tilt) ─── */
-(function enhancements() {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const progress = document.getElementById('scrollProgress');
-  if (progress) {
-    const onScroll = () => {
-      const h = document.documentElement;
-      const max = h.scrollHeight - h.clientHeight;
-      progress.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  }
-
-  if (reduce) return;
-
-  const hero = document.getElementById('hero');
-  if (hero) {
-    const imgWrap = hero.querySelector('.hero-image-wrapper');
-    const circles = hero.querySelectorAll('.hero-bg-circle');
-    hero.addEventListener('mousemove', (e) => {
-      const r = hero.getBoundingClientRect();
-      const cx = (e.clientX - r.left) / r.width - 0.5;
-      const cy = (e.clientY - r.top) / r.height - 0.5;
-      circles.forEach((el, i) => {
-        const d = (i + 1) * 16;
-        el.style.transform = `translate(${cx * d}px, ${cy * d}px)`;
-      });
-      if (imgWrap) imgWrap.style.transform = `translate(${cx * -12}px, ${cy * -12}px)`;
-    });
-    hero.addEventListener('mouseleave', () => {
-      circles.forEach(el => { el.style.transform = ''; });
-      if (imgWrap) imgWrap.style.transform = '';
-    });
-  }
-})();
-
-/* ─── ANNOUNCEMENT MARQUEE: fill width so the loop never gaps on wide screens ─── */
-(function fillMarquee() {
-  const track = document.querySelector('.announcement-track');
-  if (!track) return;
-  const base = Array.from(track.children).map(n => n.cloneNode(true));
-  if (!base.length) return;
-  const setN = (n) => {
-    track.innerHTML = '';
-    for (let i = 0; i < n; i++) base.forEach(b => track.appendChild(b.cloneNode(true)));
+/* ─── SCROLL PROGRESS BAR ─── */
+(function scrollProgress() {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+  const onScroll = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
   };
-  const build = () => {
-    let sets = 1;
-    setN(sets);
-    while (track.scrollWidth < window.innerWidth && sets < 40) { sets++; setN(sets); }
-    const halfWidth = track.scrollWidth;
-    setN(sets * 2);
-    track.style.animationDuration = Math.max(12, halfWidth / 70) + 's';
-  };
-  build();
-  let t;
-  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(build, 250); });
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 })();
