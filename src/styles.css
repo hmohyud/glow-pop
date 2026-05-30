@@ -187,10 +187,13 @@
     }
     .hero-title .highlight {
       color: var(--pink-500);
-      background: linear-gradient(135deg, var(--pink-500), var(--pink-400));
+      background: linear-gradient(90deg, var(--pink-500), var(--pink-300), var(--pink-500));
+      background-size: 200% auto;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
+      animation: textShimmer 4s linear infinite;
     }
+    @keyframes textShimmer { to { background-position: 200% center; } }
     .hero-desc {
       font-size: 17px; line-height: 1.7; color: var(--dark-light);
       margin-bottom: 36px; max-width: 480px;
@@ -324,26 +327,40 @@
     }
     .product-image-frame img {
       width: 100%; height: auto; display: block;
-      border-radius: 20px;
+      border-radius: 20px; position: relative; z-index: 1;
       filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
+      animation: productFloat 5s ease-in-out infinite;
     }
-    .orbit-ring {
-      position: absolute; border: 2px dashed var(--pink-200);
-      border-radius: 50%; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation: orbitSpin 20s linear infinite;
+    @keyframes productFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
     }
-    .orbit-ring-1 { width: 110%; height: 110%; }
-    .orbit-ring-2 { width: 130%; height: 130%; animation-direction: reverse; animation-duration: 25s; }
-    .orbit-dot {
-      position: absolute; width: 18px; height: 18px; border-radius: 50%;
-      background: var(--pink-400); box-shadow: 0 0 15px rgba(255,105,180,0.4);
+    .product-glow {
+      position: absolute; inset: 12%; z-index: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,20,147,0.25) 0%, transparent 70%);
+      filter: blur(18px);
+      animation: productPulse 4s ease-in-out infinite;
     }
-    .orbit-dot:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
-    .orbit-dot:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
-    .orbit-dot:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
-    .orbit-dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
-    @keyframes orbitSpin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+    @keyframes productPulse {
+      0%, 100% { opacity: 0.45; transform: scale(0.95); }
+      50% { opacity: 0.85; transform: scale(1.1); }
+    }
+    .sparkle {
+      position: absolute; z-index: 2; width: 16px; height: 16px;
+      background: #fff;
+      clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
+      opacity: 0; filter: drop-shadow(0 0 6px rgba(255,105,180,0.9));
+      animation: sparkleTwinkle 3.2s ease-in-out infinite;
+    }
+    .sparkle-1 { top: 9%; left: 13%; animation-delay: 0s; }
+    .sparkle-2 { top: 16%; right: 11%; width: 11px; height: 11px; animation-delay: 0.9s; }
+    .sparkle-3 { bottom: 15%; left: 17%; width: 20px; height: 20px; animation-delay: 1.6s; }
+    .sparkle-4 { bottom: 24%; right: 15%; animation-delay: 2.3s; }
+    @keyframes sparkleTwinkle {
+      0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1) rotate(90deg); }
+    }
 
     .product-info { max-width: 480px; }
     .product-info .section-label { justify-content: flex-start; }
@@ -813,3 +830,10 @@
       box-shadow: 0 0 12px rgba(255, 20, 147, 0.45);
       z-index: 10001; transition: width 0.1s linear;
     }
+    .btn-ripple {
+      position: absolute; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(0); pointer-events: none;
+      animation: btnRipple 0.6s linear;
+    }
+    @keyframes btnRipple { to { transform: scale(2.5); opacity: 0; } }
