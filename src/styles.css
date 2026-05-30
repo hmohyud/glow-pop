@@ -348,9 +348,9 @@
     }
     .sparkle {
       position: absolute; z-index: 2; width: 16px; height: 16px;
-      background: #fff;
+      background: var(--pink-500);
       clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
-      opacity: 0; filter: drop-shadow(0 0 6px rgba(255,105,180,0.9));
+      opacity: 0; filter: drop-shadow(0 0 6px rgba(255, 20, 147, 0.6));
       animation: sparkleTwinkle 3.2s ease-in-out infinite;
     }
     .sparkle-1 { top: 9%; left: 13%; animation-delay: 0s; }
