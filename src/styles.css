@@ -540,6 +540,26 @@
       font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 8px;
     }
     .sugar-card p { font-size: 13.5px; line-height: 1.6; color: var(--dark-light); }
+    .freefrom {
+      max-width: 900px; margin: 48px auto 0; text-align: center;
+      position: relative; z-index: 1;
+    }
+    .freefrom-label {
+      display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--pink-500); margin-bottom: 16px;
+    }
+    .freefrom-pills {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+    }
+    .freefrom-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 50px;
+      background: var(--white); border: 1px solid var(--pink-200);
+      font-size: 13px; font-weight: 600; color: var(--pink-700);
+    }
+    .freefrom-pill::before {
+      content: '\2717'; color: var(--pink-400); font-weight: 700;
+    }
     .sugar-footnote {
       text-align: center; max-width: 620px; margin: 48px auto 0;
       font-style: italic; color: var(--dark-light); font-size: 15px;
@@ -567,7 +587,7 @@
     }
     .stats-grid {
       max-width: 1000px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
       text-align: center;
     }
     .stat-item { position: relative; }
@@ -749,8 +769,7 @@
       .product-info .section-label { justify-content: center; }
       .product-info .section-title { text-align: center; }
       .ingredients-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
-      .stat-item:nth-child(2)::after { display: none; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 768px) {
@@ -773,7 +792,7 @@
         grid-template-columns: 1.2fr 1fr 1fr;
         padding: 14px 16px; font-size: 13px;
       }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
       .stat-item::after { display: none !important; }
       .footer-grid { grid-template-columns: 1fr; gap: 40px; }
       .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
