@@ -21,8 +21,8 @@ function resizeCanvas() {
   const host = hostEl || document.body;
   cW = host.clientWidth || window.innerWidth;
   cH = host.clientHeight || window.innerHeight;
-  if (cW < 120) cW = window.innerWidth;
-  if (cH < 120) cH = window.innerHeight;
+  if (cW < 120) cW = window.innerWidth || 1200;
+  if (cH < 120) cH = 360;
   canvas.width = cW;
   canvas.height = cH;
 }
