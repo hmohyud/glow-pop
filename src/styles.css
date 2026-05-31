@@ -295,21 +295,13 @@
       66% { transform: translateY(10px) rotate(-2deg); }
     }
 
-    /* ─── GLOSSY 3D LOLLIPOP (WebGL, in Why section) ─── */
-    .why-section { position: relative; overflow: hidden; }
-    .why-section .section-header,
-    .why-section .comparison-table { position: relative; z-index: 2; }
-    #lolly3dMount {
-      position: absolute; z-index: 1; pointer-events: none;
-      left: max(8px, calc(50% - 660px)); top: 50%;
-      transform: translateY(-50%);
-      width: 300px; height: 460px;
+    /* ─── GLOSSY 3D LOLLIPOP (WebGL, inline beside the Why title) ─── */
+    .why-title { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .lolly3d-inline {
+      flex: 0 0 auto; width: 74px; height: 108px; pointer-events: none;
     }
-    #lolly3dMount canvas { display: block; }
-    @media (max-width: 1180px) {
-      #lolly3dMount { width: 220px; height: 340px; left: -6px; opacity: 0.92; }
-    }
-    @media (max-width: 880px) { #lolly3dMount { display: none; } }
+    .lolly3d-inline canvas { display: block; width: 100% !important; height: 100% !important; }
+    @media (max-width: 880px) { .lolly3d-inline { display: none; } }
 
     /* ─── SECTION COMMON ─── */
     section { position: relative; z-index: 1; }

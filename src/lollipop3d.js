@@ -22,7 +22,7 @@ async function init(mount) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, W / H, 0.1, 100);
-  camera.position.set(0, 0.4, 10);
+  camera.position.set(0, 0.4, 12.5);
 
   // Procedural studio environment (gradient) -> glossy reflections that read as "sheen".
   const envTex = makeEnvTexture();
@@ -51,9 +51,9 @@ async function init(mount) {
       clearcoat: 1.0,
       clearcoatRoughness: 0.06,   // wet, glassy candy shell
       envMapIntensity: 1.25,
-      sheen: 1.0,
-      sheenRoughness: 0.4,
-      sheenColor: new THREE.Color(0xffd6ec)
+      sheen: 0.8,
+      sheenRoughness: 0.35,
+      sheenColor: new THREE.Color(0xcfe6ff)
     })
   );
   candy.position.y = 1.55;
@@ -67,14 +67,14 @@ async function init(mount) {
   tilt.add(stick);
 
   // ── Lights ──
-  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-  const key = new THREE.DirectionalLight(0xffffff, 2.6);
+  scene.add(new THREE.AmbientLight(0xeaf2ff, 0.4));
+  const key = new THREE.DirectionalLight(0xf4f9ff, 2.5);
   key.position.set(4, 6, 6);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xffe3f2, 1.1);
+  const fill = new THREE.DirectionalLight(0xbfe0ff, 1.3);   // icy cool fill
   fill.position.set(-6, -1, 2);
   scene.add(fill);
-  const rim = new THREE.PointLight(0xffffff, 40, 50);
+  const rim = new THREE.PointLight(0xd6f0ff, 42, 50);        // cool rim glint
   rim.position.set(-3, 4, -4);
   scene.add(rim);
 
@@ -97,7 +97,7 @@ async function init(mount) {
   let frames = 0;
   function loop() {
     if (onScreen) {
-      if (!reduce) yaw.rotation.y += 0.0075;   // slow, elegant spin
+      if (!reduce) yaw.rotation.y += 0.0032;   // very slow, elegant spin
       candy.position.y = 1.55 + Math.sin(frames * 0.012) * 0.06; // tiny breathing bob
       renderer.render(scene, camera);
       frames++;
@@ -127,15 +127,16 @@ function makeEnvTexture() {
   const g = c.getContext('2d');
   const grad = g.createLinearGradient(0, 0, 0, 128);
   grad.addColorStop(0.00, '#ffffff');
-  grad.addColorStop(0.40, '#ffe7f3');
-  grad.addColorStop(0.62, '#ff9ccb');
-  grad.addColorStop(1.00, '#d11e7a');
+  grad.addColorStop(0.32, '#eaf4ff');
+  grad.addColorStop(0.58, '#cfe4ff');
+  grad.addColorStop(1.00, '#ff7ab8');
   g.fillStyle = grad; g.fillRect(0, 0, 32, 128);
-  // a couple of bright soft "softbox" blooms for lively highlights
-  g.globalAlpha = 0.9;
+  // bright cool "softbox" blooms for icy, lively highlights
+  g.globalAlpha = 0.95;
   g.fillStyle = '#ffffff';
-  g.beginPath(); g.ellipse(10, 26, 7, 16, 0, 0, Math.PI * 2); g.fill();
-  g.beginPath(); g.ellipse(24, 54, 4, 10, 0, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.ellipse(10, 24, 7, 17, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#dff1ff';
+  g.beginPath(); g.ellipse(24, 56, 4, 11, 0, 0, Math.PI * 2); g.fill();
   const tex = new THREE.CanvasTexture(c);
   tex.mapping = THREE.EquirectangularReflectionMapping;
   tex.colorSpace = THREE.SRGBColorSpace;
