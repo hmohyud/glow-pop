@@ -114,13 +114,6 @@
           <small>Pops</small>
           <div class="float-stick stick-2"></div>
         </div>
-        <div class="lolly3d" aria-hidden="true">
-          <div class="lolly3d-candy">
-            <div class="lolly3d-swirl"></div>
-            <span class="lolly3d-sheen"></span>
-          </div>
-          <div class="lolly3d-stick"></div>
-        </div>
       </div>
     </div>
   </section>
@@ -235,6 +228,7 @@
 
   <!-- WHY GLOW POP -->
   <section class="why-section section-pad">
+    <div id="lolly3dMount" aria-hidden="true"></div>
     <div class="section-header">
       <div class="section-label reveal">Why Glow Pop?</div>
       <h2 class="section-title reveal reveal-delay-1">
@@ -571,5 +565,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="src/main.js"></script>
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="src/lollipop3d.js"></script>
 </body>
 </html>
