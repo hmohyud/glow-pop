@@ -33,7 +33,7 @@ function makeNodes() {
   nodes.length = 0;
   for (let i = 0; i < count; i++) {
     const dir = Math.random() * Math.PI * 2;
-    const speed = 0.35 + Math.random() * 0.25;
+    const speed = 0.05 + Math.random() * 0.036;
     nodes.push({
       x: Math.random() * cW, y: Math.random() * cH,
       vx: Math.cos(dir) * speed, vy: Math.sin(dir) * speed,
