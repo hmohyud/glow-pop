@@ -53,6 +53,8 @@ if (hostEl) {
   hostEl.addEventListener('mouseleave', () => { mouse.active = false; mouse.x = mouse.y = -999; });
 }
 
+const FRICTION = 0.99; // added speed bleeds off so pops coast back to the slow drift
+
 function animateCanvas() {
   ctx.clearRect(0, 0, cW, cH);
   ctx.globalAlpha = 1;
@@ -62,9 +64,7 @@ function animateCanvas() {
       const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy);
       if (d < 140 && d > 0.1) { const f = (1 - d / 140) * 0.8; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
     }
-    // friction: any added speed bleeds off so they coast back down to the slow drift
-    friction = 0.99;
-    n.vx *= friction; n.vy *= friction;
+    n.vx *= FRICTION; n.vy *= FRICTION;
     // clamp to a sane maximum
     let sp = Math.hypot(n.vx, n.vy) || 1;
     if (sp > 16) { n.vx = (n.vx / sp) * 16; n.vy = (n.vy / sp) * 16; sp = 16; }
