@@ -43,7 +43,7 @@ async function init(mount) {
   scene.add(yaw);
 
   const candy = new THREE.Mesh(
-    new THREE.SphereGeometry(1.9, 96, 96),
+    new THREE.SphereGeometry(1.33, 96, 96),
     new THREE.MeshPhysicalMaterial({
       color: 0xff2b95,                       // solid Glow-Pop pink
       roughness: 0.16,
