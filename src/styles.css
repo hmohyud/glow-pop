@@ -301,10 +301,13 @@
     .why-section .comparison-table { position: relative; z-index: 2; }
     #lolly3dMount {
       position: absolute; z-index: 1; pointer-events: none;
-      left: 50%; top: 20px; transform: translateX(-50%);
-      width: 300px; height: 400px; opacity: 0.85;
+      left: calc(50% - 560px); top: 50%; transform: translateY(-50%);
+      width: 600px; height: 760px; opacity: 0.6;
     }
     #lolly3dMount canvas { display: block; width: 100% !important; height: 100% !important; }
+    @media (max-width: 1180px) {
+      #lolly3dMount { width: 470px; height: 600px; left: -90px; opacity: 0.5; }
+    }
     @media (max-width: 880px) { #lolly3dMount { display: none; } }
 
     /* ─── SECTION COMMON ─── */

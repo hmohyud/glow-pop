@@ -1,5 +1,6 @@
 // Genuine 3D glossy lollipop (WebGL via Three.js) for the "Why Glow Pop" section.
-// Solid pink candy + glistening sheen (no stripes), rotating elegantly.
+// Solid pink candy + glistening cool sheen (no stripes), rotating slowly.
+// Sits behind the left of the title/chart as an off-center background accent.
 import * as THREE from 'three';
 
 const mount = document.getElementById('lolly3dMount');
@@ -9,20 +10,21 @@ if (mount) {
 
 async function init(mount) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let W = mount.clientWidth || 300;
-  let H = mount.clientHeight || 460;
+  let W = mount.clientWidth || 600;
+  let H = mount.clientHeight || 760;
 
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(W, H);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.2;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   mount.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, W / H, 0.1, 100);
-  camera.position.set(0, 0.2, 14);
+  camera.position.set(0, 0.3, 13);
+  camera.lookAt(0, 0.3, 0);
 
   // Procedural studio environment (gradient) -> glossy reflections that read as "sheen".
   const envTex = makeEnvTexture();
@@ -34,52 +36,52 @@ async function init(mount) {
 
   // ── Lollipop assembly ──
   // yaw (spins around world Y) > tilt (fixed lean) > candy + stick.
-  // The lean makes the spin visibly 3D: the stick sweeps a gentle cone and the
-  // specular sheen glides across the solid candy, with no stripes needed.
   const yaw = new THREE.Group();
   const tilt = new THREE.Group();
-  tilt.rotation.z = 0.26;
+  tilt.rotation.z = 0.24;
   yaw.add(tilt);
   scene.add(yaw);
 
   const candy = new THREE.Mesh(
-    new THREE.SphereGeometry(0.84, 96, 96),
+    new THREE.SphereGeometry(1.9, 96, 96),
     new THREE.MeshPhysicalMaterial({
-      color: 0xff2b95,            // solid Glow-Pop pink
+      color: 0xff2b95,                       // solid Glow-Pop pink
       roughness: 0.16,
       metalness: 0.0,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.06,   // wet, glassy candy shell
-      envMapIntensity: 1.55,
+      clearcoatRoughness: 0.06,              // wet, glassy candy shell
+      envMapIntensity: 1.35,
+      emissive: new THREE.Color(0xff2b95),   // self-glow floor -> silhouette can never go black
+      emissiveIntensity: 0.4,
       sheen: 0.8,
       sheenRoughness: 0.35,
       sheenColor: new THREE.Color(0xcfe6ff)
     })
   );
-  candy.position.y = 1.25;
+  candy.position.y = 1.5;
   tilt.add(candy);
 
   const stick = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.12, 0.12, 2.7, 40),
+    new THREE.CylinderGeometry(0.13, 0.13, 3.4, 40),
     new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.35, clearcoat: 0.5, envMapIntensity: 0.8 })
   );
-  stick.position.y = -1.05;
+  stick.position.y = -1.1;
   tilt.add(stick);
 
-  // ── Lights ──
-  scene.add(new THREE.AmbientLight(0xfff2f8, 1.15));         // strong base so no edge goes black
+  // ── Lights (bright & wrap-around so no edge goes dark) ──
+  scene.add(new THREE.AmbientLight(0xfff2f8, 1.5));
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(4, 6, 6);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xcfe6ff, 1.7);    // icy cool fill, brightens the shadow side
+  const fill = new THREE.DirectionalLight(0xcfe6ff, 1.9);   // icy cool fill, brightens shadow side
   fill.position.set(-6, -1, 2);
   scene.add(fill);
-  const under = new THREE.DirectionalLight(0xffe6f2, 1.0);   // soft bounce from below to kill the dark rim
+  const under = new THREE.DirectionalLight(0xffe6f2, 1.2);  // bounce from below -> kills dark rim
   under.position.set(0, -6, 3);
   scene.add(under);
-  const rim = new THREE.PointLight(0xeaf6ff, 36, 60);        // cool rim glint
-  rim.position.set(-3, 4, -4);
-  scene.add(rim);
+  const back = new THREE.DirectionalLight(0xffd9ec, 1.1);   // back light wraps the silhouette
+  back.position.set(0, 1, -6);
+  scene.add(back);
 
   function resize() {
     W = mount.clientWidth || W;
@@ -101,7 +103,7 @@ async function init(mount) {
   function loop() {
     if (onScreen) {
       if (!reduce) yaw.rotation.y += 0.0032;   // very slow, elegant spin
-      candy.position.y = 1.25 + Math.sin(frames * 0.012) * 0.04; // tiny breathing bob
+      candy.position.y = 1.5 + Math.sin(frames * 0.012) * 0.05; // tiny breathing bob
       renderer.render(scene, camera);
       frames++;
     }
@@ -130,9 +132,9 @@ function makeEnvTexture() {
   const g = c.getContext('2d');
   const grad = g.createLinearGradient(0, 0, 0, 128);
   grad.addColorStop(0.00, '#ffffff');
-  grad.addColorStop(0.32, '#eaf4ff');
-  grad.addColorStop(0.58, '#cfe4ff');
-  grad.addColorStop(1.00, '#ff7ab8');
+  grad.addColorStop(0.40, '#f3f8ff');
+  grad.addColorStop(0.72, '#ffe6f3');
+  grad.addColorStop(1.00, '#ffd2ea');   // kept light all the way down -> no dark grazing reflections
   g.fillStyle = grad; g.fillRect(0, 0, 32, 128);
   // bright cool "softbox" blooms for icy, lively highlights
   g.globalAlpha = 0.95;
