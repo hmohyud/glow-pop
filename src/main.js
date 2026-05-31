@@ -58,17 +58,21 @@ function animateCanvas() {
   ctx.clearRect(0, 0, cW, cH);
   ctx.globalAlpha = 1;
   nodes.forEach(n => {
-    // gentle cursor push (deflects direction, not permanent speed)
+    // cursor push accelerates the pops (repel) above their resting speed
     if (mouse.active) {
       const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy);
-      if (d < 110 && d > 0.1) { const f = (1 - d / 110) * 0.4; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
+      if (d < 140 && d > 0.1) { const f = (1 - d / 140) * 0.8; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
     }
     // tilt nudges the travel direction
-    if (tiltActive) { n.vx += tiltX * 0.05; n.vy += tiltY * 0.05; }
-    // renormalize back to the node's steady glide speed so motion stays smooth & constant
-    const sp = Math.hypot(n.vx, n.vy) || 1;
-    const target = n.speed + (tiltActive ? Math.hypot(tiltX, tiltY) * 0.5 : 0);
-    n.vx = (n.vx / sp) * target; n.vy = (n.vy / sp) * target;
+    if (tiltActive) { n.vx += tiltX * 0.06; n.vy += tiltY * 0.06; }
+    // friction: any added speed bleeds off so they coast back down to the slow drift
+    n.vx *= 0.95; n.vy *= 0.95;
+    // clamp to a sane maximum
+    let sp = Math.hypot(n.vx, n.vy) || 1;
+    if (sp > 16) { n.vx = (n.vx / sp) * 16; n.vy = (n.vy / sp) * 16; sp = 16; }
+    // floor: never drop below the slow resting glide speed (keeps them drifting, never stalls)
+    const minSp = n.speed + (tiltActive ? Math.hypot(tiltX, tiltY) * 0.4 : 0);
+    if (sp < minSp) { n.vx = (n.vx / sp) * minSp; n.vy = (n.vy / sp) * minSp; }
     // glide
     n.x += n.vx; n.y += n.vy; n.ang += 0.003;
     // bounce off edges
