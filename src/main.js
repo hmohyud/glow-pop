@@ -99,19 +99,46 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-/* ─── MOBILE MENU ─── */
+/* ─── MOBILE MENU (radial fan-out) ─── */
 const mobileToggle = document.getElementById('mobileToggle');
 const navLinks = document.getElementById('navLinks');
-mobileToggle.addEventListener('click', () => {
-  mobileToggle.classList.toggle('active');
-  navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    mobileToggle.classList.remove('active');
-    navLinks.classList.remove('open');
+const navBackdrop = document.getElementById('navBackdrop');
+const navItems = navLinks ? [...navLinks.querySelectorAll('li a')] : [];
+
+// Place each item along a quarter-arc fanning down-and-left from the toggle,
+// with a staggered pop. Computed so it stays evenly arced for any item count.
+function layoutFan() {
+  const n = navItems.length;
+  const R = 134;
+  navItems.forEach((a, i) => {
+    const t = n === 1 ? 0 : i / (n - 1);          // 0 .. 1
+    const ang = (12 + t * 76) * Math.PI / 180;    // ~12° (down) -> ~88° (left)
+    const dx = -Math.sin(ang) * R;                // left = negative x
+    const dy = Math.cos(ang) * R;                 // down = positive y
+    a.style.setProperty('--tx', dx.toFixed(1) + 'px');
+    a.style.setProperty('--ty', dy.toFixed(1) + 'px');
+    a.style.setProperty('--d', (i * 55) + 'ms');  // stagger the pop
   });
-});
+}
+
+function closeMenu() {
+  navLinks.classList.remove('open');
+  mobileToggle.classList.remove('active');
+  if (navBackdrop) navBackdrop.classList.remove('show');
+}
+
+if (mobileToggle && navLinks) {
+  mobileToggle.addEventListener('click', () => {
+    const opening = !navLinks.classList.contains('open');
+    if (opening) layoutFan();
+    navLinks.classList.toggle('open', opening);
+    mobileToggle.classList.toggle('active', opening);
+    if (navBackdrop) navBackdrop.classList.toggle('show', opening);
+  });
+  navItems.forEach(a => a.addEventListener('click', closeMenu));
+  if (navBackdrop) navBackdrop.addEventListener('click', closeMenu);
+  window.addEventListener('resize', () => { if (navLinks.classList.contains('open')) layoutFan(); });
+}
 
 /* ─── SCROLL REVEAL (IntersectionObserver) ─── */
 function initAnimations() {
