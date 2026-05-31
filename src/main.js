@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
 const canvas = document.getElementById('lollipopCanvas');
 const ctx = canvas.getContext('2d');
 const hostEl = document.querySelector('.stats-section');
-const nodeColors = ['#FF1493', '#FF69B4', '#19C3D0', '#FF8A3D', '#FFC400', '#34C77E', '#A855F7'];
+const nodeColors = ['#FF1493', '#FF69B4', '#FF87BE', '#E91E8C', '#FFB6D9'];
 let cW = 0, cH = 0;
 let tiltX = 0, tiltY = 0, tiltActive = false;
 
@@ -32,9 +32,12 @@ function makeNodes() {
   const count = window.innerWidth < 640 ? 9 : 16;
   nodes.length = 0;
   for (let i = 0; i < count; i++) {
+    const dir = Math.random() * Math.PI * 2;
+    const speed = 0.35 + Math.random() * 0.25;
     nodes.push({
       x: Math.random() * cW, y: Math.random() * cH,
-      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+      vx: Math.cos(dir) * speed, vy: Math.sin(dir) * speed,
+      speed: speed,
       r: Math.random() * 5 + 4,
       color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
       ang: Math.random() * Math.PI * 2
@@ -55,16 +58,24 @@ function animateCanvas() {
   ctx.clearRect(0, 0, cW, cH);
   ctx.globalAlpha = 1;
   nodes.forEach(n => {
+    // gentle cursor push (deflects direction, not permanent speed)
     if (mouse.active) {
       const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy);
-      if (d < 110 && d > 0.1) { const f = (1 - d / 110) * 0.5; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
+      if (d < 110 && d > 0.1) { const f = (1 - d / 110) * 0.4; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
     }
-    if (tiltActive) { n.vx += tiltX * 0.06; n.vy += tiltY * 0.06; }
-    n.x += n.vx; n.y += n.vy; n.ang += 0.003; n.vx *= 0.99; n.vy *= 0.99;
-    if (!tiltActive && Math.abs(n.vx) < 0.04 && Math.abs(n.vy) < 0.04) { n.vx += (Math.random() - 0.5) * 0.08; n.vy += (Math.random() - 0.5) * 0.08; }
-    if (n.x < 0 || n.x > cW) n.vx *= -1;
-    if (n.y < 0 || n.y > cH) n.vy *= -1;
-    n.x = Math.max(0, Math.min(cW, n.x)); n.y = Math.max(0, Math.min(cH, n.y));
+    // tilt nudges the travel direction
+    if (tiltActive) { n.vx += tiltX * 0.05; n.vy += tiltY * 0.05; }
+    // renormalize back to the node's steady glide speed so motion stays smooth & constant
+    const sp = Math.hypot(n.vx, n.vy) || 1;
+    const target = n.speed + (tiltActive ? Math.hypot(tiltX, tiltY) * 0.5 : 0);
+    n.vx = (n.vx / sp) * target; n.vy = (n.vy / sp) * target;
+    // glide
+    n.x += n.vx; n.y += n.vy; n.ang += 0.003;
+    // bounce off edges
+    if (n.x < n.r) { n.x = n.r; n.vx = Math.abs(n.vx); }
+    if (n.x > cW - n.r) { n.x = cW - n.r; n.vx = -Math.abs(n.vx); }
+    if (n.y < n.r) { n.y = n.r; n.vy = Math.abs(n.vy); }
+    if (n.y > cH - n.r) { n.y = cH - n.r; n.vy = -Math.abs(n.vy); }
     ctx.save(); ctx.translate(n.x, n.y); ctx.rotate(n.ang);
     ctx.strokeStyle = 'rgba(255,150,200,0.45)'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(0, n.r); ctx.lineTo(0, n.r + n.r * 1.7); ctx.stroke();
