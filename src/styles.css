@@ -353,10 +353,6 @@
       opacity: 0; filter: drop-shadow(0 0 6px rgba(255, 20, 147, 0.6));
       animation: sparkleTwinkle 3.2s ease-in-out infinite;
     }
-    .sparkle-1 { top: 9%; left: 13%; animation-delay: 0s; }
-    .sparkle-2 { top: 16%; right: 11%; width: 11px; height: 11px; animation-delay: 0.9s; }
-    .sparkle-3 { bottom: 15%; left: 17%; width: 20px; height: 20px; animation-delay: 1.6s; }
-    .sparkle-4 { bottom: 24%; right: 15%; animation-delay: 2.3s; }
     @keyframes sparkleTwinkle {
       0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
       50% { opacity: 1; transform: scale(1) rotate(90deg); }
