@@ -602,11 +602,13 @@
       background: var(--white);
       border-top: 1px solid var(--pink-100);
       border-bottom: 1px solid var(--pink-100);
+      position: relative; overflow: hidden;
     }
     .stats-grid {
       max-width: 1000px; margin: 0 auto;
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
       text-align: center;
+      position: relative; z-index: 2;
     }
     .stat-item { position: relative; }
     .stat-item:not(:last-child)::after {

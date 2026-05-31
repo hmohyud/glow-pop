@@ -12,12 +12,12 @@ window.addEventListener('load', () => {
 /* ─── HERO LOLLIPOP CONSTELLATION (interactive) ─── */
 const canvas = document.getElementById('lollipopCanvas');
 const ctx = canvas.getContext('2d');
-const heroEl = document.getElementById('hero');
+const hostEl = document.querySelector('.stats-section');
 const nodeColors = ['#FF1493', '#FF69B4', '#19C3D0', '#FF8A3D', '#FFC400', '#34C77E', '#A855F7'];
 let cW = 0, cH = 0;
 
 function resizeCanvas() {
-  const host = heroEl || document.body;
+  const host = hostEl || document.body;
   cW = host.clientWidth || window.innerWidth;
   cH = host.clientHeight || window.innerHeight;
   if (cW < 120) cW = window.innerWidth;
@@ -28,7 +28,7 @@ function resizeCanvas() {
 
 const nodes = [];
 function makeNodes() {
-  const count = window.innerWidth < 640 ? 12 : 22;
+  const count = window.innerWidth < 640 ? 9 : 16;
   nodes.length = 0;
   for (let i = 0; i < count; i++) {
     nodes.push({
@@ -42,12 +42,12 @@ function makeNodes() {
 }
 
 const mouse = { x: -999, y: -999, active: false };
-if (heroEl) {
-  heroEl.addEventListener('mousemove', (e) => {
+if (hostEl) {
+  hostEl.addEventListener('mousemove', (e) => {
     const r = canvas.getBoundingClientRect();
     mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.active = true;
   });
-  heroEl.addEventListener('mouseleave', () => { mouse.active = false; mouse.x = mouse.y = -999; });
+  hostEl.addEventListener('mouseleave', () => { mouse.active = false; mouse.x = mouse.y = -999; });
 }
 
 function animateCanvas() {
@@ -61,14 +61,6 @@ function animateCanvas() {
         ctx.globalAlpha = (1 - d / 130) * 0.26;
         ctx.strokeStyle = '#FF69B4'; ctx.lineWidth = 1.3;
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-      }
-    }
-    if (mouse.active) {
-      const dx = a.x - mouse.x, dy = a.y - mouse.y, d = Math.hypot(dx, dy);
-      if (d < 170) {
-        ctx.globalAlpha = (1 - d / 170) * 0.5;
-        ctx.strokeStyle = a.color; ctx.lineWidth = 1.6;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
       }
     }
   }
