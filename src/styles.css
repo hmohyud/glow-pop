@@ -67,7 +67,7 @@
 
     /* ─── CANVAS ─── */
     #lollipopCanvas {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
     }
 
     /* ─── ANNOUNCEMENT BAR ─── */
@@ -171,7 +171,7 @@
     .hero-inner {
       max-width: 1400px; margin: 0 auto; width: 100%;
       display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
-      position: relative; z-index: 1;
+      position: relative; z-index: 2;
     }
     .hero-content { max-width: 600px; }
     .hero-badge {
