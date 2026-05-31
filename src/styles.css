@@ -150,7 +150,9 @@
       min-height: calc(100vh - 112px);
       display: flex; align-items: center;
       padding: 60px 48px;
-      background: linear-gradient(135deg, var(--pink-50) 0%, var(--cream) 50%, var(--pink-100) 100%);
+      background:
+        url("hero-pattern.svg") 0 0 / 130px 130px repeat,
+        linear-gradient(135deg, var(--pink-50) 0%, var(--cream) 50%, var(--pink-100) 100%);
       overflow: hidden;
     }
     .hero-bg-circle {
