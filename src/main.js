@@ -18,8 +18,10 @@ let cW = 0, cH = 0;
 
 function resizeCanvas() {
   const host = heroEl || document.body;
-  cW = host.clientWidth;
-  cH = host.clientHeight;
+  cW = host.clientWidth || window.innerWidth;
+  cH = host.clientHeight || window.innerHeight;
+  if (cW < 120) cW = window.innerWidth;
+  if (cH < 120) cH = window.innerHeight;
   canvas.width = cW;
   canvas.height = cH;
 }
