@@ -93,7 +93,8 @@ function animateCanvas() {
 resizeCanvas();
 makeNodes();
 animateCanvas();
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', () => { resizeCanvas(); });
+window.addEventListener('load', () => { resizeCanvas(); makeNodes(); });
 
 /* ─── NAVBAR SCROLL ─── */
 const navbar = document.getElementById('navbar');
