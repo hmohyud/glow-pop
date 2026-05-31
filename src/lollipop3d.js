@@ -43,14 +43,14 @@ async function init(mount) {
   scene.add(yaw);
 
   const candy = new THREE.Mesh(
-    new THREE.SphereGeometry(1.2, 96, 96),
+    new THREE.SphereGeometry(0.84, 96, 96),
     new THREE.MeshPhysicalMaterial({
       color: 0xff2b95,            // solid Glow-Pop pink
       roughness: 0.16,
       metalness: 0.0,
       clearcoat: 1.0,
       clearcoatRoughness: 0.06,   // wet, glassy candy shell
-      envMapIntensity: 1.25,
+      envMapIntensity: 1.55,
       sheen: 0.8,
       sheenRoughness: 0.35,
       sheenColor: new THREE.Color(0xcfe6ff)
@@ -67,14 +67,17 @@ async function init(mount) {
   tilt.add(stick);
 
   // ── Lights ──
-  scene.add(new THREE.AmbientLight(0xeaf2ff, 0.4));
-  const key = new THREE.DirectionalLight(0xf4f9ff, 2.5);
+  scene.add(new THREE.AmbientLight(0xfff2f8, 1.15));         // strong base so no edge goes black
+  const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(4, 6, 6);
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xbfe0ff, 1.3);   // icy cool fill
+  const fill = new THREE.DirectionalLight(0xcfe6ff, 1.7);    // icy cool fill, brightens the shadow side
   fill.position.set(-6, -1, 2);
   scene.add(fill);
-  const rim = new THREE.PointLight(0xd6f0ff, 42, 50);        // cool rim glint
+  const under = new THREE.DirectionalLight(0xffe6f2, 1.0);   // soft bounce from below to kill the dark rim
+  under.position.set(0, -6, 3);
+  scene.add(under);
+  const rim = new THREE.PointLight(0xeaf6ff, 36, 60);        // cool rim glint
   rim.position.set(-3, 4, -4);
   scene.add(rim);
 
