@@ -15,6 +15,7 @@ const ctx = canvas.getContext('2d');
 const hostEl = document.querySelector('.stats-section');
 const nodeColors = ['#FF1493', '#FF69B4', '#19C3D0', '#FF8A3D', '#FFC400', '#34C77E', '#A855F7'];
 let cW = 0, cH = 0;
+let tiltX = 0, tiltY = 0, tiltActive = false;
 
 function resizeCanvas() {
   const host = hostEl || document.body;
@@ -52,26 +53,15 @@ if (hostEl) {
 
 function animateCanvas() {
   ctx.clearRect(0, 0, cW, cH);
-  for (let i = 0; i < nodes.length; i++) {
-    const a = nodes[i];
-    for (let j = i + 1; j < nodes.length; j++) {
-      const b = nodes[j];
-      const dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
-      if (d < 130) {
-        ctx.globalAlpha = (1 - d / 130) * 0.26;
-        ctx.strokeStyle = '#FF69B4'; ctx.lineWidth = 1.3;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-      }
-    }
-  }
   ctx.globalAlpha = 1;
   nodes.forEach(n => {
     if (mouse.active) {
       const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy);
       if (d < 110 && d > 0.1) { const f = (1 - d / 110) * 0.5; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
     }
+    if (tiltActive) { n.vx += tiltX * 0.06; n.vy += tiltY * 0.06; }
     n.x += n.vx; n.y += n.vy; n.ang += 0.003; n.vx *= 0.99; n.vy *= 0.99;
-    if (Math.abs(n.vx) < 0.04 && Math.abs(n.vy) < 0.04) { n.vx += (Math.random() - 0.5) * 0.08; n.vy += (Math.random() - 0.5) * 0.08; }
+    if (!tiltActive && Math.abs(n.vx) < 0.04 && Math.abs(n.vy) < 0.04) { n.vx += (Math.random() - 0.5) * 0.08; n.vy += (Math.random() - 0.5) * 0.08; }
     if (n.x < 0 || n.x > cW) n.vx *= -1;
     if (n.y < 0 || n.y > cH) n.vy *= -1;
     n.x = Math.max(0, Math.min(cW, n.x)); n.y = Math.max(0, Math.min(cH, n.y));
@@ -89,6 +79,34 @@ makeNodes();
 animateCanvas();
 window.addEventListener('resize', () => { resizeCanvas(); });
 window.addEventListener('load', () => { resizeCanvas(); makeNodes(); });
+
+/* ─── TILT INTERACTION (mobile gyroscope) ─── */
+(function tilt() {
+  let baseB = null, baseG = null;
+  function onOrient(e) {
+    if (e.beta == null || e.gamma == null) return;
+    if (baseB === null) { baseB = e.beta; baseG = e.gamma; }       // calibrate to rest position
+    const dG = Math.max(-35, Math.min(35, e.gamma - baseG));        // left/right tilt
+    const dB = Math.max(-35, Math.min(35, e.beta - baseB));         // front/back tilt
+    tiltX = dG / 35; tiltY = dB / 35; tiltActive = true;
+  }
+  function enable() {
+    const DO = window.DeviceOrientationEvent;
+    if (!DO) return;
+    if (typeof DO.requestPermission === 'function') {              // iOS 13+: needs a user gesture
+      DO.requestPermission().then(state => {
+        if (state === 'granted') window.addEventListener('deviceorientation', onOrient);
+      }).catch(() => {});
+    } else {                                                        // Android / others: just listen
+      window.addEventListener('deviceorientation', onOrient);
+    }
+  }
+  // First tap anywhere enables tilt (satisfies iOS gesture requirement; harmless elsewhere).
+  window.addEventListener('touchend', function once() {
+    window.removeEventListener('touchend', once);
+    enable();
+  }, { passive: true });
+})();
 
 /* ─── NAVBAR SCROLL ─── */
 const navbar = document.getElementById('navbar');
