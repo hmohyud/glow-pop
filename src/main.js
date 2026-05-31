@@ -15,7 +15,6 @@ const ctx = canvas.getContext('2d');
 const hostEl = document.querySelector('.stats-section');
 const nodeColors = ['#FF1493', '#FF69B4', '#FF87BE', '#E91E8C', '#FFB6D9'];
 let cW = 0, cH = 0;
-let tiltX = 0, tiltY = 0, tiltActive = false;
 
 function resizeCanvas() {
   const host = hostEl || document.body;
@@ -63,8 +62,6 @@ function animateCanvas() {
       const dx = n.x - mouse.x, dy = n.y - mouse.y, d = Math.hypot(dx, dy);
       if (d < 140 && d > 0.1) { const f = (1 - d / 140) * 0.8; n.vx += (dx / d) * f; n.vy += (dy / d) * f; }
     }
-    // tilt nudges the travel direction
-    if (tiltActive) { n.vx += tiltX * 0.06; n.vy += tiltY * 0.06; }
     // friction: any added speed bleeds off so they coast back down to the slow drift
     friction = 0.99;
     n.vx *= friction; n.vy *= friction;
@@ -72,7 +69,7 @@ function animateCanvas() {
     let sp = Math.hypot(n.vx, n.vy) || 1;
     if (sp > 16) { n.vx = (n.vx / sp) * 16; n.vy = (n.vy / sp) * 16; sp = 16; }
     // floor: never drop below the slow resting glide speed (keeps them drifting, never stalls)
-    const minSp = n.speed + (tiltActive ? Math.hypot(tiltX, tiltY) * 0.4 : 0);
+    const minSp = n.speed;
     if (sp < minSp) { n.vx = (n.vx / sp) * minSp; n.vy = (n.vy / sp) * minSp; }
     // glide
     n.x += n.vx; n.y += n.vy; n.ang += 0.003;
@@ -95,26 +92,6 @@ makeNodes();
 animateCanvas();
 window.addEventListener('resize', () => { resizeCanvas(); });
 window.addEventListener('load', () => { resizeCanvas(); makeNodes(); });
-
-/* ─── TILT INTERACTION (mobile gyroscope) ─── */
-(function tilt() {
-  const DO = window.DeviceOrientationEvent;
-  if (!DO) return;
-  // iOS 13+ exposes requestPermission() and would force an "Allow Motion Access?" popup.
-  // We deliberately skip it so NO permission prompt ever appears - iOS just keeps the gentle
-  // drifting animation. Android (and others) need no permission over HTTPS, so we attach the
-  // listener directly and tilt works automatically with no prompt or tap.
-  if (typeof DO.requestPermission === "function") return;
-
-  let baseB = null, baseG = null;
-  window.addEventListener("deviceorientation", (ev) => {
-    if (ev.beta == null || ev.gamma == null) return;
-    if (baseB === null) { baseB = ev.beta; baseG = ev.gamma; }
-    const dG = Math.max(-35, Math.min(35, ev.gamma - baseG));
-    const dB = Math.max(-35, Math.min(35, ev.beta - baseB));
-    tiltX = dG / 35; tiltY = dB / 35; tiltActive = true;
-  });
-})();
 
 /* ─── NAVBAR SCROLL ─── */
 const navbar = document.getElementById('navbar');
