@@ -66,7 +66,8 @@ function animateCanvas() {
     // tilt nudges the travel direction
     if (tiltActive) { n.vx += tiltX * 0.06; n.vy += tiltY * 0.06; }
     // friction: any added speed bleeds off so they coast back down to the slow drift
-    n.vx *= 0.95; n.vy *= 0.95;
+    friction = 0.99;
+    n.vx *= friction; n.vy *= friction;
     // clamp to a sane maximum
     let sp = Math.hypot(n.vx, n.vy) || 1;
     if (sp > 16) { n.vx = (n.vx / sp) * 16; n.vy = (n.vy / sp) * 16; sp = 16; }
