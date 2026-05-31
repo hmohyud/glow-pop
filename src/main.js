@@ -105,39 +105,126 @@ const navLinks = document.getElementById('navLinks');
 const navBackdrop = document.getElementById('navBackdrop');
 const navItems = navLinks ? [...navLinks.querySelectorAll('li a')] : [];
 
-// Place each item along a quarter-arc fanning down-and-left from the toggle,
-// with a staggered pop. Computed so it stays evenly arced for any item count.
-function layoutFan() {
+// Fan items out along a quarter-arc swept from the toggle. Positions are computed
+// from the MEASURED toggle + each item's real layout center, and the radius is
+// derived from a minimum-gap so dots pack as tightly as possible WITHOUT
+// overlapping — staying as close to the pivot as the count allows. Transforms are
+// inline so they always win, with a staggered delay for a lively cascade.
+const FAN_GAP = 64;        // min distance between dot centers (dot is 56px)
+const FAN_A0 = 12 * Math.PI / 180;   // first item angle (≈ straight down)
+const FAN_A1 = 86 * Math.PI / 180;   // last item angle (≈ straight left)
+
+// Hand-tuned positions (translate offsets, in px, from each item's anchor).
+// Captured with the drag tool below; index matches DOM order
+// (0 Benefits, 1 Ingredients, 2 How It Works, 3 FAQ, 4 Shop Now).
+const FAN_POS = null;  // e.g. [[-40,120],[-150,150], ...]  — null = auto-arc
+
+function autoArc() {
+  // Radius = smallest that keeps adjacent dots FAN_GAP apart on the arc, so dots
+  // pack as tightly as possible without overlapping.
+  navItems.forEach(a => { a.style.transition = 'none'; a.style.transform = 'none'; });
+  void navLinks.offsetWidth;
+  const tr = mobileToggle.getBoundingClientRect();
+  const pivot = { x: tr.left + tr.width / 2, y: tr.top + tr.height / 2 };
+  const base = navItems.map(a => {
+    const d = a.querySelector('.nav-dot').getBoundingClientRect();
+    return { x: d.left + d.width / 2, y: d.top + d.height / 2 };
+  });
+  navItems.forEach(a => { a.style.transform = 'translate(0,0) scale(0.2)'; });
+  void navLinks.offsetWidth;
   const n = navItems.length;
-  const R = 134;
+  const step = n > 1 ? (FAN_A1 - FAN_A0) / (n - 1) : 0;
+  let R = step > 0 ? FAN_GAP / (2 * Math.sin(step / 2)) : 120;
+  R = Math.max(96, Math.min(R, 230));
+  return navItems.map((a, i) => {
+    const ang = FAN_A0 + step * i;
+    return [ +(pivot.x - Math.sin(ang) * R - base[i].x).toFixed(1),
+             +(pivot.y + Math.cos(ang) * R - base[i].y).toFixed(1) ];
+  });
+}
+
+function openFan() {
+  if (!navItems.length) return;
+  const pos = FAN_POS || autoArc();
   navItems.forEach((a, i) => {
-    const t = n === 1 ? 0 : i / (n - 1);          // 0 .. 1
-    const ang = (12 + t * 76) * Math.PI / 180;    // ~12° (down) -> ~88° (left)
-    const dx = -Math.sin(ang) * R;                // left = negative x
-    const dy = Math.cos(ang) * R;                 // down = positive y
-    a.style.setProperty('--tx', dx.toFixed(1) + 'px');
-    a.style.setProperty('--ty', dy.toFixed(1) + 'px');
-    a.style.setProperty('--d', (i * 55) + 'ms');  // stagger the pop
+    const [dx, dy] = pos[i] || [0, 0];
+    a.dataset.dx = dx; a.dataset.dy = dy;
+    a.style.transition = '';
+    a.style.transitionDelay = (i * 55) + 'ms';
+    a.style.transform = `translate(${dx}px, ${dy}px) scale(1)`;
+    a.style.opacity = '1';
+    a.style.pointerEvents = 'auto';
+  });
+}
+
+function closeFan() {
+  const n = navItems.length;
+  navItems.forEach((a, i) => {
+    a.style.transitionDelay = ((n - 1 - i) * 35) + 'ms'; // reverse cascade in
+    a.style.transform = 'translate(0, 0) scale(0.2)';
+    a.style.opacity = '0';
+    a.style.pointerEvents = 'none';
   });
 }
 
 function closeMenu() {
   navLinks.classList.remove('open');
   mobileToggle.classList.remove('active');
+  document.body.classList.remove('menu-open');
   if (navBackdrop) navBackdrop.classList.remove('show');
+  closeFan();
 }
 
 if (mobileToggle && navLinks) {
   mobileToggle.addEventListener('click', () => {
     const opening = !navLinks.classList.contains('open');
-    if (opening) layoutFan();
     navLinks.classList.toggle('open', opening);
     mobileToggle.classList.toggle('active', opening);
+    document.body.classList.toggle('menu-open', opening);
     if (navBackdrop) navBackdrop.classList.toggle('show', opening);
+    if (opening) openFan(); else closeFan();
   });
-  navItems.forEach(a => a.addEventListener('click', closeMenu));
+  navItems.forEach(a => a.addEventListener('click', (e) => {
+    if (a._dragged) { e.preventDefault(); return; }  // a drag isn't a navigation
+    closeMenu();
+  }));
   if (navBackdrop) navBackdrop.addEventListener('click', closeMenu);
-  window.addEventListener('resize', () => { if (navLinks.classList.contains('open')) layoutFan(); });
+  window.addEventListener('resize', () => { if (navLinks.classList.contains('open')) openFan(); });
+  initFanDrag();
+}
+
+// ── DRAG-TO-POSITION DEV TOOL ──
+// Drag any menu item to reposition it; on release it logs every item's offset in a
+// paste-ready array. A tap (no real movement) still navigates normally.
+function initFanDrag() {
+  navItems.forEach((a) => {
+    let sx = 0, sy = 0, bx = 0, by = 0, moved = false;
+    a.setAttribute('draggable', 'false');                       // block native link drag
+    a.addEventListener('dragstart', (e) => e.preventDefault()); // belt-and-suspenders
+    a.addEventListener('pointerdown', (e) => {
+      if (!navLinks.classList.contains('open')) return;
+      e.preventDefault();                                       // stop the link's drag ghost
+      moved = false; a._dragged = false;
+      sx = e.clientX; sy = e.clientY;
+      bx = parseFloat(a.dataset.dx || 0); by = parseFloat(a.dataset.dy || 0);
+      a.style.transition = 'none'; a.style.transitionDelay = '0ms';
+      a.setPointerCapture(e.pointerId);
+    });
+    a.addEventListener('pointermove', (e) => {
+      if (!a.hasPointerCapture || !a.hasPointerCapture(e.pointerId)) return;
+      const ndx = bx + (e.clientX - sx), ndy = by + (e.clientY - sy);
+      if (Math.abs(e.clientX - sx) > 4 || Math.abs(e.clientY - sy) > 4) { moved = true; a._dragged = true; }
+      a.dataset.dx = ndx.toFixed(1); a.dataset.dy = ndy.toFixed(1);
+      a.style.transform = `translate(${ndx.toFixed(1)}px, ${ndy.toFixed(1)}px) scale(1)`;
+    });
+    a.addEventListener('pointerup', (e) => {
+      if (a.hasPointerCapture && a.hasPointerCapture(e.pointerId)) a.releasePointerCapture(e.pointerId);
+      if (!moved) { a._dragged = false; return; }
+      const arr = navItems.map(it => [ +parseFloat(it.dataset.dx || 0).toFixed(0), +parseFloat(it.dataset.dy || 0).toFixed(0) ]);
+      console.log('FAN_POS =', JSON.stringify(arr));
+      setTimeout(() => { a._dragged = false; }, 50);
+    });
+  });
 }
 
 /* ─── SCROLL REVEAL (IntersectionObserver) ─── */
