@@ -1,3 +1,6 @@
+/* ─── LINE ICONS (Lucide) ─── */
+if (window.lucide) lucide.createIcons();
+
 /* ─── PRELOADER ─── */
 window.addEventListener('load', () => {
   setTimeout(() => {
