@@ -82,30 +82,22 @@ window.addEventListener('load', () => { resizeCanvas(); makeNodes(); });
 
 /* ─── TILT INTERACTION (mobile gyroscope) ─── */
 (function tilt() {
+  const DO = window.DeviceOrientationEvent;
+  if (!DO) return;
+  // iOS 13+ exposes requestPermission() and would force an "Allow Motion Access?" popup.
+  // We deliberately skip it so NO permission prompt ever appears - iOS just keeps the gentle
+  // drifting animation. Android (and others) need no permission over HTTPS, so we attach the
+  // listener directly and tilt works automatically with no prompt or tap.
+  if (typeof DO.requestPermission === "function") return;
+
   let baseB = null, baseG = null;
-  function onOrient(e) {
-    if (e.beta == null || e.gamma == null) return;
-    if (baseB === null) { baseB = e.beta; baseG = e.gamma; }       // calibrate to rest position
-    const dG = Math.max(-35, Math.min(35, e.gamma - baseG));        // left/right tilt
-    const dB = Math.max(-35, Math.min(35, e.beta - baseB));         // front/back tilt
+  window.addEventListener("deviceorientation", (ev) => {
+    if (ev.beta == null || ev.gamma == null) return;
+    if (baseB === null) { baseB = ev.beta; baseG = ev.gamma; }
+    const dG = Math.max(-35, Math.min(35, ev.gamma - baseG));
+    const dB = Math.max(-35, Math.min(35, ev.beta - baseB));
     tiltX = dG / 35; tiltY = dB / 35; tiltActive = true;
-  }
-  function enable() {
-    const DO = window.DeviceOrientationEvent;
-    if (!DO) return;
-    if (typeof DO.requestPermission === 'function') {              // iOS 13+: needs a user gesture
-      DO.requestPermission().then(state => {
-        if (state === 'granted') window.addEventListener('deviceorientation', onOrient);
-      }).catch(() => {});
-    } else {                                                        // Android / others: just listen
-      window.addEventListener('deviceorientation', onOrient);
-    }
-  }
-  // First tap anywhere enables tilt (satisfies iOS gesture requirement; harmless elsewhere).
-  window.addEventListener('touchend', function once() {
-    window.removeEventListener('touchend', once);
-    enable();
-  }, { passive: true });
+  });
 })();
 
 /* ─── NAVBAR SCROLL ─── */
