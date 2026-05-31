@@ -885,3 +885,56 @@
     .ingredient-card:nth-child(6) .ingredient-stick { background: linear-gradient(to bottom, #A5E5BB, transparent); }
     .float-2 { background: linear-gradient(135deg, #19C3D0, #0E9CAD); }
     .float-3 { background: linear-gradient(135deg, #FFA63D, #F26A1B); }
+    .stat-item:nth-child(2) .stat-circle { background: #CFF0F4; border-color: #6FD3DD; }
+    .stat-item:nth-child(2) .stat-circle-inner { background: var(--teal); }
+    .stat-item:nth-child(2) .stat-number { color: var(--teal); }
+    .stat-item:nth-child(3) .stat-circle { background: #FFE2CC; border-color: #FFB07A; }
+    .stat-item:nth-child(3) .stat-circle-inner { background: var(--orange); }
+    .stat-item:nth-child(3) .stat-number { color: var(--orange); }
+    .sugar-card:nth-child(2) .sugar-card-icon { background: #ECDBFB; border-color: #C49AF0; }
+    .sugar-card:nth-child(2) .sugar-card-icon svg { color: var(--purple); }
+    .sugar-card:nth-child(2) .sugar-card-stick { background: linear-gradient(to bottom, #D3B3F5, transparent); }
+    .sugar-card:nth-child(3) .sugar-card-icon { background: #D6F3DF; border-color: #7FD79A; }
+    .sugar-card:nth-child(3) .sugar-card-icon svg { color: var(--green); }
+    .sugar-card:nth-child(3) .sugar-card-stick { background: linear-gradient(to bottom, #A5E5BB, transparent); }
+    .sugar-card:nth-child(4) .sugar-card-icon { background: #CFF0F4; border-color: #6FD3DD; }
+    .sugar-card:nth-child(4) .sugar-card-icon svg { color: var(--teal); }
+    .sugar-card:nth-child(4) .sugar-card-stick { background: linear-gradient(to bottom, #8FDDE5, transparent); }
+    .callout:nth-child(2) .callout-icon { border-color: #FFB07A; }
+    .callout:nth-child(2) .callout-icon svg { color: var(--orange); }
+    .callout:nth-child(3) .callout-icon { border-color: #FFD45E; }
+    .callout:nth-child(3) .callout-icon svg { color: var(--amber); }
+    .wave-divider {
+      position: relative; z-index: 3; height: 0;
+    }
+    .wave-divider::before {
+      content: ''; position: absolute; left: 0; right: 0; top: -22px; height: 44px;
+      background: url("wave-divider.svg") repeat-x center / auto 100%;
+    }
+
+    /* ─── RAINBOW ACCENTS on a pink base (separate) ─── */
+    .product-section .section-label { color: var(--teal); }
+    .product-section .section-label::before, .product-section .section-label::after { background: var(--teal); }
+    .ingredients-section .section-label { color: var(--orange); }
+    .ingredients-section .section-label::before, .ingredients-section .section-label::after { background: var(--orange); }
+    .how-section .section-label { color: var(--purple); }
+    .how-section .section-label::before, .how-section .section-label::after { background: var(--purple); }
+    .sugar-section .section-label { color: var(--green); }
+    .sugar-section .section-label::before, .sugar-section .section-label::after { background: var(--green); }
+    .faq-section .section-label { color: var(--amber); }
+    .faq-section .section-label::before, .faq-section .section-label::after { background: var(--amber); }
+    .hero-trust .trust-item:nth-child(2) .trust-check { background: #CFF0F4; color: var(--teal); }
+    .hero-trust .trust-item:nth-child(3) .trust-check { background: #FFE2CC; color: var(--orange); }
+    .faq-item:nth-child(2):not(.active) .faq-icon { background: #FFE2CC; color: var(--orange); }
+    .faq-item:nth-child(3):not(.active) .faq-icon { background: #FFEFC2; color: var(--amber); }
+    .faq-item:nth-child(4):not(.active) .faq-icon { background: #D6F3DF; color: var(--green); }
+    .faq-item:nth-child(5):not(.active) .faq-icon { background: #CFF0F4; color: var(--teal); }
+    .footer-social a:nth-child(1) { color: #FF6FB5; }
+    .footer-social a:nth-child(2) { color: #2BC8D6; }
+    .footer-social a:nth-child(3) { color: #FFA63D; }
+
+    /* ─── RAINBOW ACCENT (together) ─── */
+    .footer::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--pink-500), var(--orange), var(--amber), var(--green), var(--teal), var(--purple));
+    }
