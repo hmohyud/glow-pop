@@ -22,7 +22,7 @@ async function init(mount) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, W / H, 0.1, 100);
-  camera.position.set(0, 0.4, 12.5);
+  camera.position.set(0, 0.2, 14);
 
   // Procedural studio environment (gradient) -> glossy reflections that read as "sheen".
   const envTex = makeEnvTexture();
@@ -38,12 +38,12 @@ async function init(mount) {
   // specular sheen glides across the solid candy, with no stripes needed.
   const yaw = new THREE.Group();
   const tilt = new THREE.Group();
-  tilt.rotation.z = 0.34;
+  tilt.rotation.z = 0.26;
   yaw.add(tilt);
   scene.add(yaw);
 
   const candy = new THREE.Mesh(
-    new THREE.SphereGeometry(1.7, 96, 96),
+    new THREE.SphereGeometry(1.2, 96, 96),
     new THREE.MeshPhysicalMaterial({
       color: 0xff2b95,            // solid Glow-Pop pink
       roughness: 0.16,
@@ -56,14 +56,14 @@ async function init(mount) {
       sheenColor: new THREE.Color(0xcfe6ff)
     })
   );
-  candy.position.y = 1.55;
+  candy.position.y = 1.25;
   tilt.add(candy);
 
   const stick = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.14, 0.14, 3.4, 40),
+    new THREE.CylinderGeometry(0.12, 0.12, 2.7, 40),
     new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.35, clearcoat: 0.5, envMapIntensity: 0.8 })
   );
-  stick.position.y = -0.7;
+  stick.position.y = -1.05;
   tilt.add(stick);
 
   // ── Lights ──
@@ -98,7 +98,7 @@ async function init(mount) {
   function loop() {
     if (onScreen) {
       if (!reduce) yaw.rotation.y += 0.0032;   // very slow, elegant spin
-      candy.position.y = 1.55 + Math.sin(frames * 0.012) * 0.06; // tiny breathing bob
+      candy.position.y = 1.25 + Math.sin(frames * 0.012) * 0.04; // tiny breathing bob
       renderer.render(scene, camera);
       frames++;
     }
