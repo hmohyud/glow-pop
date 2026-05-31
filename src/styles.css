@@ -16,6 +16,11 @@
       --dark: #7A1B4D;
       --dark-light: #8E5076;
       --gold: #FFD700;
+      --orange: #F26A1B;
+      --amber: #C8870C;
+      --teal: #0E9CAD;
+      --green: #1FA453;
+      --purple: #8B3FD6;
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body: 'Poppins', -apple-system, sans-serif;
     }
@@ -797,7 +802,20 @@
         box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         border-bottom: 2px solid var(--pink-100);
       }
-      .hero { padding: 40px 24px; }
+      .hero { padding: 16px 22px 32px; min-height: auto; }
+      .hero-inner { gap: 18px; }
+      .hero-visual { order: -1; max-width: 300px; margin: 0 auto; }
+      .hero-badge { display: none; }
+      .float-1 { width: 76px; height: 76px; }
+      .float-2 { width: 64px; height: 64px; }
+      .float-3 { width: 58px; height: 58px; }
+      .hero-badge { margin-bottom: 12px; }
+      .hero-tagline { font-size: 16px; margin-bottom: 6px; }
+      .hero-title { font-size: 34px; margin-bottom: 12px; }
+      .hero-desc { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+      .hero-buttons { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 20px; }
+      .hero-buttons .btn { width: 100%; }
+      .hero-trust { gap: 14px; }
       .float-1 { top: 4%; right: 8px; }
       .float-2 { bottom: 15%; left: 8px; }
       .float-3 { top: 50%; right: 8px; }
@@ -846,3 +864,24 @@
     .sugar-card-icon svg { width: 30px; height: 30px; }
     .callout-icon svg { width: 22px; height: 22px; }
     .stars svg { width: 15px; height: 15px; }
+
+    /* ─── POPPING COLORS (Barbie-café rainbow accents) ─── */
+    .ingredient-card:nth-child(1) .ingredient-circle { background: #FFD9EC; border-color: #FF8FC4; }
+    .ingredient-card:nth-child(1) .ingredient-circle svg { color: var(--pink-500); }
+    .ingredient-card:nth-child(2) .ingredient-circle { background: #CFF0F4; border-color: #6FD3DD; }
+    .ingredient-card:nth-child(2) .ingredient-circle svg { color: var(--teal); }
+    .ingredient-card:nth-child(2) .ingredient-stick { background: linear-gradient(to bottom, #8FDDE5, transparent); }
+    .ingredient-card:nth-child(3) .ingredient-circle { background: #FFE2CC; border-color: #FFB07A; }
+    .ingredient-card:nth-child(3) .ingredient-circle svg { color: var(--orange); }
+    .ingredient-card:nth-child(3) .ingredient-stick { background: linear-gradient(to bottom, #FFC59E, transparent); }
+    .ingredient-card:nth-child(4) .ingredient-circle { background: #FFEFC2; border-color: #FFD45E; }
+    .ingredient-card:nth-child(4) .ingredient-circle svg { color: var(--amber); }
+    .ingredient-card:nth-child(4) .ingredient-stick { background: linear-gradient(to bottom, #FFE08A, transparent); }
+    .ingredient-card:nth-child(5) .ingredient-circle { background: #ECDBFB; border-color: #C49AF0; }
+    .ingredient-card:nth-child(5) .ingredient-circle svg { color: var(--purple); }
+    .ingredient-card:nth-child(5) .ingredient-stick { background: linear-gradient(to bottom, #D3B3F5, transparent); }
+    .ingredient-card:nth-child(6) .ingredient-circle { background: #D6F3DF; border-color: #7FD79A; }
+    .ingredient-card:nth-child(6) .ingredient-circle svg { color: var(--green); }
+    .ingredient-card:nth-child(6) .ingredient-stick { background: linear-gradient(to bottom, #A5E5BB, transparent); }
+    .float-2 { background: linear-gradient(135deg, #19C3D0, #0E9CAD); }
+    .float-3 { background: linear-gradient(135deg, #FFA63D, #F26A1B); }
