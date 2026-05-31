@@ -1,2 +1,26 @@
+# ── Project: scratch / source assets not meant for the public site ──
 archive/
 .claude
+*mockup*
+*Mockup*
+*.psd
+*.ai
+
+# ── OS junk ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ── Editor / IDE ──
+.vscode/
+.idea/
+*.swp
+*~
+
+# ── Node / tooling (in case a build step is ever added) ──
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.cache/
+dist/
