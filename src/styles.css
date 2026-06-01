@@ -988,12 +988,14 @@
     .callout:nth-child(2) .callout-icon svg { color: var(--orange); }
     .callout:nth-child(3) .callout-icon { border-color: #FFD45E; }
     .callout:nth-child(3) .callout-icon svg { color: var(--amber); }
+    /* Rainbow ribbon = top of the product section. It rises out of the section's
+       top edge into the hero above; its built-in white base blends into the
+       white product background (no flat teal cutoff). */
+    .product-section { position: relative; }
     .wave-divider {
-      position: relative; z-index: 3; height: 0;
-    }
-    .wave-divider::before {
-      content: ''; position: absolute; left: 0; right: 0; top: -22px; height: 44px;
-      background: url("wave-divider.svg") repeat-x center / auto 100%;
+      position: absolute; left: 0; right: 0; top: -18px; height: 70px;
+      z-index: 3; pointer-events: none;
+      background: url("wave-divider.svg") repeat-x center bottom / auto 100%;
     }
 
     /* ─── RAINBOW ACCENTS on a pink base (separate) ─── */
