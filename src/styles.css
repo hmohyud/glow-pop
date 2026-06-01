@@ -997,6 +997,12 @@
       z-index: 3; pointer-events: none;
       background: url("wave-divider.svg") repeat-x center bottom / auto 100%;
     }
+    /* same rainbow ribbon at the BOTTOM of the section, flipped to face upward */
+    .wave-divider-bottom {
+      top: auto; bottom: -18px;
+      transform: scaleY(-1);
+      background-position: center top;
+    }
 
     /* ─── RAINBOW ACCENTS on a pink base (separate) ─── */
     .product-section .section-label { color: var(--teal); }
