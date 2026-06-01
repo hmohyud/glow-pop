@@ -1045,13 +1045,13 @@
       .hero .hero-inner { row-gap: 16px; column-gap: 0; }
       .hero .hero-visual { order: -1; margin-top: 0; }
       .hero .hero-image-wrapper {
-        max-width: 240px; margin: 0 auto;
-        border-radius: 130px 130px 24px 24px;
+        max-width: 210px; margin: 0 auto;
+        border-radius: 120px 120px 22px 22px;
       }
       .hero .hero-image-wrapper img {
         width: 100%;
-        height: clamp(200px, calc(100vh - 420px), 320px);
-        object-fit: cover; object-position: top;
+        height: clamp(248px, calc(100vh - 400px), 360px);
+        object-fit: cover; object-position: top center;
       }
       .hero .hero-content { max-width: 640px; }
       .hero .hero-badge { display: none; }
