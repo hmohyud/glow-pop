@@ -162,9 +162,10 @@
         linear-gradient(135deg, var(--pink-50) 0%, var(--cream) 50%, var(--pink-100) 100%);
       overflow: hidden;
     }
-    /* On short, wide viewports the tall hero image forces the section past the fold.
-       Don't force full height, tighten spacing, and cap the image so it fits. */
-    @media (max-height: 780px) and (min-width: 769px) {
+    /* Short + TWO-COLUMN desktop (>=1025px): the tall hero image would force the
+       section past the fold. Don't force full height, tighten spacing, cap the image.
+       Scoped to >=1025px so it never collides with the stacked (<=1024px) layout. */
+    @media (max-height: 780px) and (min-width: 1025px) {
       /* top-align the columns so the text starts high instead of being centered low */
       .hero { min-height: 0; align-items: flex-start; padding-top: 16px; padding-bottom: 18px; }
       .hero-inner { gap: 36px; align-items: center; }
@@ -177,6 +178,17 @@
       .hero-desc { margin-bottom: 18px; font-size: 15px; }
       .hero-buttons { margin-bottom: 18px; }
       .hero-trust { margin-bottom: 8px; }
+    }
+    /* Short + STACKED tablet (769–1024px): hero is one centered column with the image
+       below the text, so just tighten vertical rhythm and shrink the image. */
+    @media (max-height: 780px) and (min-width: 769px) and (max-width: 1024px) {
+      .hero { min-height: 0; padding-top: 20px; padding-bottom: 24px; }
+      .hero-visual { margin-top: 20px; }
+      .hero-image-wrapper { max-width: 280px; }
+      .hero-image-wrapper img { max-height: 46vh; object-fit: cover; object-position: top; }
+      .hero-title { margin-bottom: 12px; }
+      .hero-desc { margin-bottom: 16px; }
+      .hero-buttons { margin-bottom: 16px; }
     }
     .hero-bg-circle {
       position: absolute; border-radius: 50%;
