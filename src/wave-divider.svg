@@ -1,11 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="70" viewBox="0 0 160 70" preserveAspectRatio="none">
-  <!-- Rainbow ribbon that belongs to the TOP of the (white) next section.
-       Top is transparent so the pink hero shows through the crests; the bands
-       wave down; a WHITE band waves in at the bottom so teal blends into the
-       white product section instead of a hard flat cutoff. -->
-  <path fill="#FF1493" d="M0,12 Q40,0 80,12 T160,12 V70 H0 Z"/>
-  <path fill="#FF8A3D" d="M0,22 Q40,10 80,22 T160,22 V70 H0 Z"/>
-  <path fill="#FFC400" d="M0,32 Q40,20 80,32 T160,32 V70 H0 Z"/>
-  <path fill="#19C3D0" d="M0,42 Q40,30 80,42 T160,42 V70 H0 Z"/>
-  <path fill="#FFFFFF" d="M0,54 Q40,42 80,54 T160,54 V70 H0 Z"/>
+  <!-- Rainbow ribbon for the top of the next section. The bands are clipped by a
+       wavy mask so the area below the teal band is TRULY TRANSPARENT (not white):
+       it shows the section background in both light and force-dark modes. -->
+  <defs>
+    <mask id="waveCut">
+      <!-- white = keep (above the bottom wave), black/empty = transparent (below) -->
+      <path fill="#fff" d="M0,52 Q40,40 80,52 T160,52 V0 H0 Z"/>
+    </mask>
+  </defs>
+  <g mask="url(#waveCut)">
+    <path fill="#FF1493" d="M0,12 Q40,0 80,12 T160,12 V70 H0 Z"/>
+    <path fill="#FF8A3D" d="M0,22 Q40,10 80,22 T160,22 V70 H0 Z"/>
+    <path fill="#FFC400" d="M0,32 Q40,20 80,32 T160,32 V70 H0 Z"/>
+    <path fill="#19C3D0" d="M0,42 Q40,30 80,42 T160,42 V70 H0 Z"/>
+  </g>
 </svg>
