@@ -165,8 +165,9 @@
     /* On short, wide viewports the tall hero image forces the section past the fold.
        Don't force full height, tighten spacing, and cap the image so it fits. */
     @media (max-height: 780px) and (min-width: 769px) {
-      .hero { min-height: 0; padding-top: 18px; padding-bottom: 28px; }
-      .hero-inner { gap: 36px; }
+      /* top-align the columns so the text starts high instead of being centered low */
+      .hero { min-height: 0; align-items: flex-start; padding-top: 16px; padding-bottom: 18px; }
+      .hero-inner { gap: 36px; align-items: center; }
       .hero-image-wrapper { max-width: 300px; }
       /* cap image so the whole hero column clears the ~112px header within the fold;
          crop from the bottom (top-align) so the model's face stays in frame */
