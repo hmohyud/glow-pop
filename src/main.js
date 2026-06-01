@@ -139,7 +139,7 @@ if (mobileToggle && navLinks) {
 
 /* ─── SCROLL REVEAL (IntersectionObserver) ─── */
 function initAnimations() {
-  const reveals = document.querySelectorAll('.reveal');
+  const hero = document.getElementById('hero');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -148,11 +148,26 @@ function initAnimations() {
       }
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(el => observer.observe(el));
+
+  document.querySelectorAll('.reveal').forEach(el => {
+    // Hero (and anything already in the viewport on load) reveals immediately —
+    // never wait for a scroll that may not happen on short viewports.
+    if ((hero && hero.contains(el)) || isInViewport(el)) {
+      el.classList.add('visible');
+    } else {
+      observer.observe(el);
+    }
+  });
 
   initGSAP();
   initCounters();
   initStepsLine();
+}
+
+function isInViewport(el) {
+  const r = el.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  return r.top < vh && r.bottom > 0;
 }
 
 /* ─── GSAP ANIMATIONS ─── */
