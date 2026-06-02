@@ -375,3 +375,140 @@ document.querySelectorAll('.btn').forEach(btn => {
   }
   window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
 })();
+
+/* ─── SECTION FX: aurora background, lollipop grid, contrast-invert title ─── */
+(function sectionFX(){
+  const RND=(a,b)=>a+Math.random()*(b-a);
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;   // CSS hides the canvases and restores a plain readable title
+
+  function onScreen(el,cb){ if(!('IntersectionObserver'in window)){cb(true);return;}
+    new IntersectionObserver(es=>cb(es[0].isIntersecting),{threshold:0.02}).observe(el); }
+
+  function setup(canvas){
+    const ctx=canvas.getContext('2d'); let w=0,h=0,dpr=Math.min(window.devicePixelRatio||1,2);
+    const host=canvas.closest('.fxhost')||canvas.parentElement;
+    let dirty=true, changed=false;
+    // Assigning canvas.width/height CLEARS the canvas, so apply() is called ONLY from inside the
+    // rAF loop (via sync()) — never from the ResizeObserver. That keeps the clear and the redraw
+    // in the SAME frame. Doing it in the observer cleared the canvas AFTER the frame had drawn
+    // but BEFORE paint, blanking/fading the grid on every one of the ~40 height ticks an
+    // accordion fires as it animates open/closed.
+    function apply(){ const r=host.getBoundingClientRect();
+      const nw=Math.max(1,Math.round(r.width)), nh=Math.max(1,Math.round(r.height)); const bw=nw*dpr, bh=nh*dpr;
+      changed = (canvas.width!==bw || canvas.height!==bh);
+      if(changed){ canvas.width=bw; canvas.height=bh; }
+      ctx.setTransform(dpr,0,0,dpr,0,0); w=nw; h=nh; }
+    apply();
+    new ResizeObserver(()=>{dirty=true;}).observe(host);
+    window.addEventListener('load',()=>{dirty=true;}); window.addEventListener('resize',()=>{dirty=true;});
+    const mouse={x:-999,y:-999,inside:false};
+    host.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;mouse.inside=true;});
+    host.addEventListener('mouseleave',()=>{mouse.inside=false;mouse.x=mouse.y=-999;});
+    // sync(): called at the top of each frame; applies a pending resize and returns true only
+    // when the backing store actually changed, so callers can rebuild size-dependent caches.
+    return {ctx,get w(){return w},get h(){return h},mouse,
+      sync(){ if(!dirty) return false; dirty=false; apply(); return changed; }};
+  }
+
+  document.querySelectorAll('canvas[data-fx]').forEach(canvas=>{
+    const fx=canvas.dataset.fx; const S=setup(canvas); let vis=true; onScreen(canvas,v=>vis=v);
+
+    if(fx==='aurora'){
+      const cols=['#FF1493','#FF69B4','#FFB6D9','#E91E8C','#ff5fae','#ff9ccb'];
+      const homes=[[.15,.30],[.5,.18],[.85,.32],[.28,.78],[.72,.74],[.5,.55]];
+      const orbs=homes.map((hh,i)=>({hx:hh[0],hy:hh[1],a:Math.random()*7,sp:RND(.0014,.0033),rx:RND(70,140),ry:RND(60,120),col:cols[i%cols.length]}));
+      let px=0,py=0;
+      if(canvas.hasAttribute('data-title-src')) window.__auroraCanvas=canvas;
+      (function loop(){ if(vis){ S.sync(); const{ctx,w,h,mouse}=S; ctx.clearRect(0,0,w,h); ctx.globalCompositeOperation='lighter';
+        const tx=mouse.inside?(mouse.x/w-.5):0, ty=mouse.inside?(mouse.y/h-.5):0; px+=(tx-px)*0.06; py+=(ty-py)*0.06;
+        orbs.forEach((o,i)=>{ o.a+=o.sp;
+          const cx=o.hx*w+Math.cos(o.a)*o.rx+px*40*(i%3+1), cy=o.hy*h+Math.sin(o.a*1.2)*o.ry+py*40*(i%3+1);
+          const R=Math.max(w,h)*.42, g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+          g.addColorStop(0,o.col); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.globalAlpha=.4; ctx.fillStyle=g;
+          ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fill(); });
+        ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over'; }
+        requestAnimationFrame(loop); })();
+    }
+
+    if(fx==='grid'){
+      let pts=[]; function build(){ pts=[]; const gap=50; for(let x=gap/2;x<S.w;x+=gap)for(let y=gap/2;y<S.h;y+=gap)pts.push({x,y}); }
+      const host=canvas.closest('.fxhost');
+      const lineEls=[host.querySelector('.section-label'), host.querySelector('.section-title')].filter(Boolean);
+      const padX=9,padY=7,fade=11;
+      let boxes=[];
+      // The point grid depends only on canvas SIZE, so it's rebuilt only on a real resize.
+      // The heading clear-zone, however, must follow the heading's LIVE position: the title
+      // slides up + fades as its scroll-reveal plays, and shifts again when the web-font swaps
+      // in — so a one-time measurement would leave the zone in the wrong spot until the next
+      // resize, which is why a row of pops used to snap into place only after an accordion was
+      // toggled. Re-measuring every frame is cheap (two getBoundingClientRect reads) and the
+      // heading does NOT move when an accordion expands below it, so it stays steady on toggle.
+      function measureMask(){ const cr=canvas.getBoundingClientRect();
+        boxes=lineEls.map(el=>{const r=el.getBoundingClientRect();return{x0:r.left-cr.left-padX,y0:r.top-cr.top-padY,x1:r.right-cr.left+padX,y1:r.bottom-cr.top+padY};}); }
+      build(); measureMask();
+      function alphaAt(px,py){ let a=1;
+        for(const b of boxes){ const dx=Math.max(b.x0-px,0,px-b.x1), dy=Math.max(b.y0-py,0,py-b.y1); a=Math.min(a,Math.min(1,Math.hypot(dx,dy)/fade)); } return a; }
+      // Apply any pending resize at the TOP of the frame (atomic with the redraw below); rebuild
+      // the point grid only on a real size change, but re-measure the heading mask every frame.
+      (function loop(){ if(vis){ if(S.sync()) build(); measureMask(); const{ctx,w,h,mouse}=S; ctx.clearRect(0,0,w,h);
+        pts.forEach(p=>{ const a=alphaAt(p.x,p.y); if(a<=0.01)return;
+          let sc=1; if(mouse.inside){const d=Math.hypot(p.x-mouse.x,p.y-mouse.y); if(d<120)sc=1+(1-d/120)*1.9;}
+          const x=p.x,y=p.y,r=3.4*sc; ctx.globalAlpha=a;
+          ctx.strokeStyle='rgba(255,135,190,.5)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(x,y+r+r*1.8);ctx.stroke();
+          ctx.fillStyle='#FF1493';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+          ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.32,0,7);ctx.fill(); });
+        ctx.globalAlpha=1; }
+        requestAnimationFrame(loop); })();
+    }
+  });
+
+  /* contrast-invert title, flicker-free (cached glyph mask + slow-eased fill) */
+  document.querySelectorAll('[data-title-fx]').forEach(h2=>{
+    const text=h2.getAttribute('data-title-fx');
+    const cv=h2.querySelector('.title-fx'); if(!cv) return; const ctx=cv.getContext('2d');
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const SW=64; const buf=document.createElement('canvas'); buf.width=SW; const bctx=buf.getContext('2d',{willReadFrequently:true});
+    const DEEP=[122,27,77];
+    let maskCv=null, fillCv=null, fillCtx=null, smooth=null, W0=0,H0=0, vis=true;
+    onScreen(h2,v=>vis=v);
+    function buildMask(w,h){
+      maskCv=document.createElement('canvas'); maskCv.width=w*dpr; maskCv.height=h*dpr;
+      const m=maskCv.getContext('2d'); m.setTransform(dpr,0,0,dpr,0,0);
+      const cs=getComputedStyle(h2); m.font=cs.fontWeight+' '+parseFloat(cs.fontSize)+'px '+cs.fontFamily;
+      m.textAlign='center'; m.textBaseline='middle'; m.fillStyle='#000'; m.fillText(text,w/2,h/2);
+      fillCv=document.createElement('canvas'); fillCv.width=SW; fillCtx=fillCv.getContext('2d'); W0=w; H0=h;
+    }
+    function draw(){
+      const src=window.__auroraCanvas; if(!src){requestAnimationFrame(draw);return;}
+      const hr=h2.getBoundingClientRect(); const w=Math.max(1,Math.round(hr.width)),h=Math.max(1,Math.round(hr.height));
+      if(cv.width!==w*dpr){cv.width=w*dpr;cv.height=h*dpr;}
+      if(!maskCv||W0!==w||H0!==h) buildMask(w,h);
+      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
+      if(vis){
+        const SH=Math.max(1,Math.round(SW*h/w)); if(buf.height!==SH){buf.height=SH;fillCv.height=SH;}
+        const ar=src.getBoundingClientRect();
+        const sx=(hr.left-ar.left)/ar.width*src.width, sy=(hr.top-ar.top)/ar.height*src.height, sw=hr.width/ar.width*src.width, sh=hr.height/ar.height*src.height;
+        bctx.clearRect(0,0,SW,SH); bctx.fillStyle='#fff0f5'; bctx.fillRect(0,0,SW,SH);
+        try{ bctx.drawImage(src,sx,sy,sw,sh,0,0,SW,SH); }catch(e){}
+        const px=bctx.getImageData(0,0,SW,SH).data; const N=px.length/4;
+        if(!smooth||smooth.length!==N) smooth=null;
+        const fill=fillCtx.createImageData(SW,SH); const fd=fill.data; const raw=new Float32Array(N);
+        for(let i=0,j=0;i<px.length;i+=4,j++){ const r=px[i],g=px[i+1],b=px[i+2];
+          const lum=(0.299*r+0.587*g+0.114*b)/255, sat=(Math.max(r,g,b)-Math.min(r,g,b))/255; raw[j]=sat*1.6+(1-lum)*1.1; }
+        if(!smooth){smooth=Float32Array.from(raw);}
+        for(let j=0;j<N;j++) smooth[j]+=(raw[j]-smooth[j])*0.02;
+        const TH=0.56, BAND=0.16;
+        for(let i=0,j=0;i<px.length;i+=4,j++){ let t=(smooth[j]-(TH-BAND))/(2*BAND); t=Math.max(0,Math.min(1,t)); t=t*t*(3-2*t);
+          fd[i]=Math.round(DEEP[0]+(255-DEEP[0])*t); fd[i+1]=Math.round(DEEP[1]+(255-DEEP[1])*t); fd[i+2]=Math.round(DEEP[2]+(255-DEEP[2])*t); fd[i+3]=255; }
+        fillCtx.putImageData(fill,0,0);
+        ctx.globalCompositeOperation='source-over'; ctx.drawImage(maskCv,0,0);
+        ctx.globalCompositeOperation='source-in'; ctx.imageSmoothingEnabled=true;
+        ctx.drawImage(fillCv,0,0,SW,SH,0,0,cv.width,cv.height);
+        ctx.globalCompositeOperation='source-over';
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  });
+})();

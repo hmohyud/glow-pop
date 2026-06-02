@@ -341,16 +341,13 @@
   </section>
 
   <!-- REAL SUGAR -->
-  <section class="sugar-section section-pad">
-    <img class="fruit-deco fruit-deco-1" src="images/fruit/mango-slices.png" alt="" aria-hidden="true" loading="lazy">
-    <img class="fruit-deco fruit-deco-2" src="images/fruit/blueberries.png" alt="" aria-hidden="true" loading="lazy">
-    <img class="fruit-deco fruit-deco-3" src="images/fruit/mango-cubes.png" alt="" aria-hidden="true" loading="lazy">
-    <img class="fruit-deco fruit-deco-4" src="images/fruit/mango-leaf.png" alt="" aria-hidden="true" loading="lazy">
+  <section class="sugar-section section-pad fxhost flow-diff">
+    <canvas class="fx-canvas" data-fx="aurora" data-title-src aria-hidden="true"></canvas>
 
     <div class="section-header">
       <div class="section-label reveal">The Real Sugar Difference</div>
-      <h2 class="section-title reveal reveal-delay-1">
-        Made With <span class="highlight">Real Sugar</span>
+      <h2 class="section-title reveal reveal-delay-1" data-title-fx="Made With Real Sugar">
+        Made With <span class="highlight">Real Sugar</span><canvas class="title-fx" aria-hidden="true"></canvas>
       </h2>
       <p class="section-subtitle reveal reveal-delay-2">
         Most sugar substitutes are far sweeter than sugar &mdash; and that can keep your brain
@@ -425,7 +422,8 @@
   </section>
 
   <!-- FAQ -->
-  <section class="faq-section section-pad" id="faq">
+  <section class="faq-section section-pad fxhost" id="faq">
+    <canvas class="fx-canvas" data-fx="grid" data-mask="tight" aria-hidden="true"></canvas>
     <div class="section-header">
       <div class="section-label reveal">Got Questions?</div>
       <h2 class="section-title reveal reveal-delay-1">
