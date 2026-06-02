@@ -501,7 +501,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     function draw(){
       const src=window.__auroraCanvas; if(!src){requestAnimationFrame(draw);return;}
       const hr=h2.getBoundingClientRect(); const w=Math.max(1,Math.round(hr.width)),h=Math.max(1,Math.round(hr.height));
-      if(cv.width!==w*dpr){cv.width=w*dpr;cv.height=h*dpr;}
+      if(cv.width!==w*dpr||cv.height!==h*dpr){cv.width=w*dpr;cv.height=h*dpr;}
       if(!maskCv||W0!==w||H0!==h) buildMask(w,h);
       ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height);
       if(vis){

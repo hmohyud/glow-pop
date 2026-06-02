@@ -992,8 +992,8 @@
     .ingredients-section .section-label::before, .ingredients-section .section-label::after { background: var(--orange); }
     .how-section .section-label { color: var(--purple); }
     .how-section .section-label::before, .how-section .section-label::after { background: var(--purple); }
-    .sugar-section .section-label { color: var(--green); }
-    .sugar-section .section-label::before, .sugar-section .section-label::after { background: var(--green); }
+    .sugar-section .section-label { color: var(--dark); }
+    .sugar-section .section-label::before, .sugar-section .section-label::after { background: var(--dark); }
     .faq-section .section-label { color: var(--amber); }
     .faq-section .section-label::before, .faq-section .section-label::after { background: var(--amber); }
     .hero-trust .trust-item:nth-child(2) .trust-check { background: #CFF0F4; color: var(--teal); }
