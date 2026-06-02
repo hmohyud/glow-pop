@@ -531,3 +531,12 @@ document.querySelectorAll('.btn').forEach(btn => {
     requestAnimationFrame(draw);
   });
 })();
+
+/* ─── INGREDIENT FLIP CARDS: click / Enter / Space flips front <-> back ─── */
+(function ingredientFlip(){
+  document.querySelectorAll('.ingredient-flip').forEach(card=>{
+    function flip(){ const on=card.classList.toggle('flipped'); card.setAttribute('aria-pressed', on?'true':'false'); }
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(); } });
+  });
+})();
