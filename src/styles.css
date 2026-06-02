@@ -349,6 +349,15 @@
       border-radius: 30px; padding: 40px;
       box-shadow: 0 20px 60px rgba(255, 20, 147, 0.08);
     }
+    /* thin rainbow ring around the frame so it echoes the wave ribbon (pink base stays inside).
+       gradient + mask = a gradient border that follows the rounded corners cleanly. */
+    .product-image-frame::before {
+      content: ''; position: absolute; inset: 0; border-radius: 30px; padding: 3px;
+      background: linear-gradient(120deg, #FF1493, #F26A1B, #C8870C, #1FA453, #0E9CAD, #8B3FD6);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none; z-index: 2;
+    }
     .product-image-frame img {
       width: 100%; height: auto; display: block;
       border-radius: 20px; position: relative; z-index: 1;
