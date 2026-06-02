@@ -382,6 +382,10 @@ document.querySelectorAll('.btn').forEach(btn => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return;   // CSS hides the canvases and restores a plain readable title
 
+  // "phone mode": drop the FAQ lollipop grid entirely, and run the aurora a bit faster with its
+  // focal point lifted so the bright zones sit behind the reactive title and shift it more.
+  const phoneMQ = window.matchMedia('(max-width: 768px)');
+
   function onScreen(el,cb){ if(!('IntersectionObserver'in window)){cb(true);return;}
     new IntersectionObserver(es=>cb(es[0].isIntersecting),{threshold:0.02}).observe(el); }
 
@@ -422,8 +426,9 @@ document.querySelectorAll('.btn').forEach(btn => {
       if(canvas.hasAttribute('data-title-src')) window.__auroraCanvas=canvas;
       (function loop(){ if(vis){ S.sync(); const{ctx,w,h,mouse}=S; ctx.clearRect(0,0,w,h); ctx.globalCompositeOperation='lighter';
         const tx=mouse.inside?(mouse.x/w-.5):0, ty=mouse.inside?(mouse.y/h-.5):0; px+=(tx-px)*0.06; py+=(ty-py)*0.06;
-        orbs.forEach((o,i)=>{ o.a+=o.sp;
-          const cx=o.hx*w+Math.cos(o.a)*o.rx+px*40*(i%3+1), cy=o.hy*h+Math.sin(o.a*1.2)*o.ry+py*40*(i%3+1);
+        const phone=phoneMQ.matches, spMul=phone?1.2:1, yOff=phone?-h*0.10:0;   // phone: ~20% faster + focal point lifted
+        orbs.forEach((o,i)=>{ o.a+=o.sp*spMul;
+          const cx=o.hx*w+Math.cos(o.a)*o.rx+px*40*(i%3+1), cy=o.hy*h+yOff+Math.sin(o.a*1.2)*o.ry+py*40*(i%3+1);
           const R=Math.max(w,h)*.42, g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
           g.addColorStop(0,o.col); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.globalAlpha=.4; ctx.fillStyle=g;
           ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fill(); });
@@ -451,14 +456,17 @@ document.querySelectorAll('.btn').forEach(btn => {
         for(const b of boxes){ const dx=Math.max(b.x0-px,0,px-b.x1), dy=Math.max(b.y0-py,0,py-b.y1); a=Math.min(a,Math.min(1,Math.hypot(dx,dy)/fade)); } return a; }
       // Apply any pending resize at the TOP of the frame (atomic with the redraw below); rebuild
       // the point grid only on a real size change, but re-measure the heading mask every frame.
-      (function loop(){ if(vis){ if(S.sync()) build(); measureMask(); const{ctx,w,h,mouse}=S; ctx.clearRect(0,0,w,h);
-        pts.forEach(p=>{ const a=alphaAt(p.x,p.y); if(a<=0.01)return;
-          let sc=1; if(mouse.inside){const d=Math.hypot(p.x-mouse.x,p.y-mouse.y); if(d<120)sc=1+(1-d/120)*1.9;}
-          const x=p.x,y=p.y,r=3.4*sc; ctx.globalAlpha=a;
-          ctx.strokeStyle='rgba(255,135,190,.5)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(x,y+r+r*1.8);ctx.stroke();
-          ctx.fillStyle='#FF1493';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
-          ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.32,0,7);ctx.fill(); });
-        ctx.globalAlpha=1; }
+      // Phone mode: the lollipop grid is dropped (also hidden via CSS) — clear the canvas and
+      // skip the per-point drawing so it costs nothing on small screens.
+      (function loop(){ if(vis){ if(S.sync()) build(); const{ctx,w,h,mouse}=S; ctx.clearRect(0,0,w,h);
+        if(!phoneMQ.matches){ measureMask();
+          pts.forEach(p=>{ const a=alphaAt(p.x,p.y); if(a<=0.01)return;
+            let sc=1; if(mouse.inside){const d=Math.hypot(p.x-mouse.x,p.y-mouse.y); if(d<120)sc=1+(1-d/120)*1.9;}
+            const x=p.x,y=p.y,r=3.4*sc; ctx.globalAlpha=a;
+            ctx.strokeStyle='rgba(255,135,190,.5)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(x,y+r+r*1.8);ctx.stroke();
+            ctx.fillStyle='#FF1493';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+            ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(x-r*.3,y-r*.3,r*.32,0,7);ctx.fill(); });
+          ctx.globalAlpha=1; } }
         requestAnimationFrame(loop); })();
     }
   });
@@ -475,8 +483,19 @@ document.querySelectorAll('.btn').forEach(btn => {
     function buildMask(w,h){
       maskCv=document.createElement('canvas'); maskCv.width=w*dpr; maskCv.height=h*dpr;
       const m=maskCv.getContext('2d'); m.setTransform(dpr,0,0,dpr,0,0);
-      const cs=getComputedStyle(h2); m.font=cs.fontWeight+' '+parseFloat(cs.fontSize)+'px '+cs.fontFamily;
-      m.textAlign='center'; m.textBaseline='middle'; m.fillStyle='#000'; m.fillText(text,w/2,h/2);
+      const cs=getComputedStyle(h2); const fs=parseFloat(cs.fontSize);
+      m.font=cs.fontWeight+' '+fs+'px '+cs.fontFamily;
+      m.textAlign='center'; m.textBaseline='middle'; m.fillStyle='#000';
+      const lh=parseFloat(cs.lineHeight)||fs*1.28;
+      // Word-wrap to the heading width so the mask matches the real (wrapped) title at narrow
+      // widths — otherwise it rendered as a single line that overflowed and clipped on mobile.
+      // Browsers break greedily by default, so greedy wrapping here tracks their line breaks.
+      const words=text.split(/\s+/), lines=[]; let cur='';
+      for(const word of words){ const t=cur?cur+' '+word:word;
+        if(cur && m.measureText(t).width>w){ lines.push(cur); cur=word; } else cur=t; }
+      if(cur) lines.push(cur);
+      const startY=h/2-(lines.length-1)*lh/2;
+      lines.forEach((ln,i)=>m.fillText(ln,w/2,startY+i*lh));
       fillCv=document.createElement('canvas'); fillCv.width=SW; fillCtx=fillCv.getContext('2d'); W0=w; H0=h;
     }
     function draw(){

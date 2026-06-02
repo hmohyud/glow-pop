@@ -1055,6 +1055,8 @@
     .fxhost{position:relative}
     .fxhost > .fx-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;display:block}
     .how-section.fxhost, .faq-section.fxhost{overflow:hidden}
+    /* phone: drop the FAQ lollipop grid (the JS loop also skips it); the aurora stays */
+    @media (max-width: 768px){ .faq-section .fx-canvas{display:none} }
     /* keep real content above the canvas */
     .fxhost > .section-header, .fxhost > .steps-container, .fxhost > .faq-container{position:relative;z-index:2}
     /* contrast-invert title: real text hidden, canvas draws it (white over pink / berry over light) */
