@@ -1,4 +1,4 @@
-// Genuine 3D glossy lollipop (WebGL via Three.js) for the "Why Glow Pop" section.
+// Genuine 3D glossy lollipop (WebGL via Three.js) for the "Why Glo Pop" section.
 // Solid pink candy + glistening cool sheen (no stripes), rotating slowly.
 // Sits behind the left of the title/chart as an off-center background accent.
 import * as THREE from 'three';
@@ -45,7 +45,7 @@ async function init(mount) {
   const candy = new THREE.Mesh(
     new THREE.SphereGeometry(1.33, 96, 96),
     new THREE.MeshPhysicalMaterial({
-      color: 0xff2b95,                       // solid Glow-Pop pink
+      color: 0xff2b95,                       // solid Glo-Pop pink
       roughness: 0.16,
       metalness: 0.0,
       clearcoat: 1.0,
