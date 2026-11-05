@@ -1,0 +1,10 @@
+# Local-only working files: QA screenshots + tooling, 3D test benches and backups, internal brief.
+# Only the proposals, the shared 3D library + its CC0 assets, and the index thumbnails are published.
+BRIEF.md
+_qa/*
+!_qa/thumbs/
+*/_qa/
+_shared/lab/
+_shared/candy3d.v1.js
+_shared/candy3d.next.js
+_shared/candy3d-test.html

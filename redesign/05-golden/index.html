@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" data-product="strawberry-pop">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glo Pop — Get Your Summer Glow</title>
+  <meta name="description" content="Glo Pop peptide lollipops: collagen, hyaluronic acid, Vitamin C, B12, B6 and Zinc in a really, really good strawberry lollipop. Made with real sugar, 47 calories a pop. Get your summer glow.">
+  <meta name="theme-color" content="#FF1493">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='14.7' y='17' width='2.6' height='13' rx='1.3' fill='%23FFF3E4' stroke='%234E0E36' stroke-width='.8'/%3E%3Ccircle cx='16' cy='12' r='10' fill='%23FF1493'/%3E%3C/svg%3E">
+
+  <!-- Progressive enhancement: hide-for-intro only once JS is running, with a failsafe -->
+  <script>
+    (function (h) {
+      h.classList.remove('no-js');
+      h.classList.add('js', 'js-intro');
+      window.__gpIntroFailsafe = setTimeout(function () { h.classList.remove('js-intro'); }, 3200);
+    })(document.documentElement);
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap">
+  <link rel="preload" as="image" href="../../images/model_pink.webp" fetchpriority="high">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- ═══════════ SHARED SVG DEFS (paths for curved text) ═══════════ -->
+  <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <path id="arc-badge" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/>
+      <path id="arc-badge-lg" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/>
+      <path id="arc-postmark" d="M14,44 a30,30 0 1,1 60,0"/>
+      <path id="arc-pm" d="M44,44 m-33,0 a33,33 0 1,1 66,0 a33,33 0 1,1 -66,0"/>
+      <radialGradient id="g-moon" cx="36%" cy="30%" r="74%">
+        <stop offset="0" style="stop-color:#FFE0EF"/>
+        <stop offset=".45" style="stop-color:var(--accent)"/>
+        <stop offset="1" style="stop-color:var(--accent-ink)"/>
+      </radialGradient>
+      <radialGradient id="g-moon-glow">
+        <stop offset="0" style="stop-color:var(--accent);stop-opacity:.55"/>
+        <stop offset="1" style="stop-color:var(--accent);stop-opacity:0"/>
+      </radialGradient>
+      <radialGradient id="g-gummy" cx="34%" cy="28%" r="78%">
+        <stop offset="0" stop-color="#D4F5B0"/>
+        <stop offset=".5" stop-color="#2FB862"/>
+        <stop offset="1" stop-color="#11703B"/>
+      </radialGradient>
+      <linearGradient id="g-night" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:var(--night)"/>
+        <stop offset=".62" style="stop-color:var(--dusk)"/>
+        <stop offset="1" style="stop-color:color-mix(in oklab, var(--dusk), var(--accent) 38%)"/>
+      </linearGradient>
+      <linearGradient id="g-sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:color-mix(in oklab, var(--dusk), #0E9CAD 30%)"/>
+        <stop offset="1" style="stop-color:var(--night)"/>
+      </linearGradient>
+      <symbol id="bag-clutch" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11.5" rx="2.6"/><path d="M3.6 10.6 12 15.2l8.4-4.6"/><circle cx="12" cy="15.2" r="1.1"/></symbol>
+      <symbol id="bag-tote" viewBox="0 0 24 24"><path d="M5.2 9h13.6l-1 10.6a1.6 1.6 0 0 1-1.6 1.4H7.8a1.6 1.6 0 0 1-1.6-1.4z"/><path d="M9 9V7.2a3 3 0 0 1 6 0V9"/></symbol>
+      <symbol id="bag-beach" viewBox="0 0 24 24"><path d="M3.5 10.5h17l-1.5 8.4a2 2 0 0 1-2 1.6H7a2 2 0 0 1-2-1.6z"/><path d="M7.5 10.5c0-4 2-6.6 4.5-6.6s4.5 2.6 4.5 6.6"/><path d="M4.3 14.4h15.4M4.9 17.4h14.2"/></symbol>
+      <symbol id="mark" viewBox="0 0 32 32">
+        <rect x="14.6" y="18" width="2.8" height="12.5" rx="1.4" fill="currentColor" opacity=".35"/>
+        <circle cx="16" cy="12.5" r="10.5" fill="currentColor"/>
+        <rect x="4" y="15.2" width="24" height="1.5" fill="var(--mark-cut, #FFF3E4)"/>
+        <rect x="4" y="18.4" width="24" height="1.9" fill="var(--mark-cut, #FFF3E4)"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ═══════════ ANNOUNCEMENT ═══════════ -->
+  <div class="announce">
+    <p>
+      <span>Free shipping on every order</span>
+      <span class="announce__more" aria-hidden="true"><i data-lucide="sun"></i></span>
+      <span class="announce__more">Made with real sugar</span>
+      <span class="announce__more" aria-hidden="true"><i data-lucide="sun"></i></span>
+      <span class="announce__more">47 calories a pop</span>
+    </p>
+  </div>
+
+  <!-- ═══════════ NAV ═══════════ -->
+  <header class="nav" id="nav">
+    <div class="nav__bar">
+      <a class="brand" href="#top" aria-label="Glo Pop, back to top">
+        <svg class="brand__mark" aria-hidden="true"><use href="#mark"/></svg>
+        <span class="brand__word">Glo Pop</span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <ul>
+          <li><a href="#lineup">Lineup</a></li>
+          <li><a href="#day">The Day</a></li>
+          <li><a href="#actives">Actives</a></li>
+          <li><a href="#sugar">Real Sugar</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav__end">
+        <p class="clock" aria-hidden="true" data-phase="day">
+          <i data-lucide="sun" class="clock__i clock__i--day"></i>
+          <i data-lucide="sunset" class="clock__i clock__i--gold"></i>
+          <i data-lucide="moon" class="clock__i clock__i--night"></i>
+          <span class="clock__t">12:00</span>
+        </p>
+        <a class="btn btn--accent btn--sm nav__shop" href="#shop"><i data-lucide="shopping-bag"></i><span>Shop</span></a>
+        <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="menu">
+          <span class="sr-only">Menu</span>
+          <span class="burger" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════ MOBILE MENU (disclosure sheet) ═══════════ -->
+  <div class="menu" id="menu" hidden>
+    <div class="menu__sky" aria-hidden="true"><span class="menu__sun"></span></div>
+    <nav class="menu__nav" aria-label="Mobile">
+      <ol>
+        <li><a href="#lineup"><span>01</span>Lineup</a></li>
+        <li><a href="#day"><span>02</span>The Day</a></li>
+        <li><a href="#actives"><span>03</span>Actives</a></li>
+        <li><a href="#sugar"><span>04</span>Real Sugar</a></li>
+        <li><a href="#shop"><span>05</span>The Beach Bag</a></li>
+        <li><a href="#faq"><span>06</span>FAQ</a></li>
+      </ol>
+    </nav>
+    <p class="menu__foot"><i data-lucide="truck"></i>Free shipping on every order</p>
+  </div>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ═══════════ 1 · HERO — "Get your summer glow" ═══════════ -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__sky" aria-hidden="true">
+        <div class="hero__layer hero__layer--noon"></div>
+        <div class="hero__layer hero__layer--gold"></div>
+        <div class="hero__sunwrap">
+          <div class="hero__sun">
+            <div class="hero__sun-rise">
+              <div class="sun-glow"></div>
+              <svg class="sun-svg" viewBox="0 0 400 400">
+                <defs>
+                  <radialGradient id="sunFill" cx="50%" cy="38%" r="66%">
+                    <stop offset="0%" style="stop-color:var(--sun-core)"/>
+                    <stop offset="52%" style="stop-color:var(--sun-edge)"/>
+                    <stop offset="100%" style="stop-color:var(--sun-low)"/>
+                  </radialGradient>
+                  <mask id="sunSlits" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="400">
+                    <rect width="400" height="400" fill="#fff"/>
+                    <g fill="#000">
+                      <rect class="slit" x="0" y="232" width="400" height="5"/>
+                      <rect class="slit" x="0" y="262" width="400" height="8"/>
+                      <rect class="slit" x="0" y="290" width="400" height="11"/>
+                      <rect class="slit" x="0" y="317" width="400" height="14"/>
+                      <rect class="slit" x="0" y="343" width="400" height="17"/>
+                    </g>
+                  </mask>
+                </defs>
+                <circle cx="200" cy="200" r="198" fill="url(#sunFill)" mask="url(#sunSlits)"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <svg class="palm-shade palm-shade--hero" data-fronds="hero" viewBox="0 0 1000 700" preserveAspectRatio="xMaxYMin slice"></svg>
+      </div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="kicker" data-intro><i data-lucide="sun"></i><span data-bind="heroKicker">Peptide Lollipops · Strawberry</span></p>
+          <h1 class="hero__title" id="hero-title">
+            <span class="line l1"><span>Get your</span></span>
+            <span class="line l2"><span>summer</span></span>
+            <span class="line l3"><span>glow</span></span>
+          </h1>
+          <p class="hero__sub" data-intro data-bind="heroSub">Collagen, hyaluronic acid and glow-boosting vitamins<sup>*</sup> in a really, really good strawberry lollipop. Beauty has never tasted this good.</p>
+          <div class="hero__ctas" data-intro>
+            <a class="btn btn--accent btn--lg" href="#shop" data-bind-href="ctaHref"><span data-bind="ctaLabel">Shop Strawberry Pops</span><i data-lucide="arrow-right"></i></a>
+            <a class="btn btn--ghost btn--lg" href="#day">Spend the day with us</a>
+          </div>
+          <ul class="proof" data-intro aria-label="Key facts" data-bind="proof">
+            <li><i data-lucide="candy"></i><span><b>47</b> cal a pop</span></li>
+            <li><i data-lucide="leaf"></i><span>Made with <b>real sugar</b></span></li>
+            <li><i data-lucide="sparkles"></i><span><b>6</b> skin-loving actives</span></li>
+          </ul>
+        </div>
+
+        <figure class="hero__arch" data-intro-arch>
+          <div class="arch">
+            <div class="arch__img">
+              <img src="../../images/model_pink.webp" alt="A woman in a pink bikini holding a pink Glo Pop lollipop beside a pink pool float on a sunny beach" width="1023" height="1537" fetchpriority="high" decoding="async">
+            </div>
+            <div class="arch__grade" aria-hidden="true"></div>
+            <svg class="palm-shade palm-shade--arch" data-fronds="arch" viewBox="0 0 600 800" preserveAspectRatio="xMidYMin slice" aria-hidden="true"></svg>
+          </div>
+          <figcaption class="arch__cap"><span>N° 01</span> Strawberry, on the beach</figcaption>
+        </figure>
+
+        <div class="hero__candy">
+          <div class="hero__candy-in" data-intro-candy>
+            <div class="candy-mount" id="heroCandy" aria-hidden="true"></div>
+            <div class="candy-fallback" hidden aria-hidden="true">
+              <svg viewBox="0 0 200 360"><defs><radialGradient id="fbBall" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#FFB3D6"/><stop offset=".55" stop-color="#FF1493"/><stop offset="1" stop-color="#B0005E"/></radialGradient></defs><rect x="93" y="150" width="14" height="200" rx="7" fill="#fff"/><circle cx="100" cy="100" r="86" fill="url(#fbBall)"/><ellipse cx="72" cy="64" rx="26" ry="16" fill="#fff" opacity=".55"/></svg>
+            </div>
+          </div>
+          <p class="spin-hint" aria-hidden="true"><i data-lucide="rotate-3d"></i><span data-bind="spinHint">Grab to spin · tap for a bite</span></p>
+        </div>
+
+        <div class="badge hero__badge" aria-hidden="true">
+          <div class="badge__spin">
+            <svg viewBox="0 0 120 120"><text><textPath href="#arc-badge" textLength="272">Get your summer glow · Beauty you can taste · </textPath></text></svg>
+          </div>
+          <i data-lucide="sun" class="badge__icon"></i>
+        </div>
+      </div>
+
+      <div class="ribbon ribbon--hero" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <!-- ═══════════ 2 · LINEUP — the postcard switcher (re-themes the page + swaps the 3D) ═══════════ -->
+    <section class="lineup" id="lineup" aria-labelledby="lineup-title">
+      <div class="wrap">
+        <header class="sec-head lineup__head">
+          <p class="eyebrow">The lineup</p>
+          <h2 class="poster sec-title" id="lineup-title" data-split>Pick your postcard</h2>
+          <p class="lead">Strawberry is here now. Green Gummies are on their way. And a few more colors are already in the mail.</p>
+        </header>
+
+        <div class="lineup__grid">
+          <div class="lineup__stage" data-reveal>
+            <div class="stage">
+              <div class="stage__sky" aria-hidden="true"><span class="stage__sun"></span></div>
+              <svg class="palm-shade palm-shade--stage" data-fronds="stage" viewBox="0 0 700 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+              <div class="stage__candy">
+                <div class="candy-mount" id="stageCandy" aria-hidden="true"></div>
+                <div class="candy-fallback" hidden aria-hidden="true">
+                  <svg viewBox="0 0 200 360"><rect x="93" y="150" width="14" height="200" rx="7" fill="#fff"/><circle cx="100" cy="100" r="86" fill="url(#g-moon)"/><ellipse cx="72" cy="64" rx="26" ry="16" fill="#fff" opacity=".55"/></svg>
+                </div>
+              </div>
+              <div class="ribbon ribbon--stage" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="stage__status"><span class="stage__dot" aria-hidden="true"></span><span data-bind="statusLabel">Available now</span></p>
+              <p class="stage__cap"><i data-lucide="rotate-3d"></i><span data-bind="stageCaption">Real-time 3D · grab to spin · tap for a bite</span></p>
+            </div>
+          </div>
+
+          <div class="lineup__side">
+            <p class="lineup__label" id="pick-label">Choose a postcard</p>
+            <div class="pc-tabs" role="tablist" aria-labelledby="pick-label">
+              <button class="pc-tab" type="button" role="tab" id="tab-strawberry-pop" aria-selected="true" aria-controls="lineup-panel" data-pick="strawberry-pop">
+                <span class="pc-tab__art pc-tab__art--pink">
+                  <img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async">
+                </span>
+                <span class="pc-tab__txt"><span class="pc-tab__title">Strawberry</span><span class="pc-tab__sub">Available now</span></span>
+                <svg class="pc-tab__pm" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="40"/><circle cx="44" cy="44" r="27"/><text><textPath href="#arc-pm" textLength="205">GLO POP · SUMMER MAIL · </textPath></text><text x="44" y="49" text-anchor="middle" class="pm-mid">Picked</text></svg>
+              </button>
+              <button class="pc-tab" type="button" role="tab" id="tab-green-gummies" aria-selected="false" aria-controls="lineup-panel" tabindex="-1" data-pick="green-gummies">
+                <span class="pc-tab__art pc-tab__art--green">
+                  <svg viewBox="0 0 160 120" aria-hidden="true">
+                    <g fill="url(#g-gummy)">
+                      <rect x="26" y="50" width="48" height="40" rx="18" transform="rotate(-14 50 70)"/>
+                      <rect x="76" y="34" width="52" height="44" rx="20" transform="rotate(11 102 56)"/>
+                      <rect x="56" y="68" width="48" height="38" rx="17" transform="rotate(-4 80 87)"/>
+                    </g>
+                    <g fill="#fff" opacity=".75"><circle cx="40" cy="62" r="1.4"/><circle cx="52" cy="58" r="1"/><circle cx="92" cy="46" r="1.3"/><circle cx="108" cy="52" r="1"/><circle cx="70" cy="80" r="1.2"/><circle cx="86" cy="84" r="1"/><circle cx="60" cy="74" r=".9"/><circle cx="100" cy="40" r=".9"/></g>
+                  </svg>
+                  <span class="pc-tab__flag">Concept</span>
+                </span>
+                <span class="pc-tab__txt"><span class="pc-tab__title">Green Gummies</span><span class="pc-tab__sub">Arriving soon</span></span>
+                <svg class="pc-tab__pm" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="40"/><circle cx="44" cy="44" r="27"/><text><textPath href="#arc-pm" textLength="205">GLO POP · SUMMER MAIL · </textPath></text><text x="44" y="49" text-anchor="middle" class="pm-mid">Picked</text></svg>
+              </button>
+              <button class="pc-tab" type="button" role="tab" id="tab-next-pop" aria-selected="false" aria-controls="lineup-panel" tabindex="-1" data-pick="next-pop">
+                <span class="pc-tab__art pc-tab__art--next">
+                  <svg viewBox="0 0 160 120" aria-hidden="true">
+                    <g opacity=".9">
+                      <rect x="51" y="30" width="4" height="40" rx="2" fill="#fff"/><circle cx="53" cy="30" r="15" fill="#F26A1B"/>
+                      <rect x="78" y="22" width="4" height="40" rx="2" fill="#fff"/><circle cx="80" cy="22" r="15" fill="#8B3FD6"/>
+                      <rect x="105" y="30" width="4" height="40" rx="2" fill="#fff"/><circle cx="107" cy="30" r="15" fill="#0E9CAD"/>
+                    </g>
+                    <rect x="22" y="50" width="116" height="60" rx="6" fill="#FFFBF5"/>
+                    <path d="M22 54 L80 86 L138 54" fill="none" stroke="#A9440B" stroke-width="2" stroke-linejoin="round"/>
+                    <rect x="22" y="50" width="116" height="60" rx="6" fill="none" stroke="#A9440B" stroke-width="2"/>
+                  </svg>
+                  <span class="pc-tab__flag">Colors TBD</span>
+                </span>
+                <span class="pc-tab__txt"><span class="pc-tab__title">Next one’s in the mail</span><span class="pc-tab__sub">In development</span></span>
+                <svg class="pc-tab__pm" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="40"/><circle cx="44" cy="44" r="27"/><text><textPath href="#arc-pm" textLength="205">GLO POP · SUMMER MAIL · </textPath></text><text x="44" y="49" text-anchor="middle" class="pm-mid">Picked</text></svg>
+              </button>
+            </div>
+
+            <div class="panel" id="lineup-panel" role="tabpanel" aria-labelledby="tab-strawberry-pop">
+              <div class="panel__in">
+                <p class="panel__status">Available now</p>
+                <h3 class="panel__title">Peptide Lollipops <em>Strawberry</em></h3>
+                <p class="panel__blurb">A really, really good strawberry lollipop with six skin-loving actives inside. Made with real sugar, one a day.</p>
+                <dl class="panel__facts">
+                  <div><dt>calories a pop</dt><dd>47</dd></div>
+                  <div><dt>pops per bag</dt><dd>10</dd></div>
+                  <div><dt>actives inside</dt><dd>6</dd></div>
+                  <div><dt>sugar, always</dt><dd>Real</dd></div>
+                </dl>
+                <div class="panel__ctas">
+                  <a class="btn btn--accent" href="#shop">Shop Strawberry Pops<i data-lucide="arrow-right"></i></a>
+                  <a class="btn btn--ghost" href="#actives">What’s inside</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 3 · A SUMMER DAY WITH GLO POP — pinned horizontal postcards (vertical stack on mobile) ═══════════ -->
+    <section class="day" id="day" aria-labelledby="day-title">
+      <div class="day__pin">
+        <div class="day__sky" aria-hidden="true">
+          <div class="day__layer day__layer--dawn"></div>
+          <div class="day__layer day__layer--noon"></div>
+          <div class="day__layer day__layer--gold"></div>
+          <div class="day__layer day__layer--night"></div>
+          <div class="day__stars"></div>
+          <div class="day__sun"><span></span></div>
+          <div class="day__moon">
+            <svg viewBox="0 0 200 260"><circle cx="100" cy="90" r="96" fill="url(#g-moon-glow)"/><rect x="95" y="120" width="10" height="130" rx="5" fill="#FFF8F0"/><circle cx="100" cy="90" r="52" fill="url(#g-moon)"/><ellipse cx="82" cy="70" rx="16" ry="10" fill="#fff" opacity=".55"/></svg>
+          </div>
+          <div class="day__sea"></div>
+          <div class="day__glint"></div>
+          <div class="day__glint day__glint--moon"></div>
+        </div>
+
+        <div class="day__track">
+          <header class="day__intro">
+            <p class="eyebrow">08:00 → 22:00</p>
+            <h2 class="poster day__title" id="day-title" data-split>A summer day with Glo Pop</h2>
+            <p class="day__intro-sub serif">Four postcards. One pop a day.</p>
+            <p class="day__cue" aria-hidden="true"><span>Scroll the day</span><i data-lucide="arrow-right" class="cue-h"></i><i data-lucide="arrow-down" class="cue-v"></i></p>
+          </header>
+
+          <!-- 08:00 -->
+          <article class="pc pc--morning" aria-labelledby="pc1-t">
+            <div class="pc__front">
+              <img src="../../images/peptide_lollipops.webp" alt="A pink pouch of Glo Pop Peptide Lollipops, strawberry flavor, 10 lollipops" width="1600" height="1600" loading="lazy" decoding="async">
+              <p class="pc__time"><b>08:00</b> Morning</p>
+            </div>
+            <div class="pc__back">
+              <div class="pc__top">
+                <p class="pc__step">Step 01</p>
+                <div class="pc__stamp" aria-hidden="true"><span class="perf"><span class="perf__in"><i data-lucide="sunrise"></i><b>08</b></span></span></div>
+                <svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g><text class="pm-arc"><textPath href="#arc-postmark" textLength="88">GLO POP · SUMMER MAIL</textPath></text><text x="44" y="53" text-anchor="middle" class="pm-time">08:00</text></svg>
+              </div>
+              <h3 class="pc__title" id="pc1-t">Unwrap &amp; enjoy</h3>
+              <p class="pc__note">One a day is the whole ritual. Pop one with your iced coffee, on the walk to the beach, or wherever the morning takes you. Strawberry flavor, made with real sugar.</p>
+              <ul class="chips" aria-label="Morning facts">
+                <li class="chip"><i data-lucide="sun"></i>One a day</li>
+                <li class="chip"><i data-lucide="lollipop"></i>Strawberry</li>
+                <li class="chip"><i data-lucide="package"></i>10 pops per bag</li>
+              </ul>
+              <div class="pc__foot"><p class="pc__sign serif">x, Glo Pop</p><p class="pc__to" aria-hidden="true">To: you, wherever the sun is</p></div>
+            </div>
+          </article>
+
+          <!-- 13:00 -->
+          <article class="pc pc--beach" aria-labelledby="pc2-t">
+            <div class="pc__front">
+              <img src="../../images/model_pink.webp" alt="A woman with long blonde hair smiling in the sun, holding a pink lollipop beside a pink pool float" width="1023" height="1537" loading="lazy" decoding="async">
+              <p class="pc__time"><b>13:00</b> The beach</p>
+            </div>
+            <div class="pc__back">
+              <div class="pc__top">
+                <p class="pc__step">Step 02</p>
+                <div class="pc__stamp" aria-hidden="true"><span class="perf"><span class="perf__in"><i data-lucide="waves"></i><b>13</b></span></span></div>
+                <svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g><text class="pm-arc"><textPath href="#arc-postmark" textLength="88">GLO POP · SUMMER MAIL</textPath></text><text x="44" y="53" text-anchor="middle" class="pm-time">13:00</text></svg>
+              </div>
+              <h3 class="pc__title" id="pc2-t">Six actives get to work</h3>
+              <p class="pc__note">While you soak up the afternoon, the good stuff goes to work from within:<sup>*</sup></p>
+              <ul class="pc__actives">
+                <li><i data-lucide="gem"></i><b>Collagen peptides</b><span>Firm &amp; plump</span></li>
+                <li><i data-lucide="droplet"></i><b>Hyaluronic acid</b><span>Hydration</span></li>
+                <li><i data-lucide="citrus"></i><b>Vitamin C</b><span>Brightening</span></li>
+                <li><i data-lucide="zap"></i><b>Vitamin B12</b><span>Energy</span></li>
+                <li><i data-lucide="sparkles"></i><b>Vitamin B6</b><span>Clear skin</span></li>
+                <li><i data-lucide="shield-check"></i><b>Zinc</b><span>Skin repair</span></li>
+              </ul>
+              <div class="pc__foot"><p class="pc__sign serif">wish you were here</p><p class="pc__to" aria-hidden="true">To: you, on the sun lounger</p></div>
+            </div>
+          </article>
+
+          <!-- 19:00 -->
+          <article class="pc pc--golden" aria-labelledby="pc3-t">
+            <div class="pc__front">
+              <img src="../../images/cta_model.webp" alt="A smiling woman with long dark hair holding a pink lollipop against a pink striped backdrop" width="832" height="1248" loading="lazy" decoding="async">
+              <p class="pc__time"><b>19:00</b> Golden hour</p>
+            </div>
+            <div class="pc__back">
+              <div class="pc__top">
+                <p class="pc__step">Step 03</p>
+                <div class="pc__stamp" aria-hidden="true"><span class="perf"><span class="perf__in"><i data-lucide="sunset"></i><b>19</b></span></span></div>
+                <svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g><text class="pm-arc"><textPath href="#arc-postmark" textLength="88">GLO POP · SUMMER MAIL</textPath></text><text x="44" y="53" text-anchor="middle" class="pm-time">19:00</text></svg>
+              </div>
+              <h3 class="pc__title" id="pc3-t">Glow from within</h3>
+              <p class="pc__note">Keep it daily. Most notice a visible difference in radiance within 2–4 weeks of daily use.<sup>*</sup> No pills, no powders, just a delicious lollipop.</p>
+              <ul class="chips" aria-label="Golden hour facts">
+                <li class="chip"><i data-lucide="calendar-heart"></i>2–4 weeks</li>
+                <li class="chip"><i data-lucide="repeat"></i>Every day</li>
+                <li class="chip"><i data-lucide="ban"></i>No pills required</li>
+              </ul>
+              <div class="pc__foot"><p class="pc__sign serif">golden, obviously</p><p class="pc__to" aria-hidden="true">To: you, at golden hour</p></div>
+            </div>
+          </article>
+
+          <!-- 22:00 -->
+          <article class="pc pc--night" aria-labelledby="pc4-t">
+            <div class="pc__front pc__front--art">
+              <svg class="night-art" viewBox="0 0 400 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="420" fill="url(#g-night)"/>
+                <g fill="#FFF3E4"><circle cx="40" cy="50" r="1.4"/><circle cx="96" cy="120" r="1"/><circle cx="150" cy="38" r="1.6"/><circle cx="210" cy="92" r="1"/><circle cx="330" cy="40" r="1.3"/><circle cx="372" cy="128" r="1"/><circle cx="60" cy="190" r="1.1"/><circle cx="300" cy="200" r=".9"/><circle cx="250" cy="24" r="1"/><circle cx="20" cy="120" r=".8"/></g>
+                <circle cx="248" cy="168" r="110" fill="url(#g-moon-glow)"/>
+                <rect x="243" y="196" width="10" height="96" rx="5" fill="#FFF8F0"/>
+                <circle cx="248" cy="168" r="54" fill="url(#g-moon)"/>
+                <ellipse cx="229" cy="146" rx="16" ry="10" fill="#fff" opacity=".55"/>
+                <rect y="300" width="400" height="120" fill="url(#g-sea)"/>
+                <g fill="none" style="stroke:var(--accent)" stroke-linecap="round" opacity=".8"><path d="M214 318h68" stroke-width="3"/><path d="M226 334h44" stroke-width="2.6"/><path d="M200 350h40M254 350h28" stroke-width="2.2"/><path d="M232 366h30" stroke-width="2"/><path d="M220 382h18M246 382h22" stroke-width="1.6"/></g>
+                <path d="M0 300h400" style="stroke:color-mix(in srgb, var(--accent) 55%, transparent)" stroke-width="1"/>
+              </svg>
+              <p class="pc__time"><b>22:00</b> Night</p>
+            </div>
+            <div class="pc__back">
+              <div class="pc__top">
+                <p class="pc__step">Same time tomorrow?</p>
+                <div class="pc__stamp" aria-hidden="true"><span class="perf"><span class="perf__in"><i data-lucide="moon-star"></i><b>22</b></span></span></div>
+                <svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g><text class="pm-arc"><textPath href="#arc-postmark" textLength="88">GLO POP · SUMMER MAIL</textPath></text><text x="44" y="53" text-anchor="middle" class="pm-time">22:00</text></svg>
+              </div>
+              <h3 class="pc__title" id="pc4-t">47 calories. Real sugar.</h3>
+              <p class="pc__note">No artificial sweeteners, no sugar alcohols, no stevia. Just a little real sugar, so your palate never gets the sweetness creep. Sweet dreams.</p>
+              <ul class="chips" aria-label="Night facts">
+                <li class="chip"><i data-lucide="candy"></i>47 cal a pop</li>
+                <li class="chip"><i data-lucide="leaf"></i>Real sugar</li>
+                <li class="chip"><i data-lucide="wheat-off"></i>Gluten-free</li>
+              </ul>
+              <div class="pc__foot"><p class="pc__sign serif">sweet dreams</p><p class="pc__to" aria-hidden="true">To: you, under the pink moon</p></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="day__hud" aria-hidden="true">
+          <span class="day__clock">08:00</span>
+          <div class="day__rail"><span class="day__dot"></span>
+            <ol class="day__ticks"><li>Morning</li><li>Beach</li><li>Golden hour</li><li>Night</li></ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 4 · ACTIVES — a sheet of six stamps (turn one over for its benefits) ═══════════ -->
+    <section class="actives" id="actives" aria-labelledby="actives-title">
+      <div class="ribbon ribbon--sunrise" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="wrap">
+        <header class="sec-head actives__head">
+          <p class="eyebrow">What’s inside</p>
+          <h2 class="poster sec-title" id="actives-title" data-split>Six actives, first class</h2>
+          <p class="lead">Every Glo Pop carries a full sheet of skin-loving actives. Tap a stamp to turn it over.</p>
+        </header>
+
+        <ul class="stamps" role="list">
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Collagen Peptides" aria-describedby="st-1">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 01</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="gem" class="stamp__icon"></i>
+                  <span class="stamp__name">Collagen Peptides</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Collagen Peptides</span>
+                  <span class="stamp__desc" id="st-1">Supports skin elasticity and hydration from within for a youthful, plump complexion.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="sparkles"></i>Firm &amp; Plump</span><span class="chip"><i data-lucide="droplet"></i>Hydration</span></span>
+                  <span class="stamp__foot"><span>N° 01 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Hyaluronic Acid" aria-describedby="st-2">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 02</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="droplet" class="stamp__icon"></i>
+                  <span class="stamp__name">Hyaluronic Acid</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Hyaluronic Acid</span>
+                  <span class="stamp__desc" id="st-2">Locks in moisture for plump, dewy skin that glows from the inside out.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="droplet"></i>Hydration</span><span class="chip"><i data-lucide="sun"></i>Dewy Glow</span></span>
+                  <span class="stamp__foot"><span>N° 02 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Vitamin C" aria-describedby="st-3">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 03</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="citrus" class="stamp__icon"></i>
+                  <span class="stamp__name">Vitamin C</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Vitamin C</span>
+                  <span class="stamp__desc" id="st-3">Brightens your complexion and protects against free radicals and environmental stress.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="sun"></i>Brightening</span><span class="chip"><i data-lucide="shield"></i>Antioxidant</span></span>
+                  <span class="stamp__foot"><span>N° 03 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Vitamin B12" aria-describedby="st-4">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 04</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="zap" class="stamp__icon"></i>
+                  <span class="stamp__name">Vitamin B12</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Vitamin B12</span>
+                  <span class="stamp__desc" id="st-4">Boosts energy and supports healthy metabolism so you feel as good as you look.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="zap"></i>Energy</span><span class="chip"><i data-lucide="activity"></i>Metabolism</span></span>
+                  <span class="stamp__foot"><span>N° 04 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Vitamin B6" aria-describedby="st-5">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 05</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="sparkles" class="stamp__icon"></i>
+                  <span class="stamp__name">Vitamin B6</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Vitamin B6</span>
+                  <span class="stamp__desc" id="st-5">Promotes clear, radiant skin by supporting your body’s natural renewal processes.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="smile"></i>Clear Skin</span><span class="chip"><i data-lucide="refresh-cw"></i>Renewal</span></span>
+                  <span class="stamp__foot"><span>N° 05 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+          <li class="stamps__item">
+            <button class="stamp" type="button" aria-pressed="false" aria-label="Zinc" aria-describedby="st-6">
+              <span class="stamp__inner">
+                <span class="stamp__face stamp__face--front"><span class="perf"><span class="perf__in">
+                  <span class="stamp__scene" aria-hidden="true"><span class="stamp__sun"></span></span>
+                  <span class="stamp__no">N° 06</span><span class="stamp__brand">Glo Pop</span>
+                  <i data-lucide="shield-check" class="stamp__icon"></i>
+                  <span class="stamp__name">Zinc</span>
+                  <span class="stamp__hint">Turn over<i data-lucide="refresh-cw"></i></span>
+                </span></span></span>
+                <span class="stamp__face stamp__face--back"><span class="perf"><span class="perf__in">
+                  <span class="stamp__kicker">Zinc</span>
+                  <span class="stamp__desc" id="st-6">Supports immune function and skin repair for a healthy, balanced complexion.*</span>
+                  <span class="chips"><span class="chip"><i data-lucide="shield-check"></i>Immunity</span><span class="chip"><i data-lucide="heart-pulse"></i>Skin Repair</span></span>
+                  <span class="stamp__foot"><span>N° 06 · Glo Pop</span><span>Turn back<i data-lucide="refresh-cw"></i></span></span>
+                </span></span></span>
+              </span>
+            </button>
+          </li>
+        </ul>
+        <p class="actives__note"><i data-lucide="info"></i><span>Amount per pop: <span class="ph">mg</span> for each active. A full supplement facts panel is <span class="ph">coming</span>.</span></p>
+      </div>
+    </section>
+
+    <!-- ═══════════ 5 · REAL SUGAR — the summer menu (clean-label story) ═══════════ -->
+    <section class="sugar" id="sugar" aria-labelledby="sugar-title">
+      <div class="wrap sugar__grid">
+        <div class="sugar__copy">
+          <p class="eyebrow">The real sugar difference</p>
+          <h2 class="poster sec-title" id="sugar-title" data-split>Made with real sugar</h2>
+          <p class="lead">Most sugar substitutes are far sweeter than sugar, and that can keep your brain accustomed to extreme sweetness, driving more cravings later in the day. So we use a little real sugar instead.</p>
+          <div class="sugar__stat" data-reveal>
+            <span class="sugar__num" aria-hidden="true"><span>47</span></span>
+            <p class="sugar__unit"><b><span class="sr-only">47 </span>calories a pop</b><span class="serif">A little real sugar goes a long way.</span></p>
+          </div>
+          <p class="sugar__creep" data-reveal><i data-lucide="brain"></i><span><b>No sweetness creep.</b> Super-sweet substitutes can train your palate to crave more sweetness all day. Real sugar keeps things balanced.</span></p>
+        </div>
+
+        <div class="menu-card" data-reveal>
+          <div class="menu-card__awning" aria-hidden="true"></div>
+          <div class="menu-card__body">
+            <p class="menu-card__kicker"><span>Glo Pop</span><span class="serif">the summer menu</span></p>
+            <h3 class="menu-card__h">On the menu</h3>
+            <ul class="menu-card__on" role="list">
+              <li><span>Real sugar</span><i aria-hidden="true"></i><b>always</b></li>
+              <li><span>Calories</span><i aria-hidden="true"></i><b>47 a pop</b></li>
+              <li><span>Gluten</span><i aria-hidden="true"></i><b>free</b></li>
+              <li><span>Flavor</span><i aria-hidden="true"></i><b>strawberry</b></li>
+            </ul>
+            <h3 class="menu-card__h">Never on the menu</h3>
+            <ul class="menu-card__off" role="list">
+              <li><span class="x">Artificial sweeteners</span></li>
+              <li><span class="x">Sugar alcohols</span></li>
+              <li><span class="x">Stevia</span></li>
+              <li><span class="x">Allulose<sup aria-hidden="true">1</sup></span></li>
+              <li><span class="x">OnoSweet<sup aria-hidden="true">2</sup></span></li>
+              <li><span class="x">Erythritol</span></li>
+              <li><span class="x">Xylitol</span></li>
+              <li><span class="x">Cornstarch</span></li>
+              <li><span class="x">Modified potato starch</span></li>
+            </ul>
+            <ol class="menu-card__notes">
+              <li>We’re watching allulose closely: it’s currently banned across the UK and Europe until it’s proven safe.</li>
+              <li>OnoSweet hasn’t secured European (EFSA) approval, which still requires extensive toxicology and safety data, so we leave it out.</li>
+            </ol>
+            <p class="menu-card__foot">Always free from ultra-processed fillers. Enjoy one a day as part of a balanced, happy lifestyle.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 6 · COMPARE — Glo Pop vs the typical supplement ═══════════ -->
+    <section class="compare" id="compare" aria-labelledby="compare-title">
+      <div class="wrap compare__grid">
+        <header class="sec-head compare__head">
+          <p class="eyebrow">Why Glo Pop</p>
+          <h2 class="poster sec-title" id="compare-title" data-split>Not just candy. It’s skincare.</h2>
+          <p class="lead">Most beauty supplements taste terrible or require swallowing pills. We took a sweeter approach.</p>
+          <div class="badge compare__badge" aria-hidden="true">
+            <div class="badge__spin"><svg viewBox="0 0 120 120"><text><textPath href="#arc-badge" textLength="272">No pills · No powders · Just a lollipop · </textPath></text></svg></div>
+            <i data-lucide="lollipop" class="badge__icon"></i>
+          </div>
+        </header>
+
+        <div class="compare__card" data-reveal>
+          <table class="compare__table">
+            <caption class="sr-only">Glo Pop compared with a typical supplement</caption>
+            <thead>
+              <tr>
+                <th scope="col"><span class="sr-only">Feature</span></th>
+                <th scope="col" class="is-us"><span class="compare__brand"><svg class="brand__mark" aria-hidden="true"><use href="#mark"/></svg>Glo Pop</span></th>
+                <th scope="col"><span class="compare__them"><i data-lucide="pill"></i>Typical supplement</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Tastes amazing</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td></tr>
+              <tr><th scope="row">Collagen peptides</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="check"></i><span class="sr-only">Yes</span></td></tr>
+              <tr><th scope="row">Hyaluronic acid</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td></tr>
+              <tr><th scope="row">No pills required</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td></tr>
+              <tr><th scope="row">Made with real sugar</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td></tr>
+              <tr><th scope="row">Under 50 calories</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="minus"></i><span class="sr-only">Not applicable</span></td></tr>
+              <tr><th scope="row">Fun to use</th><td class="is-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 7 · THE BEACH BAG — bundles as bag sizes, subscribe & save, gummies waitlist ═══════════ -->
+    <section class="shop" id="shop" aria-labelledby="shop-title">
+      <div class="ribbon ribbon--shop" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="wrap">
+        <header class="sec-head shop__head">
+          <p class="eyebrow">The beach bag</p>
+          <h2 class="poster sec-title" id="shop-title" data-split>Pack your beach bag</h2>
+          <p class="lead">Pick a size. Free shipping on every order.</p>
+          <div class="badge shop__badge" aria-hidden="true">
+            <div class="badge__spin"><svg viewBox="0 0 120 120"><text><textPath href="#arc-badge" textLength="272">Free shipping · On every order · Summer mail · </textPath></text></svg></div>
+            <i data-lucide="truck" class="badge__icon"></i>
+          </div>
+        </header>
+
+        <div class="shop__grid">
+          <form class="bag" id="bagForm" novalidate>
+            <p class="bag__notice" data-shop-notice hidden></p>
+
+            <fieldset class="seg">
+              <legend class="sr-only">Purchase type</legend>
+              <label class="seg__opt"><input type="radio" name="mode" value="once" checked><span>One-time</span></label>
+              <label class="seg__opt"><input type="radio" name="mode" value="sub"><span>Subscribe &amp; save <span class="ph">XX%</span></span></label>
+              <span class="seg__thumb" aria-hidden="true"></span>
+            </fieldset>
+
+            <fieldset class="tiers">
+              <legend class="sr-only">Choose a bag size</legend>
+              <label class="tier">
+                <input type="radio" name="tier" value="1">
+                <span class="tier__top"><svg class="tier__bag tier__bag--s" aria-hidden="true"><use href="#bag-clutch"/></svg><span class="tier__check" aria-hidden="true"><i data-lucide="check"></i></span></span>
+                <span class="tier__art" data-tier-art="1"><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span></span>
+                <span class="tier__name">The Clutch</span>
+                <span class="tier__qty" data-tier-qty="1">1 bag · 10 pops</span>
+                <span class="tier__line serif" data-tier-line="1">Ten days of glow</span>
+                <span class="tier__price"><span class="tier__amt">$<span class="ph">XX</span></span><span class="tier__per">$<span class="ph">X.XX</span> a pop</span></span>
+              </label>
+              <label class="tier">
+                <input type="radio" name="tier" value="2" checked>
+                <span class="tier__top"><svg class="tier__bag tier__bag--m" aria-hidden="true"><use href="#bag-tote"/></svg><span class="tier__flag">Save <span class="ph">XX%</span></span><span class="tier__check" aria-hidden="true"><i data-lucide="check"></i></span></span>
+                <span class="tier__art" data-tier-art="2"><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span></span>
+                <span class="tier__name">The Tote</span>
+                <span class="tier__qty" data-tier-qty="2">2 bags · 20 pops</span>
+                <span class="tier__line serif" data-tier-line="2">Twenty days of glow</span>
+                <span class="tier__price"><span class="tier__amt">$<span class="ph">XX</span></span><span class="tier__per">$<span class="ph">X.XX</span> a pop</span></span>
+              </label>
+              <label class="tier">
+                <input type="radio" name="tier" value="3">
+                <span class="tier__top"><svg class="tier__bag tier__bag--l" aria-hidden="true"><use href="#bag-beach"/></svg><span class="tier__flag">Save <span class="ph">XX%</span></span><span class="tier__check" aria-hidden="true"><i data-lucide="check"></i></span></span>
+                <span class="tier__art" data-tier-art="3"><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span><span class="pouch"><img src="../../images/peptide_lollipops.webp" alt="" width="1600" height="1600" loading="lazy" decoding="async"></span></span>
+                <span class="tier__name">The Beach Bag</span>
+                <span class="tier__qty" data-tier-qty="3">3 bags · 30 pops</span>
+                <span class="tier__line serif" data-tier-line="3">A month of glow</span>
+                <span class="tier__price"><span class="tier__amt">$<span class="ph">XX</span></span><span class="tier__per">$<span class="ph">X.XX</span> a pop</span></span>
+              </label>
+            </fieldset>
+
+            <div class="bag__bar">
+              <div class="bag__summary">
+                <p class="bag__sel" data-summary>Strawberry Peptide Lollipops · The Tote · 20 pops</p>
+                <p class="bag__terms" data-terms><i data-lucide="truck"></i>Free shipping on every order</p>
+              </div>
+              <button class="btn btn--accent btn--lg bag__submit" type="submit"><i data-lucide="shopping-bag"></i><span data-submit-label>Add to beach bag</span></button>
+            </div>
+            <p class="bag__msg" role="status" aria-live="polite"></p>
+          </form>
+
+          <aside class="waitlist" id="waitlist" aria-labelledby="waitlist-title">
+            <div class="waitlist__card">
+              <div class="waitlist__art" aria-hidden="true">
+                <svg viewBox="0 0 160 120">
+                  <g fill="url(#g-gummy)">
+                    <rect x="26" y="50" width="48" height="40" rx="18" transform="rotate(-14 50 70)"/>
+                    <rect x="76" y="34" width="52" height="44" rx="20" transform="rotate(11 102 56)"/>
+                    <rect x="56" y="68" width="48" height="38" rx="17" transform="rotate(-4 80 87)"/>
+                  </g>
+                  <g fill="#fff" opacity=".75"><circle cx="40" cy="62" r="1.4"/><circle cx="52" cy="58" r="1"/><circle cx="92" cy="46" r="1.3"/><circle cx="108" cy="52" r="1"/><circle cx="70" cy="80" r="1.2"/><circle cx="86" cy="84" r="1"/><circle cx="60" cy="74" r=".9"/><circle cx="100" cy="40" r=".9"/></g>
+                </svg>
+                <span class="waitlist__flag">Concept art</span>
+              </div>
+              <div class="waitlist__body">
+                <p class="eyebrow">Arriving soon</p>
+                <h3 class="waitlist__title" id="waitlist-title">Green Gummies</h3>
+                <dl class="waitlist__facts">
+                  <div><dt>Flavor</dt><dd><span class="ph">Flavor</span></dd></div>
+                  <div><dt>Per bag</dt><dd><span class="ph">Count</span></dd></div>
+                  <div><dt>Price</dt><dd>$<span class="ph">XX</span></dd></div>
+                  <div><dt>Launch</dt><dd><span class="ph">Date</span></dd></div>
+                </dl>
+                <form class="waitlist__form" id="waitlistForm" novalidate>
+                  <label class="waitlist__label" for="wl-email">Get a postcard in your inbox when they land</label>
+                  <div class="field">
+                    <input id="wl-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="wl-msg">
+                    <button class="btn btn--accent" type="submit"><i data-lucide="send"></i><span>Join the waitlist</span></button>
+                  </div>
+                  <p class="waitlist__msg" id="wl-msg" role="status" aria-live="polite"></p>
+                </form>
+                <p class="waitlist__fine">Prototype only: this form doesn’t send anything.</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 8 · FAQ — accessible accordion (dusk) ═══════════ -->
+    <section class="faq on-dark" id="faq" aria-labelledby="faq-title">
+      <div class="ribbon ribbon--dusk" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="faq__stars" aria-hidden="true"></div>
+      <div class="wrap faq__grid">
+        <header class="sec-head faq__head">
+          <p class="eyebrow">Good questions</p>
+          <h2 class="poster sec-title" id="faq-title" data-split>You asked</h2>
+          <p class="faq__aside serif">we answered, between swims.</p>
+        </header>
+        <div class="faq__list">
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q1" aria-expanded="false" aria-controls="faq-a1"><span>What are Glo Pop peptide lollipops?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a1" role="region" aria-labelledby="faq-q1"><div class="faq__a-in"><p>Glo Pops are beauty-boosting lollipops infused with collagen peptides, hyaluronic acid, Vitamin C, B12, B6, and Zinc. They’re designed to support your skin’s radiance, hydration, and overall glow,<sup>*</sup> all in a delicious strawberry treat that’s only 47 calories.</p></div></div>
+          </div>
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q2" aria-expanded="false" aria-controls="faq-a2"><span>How many should I have per day?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a2" role="region" aria-labelledby="faq-q2"><div class="faq__a-in"><p>We recommend enjoying one Glo Pop per day as part of your daily beauty routine. Consistency is key: most notice a visible difference in their skin’s radiance within 2–4 weeks of daily use.<sup>*</sup></p></div></div>
+          </div>
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q3" aria-expanded="false" aria-controls="faq-a3"><span>Are they made with real sugar?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a3" role="region" aria-labelledby="faq-q3"><div class="faq__a-in"><p>Yes! Glo Pops are made with real sugar: no artificial sweeteners, no sugar alcohols, no stevia. Just real, delicious sweetness at only 47 calories per lollipop.</p></div></div>
+          </div>
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q4" aria-expanded="false" aria-controls="faq-a4"><span>What do they taste like?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a4" role="region" aria-labelledby="faq-q4"><div class="faq__a-in"><p>Like a really, really good strawberry lollipop. We spent months perfecting the flavor so you’d never guess there are six powerful beauty ingredients inside. That’s why we call it the most delicious skincare.</p></div></div>
+          </div>
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q5" aria-expanded="false" aria-controls="faq-a5"><span>Are they gluten-free?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a5" role="region" aria-labelledby="faq-q5"><div class="faq__a-in"><p>Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that everyone can enjoy. If you have specific dietary concerns or allergies, please check the full ingredient list on the product packaging.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 9 · FINALE — "Wish you were here" (night) ═══════════ -->
+    <section class="finale on-dark" id="finale" aria-labelledby="finale-title">
+      <div class="finale__photo">
+        <img src="../../images/cta_model.webp" alt="A smiling woman in a pink bikini holding a pink Glo Pop lollipop" width="832" height="1248" loading="lazy" decoding="async">
+      </div>
+      <div class="finale__sky" aria-hidden="true">
+        <div class="finale__stars"></div>
+      </div>
+      <div class="finale__moon" aria-hidden="true"><svg viewBox="0 0 200 260"><circle cx="100" cy="90" r="96" fill="url(#g-moon-glow)"/><rect x="95" y="120" width="10" height="130" rx="5" fill="#FFF8F0"/><circle cx="100" cy="90" r="52" fill="url(#g-moon)"/><ellipse cx="82" cy="70" rx="16" ry="10" fill="#fff" opacity=".55"/></svg></div>
+      <div class="wrap finale__copy">
+        <p class="eyebrow">Ready when you are</p>
+        <h2 class="poster finale__title" id="finale-title" data-split>Wish you were here</h2>
+        <p class="finale__sign serif">love, Glo Pop</p>
+        <p class="finale__lead">Make Glo Pop part of your daily beauty ritual. Free shipping on every order.</p>
+        <div class="finale__ctas">
+          <a class="btn btn--accent btn--lg" href="#shop" data-bind-href="ctaHref"><span data-bind="ctaLabel">Shop Strawberry Pops</span><i data-lucide="arrow-right"></i></a>
+        </div>
+        <p class="finale__note"><span>10 lollipops per bag <span aria-hidden="true">·</span></span> <span>Only 47 calories each <span aria-hidden="true">·</span></span> <span>Made with real sugar</span></p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════ 10 · FOOTER ═══════════ -->
+  <footer class="foot on-dark">
+    <div class="wrap foot__grid">
+      <div class="foot__brand">
+        <a class="brand brand--foot" href="#top" aria-label="Glo Pop, back to top"><svg class="brand__mark" aria-hidden="true"><use href="#mark"/></svg><span class="brand__word">Glo Pop</span></a>
+        <p>The most delicious skincare. Peptide lollipops with collagen, vitamins, and everything your skin craves. Beauty has never tasted this good.</p>
+        <p class="foot__social"><i data-lucide="instagram"></i>Follow along at <span class="ph">@handle</span></p>
+      </div>
+      <nav class="foot__col" aria-labelledby="f-shop">
+        <h2 id="f-shop">Shop</h2>
+        <ul role="list"><li><a href="#shop">Glo Pops</a></li><li><a href="#shop">Bundles</a></li><li><a href="#shop">Subscribe &amp; Save</a></li><li><a href="#">Gift Cards</a></li></ul>
+      </nav>
+      <nav class="foot__col" aria-labelledby="f-learn">
+        <h2 id="f-learn">Learn</h2>
+        <ul role="list"><li><a href="#">Our Story</a></li><li><a href="#actives">Ingredients</a></li><li><a href="#">Blog</a></li><li><a href="#faq">FAQ</a></li></ul>
+      </nav>
+      <nav class="foot__col" aria-labelledby="f-help">
+        <h2 id="f-help">Support</h2>
+        <ul role="list"><li><a href="#">Contact</a></li><li><a href="#">Shipping</a></li><li><a href="#">Returns</a></li><li><a href="#">Privacy</a></li></ul>
+      </nav>
+    </div>
+    <div class="wrap foot__legal">
+      <p class="foot__fda">*These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p>
+      <div class="foot__bottom">
+        <p>© 2026 Glo Pop. All rights reserved.</p>
+        <a class="foot__proposals" href="../index.html">All proposals<i data-lucide="arrow-up-right"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════ STICKY MOBILE SHOP BAR ═══════════ -->
+  <aside class="buybar" aria-label="Quick shop">
+    <p class="buybar__txt"><b data-bind="barTitle">Strawberry Pops</b><span data-bind="barSub">10 per bag · free shipping</span></p>
+    <a class="btn btn--accent btn--sm" href="#shop" data-bind-href="ctaHref"><span data-bind="barCta">Shop</span><i data-lucide="arrow-right"></i></a>
+  </aside>
+
+  <!-- ═══════════ OVERLAYS: film grade (scroll-driven), grain, prototype chip ═══════════ -->
+  <div class="grade" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <a class="proto-chip" href="../index.html">Proposal 05 · Golden Hour <span aria-hidden="true">·</span> All proposals <i data-lucide="arrow-right"></i></a>
+
+  <!-- ═══════════ SCRIPTS ═══════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" defer></script>
+  <script src="../_shared/candy3d.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glo Pop · Design proposals</title>
+<meta name="description" content="Glo Pop website design proposals.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#FFF8F5; --card:#fff; --ink:#3A0A24; --muted:#8E5076; --line:rgba(122,27,77,.14); --pink:#FF1493; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.4 'Poppins',system-ui,sans-serif}
+  img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+  .wrap{width:min(1320px,100% - 32px);margin:0 auto;padding:clamp(28px,5vw,56px) 0 64px}
+  h1{margin:0 0 clamp(20px,3vw,32px);font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,560px),1fr));gap:clamp(16px,2.4vw,28px)}
+  .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;
+        box-shadow:0 1px 2px rgba(58,10,36,.05),0 12px 36px -20px rgba(58,10,36,.3);transition:transform .25s ease,box-shadow .25s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(58,10,36,.06),0 22px 44px -22px rgba(58,10,36,.45)}
+  .card:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+  .shots{display:grid;grid-template-columns:1fr .3fr;gap:10px;align-items:start}
+  .shots span{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#f4eef0}
+  .d{aspect-ratio:1440/900}
+  .m{aspect-ratio:390/844}
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 4px 2px}
+  .name{font-size:18px;font-weight:600}
+  .name b{color:var(--pink);font-weight:600;margin-right:8px}
+  .sw{display:flex;gap:5px;flex:none}
+  .sw i{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
+  @media (prefers-reduced-motion: reduce){ .card{transition:none} .card:hover{transform:none} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Glo Pop · Design proposals</h1>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+  var PROPOSALS = [
+    ['01', '01-editorial', 'The Glo Issue', ['#FBF0EC', '#4A0D2E', '#FF1493', '#EEF3EC', '#1FA453']],
+    ['02', '02-candy', 'Sweet Riot', ['#FF1493', '#FF8AC6', '#E8174B', '#FFF4E8', '#22C55E']],
+    ['03', '03-lab', 'Glow Lab', ['#FAF8F7', '#1B0B14', '#FF1493', '#E9E2E5', '#1FA453']],
+    ['04', '04-prism', 'Prism', ['#FFF8FC', '#EBDDFF', '#FFD9C7', '#D6ECFF', '#FF1493']],
+    ['05', '05-golden', 'Golden Hour', ['#FFB38A', '#FF6F61', '#FF1493', '#4E0E36', '#FFC94A']],
+    ['06', '06-riviera', 'Riviera', ['#FFFDF8', '#5DD6E8', '#1D9BD1', '#FF1493', '#F5E6D0']]
+  ];
+  document.getElementById('grid').innerHTML = PROPOSALS.map(function (p) {
+    var t = '_qa/thumbs/' + p[1] + '/';
+    return '<a class="card" href="' + p[1] + '/index.html">' +
+      '<div class="shots">' +
+        '<span class="d"><img src="' + t + 'desktop-00.webp" alt="' + p[2] + ', desktop" width="1440" height="900" loading="lazy"></span>' +
+        '<span class="m"><img src="' + t + 'mobile-00.webp" alt="' + p[2] + ', phone" width="390" height="844" loading="lazy"></span>' +
+      '</div>' +
+      '<div class="meta"><span class="name"><b>' + p[0] + '</b>' + p[2] + '</span>' +
+        '<span class="sw" aria-hidden="true">' + p[3].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span></div>' +
+    '</a>';
+  }).join('');
+</script>
+</body>
+</html>
