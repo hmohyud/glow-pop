@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glo Pop</title>
+  <meta name="description" content="Beauty-boosting peptide lollipops with collagen, hyaluronic acid, Vitamin C, B12, B6 & Zinc. Only 47 calories. Get your summer glow.">
+
+  <!-- Social link preview (Open Graph + Twitter) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Glo Pop">
+  <meta property="og:title" content="Glo Pop — The Most Delicious Skincare">
+  <meta property="og:description" content="Peptide lollipops with collagen, hyaluronic acid, Vitamin C, B12, B6 & Zinc. Real sugar, only 47 calories. Get your summer glow.">
+  <meta property="og:url" content="https://hmohyud.github.io/glow-pop/first-draft/">
+  <meta property="og:image" content="https://hmohyud.github.io/glow-pop/images/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Glo Pop — The Most Delicious Skincare">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Glo Pop — The Most Delicious Skincare">
+  <meta name="twitter:description" content="Peptide lollipops with collagen, hyaluronic acid, Vitamin C, B12, B6 & Zinc. Real sugar, only 47 calories.">
+  <meta name="twitter:image" content="https://hmohyud.github.io/glow-pop/images/og-card.png">
+  <meta name="theme-color" content="#FF1493">
+
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/styles.css">
+</head>
+<body>
+
+  <!-- SCROLL PROGRESS -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- PRELOADER -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-lollipop">
+      <div class="preloader-candy"></div>
+      <div class="preloader-stick"></div>
+    </div>
+    <div class="preloader-text">Glo Pop</div>
+  </div>
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement-bar">
+    <div class="announcement-set">
+      <span>Free Shipping on All Orders</span>
+      <span>Get Your Summer Glow</span>
+      <span>Collagen-Infused Lollipops</span>
+      <span>Only 47 Calories Per Pop</span>
+      <span>Made With Real Sugar</span>
+    </div>
+    <div class="announcement-set" aria-hidden="true">
+      <span>Free Shipping on All Orders</span>
+      <span>Get Your Summer Glow</span>
+      <span>Collagen-Infused Lollipops</span>
+      <span>Only 47 Calories Per Pop</span>
+      <span>Made With Real Sugar</span>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo">Glo<i>Pop</i></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#benefits"><span class="nav-dot"><i data-lucide="sparkles"></i></span><span class="nav-txt">Benefits</span></a></li>
+      <li><a href="#ingredients"><span class="nav-dot"><i data-lucide="leaf"></i></span><span class="nav-txt">Ingredients</span></a></li>
+      <li><a href="#how"><span class="nav-dot"><i data-lucide="list"></i></span><span class="nav-txt">How It Works</span></a></li>
+      <li><a href="#faq"><span class="nav-dot"><i data-lucide="message-circle"></i></span><span class="nav-txt">FAQ</span></a></li>
+      <li><a href="#" class="nav-cta"><span class="nav-dot"><i data-lucide="shopping-bag"></i></span><span class="nav-txt">Shop Now</span></a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-circle"></div>
+    <div class="hero-bg-circle"></div>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge reveal">
+          <span class="stars"><i data-lucide="sparkles">&#10024;</i></span>
+          Collagen &bull; Hyaluronic Acid &bull; Vitamin C
+        </div>
+        <p class="hero-tagline reveal reveal-delay-1">Get Your Summer Glow</p>
+        <h1 class="hero-title reveal reveal-delay-2">
+          The Most <span class="highlight">Delicious</span> Skincare
+        </h1>
+        <p class="hero-desc reveal reveal-delay-3">
+          Peptide-powered lollipops with collagen, hyaluronic acid, and glow-boosting
+          vitamins. Beauty has never tasted this good.
+        </p>
+        <div class="hero-buttons reveal reveal-delay-4">
+          <a href="#" class="btn btn-primary">Shop Now &mdash; Free Shipping</a>
+          <a href="#ingredients" class="btn btn-outline">Learn More</a>
+        </div>
+        <div class="hero-trust reveal reveal-delay-5">
+          <div class="trust-item">
+            <span class="trust-check">&#10003;</span> Collagen Peptides
+          </div>
+          <div class="trust-item">
+            <span class="trust-check">&#10003;</span> Real Sugar
+          </div>
+          <div class="trust-item">
+            <span class="trust-check">&#10003;</span> Low Calorie
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="hero-image-wrapper">
+          <img src="../images/model_pink.jpg" alt="Glo Pop lifestyle" width="520" height="780" loading="eager">
+        </div>
+        <div class="hero-float-circle float-1">
+          <span>Low</span>
+          <small>Cals</small>
+          <div class="float-stick stick-2"></div>
+        </div>
+        <div class="hero-float-circle float-2">
+          <span>6</span>
+          <small>Actives</small>
+          <div class="float-stick stick-2"></div>
+        </div>
+        <div class="hero-float-circle float-3">
+          <span>10</span>
+          <small>Pops</small>
+          <div class="float-stick stick-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT SHOWCASE -->
+  <section class="product-section section-pad" id="benefits">
+    <div class="wave-divider" aria-hidden="true"></div>
+    <div class="product-grid">
+      <div class="product-image-area">
+        <div class="product-image-frame gsap-hidden">
+          <div class="product-glow"></div>
+          <img src="../images/peptide_lollipops.jpg" alt="Glo Pop Peptide Lollipops packaging" width="600" height="600" loading="lazy">
+          <span class="sparkle" style="top:11%;right:15%;width:16px;height:16px;animation-delay:0s"></span>
+          <span class="sparkle" style="top:17%;right:9%;width:10px;height:10px;animation-delay:.5s;animation-duration:2.6s"></span>
+          <span class="sparkle" style="top:24%;right:18%;width:8px;height:8px;animation-delay:1.1s"></span>
+          <span class="sparkle" style="bottom:21%;left:13%;width:15px;height:15px;animation-delay:.8s;animation-duration:3.9s"></span>
+          <span class="sparkle" style="bottom:28%;left:8%;width:9px;height:9px;animation-delay:1.6s"></span>
+          <span class="sparkle" style="top:13%;left:24%;width:12px;height:12px;animation-delay:2.1s"></span>
+          <span class="sparkle" style="bottom:14%;right:22%;width:11px;height:11px;animation-delay:.3s;animation-duration:2.4s"></span>
+          <span class="sparkle" style="top:34%;left:11%;width:9px;height:9px;animation-delay:1.4s"></span>
+          <span class="sparkle" style="bottom:34%;right:13%;width:13px;height:13px;animation-delay:2.6s;animation-duration:4.1s"></span>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="section-label reveal">Your Glow Up Bestie</div>
+        <h2 class="section-title reveal reveal-delay-1">
+          Beauty You Can <span class="highlight">Taste</span>
+        </h2>
+        <p class="section-subtitle reveal reveal-delay-2" style="text-align:left;">
+          Every Glo Pop is packed with skin-loving ingredients that work from the inside out.
+          No pills, no powders &mdash; just a delicious lollipop.
+        </p>
+        <div class="product-callouts">
+          <div class="callout reveal reveal-delay-3">
+            <div class="callout-icon"><i data-lucide="sparkles">&#10024;</i></div>
+            <div>
+              <h4>Glow-Boosting Formula</h4>
+              <p>Collagen peptides and hyaluronic acid for radiant, hydrated skin all summer long.</p>
+            </div>
+          </div>
+          <div class="callout reveal reveal-delay-4">
+            <div class="callout-icon"><i data-lucide="candy">&#127852;</i></div>
+            <div>
+              <h4>Only 47 Calories</h4>
+              <p>Made with real sugar, not artificial sweeteners. A guilt-free treat that tastes amazing.</p>
+            </div>
+          </div>
+          <div class="callout reveal reveal-delay-5">
+            <div class="callout-icon"><i data-lucide="zap">&#128171;</i></div>
+            <div>
+              <h4>Vitamin Powerhouse</h4>
+              <p>Loaded with Vitamin C, B12, B6 and Zinc to support your skin, energy, and immunity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wave-divider wave-divider-bottom" aria-hidden="true"></div>
+  </section>
+
+  <!-- INGREDIENTS -->
+  <section class="ingredients-section section-pad" id="ingredients">
+    <div class="section-header">
+      <div class="section-label reveal">What's Inside</div>
+      <h2 class="section-title reveal reveal-delay-1">
+        6 Glow-Boosting <span class="highlight">Ingredients</span>
+      </h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Every lollipop is formulated with clinically-studied ingredients for skin, energy, and radiance.
+      </p>
+    </div>
+    <div class="ingredients-grid">
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Collagen Peptides — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="gem">&#129526;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Collagen Peptides</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Collagen Peptides</h3>
+              <p>Supports skin elasticity and hydration from within for a youthful, plump complexion.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="sparkles"></i>Firm &amp; Plump</span>
+                <span class="ic-benefit"><i data-lucide="droplet"></i>Hydration</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Hyaluronic Acid — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="droplet">&#128167;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Hyaluronic Acid</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Hyaluronic Acid</h3>
+              <p>Locks in moisture for plump, dewy skin that glows from the inside out.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="droplet"></i>Hydration</span>
+                <span class="ic-benefit"><i data-lucide="sun"></i>Dewy Glow</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Vitamin C — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="citrus">&#127818;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Vitamin C</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Vitamin C</h3>
+              <p>Brightens your complexion and protects against free radicals and environmental stress.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="sun"></i>Brightening</span>
+                <span class="ic-benefit"><i data-lucide="shield"></i>Antioxidant</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Vitamin B12 — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="zap">&#9889;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Vitamin B12</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Vitamin B12</h3>
+              <p>Boosts energy and supports healthy metabolism so you feel as good as you look.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="zap"></i>Energy</span>
+                <span class="ic-benefit"><i data-lucide="activity"></i>Metabolism</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Vitamin B6 — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="sparkles">&#10024;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Vitamin B6</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Vitamin B6</h3>
+              <p>Promotes clear, radiant skin by supporting your body's natural renewal processes.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="smile"></i>Clear Skin</span>
+                <span class="ic-benefit"><i data-lucide="refresh-cw"></i>Renewal</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ingredient-card gsap-hidden">
+        <div class="ingredient-flip" tabindex="0" role="button" aria-pressed="false" aria-label="Zinc — click to see benefits">
+          <div class="ic-inner">
+            <div class="ic-front">
+              <div class="ingredient-circle"><i data-lucide="shield-check">&#128737;</i></div>
+              <div class="ingredient-stick"></div>
+              <h3>Zinc</h3>
+              <span class="ic-hint">Click to see benefits</span>
+            </div>
+            <div class="ic-back">
+              <h3>Zinc</h3>
+              <p>Supports immune function and skin repair for a healthy, balanced complexion.</p>
+              <div class="ic-benefits">
+                <span class="ic-benefit"><i data-lucide="shield-check"></i>Immunity</span>
+                <span class="ic-benefit"><i data-lucide="heart-pulse"></i>Skin Repair</span>
+              </div>
+              <span class="ic-hint ic-hint--back">&#8634; Flip back</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY GLO POP -->
+  <section class="why-section section-pad">
+    <div id="lolly3dMount" aria-hidden="true"></div>
+    <div class="section-header">
+      <div class="section-label reveal">Why Glo Pop?</div>
+      <h2 class="section-title reveal reveal-delay-1">
+        Not Just Candy. It's Skincare.
+      </h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Most beauty supplements taste terrible or require swallowing pills.
+        We took a sweeter approach.
+      </p>
+    </div>
+    <div class="comparison-table reveal reveal-delay-3">
+      <div class="comparison-header">
+        <span>Feature</span>
+        <span>Glo Pop</span>
+        <span>Typical Supplement</span>
+      </div>
+      <div class="comparison-row">
+        <span>Tastes Amazing</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#10007;</span>
+      </div>
+      <div class="comparison-row">
+        <span>Collagen Peptides</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-yes">&#10003;</span>
+      </div>
+      <div class="comparison-row">
+        <span>Hyaluronic Acid</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#10007;</span>
+      </div>
+      <div class="comparison-row">
+        <span>No Pills Required</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#10007;</span>
+      </div>
+      <div class="comparison-row">
+        <span>Made With Real Sugar</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#10007;</span>
+      </div>
+      <div class="comparison-row">
+        <span>Under 50 Calories</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#8212;</span>
+      </div>
+      <div class="comparison-row">
+        <span>Fun to Use</span>
+        <span class="check-yes">&#10003;</span>
+        <span class="check-no">&#10007;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section section-pad" id="how">
+    <div class="section-header">
+      <div class="section-label reveal">How It Works</div>
+      <h2 class="section-title reveal reveal-delay-1">
+        Three Steps to <span class="highlight">Glowing</span>
+      </h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Getting your daily glow has never been easier (or tastier).
+      </p>
+    </div>
+    <div class="steps-container">
+      <div class="steps-line"><div class="steps-line-fill" id="stepsLineFill"></div></div>
+      <div class="step reveal" data-step="1">
+        <div class="step-lollipop">
+          <div class="step-circle">1</div>
+          <div class="step-stick"></div>
+        </div>
+        <h3>Unwrap &amp; Enjoy</h3>
+        <p>Pop open a Glo Pop and savor every delicious lick. Strawberry flavor, made with real sugar.</p>
+      </div>
+      <div class="step reveal reveal-delay-2" data-step="2">
+        <div class="step-lollipop">
+          <div class="step-circle">2</div>
+          <div class="step-stick"></div>
+        </div>
+        <h3>Ingredients Absorb</h3>
+        <p>Collagen peptides, hyaluronic acid, and vitamins go to work nourishing your skin from within.</p>
+      </div>
+      <div class="step reveal reveal-delay-4" data-step="3">
+        <div class="step-lollipop">
+          <div class="step-circle">3</div>
+          <div class="step-stick"></div>
+        </div>
+        <h3>Glow From Within</h3>
+        <p>See and feel the difference &mdash; radiant, hydrated skin that glows all summer long.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL SUGAR -->
+  <section class="sugar-section section-pad fxhost flow-diff">
+    <canvas class="fx-canvas" data-fx="aurora" data-title-src aria-hidden="true"></canvas>
+
+    <div class="section-header">
+      <div class="section-label reveal">The Real Sugar Difference</div>
+      <h2 class="section-title reveal reveal-delay-1" data-title-fx="Made With Real Sugar">
+        Made With <span class="highlight">Real Sugar</span><canvas class="title-fx" aria-hidden="true"></canvas>
+      </h2>
+      <p class="section-subtitle reveal reveal-delay-2">
+        Most sugar substitutes are far sweeter than sugar &mdash; and that can keep your brain
+        accustomed to extreme sweetness, driving more cravings later in the day. So we use a
+        little real sugar instead: just 47 delicious calories a pop.
+      </p>
+    </div>
+
+    <div class="sugar-grid">
+      <div class="sugar-card reveal">
+        <div class="sugar-card-icon"><i data-lucide="candy">&#127853;</i></div>
+        <div class="sugar-card-stick"></div>
+        <h3>Just 47 Calories</h3>
+        <p>A little real sugar goes a long way. Each pop is mindfully portioned at just 47 calories.</p>
+      </div>
+      <div class="sugar-card reveal reveal-delay-1">
+        <div class="sugar-card-icon"><i data-lucide="brain">&#129504;</i></div>
+        <div class="sugar-card-stick"></div>
+        <h3>No Sweetness Creep</h3>
+        <p>Super-sweet substitutes can train your palate to crave more sweetness all day. Real sugar keeps things balanced.</p>
+      </div>
+      <div class="sugar-card reveal reveal-delay-2">
+        <div class="sugar-card-icon"><i data-lucide="leaf">&#127807;</i></div>
+        <div class="sugar-card-stick"></div>
+        <h3>No Allulose</h3>
+        <p>We're watching allulose closely &mdash; it's currently banned across the UK and Europe until it's proven safe.</p>
+      </div>
+      <div class="sugar-card reveal reveal-delay-3">
+        <div class="sugar-card-icon"><i data-lucide="flask-conical">&#128737;</i></div>
+        <div class="sugar-card-stick"></div>
+        <h3>No OnoSweet</h3>
+        <p>It hasn't secured European (EFSA) approval, which still requires extensive toxicology and safety data &mdash; so we leave it out.</p>
+      </div>
+    </div>
+
+    <div class="freefrom reveal">
+      <span class="freefrom-label">Always free from ultra-processed fillers</span>
+      <div class="freefrom-pills">
+        <span class="freefrom-pill">Cornstarch</span>
+        <span class="freefrom-pill">Modified Potato Starch</span>
+        <span class="freefrom-pill">Erythritol</span>
+        <span class="freefrom-pill">Xylitol</span>
+      </div>
+    </div>
+
+    <p class="sugar-footnote reveal">Enjoy one Glo Pop a day as part of a balanced, happy lifestyle &mdash; glowing starts with feeling good about what you eat.</p>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section section-pad">
+    <canvas id="lollipopCanvas"></canvas>
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-circle"><div class="stat-circle-inner"></div></div>
+        <div class="stat-circle-stick"></div>
+        <div class="stat-number" data-target="47">0</div>
+        <div class="stat-label">Calories Per Pop</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-circle"><div class="stat-circle-inner"></div></div>
+        <div class="stat-circle-stick"></div>
+        <div class="stat-number" data-target="6">0</div>
+        <div class="stat-label">Glow Ingredients</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-circle"><div class="stat-circle-inner"></div></div>
+        <div class="stat-circle-stick"></div>
+        <div class="stat-number" data-target="10">0</div>
+        <div class="stat-label">Pops Per Bag</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section section-pad fxhost" id="faq">
+    <canvas class="fx-canvas" data-fx="grid" data-mask="tight" aria-hidden="true"></canvas>
+    <div class="section-header">
+      <div class="section-label reveal">Got Questions?</div>
+      <h2 class="section-title reveal reveal-delay-1">
+        Frequently <span class="highlight">Asked</span>
+      </h2>
+    </div>
+    <div class="faq-container">
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          What are Glo Pop peptide lollipops?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Glo Pops are beauty-boosting lollipops infused with collagen peptides, hyaluronic acid,
+            Vitamin C, B12, B6, and Zinc. They're designed to support your skin's radiance,
+            hydration, and overall glow &mdash; all in a delicious strawberry treat that's only 47 calories.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question">
+          How many should I have per day?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            We recommend enjoying one Glo Pop per day as part of your daily beauty routine.
+            Consistency is key &mdash; most girls notice a visible difference in their skin's
+            radiance within 2&ndash;4 weeks of daily use.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <button class="faq-question">
+          Are they made with real sugar?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Yes! Glo Pops are made with real sugar &mdash; no artificial sweeteners, no sugar
+            alcohols, no stevia. Just real, delicious sweetness at only 47 calories per lollipop.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <button class="faq-question">
+          What do they taste like?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Like a really, really good strawberry lollipop. We spent months perfecting the flavor
+            so you'd never guess there are six powerful beauty ingredients inside. That's why we
+            call it the most delicious skincare.
+          </div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-4">
+        <button class="faq-question">
+          Are they gluten-free?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that
+            everyone can enjoy. If you have specific dietary concerns or allergies, please check
+            the full ingredient list on the product packaging.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section section-pad">
+    <div class="cta-bg-circles">
+      <div class="cta-circle"></div>
+      <div class="cta-circle"></div>
+      <div class="cta-circle"></div>
+      <div class="cta-circle"></div>
+    </div>
+    <div class="cta-content">
+      <div class="cta-image reveal">
+        <img src="../images/cta_model.webp" alt="Model enjoying a Glo Pop lollipop" width="832" height="1248" loading="lazy">
+      </div>
+      <div class="cta-text">
+        <div class="section-header">
+          <div class="section-label reveal" style="color:var(--pink-200);">Ready?</div>
+          <h2 class="section-title reveal reveal-delay-1">
+            Get Your Summer Glow
+          </h2>
+          <p class="section-subtitle reveal reveal-delay-2" style="color:var(--pink-200);">
+            Make Glo Pop part of your daily beauty ritual.
+            Free shipping on every order.
+          </p>
+        </div>
+        <div class="reveal reveal-delay-3">
+          <a href="#" class="btn btn-white">Shop Glo Pops &mdash; Free Shipping</a>
+          <p class="cta-note">10 lollipops per bag &bull; Only 47 calories each &bull; Made with real sugar</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo">Glo<i>Pop</i></a>
+        <p>The most delicious skincare. Peptide lollipops with collagen, vitamins,
+           and everything your skin craves. Beauty has never tasted this good.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#">Glo Pops</a></li>
+          <li><a href="#">Bundles</a></li>
+          <li><a href="#">Subscribe &amp; Save</a></li>
+          <li><a href="#">Gift Cards</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Learn</h4>
+        <ul>
+          <li><a href="#">Our Story</a></li>
+          <li><a href="#">Ingredients</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Glo Pop. All rights reserved.</span>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram">&#9679;</a>
+        <a href="#" aria-label="TikTok">&#9679;</a>
+        <a href="#" aria-label="Twitter">&#9679;</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../src/main.js"></script>
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="../src/lollipop3d.js"></script>
+</body>
+</html>
