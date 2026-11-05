@@ -340,43 +340,66 @@
     <p class="amenities__foot caption"><svg aria-hidden="true"><use href="#o-wave"/></svg><span>One pop a day · <span class="nw">amounts per pop <span class="ph">mg</span></span></span></p>
   </section>
 
-  <!-- ═══════════ 6 · THE SUN INDEX (ritual): one long summer day ═══════════ -->
+  <!-- ═══════════ 6 · THE SUN INDEX (ritual): your first month, told as one summer day ═══════════
+       One centred axis: the title, the day (the sun's arc: Day 1 to Day 30, the weeks 2–4 stretch as a warm
+       band), one card, the dots. The card's pouches carry the count: a pop leaves the bag each day, a bag
+       empties in about ten, three bags make the month. Static by default (every stop listed with its own
+       pouches); app.js pins it when the screen fits.  -->
   <section class="sunindex theme-pin" id="sun-index" aria-labelledby="sun-title">
     <div class="sunindex__stage is-window" data-water="sea" data-sun="arc" data-stop="0">
       <header class="sunindex__head" data-haze>
         <p class="eyebrow">The ritual</p>
         <h2 class="display" id="sun-title">The Sun <em>Index.</em></h2>
-        <p class="lede">One pop a day, told as one long summer day.</p>
+        <p class="lede sunindex__lede">Your first month, told as one summer day.</p>
+        <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind-html="ritualNote">Shown for Strawberry Peptide Lollipops.</span></p>
       </header>
 
-      <svg class="sunindex__arc" id="sunArc" aria-hidden="true" preserveAspectRatio="xMinYMin meet"></svg>
+      <!-- the day (drawn by app.js): the sun's arc with the weeks 2–4 band, its two feet labelled -->
+      <svg class="sunindex__arc" id="sunArc" aria-hidden="true" focusable="false"></svg>
       <div class="sun" id="sun" aria-hidden="true">
         <svg class="sun__rays" viewBox="0 0 200 200"><g id="sunRays"></g></svg>
         <span class="sun__disc"></span>
       </div>
+      <svg class="sunindex__marks" id="sunMarks" aria-hidden="true" focusable="false"></svg>
 
-      <ol class="sunindex__stops" id="sunStops">
-        <li class="stop is-active" data-stop="0">
-          <p class="stop__time"><i data-lucide="sunrise" aria-hidden="true"></i>Morning · Day 1</p>
-          <h3>Unwrap &amp; enjoy</h3>
-          <p>Pop open a Glo Pop and savor every lick. Strawberry flavor, made with real sugar, 47&nbsp;calories.</p>
-        </li>
-        <li class="stop" data-stop="1">
-          <p class="stop__time"><i data-lucide="sun" aria-hidden="true"></i>Midday · Every day</p>
-          <h3>Ingredients absorb</h3>
-          <p>One a day, every day. Collagen peptides, hyaluronic acid and vitamins go to work, nourishing your skin from within.</p>
-        </li>
-        <li class="stop" data-stop="2">
-          <p class="stop__time"><i data-lucide="sunset" aria-hidden="true"></i>Golden hour · Weeks <span class="nw">2–4</span></p>
-          <h3>Glow from within</h3>
-          <p>Consistency is key: most notice a visible difference in radiance within <span class="nw">2–4 weeks</span> of daily use.</p>
-        </li>
-      </ol>
+      <!-- the dots come before the card, so Tab meets them first (pinned they sit under it; static they're hidden) -->
+      <div class="sunindex__dial" role="group" aria-label="Jump to a stop">
+        <button type="button" data-goto="0" aria-controls="sun-stop-0" aria-current="step"><span class="sr-only">Day 1</span></button>
+        <button type="button" data-goto="1" aria-controls="sun-stop-1"><span class="sr-only">Every day</span></button>
+        <button type="button" data-goto="2" aria-controls="sun-stop-2"><span class="sr-only">Bag by bag</span></button>
+        <button type="button" data-goto="3" aria-controls="sun-stop-3"><span class="sr-only">Weeks 2 to 4</span></button>
+      </div>
 
-      <div class="sunindex__dial" role="group" aria-label="Jump to a time of day">
-        <button type="button" data-goto="0" aria-pressed="true">Morning</button>
-        <button type="button" data-goto="1" aria-pressed="false">Midday</button>
-        <button type="button" data-goto="2" aria-pressed="false">Golden hour</button>
+      <div class="sunindex__sheet" id="sunSheet">
+        <!-- three pouches, ten pops in each, emptying one pop a day as the sun travels (visual only: the list says it) -->
+        <svg class="pouches" id="sunPouches" aria-hidden="true" focusable="false"></svg>
+        <ol class="sunindex__stops" id="sunStops" aria-label="Your first month, one pop a day">
+          <li class="stop is-active" id="sun-stop-0" data-stop="0" data-day="1">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Day 1</p>
+            <h3>Unwrap &amp; enjoy</h3>
+            <p class="stop__text">Strawberry, real sugar and six actives in every pop.</p>
+          </li>
+          <li class="stop" id="sun-stop-1" data-stop="1" data-day="5">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Every day</p>
+            <h3>One a day</h3>
+            <p class="stop__text">Consistency is key.</p>
+          </li>
+          <li class="stop" id="sun-stop-2" data-stop="2" data-day="10">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Bag by bag</p>
+            <h3>A bag lasts about ten days</h3>
+            <p class="stop__text">Ten pops to a bag, so three bags is about a month.</p>
+          </li>
+          <li class="stop" id="sun-stop-3" data-stop="3" data-day="30">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when"><span class="stop__key" aria-hidden="true"></span>Weeks <span class="nw">2–4</span></p>
+            <h3>Glow from within</h3>
+            <p class="stop__text">Most notice a visible difference in radiance within <span class="nw">2–4 weeks</span> of daily use.</p>
+            <a class="btn btn--sm stop__cta" href="#menu" data-pick-bundle="month"><span>Choose The Month</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </li>
+        </ol>
       </div>
       <p class="sr-only" id="sunStatus" aria-live="polite"></p>
     </div>

@@ -50,7 +50,8 @@
         facts: [['Calories', '47 a pop'], ['In the bag', '10 lollipops'], ['Actives', '6 for skin &amp; energy'], ['Sweetened with', 'Real sugar']],
         cardCta: 'Shop strawberry', cardHref: '#menu', note: 'Free shipping on every order',
         barName: 'Strawberry Pops', barNote: '10 per bag · free shipping', barCta: 'Shop', barHref: '#menu',
-        pinNote: 'Shown for Strawberry Peptide Lollipops.'
+        pinNote: 'Shown for Strawberry Peptide Lollipops.',
+        ritualNote: 'Shown for Strawberry Peptide Lollipops.'
       }
     },
     {
@@ -71,7 +72,8 @@
         facts: [['Flavor', PH('To be announced')], ['In the bag', PH('To be announced')], ['Price', '$' + PH('XX')], ['Launch', PH('To be announced')]],
         cardCta: 'Join the list', cardHref: '#waitlist', note: 'Concept render: the final gummy may differ',
         barName: 'Green Gummies', barNote: 'Opening soon · details to come', barCta: 'Join list', barHref: '#waitlist',
-        pinNote: 'Shown for Strawberry Peptide Lollipops. Green Gummies actives are still to come.'
+        pinNote: 'Shown for Strawberry Peptide Lollipops. Green Gummies actives are still to come.',
+        ritualNote: 'Shown for Strawberry Peptide Lollipops.<span class="pin-note__more"> The Green Gummies ritual is still to come.</span>'
       }
     },
     {
@@ -92,7 +94,8 @@
         facts: [['Colour', PH('To be announced')], ['Flavor', PH('To be announced')], ['Formula', PH('To be announced')], ['Launch', PH('To be announced')]],
         cardCta: 'Get notified', cardHref: '#waitlist', note: 'Uncoloured concept render: the colour is not decided',
         barName: 'More colours', barNote: 'In development · colour to come', barCta: 'Notify me', barHref: '#waitlist',
-        pinNote: 'Shown for Strawberry Peptide Lollipops. The next colour’s formula is still to come.'
+        pinNote: 'Shown for Strawberry Peptide Lollipops. The next colour’s formula is still to come.',
+        ritualNote: 'Shown for Strawberry Peptide Lollipops.<span class="pin-note__more"> The next colour’s ritual is still to come.</span>'
       }
     }
   ];
@@ -1222,17 +1225,120 @@
   }
 
   /* ───────────────────────── 9 · The Sun Index ─────────────────────────
-     A sun travels its arc as you scroll (Day 1 → every day → weeks 2–4) and the sky and sea warm toward
-     golden hour. One stop shows at a time, opposite the sun; all three stay in the accessibility tree. */
+     Your first month, told as one summer day: the sun rises on Day 1 and sets on Day 30, and the sky and sea
+     warm as it goes. The arc stays quiet (its feet labelled Day 1 and Day 30, the weeks 2–4 stretch a warm
+     band that lights with its card, the path behind the sun gilded); the card's pouches carry the count.
+     STATIC by default (every stop listed with its pouches as they stand on its day: no JS, reduced motion,
+     or a screen too short); PINNED (.is-pinned) when it fits: scrolling runs the month day by day at one
+     steady pace (a short rest on each stop's day) and scrubs it both ways; the dots, a swipe on the card,
+     or focus entering a stop jumps there. Every stop stays in the accessibility tree; the drawing is
+     aria-hidden.                                                                                        */
+
+  // Three striped pouches with ten pops in each, in the sun's engraved line (flat fills, one hairline).
+  // set(day): pop k (1–30) lifts out of its bag on day k with a little pop and has gone by day k + 1; a bag
+  // folds and fades once its last pop has left. Days between whole days are drawn in between, so scrolling
+  // scrubs it both ways. Only the pops that change are touched.
+  var pouchN = 0;
+  function Pouches(svg) {
+    var NS = 'http://www.w3.org/2000/svg', BW = 56, GAP = 30, PER = 10, SINK = [28, 42];
+    // the bouquet, back row first: the order the pops leave in, and are drawn in (the front row overlaps)
+    var SPOTS = [[28, -27], [15.5, -25], [40.5, -25], [6.5, -16.5], [49.5, -16.5], [19.5, -18], [36.5, -18], [12, -8], [44, -8], [28, -9]];
+    var BODY = 'M4.5 0H51.5C52.6 13 56 28 56 48Q56 62.5 46 64.6Q28 66.6 10 64.6Q0 62.5 0 48C0 28 3.4 13 4.5 0Z';
+    var clipId = 'bagclip' + (++pouchN), pops = [], bags = [];
+    function el(n, a, parent) { var e = doc.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); parent.appendChild(e); return e; }
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.setAttribute('viewBox', '-6 -54 240 124');
+    el('path', { d: BODY }, el('clipPath', { id: clipId }, el('defs', {}, svg)));
+    for (var b = 0; b < 3; b++) {
+      var gb = el('g', { transform: 'translate(' + b * (BW + GAP) + ' 0)' }, svg);
+      el('ellipse', { class: 'bag__shadow', cx: 28, cy: 66, rx: 30, ry: 3.2 }, gb);
+      var mouth = el('path', { class: 'bag__mouth', d: 'M4.5 0Q28 -7 51.5 0Z' }, gb);
+      for (var i = 0; i < PER; i++) {
+        var s = SPOTS[i], dx = s[0] - SINK[0], dy = s[1] - SINK[1], l = Math.hypot(dx, dy);
+        var gp = el('g', {}, gb);
+        el('line', { class: 'pop__stick-o', x1: 0, y1: 2, x2: 0, y2: 36 }, gp);
+        el('line', { class: 'pop__stick', x1: 0, y1: 2, x2: 0, y2: 36 }, gp);
+        el('circle', { class: 'pop__head', r: 5.2 }, gp);
+        el('path', { class: 'pop__shine', d: 'M-3.2 -1A3.4 3.4 0 0 1 -1 -3.2' }, gp);
+        pops.push({ g: gp, x: s[0], y: s[1], dx: dx / l, dy: dy / l, rot: (Math.atan2(dx, -dy) * 180 / Math.PI).toFixed(1), key: '' });
+      }
+      var front = el('g', {}, gb);
+      el('path', { class: 'bag__body', d: BODY }, front);
+      var stripes = el('g', { 'clip-path': 'url(#' + clipId + ')' }, front);
+      for (var x = -2; x < 58; x += 8) {
+        el('rect', { class: 'bag__stripe', x: x, y: 0, width: 4, height: 12 }, stripes);
+        el('rect', { class: 'bag__stripe', x: x, y: 54, width: 4, height: 12 }, stripes);
+      }
+      el('line', { class: 'bag__zip', x1: 3.2, y1: 16, x2: 52.8, y2: 16 }, front);
+      el('circle', { class: 'bag__mark-r', cx: 28, cy: 34, r: 6.4 }, front);   // the parasol mark, seen from above
+      el('circle', { class: 'bag__mark', cx: 28, cy: 34, r: 3.4, 'stroke-dasharray': (Math.PI * 6.8 / 16).toFixed(3) }, front);
+      el('circle', { class: 'bag__mark-c', cx: 28, cy: 34, r: 1.3 }, front);
+      el('path', { class: 'bag__line', d: BODY }, front);
+      bags.push({ g: gb, mouth: mouth, key: '' });
+    }
+    function ease(t) { return t * t * (3 - 2 * t); }
+    function pop(t) { t -= 1; return 1 + 2.6 * t * t * t + 1.6 * t * t; }   // out, with a little overshoot
+    return {
+      set: function (day) {
+        for (var k = 0; k < pops.length; k++) {
+          var p = pops[k], t = day - k, lift = 0, sc = 1, op = 1;
+          if (t >= 2) op = 0;
+          else if (t > 1) { var u = t - 1; lift = 17 + 12 * u * u; sc = 1.2 - 0.3 * u; op = 1 - ease(u); }   // eaten: up and away
+          else if (t > 0) { lift = 17 * pop(t); sc = 1 + 0.2 * ease(t); }                                     // today's: out of the bag
+          var key = op < 0.002 ? 'x' : lift.toFixed(2) + '/' + sc.toFixed(3) + '/' + op.toFixed(3);
+          if (key === p.key) continue;
+          p.key = key;
+          if (key === 'x') { p.g.setAttribute('visibility', 'hidden'); continue; }
+          p.g.removeAttribute('visibility');
+          p.g.setAttribute('transform', 'translate(' + (p.x + p.dx * lift).toFixed(2) + ' ' + (p.y + p.dy * lift).toFixed(2) + ') rotate(' + p.rot + ') scale(' + sc.toFixed(3) + ')');
+          if (op < 1) p.g.setAttribute('opacity', op.toFixed(3)); else p.g.removeAttribute('opacity');
+        }
+        for (var b = 0; b < bags.length; b++) {
+          var e = clamp(day - (b + 1) * PER, 0, 1), kb = e.toFixed(3), bg = bags[b];
+          if (kb === bg.key) continue;
+          bg.key = kb;
+          bg.mouth.setAttribute('d', 'M4.5 0Q28 ' + (-7 + 5.8 * e).toFixed(2) + ' 51.5 0Z');
+          if (e > 0) bg.g.setAttribute('opacity', (1 - 0.4 * e).toFixed(3)); else bg.g.removeAttribute('opacity');
+        }
+      }
+    };
+  }
+
   var Sun = (function () {
-    var sec = $('#sun-index'), stage = $('.sunindex__stage'), svg = $('#sunArc'), sunEl = $('#sun'), head = $('.sunindex__head');
-    var stopsEl = $('#sunStops'), status = $('#sunStatus');
-    if (!sec || !stage || !svg || !sunEl) return null;
-    var stops = $$('.stop', stage), dial = $$('.sunindex__dial button', stage);
-    var NS = 'http://www.w3.org/2000/svg';
-    var TH0 = Math.PI * 0.955, TH1 = Math.PI * 0.045;      // sunrise (left) → golden hour (right)
-    var STOPS = [1 / 6, 0.5, 5 / 6];
-    var g = { W: 0, H: 0, cx: 0, hz: 0, rx: 0, ry: 0 }, active = -1, p = STOPS[0], rect = null, stageRect = null, visible = false, labelEls = [];
+    var sec = $('#sun-index'), stage = $('.sunindex__stage'), svg = $('#sunArc'), marks = $('#sunMarks'), sunEl = $('#sun');
+    var head = $('.sunindex__head'), sheet = $('#sunSheet'), stopsEl = $('#sunStops'), status = $('#sunStatus'), dialEl = $('.sunindex__dial');
+    if (!sec || !stage || !svg || !marks || !sunEl || !head || !sheet || !stopsEl || !dialEl) return null;
+    var stops = $$('.stop', stopsEl), dial = $$('button', dialEl), N = stops.length;
+    var NS = 'http://www.w3.org/2000/svg', DAYS = 30, LAST = DAYS + 1;   // LAST: the morning after Day 30, the month's last pop gone
+    var TH0 = Math.PI * 0.955, TH1 = Math.PI * 0.045;      // Day 1 (sunrise, left) → Day 30 (golden hour, right)
+    var ANCHOR = stops.map(function (s) { return +s.getAttribute('data-day') || 1; });   // the day each stop's sun rests on: 1, 5, 10, 30
+    // the pouches' day at each rest: the last runs on to the morning after, so the month ends on three empty bags
+    var REST = ANCHOR.map(function (d, j) { return j === N - 1 ? LAST : d; });
+    var WINDOW = [14, 28];        // "within 2–4 weeks": from the end of week two to the end of week four
+    // the card turns over halfway between two rests, and to weeks 2–4 as the sun reaches its band (which lights then)
+    var SWITCH = ANCHOR.slice(1).map(function (d, j) { return j === N - 2 ? WINDOW[0] : (ANCHOR[j] + d) / 2; });
+    var STILL = (1 + DAYS) / 2;   // static: the sun stands at noon over the whole month
+    var g = { W: 0, H: 0, cx: 0, hz: 0, rx: 0, ry: 0, disc: 30, ray: 62, small: false, xMin: 8, xMax: 0, top: 0 };
+    var pinned = false, active = -1, sp = 0, day = REST[0], rect = null, stageRect = null, visible = false, jump = null;
+    var labels = [], prog = null, band = null, lit = null, lastKey = '', lastWarm = -1, lastDay = -1, drawn = false;
+    var bagsEl = $('#sunPouches'), bags = bagsEl ? Pouches(bagsEl) : null, snaps = false;
+
+    // The scroll, day by day: the dawn (the sun lifts off the horizon to Day 1 as the first pop comes out), a
+    // short rest on each stop's day, and one steady pace between them, so every day takes the same scroll and
+    // every bag empties at the same rate (a quick ramp at each end softens the starts and stops).
+    var T_DAWN = 0.06, T_REST = 0.065, T_END = 0.08, T_RAMP = 0.016;
+    var legs = [], restMid = [];
+    (function () {
+      var at = 0, k = (1 - T_DAWN - (N - 1) * (T_REST + T_RAMP) - T_END) / (REST[N - 1] - REST[0]);   // scroll per day
+      function leg(len, d0, d1, kind) { legs.push({ a: at, len: len, d0: d0, d1: d1, kind: kind }); at += len; }
+      leg(T_DAWN, 0, REST[0], 'dawn');
+      for (var j = 0; j < N; j++) {
+        var rl = j === N - 1 ? T_END : T_REST;
+        restMid.push(at + rl / 2);
+        leg(rl, REST[j], REST[j], 'rest');
+        if (j < N - 1) leg((REST[j + 1] - REST[j]) * k + T_RAMP, REST[j], REST[j + 1], 'go');
+      }
+    })();
 
     // engraved rays: fine, alternating long and short
     var rays = $('#sunRays');
@@ -1244,84 +1350,260 @@
       }
       rays.innerHTML = s;
     }
-    function el(name, attrs) { var e = doc.createElementNS(NS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+    function el(name, attrs, text) { var e = doc.createElementNS(NS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+    function f1(v) { return Math.round(v * 10) / 10; }
+    function thetaOf(d) { return lerp(TH0, TH1, (d - 1) / (DAYS - 1)); }
     function pt(th) { return [g.cx + Math.cos(th) * g.rx, g.hz - Math.sin(th) * g.ry]; }
-    function layout() {
-      g.W = stage.clientWidth;
-      g.H = reduce && stopsEl ? (stopsEl.offsetTop || stage.clientHeight) : stage.clientHeight;
-      var small = g.W < 768;
-      g.hz = g.H * 0.6;
-      stage.__hzPx = g.hz;
-      var headBottom = head ? (head.offsetTop + head.offsetHeight) : g.H * 0.3;
-      g.cx = g.W / 2;
-      g.rx = Math.min(g.W * (small ? 0.35 : 0.36), 600);
-      g.ry = Math.max(70, g.hz - headBottom - (small ? 62 : 80));
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
-      svg.setAttribute('viewBox', '0 0 ' + g.W + ' ' + g.H);
-      svg.appendChild(el('path', { d: 'M ' + (g.cx - g.rx) + ' ' + g.hz + ' A ' + g.rx + ' ' + g.ry + ' 0 0 1 ' + (g.cx + g.rx) + ' ' + g.hz, class: 'arc' }));
-      for (var k = 0; k <= 12; k++) {
-        var th = Math.PI - k / 12 * Math.PI, c = pt(th), n = normal(th);
-        var major = k === 2 || k === 6 || k === 10, L = major ? 14 : 7;
-        svg.appendChild(el('line', { x1: c[0], y1: c[1], x2: c[0] + n[0] * L, y2: c[1] + n[1] * L, class: major ? 'tick tick--major' : 'tick' }));
+    function normal(th) { var nx = Math.cos(th) / g.rx, ny = -Math.sin(th) / g.ry, l = Math.hypot(nx, ny) || 1; return [nx / l, ny / l]; }   // outward
+    function arcPath(t0, t1) { var a = pt(t0), b = pt(t1); return 'M' + f1(a[0]) + ' ' + f1(a[1]) + 'A' + f1(g.rx) + ' ' + f1(g.ry) + ' 0 0 1 ' + f1(b[0]) + ' ' + f1(b[1]); }
+
+    // The pouches' day at scroll progress v (0–1 through the pin), from the legs above.
+    function dayAt(v) {
+      for (var j = 0; j < legs.length; j++) {
+        var L = legs[j], len = L.len, D = L.d1 - L.d0;
+        if (v > L.a + len && j < legs.length - 1) continue;
+        var u = clamp(v - L.a, 0, len);
+        if (!D) return L.d0;
+        if (L.kind === 'dawn') { var f = u / len; return L.d0 + D * f * f * (3 - 2 * f); }
+        var w = Math.min(T_RAMP, len / 2), vmax = D / (len - w);              // full pace: the same on every leg
+        if (u < w) return L.d0 + vmax * u * u / (2 * w);
+        if (u > len - w) return L.d1 - vmax * (len - u) * (len - u) / (2 * w);
+        return L.d0 + vmax * (u - w / 2);
       }
-      // labels just outside the arc, at their major ticks
-      var labels = small ? ['Day 1', 'Every day', 'Wk 2–4'] : ['Day 1', 'Every day', 'Weeks 2–4'];
-      labelEls = [];
-      STOPS.forEach(function (sp, j) {
-        var th = lerp(TH0, TH1, sp);
-        var thT = Math.PI - [2, 6, 10][j] / 12 * Math.PI, c = pt(thT), n = normal(thT), off = 14 + (small ? 16 : 12);
-        var x = c[0] + n[0] * off, y = c[1] + n[1] * off;
-        var anchor = small || j === 1 ? 'middle' : (j === 0 ? 'end' : 'start');
-        if (small) x = clamp(x, 34, g.W - 34);
-        var t = el('text', { x: x.toFixed(1), y: (y + (j === 1 ? -2 : 4)).toFixed(1), 'text-anchor': anchor });
-        t.textContent = labels[j];
-        svg.appendChild(t);
-        labelEls.push({ el: t, x: x, y: y });
-      });
+      return REST[N - 1];
+    }
+    // the sun's day: the pouches' own until the last leg, which it spreads over the run to the morning after,
+    // so the sun reaches Day 30 just as the month's last pop leaves (and never stops short)
+    function sunDay(d) {
+      var a = ANCHOR[N - 2];
+      return d <= a ? d : a + (d - a) * (DAYS - a) / (LAST - a);
+    }
+    function stopAt(d) { var i = 0; while (i < SWITCH.length && d >= SWITCH[i]) i++; return i; }
+
+    // ── layout: pin when it fits, else list; then place the horizon, the arc and its two labels
+    function setPinned(on) { pinned = on; sec.classList.toggle('is-pinned', on); }
+    function measure() {
+      // the card as CSS lays it out (above the dots, at its tallest stop): its top is where it will stay
+      sheet.style.top = sheet.style.bottom = stopsEl.style.height = '';
+      g.W = stage.clientWidth; g.H = stage.clientHeight;
+      g.small = g.W < 768; g.disc = g.small ? 22 : 30; g.ray = g.small ? 46 : 62;   // the disc's radius; the long rays' reach
+      var headBottom = head.offsetTop + head.offsetHeight, land = g.W > g.H;
+      var lift = g.ray + (g.small ? 10 : 16);          // the sun at noon: its rays stay this far below the title
+      g.top = headBottom + 4;
+      g.cx = g.W / 2; g.xMax = g.W - 8;
+      // centred and never edge to edge: capped on wide screens, with room outside the feet for their labels
+      g.rx = Math.max(80, Math.min(g.small ? g.W * 0.4 : 480, g.cx - g.xMin - (g.small ? 30 : 96)));
+      // as tall as the sky allows: a gentle dome on landscape screens, a tall one on portrait ones
+      var kY = land ? 0.8 : 1.3;
+      if (pinned) {
+        // a strip of sea above the card (the card is as tall as its tallest stop, so the horizon never moves);
+        // where the card reaches under a foot, wide enough that the sun's lowest rays clear it standing there
+        var strip = clamp((g.H - 640) * 0.25, 18, 48), cardTop = sheet.offsetTop, cardL = sheet.offsetLeft;
+        var under = g.cx + Math.cos(TH0) * g.rx + g.ray + 4 > cardL;
+        for (var it = 0; it < 4; it++) {
+          g.hz = Math.min(g.H * 0.64, cardTop - strip);
+          g.ry = Math.min(g.hz - headBottom - lift, g.rx * kY);
+          var need = g.ray + 6 - Math.sin(TH0) * g.ry;
+          if (!under || strip >= need - 0.5) break;
+          strip = need;
+        }
+      } else {
+        g.hz = sheet.offsetTop - (g.small ? 26 : 34);     // static: the day sits on the list
+        g.ry = Math.min(g.hz - headBottom - lift, g.rx * kY);
+      }
+      return g.ry >= (g.small ? 84 : land ? 90 : 110);   // landscape screens may take a flatter day
+    }
+    function layout() {
+      setPinned(!reduce);
+      if (!measure() && pinned) { setPinned(false); measure(); }
+      if (!pinned) { day = STILL; snapshots(); }
+      else { sheet.style.top = sheet.offsetTop + 'px'; sheet.style.bottom = 'auto'; }   // pinned: the card hangs from its top
+      stage.__hzPx = g.hz;
+      stage.style.setProperty('--hz', f1(g.hz) + 'px');
+      draw();
+      fitSheet(true);
+    }
+    // static: every stop shows its own pouches, as they stand on its day (drawn once)
+    function snapshots() {
+      if (snaps) return;
+      snaps = true;
+      stops.forEach(function (st, j) { var v = $('.stop__pouches', st); if (v) Pouches(v).set(REST[j]); });
+    }
+    // pinned, the card hugs the stop showing: its top (and the pouches) stay put, its foot eases (the last
+    // stop's link makes it taller); the horizon was set for the tallest
+    function fitSheet(now) {
+      if (!pinned || active < 0) { stopsEl.style.height = ''; return; }
+      if (now) stopsEl.style.transition = 'none';
+      stopsEl.style.height = stops[active].offsetHeight + 'px';
+      if (now) { void stopsEl.offsetHeight; stopsEl.style.transition = ''; }
+    }
+
+    // The feet's labels, as a mirrored pair: the first spot where both fit on screen, between the title and the
+    // horizon, at the feet if they can (outside the arc, else inside), past the reach of the rays, so the sun
+    // never strikes through them standing there.
+    function hits(a, b, m) { return a.x < b.x + b.w + m && b.x < a.x + a.w + m && a.y < b.y + b.h + m && b.y < a.y + a.h + m; }
+    function label(d, text, side) {
+      var th = thetaOf(d), c = pt(th), n = normal(th), gap = g.ray + 6, nx = n[0] * side, ny = n[1] * side;
+      var t = el('text', { 'text-anchor': 'middle' }, text);
+      marks.appendChild(t);
+      var bb = t.getBBox(), ext = Math.abs(nx) * bb.width / 2 + Math.abs(ny) * bb.height / 2;
+      var dx = c[0] + nx * (gap + ext) - (bb.x + bb.width / 2), dy = c[1] + ny * (gap + ext) - (bb.y + bb.height / 2);
+      t.setAttribute('transform', 'translate(' + f1(dx) + ' ' + f1(dy) + ')');
+      var box = { x: bb.x + dx, y: bb.y + dy, w: bb.width, h: bb.height };
+      var ok = box.x >= g.xMin && box.x + box.w <= g.xMax && box.y >= g.top && box.y + box.h <= g.hz + 1;
+      return { el: t, b: box, on: true, ok: ok };
+    }
+    function placeFeet() {
+      for (var q = 0; q < 3; q++) {
+        for (var side = 1; side >= -1; side -= 2) {
+          var a = label(1 + q, 'Day 1', side), b = label(DAYS - q, 'Day 30', side);
+          if (a.ok && b.ok && !hits(a.b, b.b, 6)) { labels.push(a, b); return true; }
+          marks.removeChild(a.el); marks.removeChild(b.el);
+        }
+      }
+      return false;      // no room on this screen: the card and the dots still say it
+    }
+    function draw() {
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      while (marks.firstChild) marks.removeChild(marks.firstChild);
+      var vb = '0 0 ' + g.W + ' ' + g.H;
+      svg.setAttribute('viewBox', vb); marks.setAttribute('viewBox', vb);
+      // the weeks 2–4 band: a warm glow along those days, faded at both ends
+      var w0 = pt(thetaOf(WINDOW[0])), w1 = pt(thetaOf(WINDOW[1])), wd = arcPath(thetaOf(WINDOW[0]), thetaOf(WINDOW[1]));
+      var grad = el('linearGradient', { id: 'sunBand', gradientUnits: 'userSpaceOnUse', x1: f1(w0[0] - 6), y1: 0, x2: f1(w1[0] + 6), y2: 0 });
+      [[0, 0], [0.2, 1], [0.8, 1], [1, 0]].forEach(function (s) { grad.appendChild(el('stop', { offset: s[0], 'stop-color': '#FFA347', 'stop-opacity': s[1] })); });
+      svg.appendChild(el('defs', {})).appendChild(grad);
+      band = el('g', { class: 'window' });
+      band.appendChild(el('path', { d: wd, class: 'glow', stroke: 'url(#sunBand)' }));
+      band.appendChild(el('path', { d: wd, class: 'core', stroke: 'url(#sunBand)' }));
+      svg.appendChild(band);
+      svg.appendChild(el('path', { d: arcPath(Math.PI, 0), class: 'arc' }));    // the day's path, dotted, over the band
+      prog = el('path', { d: 'M0 0', class: 'done' });                           // pinned only: static, no day has passed
+      svg.appendChild(prog);
+      labels = [];
+      placeFeet();
+      drawn = true; lastKey = ''; lastWarm = -1; lastDay = -1; lit = null;
+      sec.classList.add('is-drawn');
+      stageRect = stage.getBoundingClientRect();
       write(true);
     }
-    function normal(th) { var nx = Math.cos(th) / g.rx, ny = -Math.sin(th) / g.ry, l = Math.hypot(nx, ny) || 1; return [nx / l, ny / l]; }
+
     function setActive(i, announce) {
       if (i !== active) {
         active = i;
-        stops.forEach(function (s, j) { s.classList.toggle('is-active', j === i); });
+        stops.forEach(function (st, j) { st.classList.toggle('is-active', j === i); });
         stage.setAttribute('data-stop', i);
-        dial.forEach(function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+        dial.forEach(function (b, j) { if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+        if (drawn) fitSheet(false);
       }
       if (announce && status) {
-        var st = stops[i], tm = $('.stop__time', st), h = $('h3', st);
-        status.textContent = (tm ? tm.textContent : '') + ': ' + (h ? h.textContent : '') + '.';
+        var st = stops[i], w = $('.stop__when', st), h = $('h3', st);
+        status.textContent = (w ? w.textContent.trim() : '') + ': ' + (h ? h.textContent : '') + '.';   // "Bag by bag: A bag lasts about ten days."
       }
     }
     function read() {
       rect = sec.getBoundingClientRect(); stageRect = stage.getBoundingClientRect();
       visible = rect.bottom > -10 && rect.top < innerHeight + 10;
-      if (!reduce && visible) { var total = rect.height - innerHeight; p = total > 0 ? clamp(-rect.top / total, 0, 1) : 0; }
+      if (pinned && visible) {
+        var total = rect.height - innerHeight;
+        sp = total > 0 ? clamp(-rect.top / total, 0, 1) : 0;
+        day = dayAt(sp);
+      }
     }
     function write(force) {
-      if (!visible && !force) return;
-      var th = lerp(TH0, TH1, p), c = pt(th);
-      sunEl.style.transform = 'translate3d(' + c[0].toFixed(1) + 'px,' + c[1].toFixed(1) + 'px,0)';
-      // a label fades while the sun passes over it
-      labelEls.forEach(function (l) { l.el.style.opacity = clamp((Math.hypot(l.x - c[0], l.y - c[1]) - 56) / 36, 0, 1).toFixed(2); });
-      var warm = clamp(p * 1.04 - 0.02, 0, 1);
-      sunEl.style.setProperty('--warm', warm.toFixed(3));
+      if (!drawn || (!visible && !force)) return;
+      var sd = pinned ? sunDay(day) : STILL, th = thetaOf(sd), c = pt(th), key = f1(c[0]) + ',' + f1(c[1]);
+      if (key !== lastKey) {
+        lastKey = key;
+        sunEl.style.transform = 'translate3d(' + f1(c[0]) + 'px,' + f1(c[1]) + 'px,0)';
+        prog.setAttribute('d', pinned && sd > 1.01 ? arcPath(TH0, th) : 'M0 0');
+        // a label steps aside only if the disc itself would cover it (placed past the rays, it never should)
+        labels.forEach(function (l) {
+          var b = l.b, qx = clamp(c[0], b.x, b.x + b.w), qy = clamp(c[1], b.y, b.y + b.h);
+          var on = Math.hypot(qx - c[0], qy - c[1]) > g.disc + 3;
+          if (on !== l.on) { l.on = on; l.el.style.opacity = on ? '' : '0'; }
+        });
+      }
+      if (day !== lastDay) { lastDay = day; if (bags && pinned) bags.set(day); }
+      if (pinned) {
+        // a jump (a dot, a key, a swipe) shows its stop at once, not every card it scrolls past on the way
+        var i = stopAt(day);
+        if (jump) { if (i === jump.to || performance.now() > jump.until) jump = null; else i = jump.to; }
+        setActive(i, false);
+      }
+      var on = !pinned || active === N - 1;            // the band lights with its card (static: always)
+      if (on !== lit) { lit = on; band.classList.toggle('is-lit', on); }
+      var warm = clamp((sd - 1) / (DAYS - 1) * 1.04 - 0.02, 0, 1);
+      if (Math.abs(warm - lastWarm) > 0.0005) { lastWarm = warm; sunEl.style.setProperty('--warm', warm.toFixed(3)); }
       if (Water && stageRect) { Water.sun = [stageRect.left + c[0], stageRect.top + c[1]]; Water.warm = warm; }
-      if (!reduce) setActive(p < 1 / 3 ? 0 : p < 2 / 3 ? 1 : 2, false);
     }
-    dial.forEach(function (b, j) {
-      b.addEventListener('click', function () {
-        setActive(j, true);
-        if (reduce) { p = STOPS[j]; stageRect = stage.getBoundingClientRect(); write(true); kick(); return; }   // still mode: the dial sets the hour
-        var r = sec.getBoundingClientRect(), total = r.height - innerHeight;
-        window.scrollTo({ top: window.scrollY + r.top + total * STOPS[j], behavior: 'smooth' });
+
+    // ── jumping to a stop (pinned): scroll to the middle of its rest, where the sun stands on its day
+    function restY(i) { var sr = sec.getBoundingClientRect(); return Math.round(window.scrollY + sr.top + (sr.height - innerHeight) * restMid[i]); }
+    function goTo(i, instant) {
+      i = clamp(i, 0, N - 1);
+      setActive(i, true);
+      if (!pinned) {                                   // static: every stop is showing; bring this one into view
+        var r = stops[i].getBoundingClientRect();
+        if (r.top < 0 || r.bottom > innerHeight) stops[i].scrollIntoView({ block: 'nearest', behavior: reduce || instant ? 'instant' : 'smooth' });
+        return;
+      }
+      jump = instant ? null : { to: i, until: performance.now() + 1500 };
+      window.scrollTo({ top: restY(i), behavior: instant ? 'instant' : 'smooth' });
+    }
+    // the reader takes over (wheel, touch, scrolling keys): the card follows the scroll again
+    window.addEventListener('wheel', function () { jump = null; }, { passive: true });
+    window.addEventListener('touchmove', function () { jump = null; }, { passive: true });
+    window.addEventListener('keydown', function (e) { if (!dialEl.contains(e.target)) jump = null; });
+    dial.forEach(function (b, j) { b.addEventListener('click', function () { goTo(j, false); }); });
+    dialEl.addEventListener('keydown', function (e) {
+      var i = dial.indexOf(doc.activeElement); if (i < 0) return;
+      var n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? N - 1 : null;
+      if (n === null) return;
+      e.preventDefault();
+      n = clamp(n, 0, N - 1);
+      if (n !== i) { dial[n].focus(); goTo(n, false); }
+    });
+    // keyboard focus landing in a stop that isn't showing (its link) brings that stop up first
+    stopsEl.addEventListener('focusin', function (e) {
+      if (!pinned) return;
+      var li = e.target.closest && e.target.closest('.stop'), i = stops.indexOf(li);
+      if (i >= 0 && i !== active) goTo(i, true);
+    });
+    // touch: swipe the card sideways for the next or previous stop
+    var sw = null;
+    sheet.addEventListener('touchstart', function (e) { sw = pinned && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+    sheet.addEventListener('touchend', function (e) {
+      if (!sw || !e.changedTouches.length) return;
+      var dx = e.changedTouches[0].clientX - sw.x, dy = e.changedTouches[0].clientY - sw.y; sw = null;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(active + (dx < 0 ? 1 : -1), false);
+    }, { passive: true });
+    // the last stop's next step opens the menu with The Month chosen (the link works without this, too)
+    $$('[data-pick-plan], [data-pick-bundle]', stopsEl).forEach(function (a) {
+      a.addEventListener('click', function () {
+        var form = $('#orderForm'); if (!form) return;
+        var plan = a.getAttribute('data-pick-plan'), bundle = a.getAttribute('data-pick-bundle');
+        var inp = $(plan ? 'input[name="plan"][value="' + plan + '"]' : 'input[name="bundle"][value="' + bundle + '"]', form);
+        if (inp && !inp.checked) { inp.checked = true; inp.dispatchEvent(new Event('change', { bubbles: true })); }
       });
     });
+
+    var queued = false;
+    function relayout() { if (queued) return; queued = true; requestAnimationFrame(function () { queued = false; layout(); kick(); }); }
     setActive(0, false);
     layout();
-    window.addEventListener('resize', layout, { passive: true });
-    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(layout);
-    return { read: read, write: function () { write(false); }, get visible() { return visible; } };
+    window.addEventListener('resize', relayout, { passive: true });
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(relayout);
+    if ('ResizeObserver' in window) new ResizeObserver(relayout).observe(head);   // a product note appears or goes
+    return {
+      read: read, write: function () { write(false); }, layout: relayout, goTo: goTo,
+      get visible() { return visible; },
+      // QA: the geometry and the state; where each stop rests (scroll progress) and the day at any progress
+      state: function () { return { pinned: pinned, active: active, day: +day.toFixed(2), sunDay: +(pinned ? sunDay(day) : STILL).toFixed(2), sp: +sp.toFixed(3), hz: Math.round(g.hz), cx: Math.round(g.cx), rx: Math.round(g.rx), ry: Math.round(g.ry), top: Math.round(g.top), lit: lit, labels: labels.map(function (l) { return { t: l.el.textContent, on: l.on, b: [l.b.x, l.b.y, l.b.w, l.b.h].map(Math.round) }; }) }; },
+      rests: function () { return restMid.slice(); },
+      dayAt: dayAt
+    };
   })();
 
   /* ───────────────────────── 10 · Shop menu + waitlist (prototype: no network) ───────────────────────── */
@@ -1518,6 +1800,7 @@
     initShop();
     initFaq();
     initReveal();
+    if (Sun) Sun.layout();             // the icons are in: measure the Sun Index again
     mountCandy(heroMount, $('#heroFallback'), {
       zoom: 1,
       onRender: heroRendered,          // copy each new frame for the pool-floor shadow
@@ -1539,7 +1822,7 @@
     kick();
     // QA / review hook
     window.__riviera = {
-      setProduct: setProduct, products: PRODUCTS, water: Water, kick: kick, get loopRunning() { return running; },
+      setProduct: setProduct, products: PRODUCTS, water: Water, kick: kick, sun: Sun, get loopRunning() { return running; },
       get heroCandy() { return heroApi; }, get cabanaCandy() { return cab.api; },
       shadowState: function () {
         var sh = Water && Water.shadow;

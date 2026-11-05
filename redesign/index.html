@@ -6,6 +6,7 @@
 <title>Glo Pop · Design proposals</title>
 <meta name="description" content="Glo Pop website design proposals.">
 <meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 18v12' stroke='%23e8dde2' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='11' r='9' fill='%23FF1493'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
@@ -39,7 +40,9 @@
   <div class="grid" id="grid"></div>
 </main>
 <script>
+  // [number, thumbs folder, name, palette, link (defaults to the proposal folder)]
   var PROPOSALS = [
+    ['', '00-first-draft', 'First draft', ['#FFF0F5', '#7A1B4D', '#FF1493', '#F26A1B', '#0E9CAD'], '../index.html'],
     ['01', '01-editorial', 'The Glo Issue', ['#FBF0EC', '#4A0D2E', '#FF1493', '#EEF3EC', '#1FA453']],
     ['02', '02-candy', 'Sweet Riot', ['#FF1493', '#FF8AC6', '#E8174B', '#FFF4E8', '#22C55E']],
     ['03', '03-lab', 'Glow Lab', ['#FAF8F7', '#1B0B14', '#FF1493', '#E9E2E5', '#1FA453']],
@@ -49,12 +52,12 @@
   ];
   document.getElementById('grid').innerHTML = PROPOSALS.map(function (p) {
     var t = '_qa/thumbs/' + p[1] + '/';
-    return '<a class="card" href="' + p[1] + '/index.html">' +
+    return '<a class="card" href="' + (p[4] || p[1] + '/index.html') + '">' +
       '<div class="shots">' +
         '<span class="d"><img src="' + t + 'desktop-00.webp" alt="' + p[2] + ', desktop" width="1440" height="900" loading="lazy"></span>' +
         '<span class="m"><img src="' + t + 'mobile-00.webp" alt="' + p[2] + ', phone" width="390" height="844" loading="lazy"></span>' +
       '</div>' +
-      '<div class="meta"><span class="name"><b>' + p[0] + '</b>' + p[2] + '</span>' +
+      '<div class="meta"><span class="name">' + (p[0] ? '<b>' + p[0] + '</b>' : '') + p[2] + '</span>' +
         '<span class="sw" aria-hidden="true">' + p[3].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span></div>' +
     '</a>';
   }).join('');

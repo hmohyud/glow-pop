@@ -652,7 +652,8 @@ html.has-water .lolly-fallback.is-cast .lolly-fallback__head, html.has-water .lo
 .cabana-card__title { margin: 14px 0 12px; font: 500 var(--fs-h3)/1.1 var(--serif); letter-spacing: -.01em; }
 .cabana-card__title em { font-style: italic; font-weight: 400; color: var(--accent-text); }
 .cabana-card__text { color: var(--ink-2); max-width: 50ch; }
-.cabana-card__facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--line); align-self: center; }
+.cabana-card__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); align-self: center; }
+.cabana-card__facts dd .ph { white-space: normal; }   /* "To be announced" may wrap in a narrow cell (no page overflow at 360px) */
 .cabana-card__facts div { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--line); }
 .cabana-card__facts dt { font: 500 var(--fs-cap)/1.2 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
 .cabana-card__facts dd { margin-top: 6px; font: 500 1.1rem/1.25 var(--sans); color: var(--ink); }
@@ -730,47 +731,213 @@ html:not(.js) .amenity__turn { display: none; }
 .amenities__foot svg { width: 46px; height: 10px; color: var(--accent); }
 
 /* ───────────── 13 · THE SUN INDEX ─────────────
-   One stop at a time, set on the side of the sea away from the sun, so the glitter
-   path under the sun stays clear. Every stop stays in the accessibility tree.        */
-.sunindex { position: relative; height: 300vh; }
-.sunindex__stage {
-  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden;
-  background: linear-gradient(to bottom, #A9DAF2 0%, #FFF3E2 59%, #5BBFE0 60%, #1C7FB8 100%);
+   Your first month, told as one summer day: the sun rises on Day 1 and sets on Day 30, and the sky and sea
+   warm as it goes. The arc stays quiet (its two feet labelled, the weeks 2–4 stretch a warm band that lights
+   with its card, the path behind the sun gilded); the pouches carry the count: a pop leaves the bag each day,
+   a bag empties in about ten days, three bags make the month. One centred axis at every size: the title, the
+   day, one card, the dots. STATIC by default (no JS, reduced motion, or a screen too short to pin): the day
+   above (the sun at noon), the four stops listed under it, each with its own pouches. PINNED (.is-pinned, set
+   by app.js when the screen fits): one stop at a time in a card over the sea, the card hanging from a fixed
+   top so the pouches never move. Every stop stays in the accessibility tree; the drawing is aria-hidden.   */
+.sunindex {
+  position: relative;
+  --dial-h: 44px; --dial-b: max(14px, env(safe-area-inset-bottom)); --card-w: 560px;
 }
-.sunindex__head { position: absolute; z-index: 3; left: 0; right: 0; top: calc(var(--nav-h) + 30px); display: grid; justify-items: center; gap: 10px; text-align: center; padding-inline: var(--gutter); --em: var(--accent-display); }
+.sunindex__stage {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  padding: clamp(64px, 9vw, 120px) var(--gutter) clamp(44px, 6vw, 88px);
+  /* static fallback sky and sea (no WebGL): the horizon follows the drawn day */
+  background: linear-gradient(to bottom, #A9DAF2 0, #FFF3E2 calc(var(--hz, 62%) - 1px), #5BBFE0 var(--hz, 62%), #1C7FB8 100%);
+}
+.sunindex__head { position: relative; z-index: 3; display: grid; justify-items: center; gap: 10px; text-align: center; --em: var(--accent-display); }
 .sunindex__head .display { font-size: clamp(2.1rem, 1.2rem + 3vw, 4rem); }
 .sunindex__head .eyebrow { color: var(--ink); }
-.sunindex__head .lede { font-size: 1rem; color: var(--ink); }
-.sunindex__arc { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; max-width: none; overflow: visible; pointer-events: none; }
-.sunindex__arc .arc { fill: none; stroke: rgba(74, 13, 46, .38); stroke-width: 1; stroke-dasharray: 2 6; }
-.sunindex__arc .tick { stroke: rgba(74, 13, 46, .4); stroke-width: 1; }
-.sunindex__arc .tick--major { stroke: rgba(74, 13, 46, .75); stroke-width: 1.4; }
-.sunindex__arc text { font: 500 11.5px/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; fill: var(--ink); paint-order: stroke; stroke: rgba(255, 253, 248, .55); stroke-width: 3px; stroke-linejoin: round; }
-/* the engraved sun: a flat warm disc, one hairline ring, fine alternating amber rays; the shader carries the glow */
+.sunindex__lede { font-size: 1.0625rem; color: var(--ink); max-width: 44ch; }
+.sunindex__head .pin-note { margin-top: 2px; background: rgba(255, 253, 248, .92); }
+
+/* the day: a dotted path under the sun, gilded behind it; weeks 2–4 a soft warm band; two quiet labels */
+.sunindex__arc, .sunindex__marks { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; overflow: visible; pointer-events: none; }
+.sunindex__arc { z-index: 2; }
+.sunindex__marks { z-index: 3; }
+.sunindex__arc .arc { fill: none; stroke: rgba(74, 13, 46, .34); stroke-width: 1.2; stroke-dasharray: 2 6; stroke-linecap: round; }
+/* the weeks 2–4 band: a soft warm glow with faded ends (a gradient along it), brighter once the sun is in it */
+.sunindex__arc .window { opacity: .62; transition: opacity .8s ease; }
+.sunindex__arc .window.is-lit { opacity: 1; }
+.sunindex__arc .window path { fill: none; stroke-linecap: round; }
+.sunindex__arc .window .glow { stroke-width: 18; opacity: .3; }
+.sunindex__arc .window .core { stroke-width: 6; opacity: .62; }
+.sunindex__arc .done { fill: none; stroke: #E39226; stroke-width: 2.2; stroke-linecap: round; }
+.sunindex__marks text {
+  font: 600 12.5px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; fill: var(--ink);
+  paint-order: stroke; stroke: rgba(255, 253, 248, .78); stroke-width: 4px; stroke-linejoin: round; transition: opacity .3s ease;
+}
+
+/* the engraved sun: a flat warm disc, one hairline ring, fine alternating amber rays */
 .sun { position: absolute; z-index: 2; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
 .sun__disc { position: absolute; left: -30px; top: -30px; width: 60px; height: 60px; border-radius: 50%; background: #FFD253; box-shadow: inset 0 0 0 1.2px var(--amber); }
 .sun__disc::after { content: ''; position: absolute; inset: 0; border-radius: 50%; opacity: var(--warm, 0); background: #FFAE68; box-shadow: inset 0 0 0 1.2px #C2601C; }
 .sun__rays { position: absolute; left: -84px; top: -84px; width: 168px; height: 168px; max-width: none; color: var(--amber); animation: sun-turn 90s linear infinite; }
 .sun__rays line { stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; }
 @keyframes sun-turn { to { transform: rotate(360deg); } }
-.sunindex__stops { position: absolute; z-index: 3; left: var(--gutter); right: var(--gutter); bottom: 84px; display: grid; }
-.stop {
-  grid-area: 1 / 1; align-self: end; width: 100%;
-  padding: 20px 22px 22px; border-radius: var(--r-xs);
-  background: rgba(255, 253, 248, .93); -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, 0 -2px 0 var(--accent) inset, var(--shadow-float);
-  opacity: 0; transform: translateY(14px); pointer-events: none;
-  transition: opacity .5s ease, transform .7s var(--ease-out);
+/* phones and small tablets: a smaller sun for the narrower sky (at dawn and dusk its rays meet the screen edge),
+   and a slimmer band (on a narrow arc a wide glow reads as a smudge) */
+@media (max-width: 767px) {
+  .sun__disc { left: -22px; top: -22px; width: 44px; height: 44px; }
+  .sun__rays { left: -62px; top: -62px; width: 124px; height: 124px; }
+  .sunindex__marks text { font-size: 12px; letter-spacing: .14em; }
+  .sunindex__arc .window .glow { stroke-width: 10; }
+  .sunindex__arc .window .core { stroke-width: 4.5; }
 }
-.stop.is-active { opacity: 1; transform: none; pointer-events: auto; }
-.stop__time { display: flex; align-items: center; gap: 9px; font: 500 var(--fs-cap)/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--accent-text); }
-.stop__time .lucide { width: 16px; height: 16px; }
-.stop h3 { margin: 12px 0 8px; font: 600 1.55rem/1.1 var(--serif); }
-.stop p:last-child { color: var(--ink); }
-.sunindex__dial { position: absolute; z-index: 3; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 4px; padding: 4px; border-radius: var(--r-pill); background: rgba(255, 253, 248, .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, 0 10px 24px -14px rgba(3, 40, 70, .5); }
-.sunindex__dial button { min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: transparent; cursor: pointer; font: 500 var(--fs-cap)/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); white-space: nowrap; transition: background var(--d-fast), color var(--d-fast); }
-.sunindex__dial button:hover { background: var(--accent-tint); }
-.sunindex__dial button[aria-pressed="true"] { background: var(--accent-btn); color: #fff; }
+
+/* the pouches: three striped bags (the real pouch: pink, striped top and bottom, the parasol mark), ten pops
+   in each, drawn in the sun's engraved line: flat fills, one hairline. app.js moves the pops. */
+.pouches { display: block; height: 104px; width: auto; max-width: 100%; margin-inline: auto; overflow: visible; }
+.pouches .bag__shadow { fill: rgba(74, 13, 46, .09); }
+.pouches .bag__mouth { fill: #F28CBC; stroke: rgba(74, 13, 46, .5); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .bag__body { fill: #FFD3E6; }
+.pouches .bag__stripe { fill: #FF72B3; }
+.pouches .bag__zip { stroke: rgba(74, 13, 46, .3); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .bag__mark { fill: none; stroke: var(--accent); stroke-width: 4.4; }
+.pouches .bag__mark-r { fill: var(--white); stroke: rgba(74, 13, 46, .5); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .bag__mark-c { fill: var(--berry); }
+.pouches .bag__line { fill: none; stroke: rgba(74, 13, 46, .62); stroke-width: 1.1; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.pouches .pop__stick-o { stroke: rgba(74, 13, 46, .58); stroke-width: 3.2; stroke-linecap: round; }
+.pouches .pop__stick { stroke: var(--white); stroke-width: 1.6; stroke-linecap: round; }
+.pouches .pop__head { fill: var(--accent); stroke: rgba(74, 13, 46, .7); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .pop__shine { fill: none; stroke: #fff; stroke-width: 1.1; stroke-linecap: round; opacity: .9; vector-effect: non-scaling-stroke; }
+
+/* the stops: a tiny eyebrow, a short headline, one sentence; the last one leads to The Month */
+.sunindex__sheet { position: relative; z-index: 3; width: 100%; max-width: var(--maxw); margin-top: var(--sky, clamp(300px, 34vw, 440px)); }
+.sunindex__sheet > .pouches { display: none; }   /* static: each stop shows its own pouches */
+.sunindex__stops { width: 100%; display: grid; gap: 14px; }
+.stop {
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 20px 22px 24px; border-radius: var(--r-xs);
+  background: rgba(255, 253, 248, .95); box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, var(--shadow-float);
+}
+.stop__pouches { margin-bottom: 14px; }
+.stop__when { font: 500 var(--fs-cap)/1.2 var(--sans); letter-spacing: var(--track-cap); text-transform: uppercase; color: var(--accent-text); }
+/* the weeks 2–4 key: a sliver of the arc's warm band, so the band needs no words */
+.stop__key {
+  display: inline-block; width: 18px; height: 5px; margin: 0 9px 0 0; border-radius: 3px; vertical-align: .14em;
+  background: linear-gradient(90deg, rgba(255, 163, 71, .3), #FFA347 32% 68%, rgba(255, 163, 71, .3));
+  box-shadow: 0 0 0 3px rgba(255, 163, 71, .2);
+}
+.stop h3 { margin: 8px 0 6px; font: 600 1.5rem/1.14 var(--serif); text-wrap: balance; }
+.stop__text { max-width: 38ch; color: var(--ink); font-size: 1rem; line-height: 1.5; text-wrap: balance; }
+.stop__cta { margin-top: 16px; }
+/* static listing: two columns on tablets, a row of four on wide screens */
+@media (min-width: 640px) { .sunindex:not(.is-pinned) .sunindex__stops { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .sunindex:not(.is-pinned) .sunindex__stops { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* the dots: four stops, 44px to tap, keyboard friendly (pinned only: static, every stop is already showing) */
+.sunindex__dial {
+  position: relative; z-index: 4; display: none; padding: 0 6px; border-radius: var(--r-pill);
+  background: rgba(255, 253, 248, .86); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, 0 10px 24px -14px rgba(3, 40, 70, .5);
+}
+.sunindex__dial button {
+  display: grid; place-items: center; width: 44px; height: var(--dial-h); padding: 0; border: 0; border-radius: var(--r-pill);
+  background: none; cursor: pointer;
+}
+.sunindex__dial button::before {
+  content: ''; width: 9px; height: 9px; border-radius: 5px; box-shadow: inset 0 0 0 1.5px rgba(74, 13, 46, .5);
+  transition: width .45s var(--ease-out), background-color .25s, box-shadow .25s;
+}
+@media (hover: hover) { .sunindex__dial button:hover::before { box-shadow: inset 0 0 0 1.5px var(--accent-btn); } }   /* no sticky hover after a tap */
+.sunindex__dial button[aria-current="step"]::before { width: 26px; background: var(--accent-btn); box-shadow: none; }
+.sunindex__dial button:focus-visible { outline-offset: -4px; }
+
+/* drawn by app.js: without it (no JS) the sun and the pouches stay out of the way */
+.sunindex:not(.is-drawn) .sun, .sunindex:not(.is-drawn) .pouches { display: none; }
+
+/* ── PINNED: the stage stays put while the days go by; everything on one centred axis ── */
+.sunindex.is-pinned { height: 240vh; }
+.sunindex.is-pinned .sunindex__stage { position: sticky; top: 0; display: block; height: 100vh; height: 100svh; padding: 0; overflow: hidden; }
+.is-pinned .sunindex__head { position: absolute; left: 0; right: 0; top: calc(var(--nav-h) + 20px); padding-inline: var(--gutter); }
+.is-pinned .sunindex__dial { position: absolute; left: 50%; bottom: var(--dial-b); display: flex; transform: translateX(-50%); }
+.is-pinned .sunindex__sheet {
+  position: absolute; left: 0; right: 0; bottom: calc(var(--dial-b) + var(--dial-h) + 12px);
+  width: calc(100% - 2 * var(--gutter)); max-width: var(--card-w); margin: 0 auto; padding: 18px 22px 16px; border-radius: var(--r-xs);
+  background: rgba(255, 253, 248, .95); -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, 0 -2px 0 var(--accent) inset, var(--shadow-float);
+  touch-action: pan-y;
+}
+.is-pinned .sunindex__sheet > .pouches { display: block; height: 112px; margin-bottom: 12px; }
+/* the card hangs from its top (app.js), so the pouches never move; it hugs the stop showing, its foot easing
+   down for the last stop's link once the old words have gone */
+.is-pinned .sunindex__stops { grid-template-columns: minmax(0, 1fr); gap: 0; overflow: hidden; transition: height .4s var(--ease-out) .1s; }
+/* one stop out, then the next in (never both at once) */
+.is-pinned .stop {
+  grid-area: 1 / 1; align-self: start; padding: 0 8px 8px; background: none; box-shadow: none;
+  opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity .16s ease, transform .2s ease;
+}
+.is-pinned .stop.is-active { opacity: 1; transform: none; pointer-events: auto; transition: opacity .3s ease .14s, transform .45s var(--ease-out) .14s; }
+.is-pinned .stop__pouches { display: none; }
+.is-pinned .stop h3 { margin-top: 6px; }
+/* phones: a tighter head and card, still ≥ 14px for reading */
+@media (max-width: 767px) {
+  .is-pinned .sunindex__head { top: calc(var(--nav-h) + 14px); gap: 8px; }
+  .is-pinned .sunindex__head .display { font-size: 2rem; }
+  .is-pinned .sunindex__lede { font-size: .9375rem; }
+  .is-pinned .sunindex__head .pin-note { padding: 5px 12px; font-size: .8rem; line-height: 1.3; }
+  .is-pinned .sunindex__head .pin-note .lucide { width: 14px; height: 14px; }
+  .is-pinned .pin-note__more { display: none; }   /* phones: the product it shows is the part that matters */
+  .is-pinned .sunindex__sheet { padding: 14px 14px 10px; }
+  .is-pinned .sunindex__sheet > .pouches { height: 92px; margin-bottom: 8px; }
+  .is-pinned .stop h3 { margin: 4px 0 4px; font-size: 1.3rem; }
+  .is-pinned .stop__text { font-size: .9375rem; line-height: 1.45; }
+  .is-pinned .stop__cta { margin-top: 12px; }
+}
+/* short phones (Safari with its bars showing, small Androids): the head gives way so the day still pins */
+@media (max-width: 767px) and (max-height: 760px) {
+  .is-pinned .sunindex__head { top: calc(var(--nav-h) + 8px); gap: 6px; }
+  .is-pinned .sunindex__head .eyebrow { display: none; }
+  .is-pinned .sunindex__head .display { font-size: 1.75rem; }
+  .is-pinned .sunindex__sheet > .pouches { height: 78px; }
+}
+@media (max-width: 767px) and (max-height: 680px) {
+  .is-pinned .sunindex__lede { display: none; }
+  .is-pinned .sunindex__sheet > .pouches { height: 72px; }
+  .is-pinned .stop__cta { margin-top: 10px; }
+}
+/* short desktops and laptops: a smaller title and the line under it gives way, so the day keeps its sky */
+@media (min-width: 768px) and (max-height: 820px) {
+  .is-pinned .sunindex__head { top: calc(var(--nav-h) + 14px); gap: 8px; }
+  .is-pinned .sunindex__head .display { font-size: clamp(2.1rem, 1rem + 2.4vw, 3.2rem); }
+  .is-pinned .sunindex__lede { display: none; }
+  .is-pinned .sunindex__sheet > .pouches { height: 88px; margin-bottom: 8px; }
+  .is-pinned .sunindex__sheet { padding-top: 14px; }
+}
+/* short, wide screens (a laptop under its browser bars): the card lies down, the pouches beside the words,
+   so the day keeps its sky and still pins */
+@media (min-width: 900px) and (max-height: 760px) {
+  .is-pinned .sunindex__head { top: calc(var(--nav-h) + 12px); }
+  .is-pinned .sunindex__head .eyebrow { display: none; }
+  .is-pinned .sunindex__head .display { font-size: 2.25rem; }
+  .is-pinned .sunindex__sheet {
+    --card-w: 720px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; column-gap: 22px;
+    padding: 14px 24px 12px 22px;
+  }
+  .is-pinned .sunindex__sheet > .pouches { height: 88px; margin: 0; }
+  /* the words sit level with the pouches; the last stop's link runs on below them */
+  .is-pinned .stop { align-items: flex-start; justify-content: center; min-height: 88px; text-align: left; padding: 0 6px 6px; }
+  .is-pinned .stop h3 { margin: 5px 0 4px; font-size: 1.375rem; }
+  .is-pinned .stop__text { font-size: .9375rem; line-height: 1.45; text-wrap: pretty; }
+  .is-pinned .stop__cta { margin-top: 10px; }
+}
+/* another cabana chosen: its note (what this shows) takes the line's place, so the day keeps its sky */
+@media (min-width: 768px) and (max-height: 960px) { html:not([data-product="strawberry-pop"]) .is-pinned .sunindex__lede { display: none; } }
+/* tall tablets and big screens: the pouches carry the count, so they get the room to be read at a glance */
+@media (min-width: 768px) and (min-height: 1000px) { .is-pinned .sunindex__sheet > .pouches { height: 124px; } }
+@media (min-width: 1200px) and (min-height: 860px) { .is-pinned .sunindex__sheet > .pouches { height: 120px; } }
+@media (min-width: 1200px) and (min-height: 1000px) { .is-pinned .sunindex__sheet > .pouches { height: 136px; } }
+/* touch screens: no blur behind the card and the dots over the live water (cheaper every frame) */
+@media (pointer: coarse) {
+  .sunindex__dial, .is-pinned .sunindex__sheet { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sunindex__dial { background: rgba(255, 253, 248, .95); }
+  .is-pinned .sunindex__sheet { background: rgba(255, 253, 248, .97); }
+}
 
 /* ───────────── 14 · REAL SUGAR ───────────── */
 .sugar { background: var(--sand); isolation: isolate; overflow: clip; --em: var(--accent-display); }
@@ -1058,11 +1225,6 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .compare__us { flex-direction: column; gap: 6px; }   /* the parasol mark sits above the name: no "Glo / Pop" break */
   .waitlist__row .btn { flex: 1 1 100%; }
 }
-/* phones and small tablets: a smaller engraved sun, so its rays never run off the screen edge */
-@media (max-width: 767px) {
-  .sun__disc { left: -22px; top: -22px; width: 44px; height: 44px; }
-  .sun__rays { left: -62px; top: -62px; width: 124px; height: 124px; }
-}
 
 /* ═══════════ RESPONSIVE ═══════════ */
 @media (min-width: 560px) {
@@ -1071,7 +1233,7 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .hero__ctas { width: auto; }
   .hero__ctas .btn { flex: 0 0 auto; }
   .proofs { border-radius: var(--r-pill); }
-  .cabana-card__facts { grid-template-columns: repeat(4, 1fr); }
+  .cabana-card__facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (min-width: 640px) {
   .cabana-scroller { overflow: visible; }
@@ -1083,7 +1245,6 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
 @media (min-width: 768px) {
   .awning--hero { --sw: 40px; --sh: 28px; }
   .hero__candy { height: clamp(360px, 46svh, 480px); }
-  .sunindex__stops { left: 50%; right: auto; width: 520px; transform: translateX(-50%); }
   .sugar__notes { grid-template-columns: 1fr 1fr; }
   .note + .note { border-top: 0; }
   .note:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -1139,15 +1300,9 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
 
   /* cabana card: copy + facts, then CTA + stamp below */
   .cabana-card__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; column-gap: 40px; }
-  .cabana-card__facts { grid-template-columns: 1fr 1fr; }
+  .cabana-card__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cabana-card__cta { grid-auto-flow: column; justify-content: start; align-items: center; column-gap: 20px; }
   .cabana-card__stamp { display: flex; justify-self: end; }
-
-  /* the Sun Index: a shorter pin; the stop sits over the sea, on the side away from the sun */
-  .sunindex { height: 220vh; }
-  .sunindex__stops { left: auto; transform: none; width: min(440px, 34vw); right: var(--gutter); bottom: 104px; transition: right .9s var(--ease-io); }
-  .sunindex__stage[data-stop="1"] .sunindex__stops, .sunindex__stage[data-stop="2"] .sunindex__stops { right: calc(100% - var(--gutter) - min(440px, 34vw)); }
-  .stop { padding: 24px 28px 26px; }
 }
 @media (min-width: 1200px) {
   .cabana-card__inner { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.25fr) auto auto; column-gap: 36px; }
@@ -1173,19 +1328,12 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .hero__title { margin: 14px 0 16px; }
   .hero__ctas { margin-top: 22px; }
   .proofs { margin-top: 18px; }
-  .sunindex__head { top: calc(var(--nav-h) + 18px); }
-  .sunindex__stops { bottom: 86px; }
-  .stop { padding: 18px 22px 20px; }
-  .stop h3 { font-size: 1.35rem; margin: 10px 0 6px; }
-  .stop p:last-child { font-size: .95rem; }
 }
 
 /* touch screens: lighter blurs over the live water (cheaper to composite every frame) */
 @media (pointer: coarse) {
   .proofs { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 253, 248, .86); }
-  .stop { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 253, 248, .96); }
-  .sunindex__dial, .caption--hero, .hero__hint { -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .sunindex__dial { background: rgba(255, 253, 248, .95); }
+  .caption--hero, .hero__hint { -webkit-backdrop-filter: none; backdrop-filter: none; }
   .caption--hero { background: rgba(255, 253, 248, .94); }
   .hero__hint { background: rgba(5, 46, 76, .62); }
 }
@@ -1195,14 +1343,6 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   html { scroll-behavior: auto; transition: none; }
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
   .sun__rays, .sugar::after, .menu::after { animation: none !important; }
-  /* the Sun Index is not pinned: the day sits above, all three stops below it */
-  .sunindex { height: auto; }
-  .sunindex__stage { position: relative; height: auto; min-height: 0; padding: min(74svh, 660px) 0 36px; }
-  .sunindex__stops, .sunindex__stage[data-stop] .sunindex__stops { position: relative; left: auto; right: auto; bottom: auto; width: auto; transform: none; margin-inline: var(--gutter); display: grid; gap: 14px; }
-  .stop { grid-area: auto; align-self: stretch; opacity: 1; transform: none; pointer-events: auto; box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, var(--shadow-float); }
-  .stop.is-active { box-shadow: 0 0 0 1px rgba(255, 255, 255, .6) inset, 0 -3px 0 var(--accent) inset, var(--shadow-float); }
-  .sunindex__dial { bottom: auto; top: calc(min(74svh, 660px) - 66px); }
-}
-@media (prefers-reduced-motion: reduce) and (min-width: 900px) {
-  .sunindex__stops, .sunindex__stage[data-stop] .sunindex__stops { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* the Sun Index is never pinned here (app.js leaves it static): the day above, every stop listed below it
+     with its own pouches, drawn as they stand on that stop's day */
 }
