@@ -1507,7 +1507,7 @@
       }
     }
 
-    var W = 0, H = 0, gy = 0, dpr = 1, cam = { s: 60, x: -3 }, camT = { s: 60, x: -3 }, sMax = 90, moving = false;
+    var W = 0, H = 0, gy = 0, dpr = 1, cam = { s: 60, x: -3, d: 2.6 }, camT = { s: 60, x: -3, d: 2.6 }, sMax = 90, moving = false;
     var S = { k: 'sugar', fill: 0, sachet: null, frac: null, ghost: null, tag: null, tagY: 0, lift: 0 };
     // the pile's cache: P.cv holds the settled cubes, P.fc the handful still dropping; both at P.sd device px a cube
     var P = { g: null, r: 0, fr: 0, sd: 0, ddx: 0, ddy: 0, cs: 1, pad: 4, Wc: 0, Hc: 0, cv: null, fc: null };
@@ -1548,8 +1548,6 @@
       c.setTransform(dpr, 0, 0, dpr, 0, 0);
       c.fillStyle = C.tint; c.fillRect(0, 0, W, H);
       cloud(c, W * 0.07, H * 0.17, W < 600 ? 44 : 70); cloud(c, W * 0.83, H * 0.36, W < 600 ? 32 : 50);
-      c.beginPath(); c.moveTo(0, H); ground.forEach(function (p) { c.lineTo(p[0], p[1]); }); c.lineTo(W, H); c.closePath();
-      c.fillStyle = C.sand; c.fill();
     }
     function cloud(c, x, y, w) {
       var B = [[0, 0.1, 0.34], [0.3, -0.12, 0.4], [0.62, 0.08, 0.3]];
@@ -1568,8 +1566,8 @@
       var fw = flagW(), padTop = W < 600 ? 78 : 96, s = Math.min((W - 40) / (xmax + 7.4), (W - 60 - fw) / (xmax + 0.5), (gy - padTop) / ymax, sMax);
       if (s * dpr >= 2) s = Math.floor(s * dpr) / dpr;
       var xmin = Math.min(-6.9, -(fw + 20) / s);
-      camT.s = s; camT.x = (xmin + xmax + 0.5) / 2;
-      if (snap) { cam.s = camT.s; cam.x = camT.x; }
+      camT.s = s; camT.x = (xmin + xmax + 0.5) / 2; camT.d = depthT();
+      if (snap) { cam.s = camT.s; cam.x = camT.x; cam.d = camT.d; }
     }
     var X = function (x) { return W / 2 + (x - cam.x) * cam.s; }, Y = function (y) { return gy - y * cam.s; };
 
@@ -1658,41 +1656,74 @@
       seg(R[2], R[3]); seg(R[3], R[0]);
       return { cv: el, ox: m, oy: sd + ddy + m };
     }
+    // the real pile and the pencil one are one solid: every cell of either, on one lattice, stamped in a single
+    // back-to-front pass (bottom layer up, back row forward, left to right). Real cubes keep the real sprite, the
+    // rest are pencil, and a pencil cube in front of or on top of a real one hides it, as it would on a table.
     function ghostCache(gh) {
-      var sd = P.sd;
-      if (G.gh === gh && G.sd === sd && G.ai === C.ai && G.cv) return;
-      var top = 0;
-      gh.L.forEach(function (l) { top = Math.max(top, (l.k + 1) * sd + (l.k + l.m) * P.ddy); });
-      G.Wc = Math.ceil(P.pad * 2 + gh.b * (sd + P.ddx) + 2); G.Hc = Math.ceil(P.pad * 2 + top + 2);
+      var g = P.g, sd = P.sd, r = P.r;
+      if (G.gh === gh && G.g === g && G.r === r && G.sd === sd && G.ai === C.ai && G.cv) return;
+      var B = Math.max(g.b, gh.b), Ly = Math.max(g.L.length, gh.L.length) + 1, occ = new Uint8Array(B * B * Ly);
+      var at = function (x, y, z) { return x < 0 || z < 0 || x >= B || z >= B || y >= Ly ? 0 : occ[(y * B + z) * B + x]; };
+      forCubes(gh, 0, gh.n, false, function (x, y, z) { occ[(y * B + z) * B + x] = 1; });
+      forCubes(g, 0, r, false, function (x, y, z) { occ[(y * B + z) * B + x] = 2; });
+      var top = 0, x, y, z;
+      for (y = 0; y < Ly; y++) for (z = 0; z < B; z++) for (x = 0; x < B; x++) if (occ[(y * B + z) * B + x]) top = Math.max(top, (y + 1) * sd + (z + 1) * P.ddy);
+      G.Wc = Math.ceil(P.pad * 2 + B * (sd + P.ddx) + 2); G.Hc = Math.ceil(P.pad * 2 + top + 2);
       G.cv = G.cv || canvas(); G.cv.width = G.Wc; G.cv.height = G.Hc;
-      G.spr = ghostSprite(sd);
-      var c = G.cv.getContext('2d'), sp = G.spr;
+      if (!G.spr || G.sd !== sd || G.ai !== C.ai) G.spr = ghostSprite(sd);
+      sprite(sd);
+      var c = G.cv.getContext('2d');
       c.clearRect(0, 0, G.Wc, G.Hc);
-      forCubes(gh, 0, gh.n, true, function (x, y, z) {
+      for (y = 0; y < Ly; y++) for (z = B - 1; z >= 0; z--) for (x = 0; x < B; x++) {
+        var v = occ[(y * B + z) * B + x];
+        if (!v || (at(x + 1, y, z) && at(x, y + 1, z) && at(x, y, z - 1))) continue;   // all three seen faces covered
+        var sp = v === 2 ? SPR : G.spr;
         c.drawImage(sp.cv, P.pad + x * sd + z * P.ddx - sp.ox, G.Hc - P.pad - y * sd - z * P.ddy - sp.oy);
-      });
-      G.gh = gh; G.sd = sd; G.ai = C.ai;
+      }
+      G.gh = gh; G.g = g; G.r = r; G.sd = sd; G.ai = C.ai;
     }
-    function ghost(gh) {
+    function ghostNote(gh) {                                     // a pencil note on the far slope
       var ex = P.sd ? P.ddx / P.sd : DX, ey = P.sd ? P.ddy / P.sd : DY;
-      var pt = function (x, y, z) { return [X(x + z * ex), Y(y + z * ey)]; };
+      var l = gh.L[Math.floor(gh.L.length / 2)], e = [X(X0 + l.k + l.m + (l.k + l.m) * ex), Y(l.k + 1 + (l.k + l.m) * ey)];
       ctx.save();
-      if (P.sd) {
-        ghostCache(gh);
-        var f = cam.s / P.cs, x0 = X(X0) - P.pad / dpr * f, y0 = Y(0) - (G.Hc - P.pad) / dpr * f;
-        if (Math.abs(f - 1) < 1e-3) { x0 = Math.round(x0 * dpr) / dpr; y0 = Math.round(y0 * dpr) / dpr; }
-        ctx.drawImage(G.cv, x0, y0, G.Wc / dpr * f, G.Hc / dpr * f);
-      }
+      ctx.font = '700 ' + (W < 600 ? 17 : 21) + 'px Caveat, "Segoe Print", cursive';
+      var txt = 'up to ' + gh.n.toLocaleString('en-US'), w = ctx.measureText(txt).width;
+      ctx.translate(Math.min(W - w - 8, e[0] + 10), Math.max(18, e[1] + 4)); ctx.rotate(-5 * RAD);
+      ctx.fillStyle = C.ai; ctx.textBaseline = 'middle'; ctx.fillText(txt, 0, 0);
       ctx.restore();
-      if (S.tag) {                                               // and a pencil note on its far slope
-        var l = gh.L[Math.floor(gh.L.length / 2)], e = pt(X0 + l.k + l.m, l.k + 1, l.k + l.m);
-        ctx.save();
-        ctx.font = '700 ' + (W < 600 ? 17 : 21) + 'px Caveat, "Segoe Print", cursive';
-        var txt = 'up to ' + gh.n.toLocaleString('en-US'), w = ctx.measureText(txt).width;
-        ctx.translate(Math.min(W - w - 8, e[0] + 10), Math.max(18, e[1] + 4)); ctx.rotate(-5 * RAD);
-        ctx.fillStyle = C.ai; ctx.textBaseline = 'middle'; ctx.fillText(txt, 0, 0);
-        ctx.restore();
+    }
+    // the sand is a floor seen from the same angle as the cubes: it runs back to a horizon just behind the
+    // deepest pile on stage, and every pile and cube sits on it with a soft contact shadow
+    function floor() {
+      var d = cam.d, top = Y(d * DY), lift = gy - top;
+      ctx.beginPath(); ctx.moveTo(0, H);
+      ground.forEach(function (p) { ctx.lineTo(p[0], p[1] - lift); });
+      ctx.lineTo(W, H); ctx.closePath();
+      var gr = ctx.createLinearGradient(0, top, 0, H);
+      gr.addColorStop(0, mixc(C.sand, '#FFFFFF', 0.3)); gr.addColorStop(clamp(lift / Math.max(1, H - top), 0.01, 0.95), C.sand); gr.addColorStop(1, C.sand);
+      ctx.fillStyle = gr; ctx.fill();
+      ctx.strokeStyle = 'rgba(176,110,60,.16)'; ctx.lineWidth = 1;            // a few ripples along the floor's own depth lines
+      for (var i = 1; i <= 3; i++) {
+        var yy = Y(d * i / 4 * DY);
+        if (gy - yy < 10) continue;
+        ctx.setLineDash([10, 9]); ctx.lineDashOffset = i * 7;
+        ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W, yy); ctx.stroke();
       }
+      ctx.setLineDash([]);
+      var foot = function (x0, x1, z0, z1, a) {                    // a footprint on the floor, pushed a little right and back
+        var q = [[x0 + 0.08, z0 - 0.05], [x1 + 0.22, z0 - 0.05], [x1 + 0.22, z1 + 0.18], [x0 + 0.08, z1 + 0.18]];
+        ctx.beginPath(); q.forEach(function (v, j) { var px = X(v[0] + v[1] * DX), py = Y(v[1] * DY); if (j) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
+        ctx.closePath(); ctx.fillStyle = 'rgba(122,60,30,' + a + ')'; ctx.fill();
+      };
+      if (S.ghost) foot(X0, X0 + S.ghost.b, 0, S.ghost.b, 0.14);
+      else if (P.g && P.r) {                                     // only under what has landed: the base fills back rows first
+        var pb = P.g.b, rows = Math.min(pb, Math.ceil(P.r / pb));
+        foot(X0, X0 + pb, pb - rows, pb, 0.14);
+      } else if (S.frac) foot(X0 + 0.05, X0 + 1.05, 0, 1, 0.14);
+      foot(-0.5, 0.5, 0, 1, 0.16);                               // the reference cube
+    }
+    function depthT() {                                          // how far back the floor runs for what's on stage
+      return Math.max(1, S.ghost ? S.ghost.b : 0, P.g ? P.g.b : 0) + 1.6;
     }
     function spoon() {                                          // a paper teaspoon lying on the sand, bowl up
       var s = cam.s, bx = X(-2.3), by = Y(0.5), rx = 1.05 * s, ry = 0.46 * s;
@@ -1800,13 +1831,19 @@
         var want = sdFor(cam.s);
         if (!P.sd || (want !== P.sd && (!moving || Math.abs(Math.log(want / P.sd)) > 0.22))) setup(want);
       }
-      if (S.ghost) ghost(S.ghost);
+      floor();
       if (P.g && P.fr) {
         var f = cam.s / P.cs, x0 = X(X0) - P.pad / dpr * f, y0 = Y(0) - (P.Hc - P.pad) / dpr * f, w = P.Wc / dpr * f, h = P.Hc / dpr * f;
         if (Math.abs(f - 1) < 1e-3) { x0 = Math.round(x0 * dpr) / dpr; y0 = Math.round(y0 * dpr) / dpr; }
-        if (P.r) ctx.drawImage(P.cv, x0, y0, w, h);
+        if (S.ghost && P.sd) {                                   // real and pencil cubes as one solid
+          ghostCache(S.ghost);
+          var gy0 = Y(0) - (G.Hc - P.pad) / dpr * f;
+          if (Math.abs(f - 1) < 1e-3) gy0 = Math.round(gy0 * dpr) / dpr;
+          ctx.drawImage(G.cv, x0, gy0, G.Wc / dpr * f, G.Hc / dpr * f);
+        } else if (P.r) ctx.drawImage(P.cv, x0, y0, w, h);
         if (P.fr > P.r) ctx.drawImage(P.fc, x0, y0 - Math.round(S.lift * cam.s * dpr) / dpr, w, h);
       }
+      if (S.ghost && S.tag) ghostNote(S.ghost);
       if (S.frac) {                                              // less than a cube: a cube cut down, the rest traced
         var fr = S.frac, xc = X0 + 0.55;
         outline([[xc - 0.5, 0], [xc - 0.5, 1], [xc - 0.5 + DX, 1 + DY], [xc + 0.5 + DX, 1 + DY], [xc + 0.5 + DX, DY], [xc + 0.5, 0]]);
@@ -1895,9 +1932,9 @@
         else { apply(frames.shift()); hold = Math.random() < 0.2 ? 1 : 0; dirty = true; }   // now and then a frame is held twice
       }
       var k = 1 - Math.exp(-dt * 3.2), ls = Math.log(cam.s), lt = Math.log(camT.s), was = moving;
-      cam.s = Math.exp(ls + (lt - ls) * k); cam.x += (camT.x - cam.x) * k;
-      moving = Math.abs(lt - ls) > 0.002 || Math.abs(camT.x - cam.x) * cam.s > 0.3;
-      if (!moving) { cam.s = camT.s; cam.x = camT.x; }
+      cam.s = Math.exp(ls + (lt - ls) * k); cam.x += (camT.x - cam.x) * k; cam.d += (camT.d - cam.d) * k;
+      moving = Math.abs(lt - ls) > 0.002 || Math.abs(camT.x - cam.x) * cam.s > 0.3 || Math.abs(camT.d - cam.d) * cam.s * DY > 0.3;
+      if (!moving) { cam.s = camT.s; cam.x = camT.x; cam.d = camT.d; }
       if (dirty || moving || was) paint();                          // between stop-motion frames a still camera costs nothing
       if ((frames.length || moving) && onScreen) raf = requestAnimationFrame(loop); else last = 0;
     }
