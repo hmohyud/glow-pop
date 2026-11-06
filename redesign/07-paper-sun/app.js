@@ -1537,7 +1537,7 @@
       sMax = W < 600 ? 52 : 88;
       ground = [];
       for (var x = -8, i = 0; x <= W + 8; x += 14, i++) ground.push([x, gy + Math.sin(i * 1.7) * 1.4 + ((i * 7919) % 5 - 2) * 0.5]);
-      BG = null; P.sd = 0; SPR.sd = 0;
+      BG = null; P.sd = 0; SPR.sd = 0; G.sd = 0;
       return true;
     }
     // the backdrop (sky, two paper clouds, the sand) never moves: drawn once per size and theme
@@ -1633,19 +1633,56 @@
       f.clearRect(0, 0, P.Wc, P.Hc);
       if (fr > r) forCubes(g, r, fr, false, stampTo(f));
     }
-    function ghost(gh) {                                        // a range: the far end's pyramid, traced in pencil behind
+    // a range: the far end's pyramid, traced in pencil behind. It is stamped cube by cube on the very same lattice
+    // as the real pile (same foot, same build order, same sprite geometry), so every dashed seam runs on from a real
+    // cube's edge: the pencil cubes are the extra cubes the pile would need to reach the high end.
+    var G = { gh: null, sd: 0, cv: null, spr: null, Wc: 0, Hc: 0, ai: '' };
+    function ghostSprite(sd) {
+      var ddx = P.ddx, ddy = P.ddy, m = 2, el = canvas();
+      el.width = sd + ddx + m * 2; el.height = sd + ddy + m * 2;
+      var c = el.getContext('2d'), x = m, y = sd + ddy + m, s = sd;
+      var F = [[x, y], [x, y - s], [x + s, y - s], [x + s, y]];                       // front
+      var T = [[x, y - s], [x + ddx, y - s - ddy], [x + s + ddx, y - s - ddy], [x + s, y - s]];   // top
+      var R = [[x + s, y], [x + s, y - s], [x + s + ddx, y - s - ddy], [x + s + ddx, y - ddy]];  // right side
+      var poly = function (q, col) { c.beginPath(); q.forEach(function (v, i) { if (i) c.lineTo(v[0], v[1]); else c.moveTo(v[0], v[1]); }); c.closePath(); c.fillStyle = col; c.fill(); };
+      poly(F, C.ghost); poly(T, mixc(C.ghost, '#FFFFFF', 0.45)); poly(R, mixc(C.ghost, C.side, 0.4));
+      var dash = sd >= 14 * dpr, lw = Math.max(1, Math.round(1.1 * dpr));
+      c.strokeStyle = C.ai; c.globalAlpha = dash ? 0.7 : (sd >= 6 * dpr ? 0.2 : 0.12); c.lineWidth = lw; c.lineCap = 'butt';
+      var seg = function (a, b) {                                   // each edge gets a whole number of dashes, so seams meet cleanly
+        var len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        if (dash) { var n = Math.max(1, Math.round(len / (7 * dpr))), per = len / n; c.setLineDash([per * 0.6, per * 0.4]); c.lineDashOffset = -per * 0.2; }
+        c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+      };
+      seg(F[0], F[1]); seg(F[1], F[2]); seg(F[2], F[3]); seg(F[3], F[0]);
+      seg(T[0], T[1]); seg(T[1], T[2]); seg(T[2], T[3]);
+      seg(R[2], R[3]); seg(R[3], R[0]);
+      return { cv: el, ox: m, oy: sd + ddy + m };
+    }
+    function ghostCache(gh) {
+      var sd = P.sd;
+      if (G.gh === gh && G.sd === sd && G.ai === C.ai && G.cv) return;
+      var top = 0;
+      gh.L.forEach(function (l) { top = Math.max(top, (l.k + 1) * sd + (l.k + l.m) * P.ddy); });
+      G.Wc = Math.ceil(P.pad * 2 + gh.b * (sd + P.ddx) + 2); G.Hc = Math.ceil(P.pad * 2 + top + 2);
+      G.cv = G.cv || canvas(); G.cv.width = G.Wc; G.cv.height = G.Hc;
+      G.spr = ghostSprite(sd);
+      var c = G.cv.getContext('2d'), sp = G.spr;
+      c.clearRect(0, 0, G.Wc, G.Hc);
+      forCubes(gh, 0, gh.n, true, function (x, y, z) {
+        c.drawImage(sp.cv, P.pad + x * sd + z * P.ddx - sp.ox, G.Hc - P.pad - y * sd - z * P.ddy - sp.oy);
+      });
+      G.gh = gh; G.sd = sd; G.ai = C.ai;
+    }
+    function ghost(gh) {
       var ex = P.sd ? P.ddx / P.sd : DX, ey = P.sd ? P.ddy / P.sd : DY;
       var pt = function (x, y, z) { return [X(x + z * ex), Y(y + z * ey)]; };
       ctx.save();
-      ctx.lineWidth = 1.3; ctx.strokeStyle = C.ai; ctx.setLineDash([5, 4]); ctx.lineJoin = 'round';
-      gh.L.forEach(function (l) {
-        var x0 = X0 + l.k, x1 = x0 + l.m, y0 = l.k, y1 = y0 + 1, z1 = l.k + l.m, z0 = z1 - l.rows;
-        var p = [pt(x0, y0, z0), pt(x0, y1, z0), pt(x0, y1, z1), pt(x1, y1, z1), pt(x1, y0, z1), pt(x1, y0, z0)], q = pt(x1, y1, z0);
-        ctx.beginPath(); p.forEach(function (v, i) { if (i) ctx.lineTo(v[0], v[1]); else ctx.moveTo(v[0], v[1]); }); ctx.closePath();
-        ctx.fillStyle = C.ghost; ctx.fill(); ctx.globalAlpha = 0.75; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(p[1][0], p[1][1]); ctx.lineTo(q[0], q[1]); ctx.lineTo(p[5][0], p[5][1]); ctx.moveTo(q[0], q[1]); ctx.lineTo(p[3][0], p[3][1]); ctx.stroke();
-        ctx.globalAlpha = 1;
-      });
+      if (P.sd) {
+        ghostCache(gh);
+        var f = cam.s / P.cs, x0 = X(X0) - P.pad / dpr * f, y0 = Y(0) - (G.Hc - P.pad) / dpr * f;
+        if (Math.abs(f - 1) < 1e-3) { x0 = Math.round(x0 * dpr) / dpr; y0 = Math.round(y0 * dpr) / dpr; }
+        ctx.drawImage(G.cv, x0, y0, G.Wc / dpr * f, G.Hc / dpr * f);
+      }
       ctx.restore();
       if (S.tag) {                                               // and a pencil note on its far slope
         var l = gh.L[Math.floor(gh.L.length / 2)], e = pt(X0 + l.k + l.m, l.k + 1, l.k + l.m);
@@ -1909,7 +1946,7 @@
       else { target(true); paint(); }
     }
     if ('ResizeObserver' in window) new ResizeObserver(refit).observe(stage); else on(window, 'resize', refit);
-    listeners.push(function () { setTimeout(function () { C = colors(); BG = null; SPR.sd = 0; P.sd = 0; if (started && !raf) paint(); }, 760); });
+    listeners.push(function () { setTimeout(function () { C = colors(); BG = null; SPR.sd = 0; P.sd = 0; G.sd = 0; if (started && !raf) paint(); }, 760); });
     if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { if (started && !raf) paint(); });
     // work out every packet's pyramid while the page is idle, so a tap never waits on arithmetic
     (window.requestIdleCallback || function (fn2) { return setTimeout(fn2, 400); })(function () {
