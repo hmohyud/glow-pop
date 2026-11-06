@@ -32,23 +32,26 @@
               statusLabel: 'Available now', stageCaption: 'Real-time 3D · grab to spin · tap for a bite', spinHint: 'Grab to spin · tap for a bite' }
     },
     {
-      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: null /* TBD */,
+      // Facts from the client's Supplement Facts label: Strawberry-Watermelon; serving 2 gummies, 30 servings
+      // (60 gummies) per container. Still TBD: price, launch, directions, other ingredients, allergens, final shape.
+      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: 'Strawberry-Watermelon',
       status: 'coming-soon', statusLabel: 'Arriving soon',
       color: '#1FA453', color3d: '#0E8A3E', deep: '#0F3A2A', tint: '#EAF6DE', meta: '#1FA453',
-      perBag: null /* TBD */,
+      perBag: 60, unit: 'gummies', pack: ['container', 'containers'], per: 'a serving',   // 30 servings × 2 gummies
       tab: { title: 'Green Gummies', sub: 'Arriving soon' },
       panel: {
-        title: 'Green Gummies <em>' + PH('Flavor') + '</em>',
-        blurb: 'Our first gummy, in a brand-new green. The working name is Green Gummies; everything else is still under wraps.',
-        facts: [[PH('Flavor'), 'flavor'], [PH('Actives'), 'actives'], [PH('Count'), 'gummies per bag'], [PH('Date'), 'launch']],
+        title: 'Green Gummies <em>Strawberry-Watermelon</em>',
+        blurb: 'Our first gummy, in a brand-new green: five B vitamins plus an organic super-greens blend of 15 ingredients.',
+        facts: [['20', 'calories per 2 gummies'], ['3g', 'sugar per 2 gummies'], ['60', 'gummies per container'], [PH('Date'), 'launch']],
         cta: { label: 'Join the waitlist', href: '#waitlist' },
-        alt: { label: 'Shop Strawberry for now', href: '#shop' },
+        alt: { label: 'Shop Strawberry for now', href: '#shop' },   // used only if the label markup is missing
+        label: true,   // the secondary button opens the Supplement facts drawer (Strawberry's is "What's inside")
         caption: 'Concept render · final gummy TBD'
       },
-      copy: { heroKicker: 'Green Gummies · arriving soon', ctaLabel: 'Join the Green Gummies waitlist', ctaHref: '#waitlist',
-              heroSub: 'Our first gummy is on its way, in a brand-new green. Flavor, actives and launch date are still under wraps. Until then, the strawberry pops are here.',
-              proof: '<li><i data-lucide="candy"></i><span>' + PH('Flavor') + '</span></li><li><i data-lucide="sparkles"></i><span>' + PH('Actives') + '</span></li><li><i data-lucide="mail"></i><span>Launch ' + PH('Date') + '</span></li>',
-              barTitle: 'Green Gummies', barSub: 'Arriving soon · join the list', barCta: 'Waitlist',
+      copy: { heroKicker: 'Green Gummies · <span class="nobr">Strawberry-Watermelon</span>', ctaLabel: 'Join the Green Gummies waitlist', ctaHref: '#waitlist',
+              heroSub: 'Our first gummy is on its way, in strawberry-watermelon, with five B vitamins and an organic super-greens blend. Until then, the strawberry pops are here.',
+              proof: '<li><i data-lucide="candy"></i><span><b>20</b> cal per 2 gummies</span></li><li><i data-lucide="sparkles"></i><span><b>5</b> B vitamins + super greens</span></li><li><i data-lucide="mail"></i><span>Launch ' + PH('Date') + '</span></li>',
+              barTitle: 'Green Gummies', barSub: 'Strawberry-watermelon · arriving soon', barCta: 'Waitlist',
               statusLabel: 'Arriving soon', stageCaption: 'Concept render · final gummy TBD · tap to squish', spinHint: 'Grab to spin · tap to squish' }
     },
     {
@@ -388,15 +391,27 @@
   }
 
   /* ───────────────────────── 10 · Lineup: the postcard switcher (tabs) ───────────────────────── */
+  // The gummies' Supplement Facts label is authored once, on the gummies card (#sf-wl); the green spec sheet reuses it.
+  var labelHTML = null;
+  function gummyLabel() {
+    if (labelHTML === null) { var src = $('#sf-wl .sfacts__in'); labelHTML = src ? src.innerHTML : ''; }
+    return labelHTML;
+  }
   function panelHTML(p) {
     var facts = p.panel.facts.map(function (f) { return '<div><dt>' + f[1] + '</dt><dd>' + f[0] + '</dd></div>'; }).join('');
-    return '<div class="panel__in">' +
+    var label = p.panel.label && gummyLabel();
+    var alt = label
+      ? '<button class="btn btn--ghost sfacts__toggle" type="button" id="sf-panel-btn" aria-expanded="false" aria-controls="sf-panel" data-sfacts-btn>' +
+        'Supplement facts<span class="sfacts__plus" aria-hidden="true"><i data-lucide="plus"></i></span></button>'
+      : '<a class="btn btn--ghost" href="' + p.panel.alt.href + '">' + p.panel.alt.label + '</a>';
+    return '<div class="panel__in' + (label ? ' sfacts--js" data-sfacts' : '"') + '>' +
       '<p class="panel__status">' + p.statusLabel + '</p>' +
       '<h3 class="panel__title">' + p.panel.title + '</h3>' +
       '<p class="panel__blurb">' + p.panel.blurb + '</p>' +
       '<dl class="panel__facts">' + facts + '</dl>' +
-      '<div class="panel__ctas"><a class="btn btn--accent" href="' + p.panel.cta.href + '">' + p.panel.cta.label + '<i data-lucide="arrow-right"></i></a>' +
-      '<a class="btn btn--ghost" href="' + p.panel.alt.href + '">' + p.panel.alt.label + '</a></div></div>';
+      '<div class="panel__ctas"><a class="btn btn--accent" href="' + p.panel.cta.href + '">' + p.panel.cta.label + '<i data-lucide="arrow-right"></i></a>' + alt + '</div>' +
+      // wrapped: the panel's entrance tween sets inline visibility on direct children, which would un-hide a closed drawer
+      (label ? '<div class="panel__drawer"><div class="sfacts__a" id="sf-panel"><div class="sfacts__in">' + label + '</div></div></div>' : '') + '</div>';
   }
   function initSwitcher() {
     var tabs = $$('.pc-tab'), panel = $('#lineup-panel'), list = $('.pc-tabs');
@@ -410,7 +425,11 @@
         t.tabIndex = on ? 0 : -1;
       });
       panel.setAttribute('aria-labelledby', 'tab-' + p.id);
-      var swap = function () { panel.innerHTML = panelHTML(p); icons(); };
+      var swap = function () {
+        holdBeside(panel, false, true);              // a drawer that was open goes with the old panel
+        panel.innerHTML = panelHTML(p); icons();
+        refreshSoon();                               // panel height differs per product: re-measure the pinned day below
+      };
       if (motionOK && panel.firstElementChild) {
         gsap.to(panel.firstElementChild, {
           autoAlpha: 0, y: 12, duration: .22, ease: 'power2.in',
@@ -570,7 +589,10 @@
     if (p.status === 'available') return repeat(n, POUCH);
     return '<span class="tier-alt">' + (p.kind === 'gummy' ? GUMMY_SVG : ENVELOPE_SVG) + '<span class="tier-alt__n">× ' + n + '</span></span>';
   }
-  function qtyText(p, n) { return n + (n > 1 ? ' bags' : ' bag') + ' · ' + (p.perBag ? (n * p.perBag) + ' pops' : PH('Count')); }
+  function qtyText(p, n) {
+    var pack = p.pack || ['bag', 'bags'];
+    return n + ' ' + (n > 1 ? pack[1] : pack[0]) + ' · ' + (p.perBag ? (n * p.perBag) + ' ' + (p.unit || 'pops') : PH('Count'));
+  }
   function initShop() {
     var form = $('#bagForm');
     if (!form) return;
@@ -582,7 +604,7 @@
     }
     function update() {
       var p = state.product, c = cur(), avail = p.status === 'available';
-      var title = p.id === 'strawberry-pop' ? 'Strawberry Peptide Lollipops' : p.name;
+      var title = p.id === 'strawberry-pop' ? 'Strawberry Peptide Lollipops' : (p.flavor ? p.flavor + ' ' : '') + p.name;
       sel.innerHTML = title + ' · ' + TIER_NAMES[c.n] + ' · ' + qtyText(p, c.n);
       terms.innerHTML = c.sub
         ? '<i data-lucide="repeat"></i>Delivered every ' + PH('XX days') + ' · terms ' + PH('Terms')
@@ -596,12 +618,14 @@
       [1, 2, 3].forEach(function (n) {
         var q = $('[data-tier-qty="' + n + '"]', form), a = $('[data-tier-art="' + n + '"]', form), l = $('[data-tier-line="' + n + '"]', form);
         if (q) q.innerHTML = qtyText(p, n);
-        if (l) l.textContent = p.perBag ? TIER_LINES[n] : (p.status === 'coming-soon' ? 'Arriving soon' : 'In development');
+        // "N days of glow" is the lollipops' one-a-day maths; the gummies have a serving size but no directions yet
+        if (l) l.textContent = avail ? TIER_LINES[n] : (p.status === 'coming-soon' ? 'Arriving soon' : 'In development');
         if (a) a.innerHTML = tierArt(p, n);
       });
+      $$('.tier__per', form).forEach(function (el) { el.innerHTML = '$' + PH('X.XX') + ' ' + (p.per || 'a pop'); });
       notice.hidden = avail;
       if (!avail) notice.innerHTML = '<i data-lucide="mail"></i><span>' + (p.status === 'coming-soon'
-        ? 'Green Gummies are arriving soon. Sizes and prices are placeholders until launch.'
+        ? 'Green Gummies are arriving soon in strawberry-watermelon, 60 to a container. Bundles and prices are placeholders until launch.'
         : 'More colors are in development. Everything here is a placeholder for now.') + '</span>';
       form.classList.toggle('is-preview', !avail);
       update();
@@ -634,6 +658,49 @@
       msg.classList.toggle('is-error', !ok);
       msg.textContent = ok ? 'You’re on the list! (Prototype: nothing was sent.)' : 'Please enter a valid email address.';
       if (ok) inp.value = ''; else inp.focus();
+    });
+  }
+
+  /* ───────────────────────── 15b · Supplement facts drawers (gummies card + green spec sheet) ───────────────────────── */
+  // Without JS the label simply shows; with JS it folds away behind its button (same pattern as the FAQ).
+  var refreshT = 0;
+  function refreshSoon() {                            // the pinned day sits right below the lineup: re-measure once settled
+    if (!hasGSAP) return;
+    clearTimeout(refreshT);
+    refreshT = setTimeout(function () { ScrollTrigger.refresh(); }, reduce ? 60 : 620);
+  }
+  // On desktop the 3D stage stretches to the height of the spec column. While the label is open the stage keeps the
+  // height it had and rides along (sticky) instead of growing into a tall poster; it lets go once the drawer has closed.
+  var holdT = 0;
+  function holdBeside(node, on, now) {
+    var st = $('.lineup__stage');
+    if (!st || !node.closest('#lineup-panel')) return;
+    clearTimeout(holdT);
+    if (on) {
+      if (st.classList.contains('is-held') || !window.matchMedia('(min-width: 1024px)').matches) return;
+      st.style.height = st.offsetHeight + 'px';
+      st.classList.add('is-held');
+    } else {
+      var release = function () { st.style.height = ''; st.classList.remove('is-held'); };
+      if (now || reduce) release(); else holdT = setTimeout(release, 600);
+    }
+  }
+  function setFacts(box, open) {
+    var b = $('[data-sfacts-btn]', box);
+    if (!b) return;
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    box.classList.toggle('is-open', open);
+  }
+  function initFacts() {
+    $$('[data-sfacts]').forEach(function (box) { box.classList.add('sfacts--js'); setFacts(box, false); });
+    doc.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('[data-sfacts-btn]');
+      var box = b && b.closest('[data-sfacts]');
+      if (!box) return;
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      holdBeside(box, open);
+      setFacts(box, open);
+      refreshSoon();
     });
   }
 
@@ -696,6 +763,7 @@
     initSugar();
     initShop();
     initWaitlist();
+    initFacts();
     initFaq();
     initFinale();
     initBuybar();

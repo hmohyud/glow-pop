@@ -2,7 +2,8 @@
    Glo Pop — Proposal 02 · "Sweet Riot" · app.js (classic script)
    Modules: products → theme engine → product-bound UI → fit type → hero intro
             → reveals → velocity marquees → 3D candy rider → switcher → cards
-            → bag builder (+ sprinkles, toast) → waitlist → FAQ → menu → chrome
+            → bag builder (+ sprinkles, toast) → waitlist → FAQ → supplement facts
+            → menu → chrome
    ========================================================================== */
 (function () {
   'use strict';
@@ -61,8 +62,11 @@
       }
     },
     {
+      // Real facts from the client (Nov 2026): flavor + their Supplement Facts label.
+      // Still unknown, so still placeholders: price, launch date, directions, other
+      // ingredients, allergens, vegan / gluten-free status, final name and gummy shape.
       id: 'green-gummies', kind: 'gummy', status: 'coming-soon',
-      name: 'Green Gummies', short: 'Green Gummies', flavor: null,           // flavor TBD
+      name: 'Green Gummies', short: 'Green Gummies', flavor: 'Strawberry-Watermelon',
       theme: {
         accent: '#22C55E', accent2: '#A3E635', accent3: '#16A34A', deep: '#0B3B22', ink: '#062A17',
         paper: '#F1FBEA', tint: '#DDF7E5', onAccent: '#062A17', onAccentHi: '#062A17', extrude: '#F1FBEA',
@@ -71,21 +75,46 @@
       candy: { kind: 'gummy', color: '#0C9A43' },
       ui: {
         kicker: 'Green Gummies · Coming soon',
-        heroSub: 'Green Gummies are on their way to the Glo Pop candy shop. Flavor, actives and launch date are still under wraps.',
-        proof: [['clock', 'Coming soon'], ['candy', PH('Flavor')], ['sparkles', PH('Actives')]],
-        badge: 'Green gummies • Coming soon • Join the list • ',
+        heroSub: 'Strawberry-watermelon gummies with five B vitamins and organic super greens, on their way to the candy shop.',
+        proof: [['candy', 'Strawberry-watermelon'], ['sparkles', '5 B vitamins'], ['clock', 'Coming soon']],
+        badge: 'Strawberry-watermelon • Coming soon • ',
         ctaLabel: 'Join the waitlist', ctaHref: '#waitlist',
         status: ['clock', 'Coming soon'],
-        title: 'Green Gummies', flavorLine: '<small>(working name)</small>',
-        blurb: 'A gummy is joining the Glo Pop color system. The recipe is still in the kitchen, so every detail below stays a placeholder until it’s real.',
-        phFacts: ['Flavor', 'Actives', 'Count', 'Price', 'Launch date'],
-        tags: [['clock', 'Coming soon'], ['bell', 'Waitlist open']],
+        title: 'Green Gummies <small>(working name)</small>', flavorLine: 'Strawberry-Watermelon',
+        blurb: 'Strawberry meets watermelon in a gummy. Five B vitamins and an organic super-greens blend, from kale to elderberry, ride along inside.',
+        facts: [['20', 'calories per 2&nbsp;gummies'], ['3g', 'sugar per 2&nbsp;gummies'], ['60', 'gummies a container'], ['5', 'B vitamins inside']],
+        phFacts: ['Price', 'Launch date', 'How many a day'],
+        tags: [['clock', 'Coming soon'], ['bell', 'Waitlist open'], ['leafy-green', 'Organic super greens']],
         ctas: [['Join the waitlist', '#waitlist', 'primary'], ['Back to Strawberry', 'strawberry-pop', 'switch']],
-        marquee: ['Green Gummies', 'Coming soon', 'Flavor TBD', 'Join the waitlist', 'Working name'],
-        finaleNote: 'Green Gummies: flavor, count and price ' + PH('details'),
+        marquee: ['Green Gummies', 'Strawberry-watermelon', '5 B vitamins', 'Organic super greens', 'Coming soon', 'Join the waitlist'],
+        finaleNote: 'Green Gummies: <span class="nw">strawberry-watermelon ·</span> <span class="nw">60 gummies a container ·</span> <span class="nw">price $' + PH('XX') + '</span>',
         shopbarMeta: 'Coming soon · ' + PH('Price'),
         lockTitle: 'Not in the shop yet',
-        lockCopy: 'Green Gummies are still in the works. Join the waitlist and you’ll hear first.'
+        lockCopy: 'Strawberry-watermelon Green Gummies are on their way. Join the waitlist and you’ll hear first.',
+        sixNote: 'These six live in the Strawberry Pop. Green Gummies bring five B vitamins and an organic super-greens blend: <a href="#pick" data-sf-open="green-gummies">see the supplement facts</a>.',
+        sugarNote: 'Recipe facts above are for the Strawberry Pop. Green Gummies: 20 calories and 3 g sugar per 2-gummy serving; other ingredients ' + PH('list')
+      },
+      // Supplement Facts exactly as printed on the client's label (HTML strings; %DVs reproduced as given).
+      // rows: [nutrient, amount per serving, % daily value, indent level]
+      label: {
+        name: 'Green Gummies, Strawberry-Watermelon',
+        serving: '2 Gummies', servings: '30',
+        rows: [
+          ['Calories', '20', ''],
+          ['Total Carbohydrate', '5 g', '2%'],
+          ['Total Sugars', '3 g', '2%', 1],
+          ['Added Sugars', '3 g', '6%', 2],
+          ['Riboflavin', '0.8 mg', '62%'],
+          ['Niacin', '1.4 mg <abbr title="niacin equivalents">NE</abbr>', '9%'],
+          ['Vitamin B6', '0.9 mg', '53%'],
+          ['Folate', '50 mcg <abbr title="dietary folate equivalents">DFE</abbr>', '53%'],
+          ['Pantothenic Acid', '0.9 mg', '18%'],
+          ['Sodium', '15 mg', '&lt;1%'],
+          ['Organic Super Greens Blend', '170 mg', '&lt;1%*']
+        ],
+        blend: 'Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry',
+        foot: ['Percent Daily Values are based on a 2,000 calorie diet.', '*Daily Value not established.'],
+        tbd: [['Other ingredients', 'list'], ['Directions', 'details'], ['Allergens', 'details']]
       }
     },
     {
@@ -113,7 +142,9 @@
         finaleNote: 'New colors and flavors: ' + PH('details'),
         shopbarMeta: 'In development · ' + PH('Price'),
         lockTitle: 'Still in the lab',
-        lockCopy: 'New colors are in development. Join the list and you’ll be first to know.'
+        lockCopy: 'New colors are in development. Join the list and you’ll be first to know.',
+        sixNote: 'These six live in the Strawberry Pop. New pops: ' + PH('actives'),
+        sugarNote: 'Recipe facts above are for the Strawberry Pop. New pops: ' + PH('recipe')
       }
     }
   ];
@@ -159,15 +190,43 @@
     });
   }
 
+  // Supplement Facts disclosure (closed by default) for a product that has a printed label.
+  // aria-live="off": the lineup panel is a polite live region, and opening the label must not read the whole table out.
+  function labelHTML(p) {
+    var L = p.label; if (!L) return '';
+    var id = 'sf-' + p.id, last = L.rows.length - 1;
+    var rows = L.rows.map(function (r, i) {
+      var cls = (r[3] ? 'sf-l' + r[3] : '') + (L.blend && i === last ? ' sf-has-blend' : '');
+      return '<tr' + (cls ? ' class="' + cls.trim() + '"' : '') + '><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
+    }).join('');
+    if (L.blend) rows += '<tr class="sf-blend"><td colspan="3"><span class="sr-only">' + L.rows[last][0] + ' contains: </span>' + L.blend + '</td></tr>';
+    return '<div class="sf" aria-live="off">' +
+      '<h4 class="sf-h"><button class="sf-btn" type="button" id="' + id + '-btn" aria-expanded="false" aria-controls="' + id + '">' +
+        '<span class="sf-btn-text"><span class="sf-btn-title">' + ico('scroll-text') + 'Supplement Facts</span> ' +
+        '<span class="sf-btn-meta"><span class="nw">Serving Size: ' + L.serving + '<span class="sf-dot" aria-hidden="true"> ·</span></span> <span class="nw">Servings Per Container: ' + L.servings + '</span></span></span>' +
+        '<span class="sf-ico" aria-hidden="true">' + ico('plus') + '</span>' +
+      '</button></h4>' +
+      '<div class="sf-panel" id="' + id + '" role="region" aria-labelledby="' + id + '-btn" hidden><div class="sf-body">' +
+        '<table class="sf-table"><caption class="sr-only">Supplement Facts: ' + L.name + '. Serving Size: ' + L.serving + '. Servings Per Container: ' + L.servings + '.</caption>' +
+          '<thead><tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">%&nbsp;Daily Value</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody></table>' +
+        '<p class="sf-foot">' + L.foot.join('<br>') + '</p>' +
+        (L.tbd ? '<dl class="sf-tbd">' + L.tbd.map(function (t) { return '<div><dt>' + t[0] + '</dt><dd>' + PH(t[1]) + '</dd></div>'; }).join('') + '</dl>' : '') +
+      '</div></div></div>';
+  }
+
   function renderPickInfo(p) {
     var el = $('#pickInfo'); if (!el) return;
     var u = p.ui, h = '';
+    var hadOpenLabel = !!el.querySelector('.sf.is-open');   // its height is about to vanish: re-measure triggers after
     h += '<p class="status">' + ico(u.status[0]) + '<span>' + u.status[1] + '</span></p>';
     h += '<h3 class="pinfo-name">' + u.title + ' <span class="pinfo-flavor">' + u.flavorLine + '</span></h3>';
     h += '<p class="pinfo-blurb">' + u.blurb + '</p>';
+    // known facts as tiles, still-unknown ones as dashed placeholder chips (a product can have both)
     if (u.facts) {
       h += '<ul class="facts">' + u.facts.map(function (f) { return '<li><b>' + f[0] + '</b><span>' + f[1] + '</span></li>'; }).join('') + '</ul>';
-    } else {
+    }
+    if (u.phFacts) {
       h += '<ul class="facts facts--ph">' + u.phFacts.map(function (f) { return '<li><span class="ph-fact">' + PH(f) + '</span></li>'; }).join('') + '</ul>';
     }
     h += '<ul class="tags">' + u.tags.map(function (t) { return '<li>' + ico(t[0]) + t[1] + '</li>'; }).join('') + '</ul>';
@@ -175,10 +234,12 @@
       if (c[2] === 'switch') return '<button class="btn btn--line js-pick" type="button" data-product="' + c[1] + '">' + c[0] + '</button>';
       return '<a class="btn btn--' + c[2] + '" href="' + c[1] + '"' + (c[2] === 'primary' ? ' data-pop' : '') + '>' + c[0] + '</a>';
     }).join('') + '</div>';
+    h += labelHTML(p);
     el.innerHTML = h;
     if (animate) {
       G.from(el.children, { y: 26, opacity: 0, duration: .6, ease: 'back.out(1.8)', stagger: .05, clearProps: 'transform,opacity' });
     }
+    if (hadOpenLabel && ST) requestAnimationFrame(function () { ST.refresh(); });
   }
 
   function renderProduct(p) {
@@ -850,6 +911,47 @@
     function refresh() { if (ST) ST.refresh(); Rider.poke(); }
   }
 
+  /* ── 16b. SUPPLEMENT FACTS (disclosure in the lineup panel) ───────────────
+     The panel is re-rendered on every product switch, so clicks are delegated.
+     Same motion as the FAQ; the lineup grows, so the docked candy re-measures. */
+  var Label = (function () {
+    function refresh() { if (ST) ST.refresh(); Rider.poke(); }
+    function set(btn, open) {
+      var panel = document.getElementById(btn.getAttribute('aria-controls')), box = btn.closest('.sf');
+      if (!panel || (btn.getAttribute('aria-expanded') === 'true') === open) return;
+      btn.setAttribute('aria-expanded', String(open));
+      if (box) box.classList.toggle('is-open', open);
+      if (animate) G.killTweensOf(panel);
+      if (open) {
+        panel.hidden = false;
+        if (animate) G.fromTo(panel, { height: 0 }, { height: 'auto', duration: .5, ease: 'power3.out', clearProps: 'height', onUpdate: Rider.poke, onComplete: refresh });
+        else refresh();
+      } else if (animate) {
+        G.to(panel, { height: 0, duration: .32, ease: 'power2.in', onUpdate: Rider.poke, onComplete: function () { panel.hidden = true; G.set(panel, { clearProps: 'height' }); refresh(); } });
+      } else { panel.hidden = true; refresh(); }
+    }
+    // "see the supplement facts" links elsewhere on the page: scroll to the label and open it
+    function openFor(id) {
+      var btn = document.getElementById('sf-' + id + '-btn');
+      if (!btn) return false;
+      set(btn, true);
+      (btn.closest('.sf') || btn).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      btn.focus({ preventScroll: true });
+      return true;
+    }
+    function init() {
+      document.addEventListener('click', function (e) {
+        var t = e.target && e.target.closest ? e.target : null;
+        if (!t) return;
+        var btn = t.closest('.sf-btn');
+        if (btn) { set(btn, btn.getAttribute('aria-expanded') !== 'true'); return; }
+        var link = t.closest('[data-sf-open]');
+        if (link && openFor(link.getAttribute('data-sf-open'))) e.preventDefault();
+      });
+    }
+    return { init: init };
+  })();
+
   /* ── 17. MOBILE MENU ──────────────────────────────────────────────────── */
   function setupMenu() {
     var menu = $('#menu'), btn = $('.menu-btn'), main = $('#main'), foot = $('.footer');
@@ -927,6 +1029,7 @@
     safe('builder', Builder.init);
     safe('waitlist', setupWaitlist);
     safe('faq', setupFaq);
+    safe('label', Label.init);
     safe('menu', setupMenu);
     safe('chrome', setupChrome);
     hooks.onProduct.push(function (p) { Rider.setProduct(p); Marquee.rebuild(); });

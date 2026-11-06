@@ -183,7 +183,7 @@
       <header class="section-head beach__head" data-haze>
         <p class="eyebrow">The lineup</p>
         <h2 class="display" id="cabanas-title">Choose your <em>cabana.</em></h2>
-        <p class="lede">Three cabanas on the sand: choose one and its curtains open. Strawberry is available now, the green cabana opens soon, and the third is still choosing its colour.</p>
+        <p class="lede">Three cabanas on the sand: choose one and its curtains open. Strawberry is available now, the green cabana opens soon with <span class="nw">strawberry-watermelon</span> gummies, and the third is still choosing its colour.</p>
       </header>
       <div class="beach__sand" aria-hidden="true"><span class="beach__foam"></span></div>
       <div class="cabana-scroller" role="group" aria-label="Choose a product">
@@ -225,6 +225,14 @@
           <p class="cabana-card__note" data-bind-html="note">Free shipping on every order</p>
         </div>
         <span class="cabana-card__stamp" aria-hidden="true"><span>Glo Pop</span><b data-bind="stampNo">N<span class="ord">o</span> 1</b><span>Beach Club</span></span>
+        <!-- Supplement Facts drawer: filled from the chosen product's label by app.js; hidden for products without one -->
+        <div class="cabana-card__label" id="cabanaLabel" data-swap hidden>
+          <button class="label-toggle" id="labelToggle" type="button" aria-expanded="false" aria-controls="labelPanel">
+            <span class="label-toggle__text"><span class="label-toggle__k"><i data-lucide="clipboard-list" aria-hidden="true"></i>Supplement facts</span><span class="label-toggle__meta"></span></span>
+            <span class="label-toggle__icon" aria-hidden="true"></span>
+          </button>
+          <div class="label-panel" id="labelPanel" role="region" hidden></div>
+        </div>
       </div>
       <p class="sr-only" id="themeStatus" role="status" aria-live="polite"></p>
     </div>
@@ -236,7 +244,7 @@
       <p class="eyebrow" data-reveal>What's inside</p>
       <h2 class="display" id="amenities-title" data-reveal>Six amenities, <em>all inclusive.</em></h2>
       <p class="lede" data-reveal>Every pop carries six skin-loving actives. Turn a card to see what each one does for you.</p>
-      <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind="pinNote">Shown for Strawberry Peptide Lollipops.</span></p>
+      <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind-html="pinNote">Shown for Strawberry Peptide Lollipops.</span></p>
     </header>
 
     <ul class="amenity-grid wrap" id="amenityGrid">
@@ -532,7 +540,7 @@
           <div class="band band--green" aria-hidden="true"></div>
           <p class="eyebrow eyebrow--green"><i data-lucide="bell" aria-hidden="true"></i>Opening soon</p>
           <h3>Join the list for the <em>green cabana.</em></h3>
-          <p>Green Gummies are on their way. Flavor, count and launch date are <span class="ph">still to come</span>. Leave your email and you'll hear first when the green cabana opens.</p>
+          <p>Green Gummies are on their way: <span class="nw">strawberry-watermelon</span>, with five B vitamins and an organic super-greens blend. The launch date is <span class="ph">still to come</span>. Leave your email and you'll hear first when the green cabana opens.</p>
           <div class="waitlist__row">
             <label class="sr-only" for="wl-email">Email address</label>
             <input id="wl-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="wl-msg">
@@ -577,6 +585,10 @@
         <div class="faq__item" data-reveal>
           <h3><button class="faq__q" type="button" id="fq5" aria-expanded="false" aria-controls="fa5"><span class="faq__n" aria-hidden="true">v.</span><span class="faq__text">Are they gluten<span class="hy">-</span>free?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
           <div class="faq__a" id="fa5" role="region" aria-labelledby="fq5"><p>Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that everyone can enjoy. If you have specific dietary concerns or allergies, please check the full ingredient list on the packaging.</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq6" aria-expanded="false" aria-controls="fa6"><span class="faq__n" aria-hidden="true">vi.</span><span class="faq__text">What's in the Green Gummies?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa6" role="region" aria-labelledby="fq6"><p>They'll be <span class="nw">strawberry-watermelon</span>, with five B vitamins (riboflavin, niacin, vitamin B6, folate and pantothenic acid) and an organic super-greens blend of 15 ingredients, from kale and spinach to acai and elderberry. Each 2-gummy serving has 20&nbsp;calories and 3&nbsp;g sugar, and a container holds 30 servings (60 gummies). Price, launch date, directions, allergens and the full ingredient list are <span class="ph">still to come</span>. <a href="#cabanaLabel" data-show-label="green-gummies">See the supplement facts</a>.</p></div>
         </div>
       </div>
     </div>

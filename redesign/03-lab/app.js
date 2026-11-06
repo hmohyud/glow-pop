@@ -52,6 +52,24 @@
       chips: [['shield-check', 'Immunity'], ['heart-pulse', 'Skin Repair']] }
   ];
 
+  // GP-02's actives, straight off the client's Supplement Facts label (amounts and % DV exactly as printed).
+  // No benefit copy has been supplied for them yet, so "What it does" stays a visible placeholder: facts only, no claims.
+  var GP02_ACTIVES = [
+    { code: 'A-01', name: 'Riboflavin', kind: 'B vitamin · B2', dose: '0.8 mg', dv: '62%',
+      is: 'Vitamin B2, one of five B vitamins in every serving.' },
+    { code: 'A-02', name: 'Niacin', kind: 'B vitamin · B3', dose: '1.4 mg NE', dv: '9%',
+      is: 'Vitamin B3, measured in niacin equivalents (NE).' },
+    { code: 'A-03', name: 'Vitamin B6', kind: 'B vitamin · B6', dose: '0.9 mg', dv: '53%',
+      is: 'One of five B vitamins in every serving. GP-01 has it too.' },
+    { code: 'A-04', name: 'Folate', kind: 'B vitamin · B9', dose: '50 mcg DFE', dv: '53%',
+      is: 'Vitamin B9, measured in dietary folate equivalents (DFE).' },
+    { code: 'A-05', name: 'Pantothenic Acid', kind: 'B vitamin · B5', dose: '0.9 mg', dv: '18%',
+      is: 'Vitamin B5, one of five B vitamins in every serving.' },
+    { code: 'A-06', name: 'Super Greens Blend', kind: 'Organic blend · 15 ingredients', dose: '170 mg', dv: '&lt;1%*',
+      is: 'An organic blend of 15 ingredients, 170 mg in all: kale leaf, broccoli stalk &amp; flower, beet root, guava extract, spinach leaf, lemon extract, carrot root, wild blueberry, mango extract, pomegranate fruit, goji juice, spirulina, noni fruit, acai berry and elderberry.',
+      note: '*Daily Value not established.' }
+  ];
+
   var PRODUCTS = [
     {
       id: 'strawberry-pop', code: 'GP-01', kind: 'lollipop', status: 'available',
@@ -92,41 +110,52 @@
     },
     {
       id: 'green-gummies', code: 'GP-02', kind: 'gummy', status: 'coming-soon',
-      name: 'Green Gummies', short: 'Green Gummies', flavor: null,
+      name: 'Green Gummies', short: 'Green Gummies', flavor: 'Strawberry-Watermelon',
       color: '#1FA453', deep: '#0E4D2C', tint: '#E3F6EA', swatch: '#1FA453',
-      statusLabel: 'In formulation', statusShort: 'Soon',
+      statusLabel: 'Coming soon', statusShort: 'Soon',
       theme: { 'accent': '#1FA453', 'accent-ink': '#0D7A3C', 'accent-deep': '#0E4D2C', 'accent-tint': '#DCF3E4', 'accent-wash': '#EFF9F3',
                'paper': '#F4F9F6', 'paper-2': '#EAF2ED', 'line': '#DDE7E1', 'line-2': '#CBD9D0', 'ink-2': '#36463D', 'ink-3': '#5E6E65' },
+      // known (client label, Nov 2026): flavor, serving, count, calories, sugar, actives.
+      // still unknown, kept as visible placeholders: price, launch date, directions, other ingredients/sweetener, allergens, dietary status, final shape.
       copy: {
-        eyebrow: 'GP-02 · Green Gummies · In formulation',
-        lead: 'A new format for the formula library, still in the lab. Flavor, actives, count and price are ' + ph('to be announced') + '. Join the waitlist to hear first.',
+        eyebrow: 'GP-02 · Green Gummies · Coming soon',
+        lead: 'Strawberry-watermelon gummies with five B vitamins and an organic super-greens blend. Price and launch date are ' + ph('to be announced') + '. Join the waitlist to hear first.',
         cta: 'Join the waitlist',
-        explorerTitle: 'The formula is still in the&nbsp;lab.',
-        explorerLead: 'GP-02’s actives haven’t been finalized, so the map stays blank. We’d rather show nothing than guess.',
-        activesMeta: ph('Actives'),
+        explorerTitle: 'Five B vitamins. One super-greens&nbsp;blend.',
+        explorerLead: 'Select an active to see how much goes into every 2-gummy serving, straight from the label. What each one does stays blank until it’s confirmed.',
+        activesMeta: '6 actives',
         auditTitle: 'Ten checks. All&nbsp;pending.',
-        auditLead: 'GP-02 is still in formulation, so its audit can’t run yet. Every check reads pending until the formula is final.',
+        auditLead: 'GP-02’s sweetener and other ingredients haven’t been confirmed yet, so its audit can’t run. Every check reads pending until they are.',
         auditLabel: 'Audit pending',
+        auditSr: 'Audit pending for GP-02: its sweetener and other ingredients are not confirmed yet.',
         shopCap: 'GP-02 · concept illustration, not the final product',
-        stickySub: 'In formulation',
+        stickySub: 'Strawberry-watermelon',
         stickyCta: 'Waitlist',
-        waitKicker: 'GP-02 · Green Gummies · In formulation',
+        waitKicker: 'GP-02 · Green Gummies · Coming soon',
         waitTitle: 'Be first in line for Green Gummies.',
-        waitCopy: 'Flavor, actives, count, price and launch date are all still in the lab. Join the waitlist and hear the moment they’re real.',
+        waitCopy: 'Strawberry-watermelon gummies with five B vitamins and an organic super-greens blend, 60 to a container. Price and launch date are still ' + ph('to be announced') + '. Join the waitlist and hear the moment they’re real.',
         waitCta: 'Join the waitlist'
       },
-      spec: { name: 'Green Gummies · working name', kcal: tbd(), kcalSub: 'per gummy', actives: tbd(), activesSub: 'to be announced',
-              sugar: ph('Sweetener'), sugarSub: 'to be confirmed', count: tbd(), countSub: 'dose to be confirmed' },
-      actives: null,
+      spec: { name: 'Green Gummies · Strawberry-Watermelon', kcal: 20, kcalSub: 'per 2-gummy serving', actives: 6, activesSub: '5 B vitamins + greens blend',
+              sugar: ph('Sweetener'), sugarSub: '3 g sugar per serving', count: 60, countUnit: 'gummies', countSub: '30 servings · ' + ph('directions') },
+      actives: GP02_ACTIVES,
       audit: false,
+      // the client's Supplement Facts label, exactly as printed (names, amounts and % DV untouched; sub-rows indented as on a label)
       facts: {
-        serving: ph('Serving size'), servings: ph('—'),
-        rows: [['Calories', ph('—'), '', 'ft-kcal'], ['Total sugars', ph('— g'), ph('—')], ['Actives', ph('To be announced'), ph('—'), 'ft-gap']],
+        serving: '2 Gummies', servings: '30',
+        caption: 'GP-02 Green Gummies, amounts per serving',
+        rows: [['Calories', '20', '', 'ft-kcal'],
+               ['Total Carbohydrate', '5 g', '2%'], ['Total Sugars', '3 g', '2%', 'ft-sub'], ['Added Sugars', '3 g', '6%', 'ft-sub2'],
+               ['Riboflavin', '0.8 mg', '62%'], ['Niacin', '1.4 mg NE', '9%'], ['Vitamin B6', '0.9 mg', '53%'],
+               ['Folate', '50 mcg DFE', '53%'], ['Pantothenic Acid', '0.9 mg', '18%'], ['Sodium', '15 mg', '&lt;1%'],
+               ['Organic Super Greens Blend', '170 mg', '&lt;1%*', 'ft-join']],
+        blend: 'Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
+        foot: 'Percent Daily Values are based on a 2,000 calorie diet. *Daily Value not established.',
         other: '<b>Other ingredients:</b> ' + ph('full ingredient list') + '.',
-        flags: 'Dietary notes: ' + ph('to be confirmed') + '.'
+        flags: 'Directions, allergens, vegan and gluten-free status: ' + ph('to be confirmed') + '.'
       },
       card: { kind: 'Working name', art: 'gummy', tag: 'Concept render',
-              facts: [['Format', 'Gummy'], ['Flavor', ph('Flavor')], ['Actives', ph('Actives')], ['Count', ph('Count')], ['Launch', ph('Date')]],
+              facts: [['Format', 'Gummy'], ['Flavor', 'Strawberry-Watermelon'], ['Actives', '5 B vitamins + greens'], ['Count', '60 per container'], ['Launch', ph('Date')]],
               go: 'Join the waitlist', goIcon: 'bell' }
     },
     {
@@ -326,8 +355,8 @@
     var go = e.target.closest('[data-product-go]');
     if (go) { setProduct(go.getAttribute('data-product-go')); return; }   // link continues to #shop
     var xr = e.target.closest('[data-xref]');
-    if (xr && Explorer) {                                                 // A-01 etc.: open that active, link scrolls to #formula
-      if (!current.actives) setProduct('strawberry-pop');
+    if (xr && Explorer) {                                                 // A-01 etc. are GP-01's actives: open that one, link scrolls to #formula
+      if (current.id !== 'strawberry-pop') setProduct('strawberry-pop');
       Explorer.open(+xr.getAttribute('data-xref'));
       return;
     }
@@ -380,6 +409,7 @@
     setRONum('kcal', s.kcal, animate);
     setRONum('actives', s.actives, animate);
     setRONum('count', s.count, animate);
+    swapHTML(ro('countUnit'), s.countUnit || 'per bag', animate);
     swapHTML(ro('sugar'), s.sugar, animate);
     ['kcalSub', 'activesSub', 'sugarSub', 'countSub'].forEach(function (k) { swapHTML(ro(k), s[k], animate); });
   }
@@ -548,9 +578,22 @@
     }
 
     function panelHTML(a, i, n) {
-      return '<article class="ap" role="tabpanel" id="ap-' + i + '" aria-labelledby="dt-' + i + '" tabindex="0"' + (i === sel ? '' : ' hidden') + '>' +
+      var head = '<article class="ap" role="tabpanel" id="ap-' + i + '" aria-labelledby="dt-' + i + '" tabindex="0"' + (i === sel ? '' : ' hidden') + '>' +
         '<header class="ap-head"><span class="mono">Active ' + pad2(i + 1) + ' / ' + pad2(n) + '</span><span class="mono ap-code">' + a.code + '</span></header>' +
-        '<h3 class="ap-name">' + a.name + '</h3>' +
+        '<h3 class="ap-name">' + a.name + '</h3>';
+      // label amounts known, benefit copy not supplied yet (GP-02): show the facts, keep "What it does" a visible placeholder
+      if (a.dose) {
+        return head +
+          '<p class="ap-role mono">' + a.kind + '</p>' +
+          '<dl class="ap-rows">' +
+            '<div class="ap-row"><dt class="mono">What it is</dt><dd>' + a.is + '</dd></div>' +
+            '<div class="ap-row"><dt class="mono">What it does</dt><dd>' + ph('To be confirmed') + '</dd></div>' +
+            '<div class="ap-row ap-row--dose"><dt class="mono">Per serving</dt><dd><span class="ap-dose">' + a.dose + '</span><span class="ap-dv mono">% DV ' + a.dv + '</span></dd></div>' +
+          '</dl>' +
+          (a.note ? '<p class="ap-note">' + a.note + '</p>' : '') +
+          '</article>';
+      }
+      return head +
         '<p class="ap-role mono">Role · ' + a.role + '</p>' +
         '<dl class="ap-rows">' +
           '<div class="ap-row"><dt class="mono">What it does</dt><dd>' + a.does + '<sup class="fn">*</sup></dd></div>' +
@@ -599,7 +642,7 @@
       tabsEl.innerHTML = list.map(function (a, i) {
         return '<button class="dg-node" role="tab" type="button" id="dt-' + i + '" aria-selected="false" aria-controls="ap-' + i + '" tabindex="-1">' +
           '<span class="dn-dot mono">' + pad2(i + 1) + '</span>' +
-          '<span class="dn-label"><span class="dn-name">' + a.name + '</span><span class="dn-role mono">' + a.role + '</span></span></button>';
+          '<span class="dn-label"><span class="dn-name">' + a.name + '</span><span class="dn-role mono">' + (a.role || a.dose) + '</span></span></button>';
       }).join('');
       panelsEl.innerHTML = list.map(function (a, i) { return panelHTML(a, i, list.length); }).join('');
       layout();
@@ -765,7 +808,7 @@
         if (state !== 'pass') r.classList.remove('is-pass');
         else if (seen[i] || !wrap.classList.contains('audit-armed')) r.classList.add('is-pass');
       });
-      if (sr) sr.textContent = state === 'pass' ? 'All 10 checks pass for ' + p.code + '.' : 'Audit pending for ' + p.code + ': the formula is not final.';
+      if (sr) sr.textContent = state === 'pass' ? 'All 10 checks pass for ' + p.code + '.' : (p.copy.auditSr || 'Audit pending for ' + p.code + ': the formula is not final.');
       update();
     }
     return { arm: arm, setProduct: setProduct };
@@ -779,11 +822,15 @@
     if (!box) return;
     var f = p.facts;
     var set = function (k, html) { var el = $('[data-f="' + k + '"]', box); if (el) el.innerHTML = html; };
+    set('caption', f.caption || 'Amounts per serving');
     set('serving', f.serving);
     set('servings', f.servings);
+    // a blend's contents print under it, inside the label's bottom bar (GP-02)
     set('rows', f.rows.map(function (r) {
       return '<tr' + (r[3] ? ' class="' + r[3] + '"' : '') + '><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
-    }).join(''));
+    }).join('') + (f.blend ? '<tr class="ft-blend"><td colspan="3">' + f.blend + '</td></tr>' : ''));
+    var foot = $('[data-f="foot"]', box);   // % DV footnote, only on a real printed label
+    if (foot) { foot.innerHTML = f.foot || ''; foot.hidden = !f.foot; }
     set('other', f.other);
     set('flags', f.flags);
   }

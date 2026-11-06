@@ -574,6 +574,64 @@ ul, ol { padding: 0; }
 .specs dt { font: 500 9.5px/1.2 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2); }
 .specs dd { font: 400 19px/1.15 var(--f-display); text-align: right; color: var(--ink); }
 
+/* the full label: a disclosure row that closes the spec sheet (only shades with a Supplement Facts panel) */
+.specs:has(+ .facts) { margin-bottom: 0; }
+.facts { margin-bottom: 28px; }
+.facts__h { font: inherit; }
+.facts__toggle {
+  width: 100%; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 0;
+  background: none; border: 0; border-bottom: 1px solid var(--rule); text-align: left; cursor: pointer; color: var(--ink);
+}
+.facts__k { flex: 1; font: 500 9.5px/1.2 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2); }
+.facts__v {
+  font: 400 19px/1.15 var(--f-display);
+  background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0% 1.5px no-repeat;
+  transition: background-size var(--dur-3) var(--ease-out);
+}
+.facts__ic { width: 20px; height: 20px; color: var(--accent-ink); transition: transform var(--dur-3) var(--ease-out); }
+@media (hover: hover) { .facts__toggle:hover .facts__v { background-size: 100% 1.5px; } }
+.facts.is-open .facts__ic { transform: rotate(45deg); }
+.facts__panel {
+  display: grid; grid-template-rows: 0fr; visibility: hidden;
+  transition: grid-template-rows var(--dur-3) var(--ease-out), visibility 0s linear var(--dur-3);
+}
+.facts.is-open .facts__panel { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows var(--dur-3) var(--ease-out), visibility 0s; }
+.facts__in { min-height: 0; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .facts__panel, .facts.is-open .facts__panel { transition: none; } }
+
+/* the label itself, set in the issue’s type: heavy ink bars where a printed panel has them */
+.label {
+  max-width: 34rem; margin: 18px 0 4px; padding: clamp(16px, 1.8vw, 26px) clamp(16px, 1.8vw, 26px) clamp(14px, 1.4vw, 20px);
+  background: var(--paper); border: 1px solid var(--ink); color: var(--ink);
+}
+.label__t { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.label__t caption { caption-side: top; text-align: left; padding-bottom: 10px; border-bottom: 8px solid var(--ink); }
+.label__title { display: block; margin-bottom: 12px; font: 400 clamp(38px, 3.4vw, 54px)/.9 var(--f-display); letter-spacing: -.012em; }
+.label__title em { font-style: italic; }
+.label__serv { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 2px 0; font-size: 14.5px; line-height: 1.35; }
+.label__serv b { font-weight: 600; }
+.label__t th, .label__t td { padding: 7px 0; border-bottom: 1px solid var(--rule); font-size: 14.5px; line-height: 1.3; vertical-align: baseline; }
+.label__t thead th {
+  padding: 9px 0 7px; border-bottom: 1px solid var(--ink); text-align: left;
+  font: 500 9px/1.2 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2);
+}
+.label__t thead th + th { width: 1%; text-align: right; white-space: nowrap; }   /* amount + %DV columns hug their figures */
+.label__t tbody th { padding-right: 12px; text-align: left; font-weight: 400; }
+.label__t td { padding-left: 12px; text-align: right; white-space: nowrap; }
+.label__t tbody tr > td:nth-child(2) { width: 1%; }
+.label__t td + td { padding-left: 16px; font-weight: 500; }
+.label__t .is-cal th, .label__t .is-cal td { padding: 9px 0 7px; border-bottom: 4px solid var(--ink); font: 400 28px/1 var(--f-display); }
+.label__t .is-in th { padding-left: 14px; }
+.label__t .is-in2 th { padding-left: 28px; }
+.label__t .is-blend > * { border-top: 4px solid var(--ink); border-bottom: 0; }
+.label__t .is-mix td {
+  padding: 0 0 12px 14px; border-bottom: 8px solid var(--ink); text-align: left; white-space: normal;
+  font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
+}
+.label__mix-k { font-style: italic; }
+.label__foot { margin-top: 10px; font-size: 12.5px; line-height: 1.55; color: var(--ink-2); }
+.label__more { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; line-height: 1.8; color: var(--ink-2); }
+
 /* ---------- 7.3 No. 03 — The formula, in six parts (tabs) ---------- */
 .formula__head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; margin-bottom: clamp(48px, 6vw, 104px); }
 .formula__head .kicker { grid-column: 1 / -1; }
@@ -872,6 +930,7 @@ ul, ol { padding: 0; }
 .waitlist__input:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
 .waitlist__msg { flex-basis: 100%; min-height: 1.4em; font-size: 13px; color: var(--accent-ink); }
 .look__go { margin-top: 18px; }
+.look__label { margin-top: -2px; }
 
 /* ---------- 7.8 No. 08 — Questions (accordion) ---------- */
 .faq__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 40px; align-items: start; }

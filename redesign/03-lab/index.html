@@ -188,7 +188,7 @@
             </div>
             <div class="ro">
               <dt class="mono">Count</dt>
-              <dd class="ro-val"><span class="ro-num" data-ro="count">10</span><span class="ro-unit mono">per bag</span></dd>
+              <dd class="ro-val"><span class="ro-num" data-ro="count">10</span><span class="ro-unit mono" data-ro="countUnit">per bag</span></dd>
               <dd class="ro-sub" data-ro="countSub">one a day</dd>
             </div>
           </dl>
@@ -617,7 +617,7 @@
             <p class="facts-line">Serving size <b data-f="serving">1 lollipop</b></p>
             <p class="facts-line">Servings per container <b data-f="servings">10</b></p>
             <table class="facts-table">
-              <caption class="sr-only">Amounts per serving</caption>
+              <caption class="sr-only" data-f="caption">Amounts per serving</caption>
               <thead>
                 <tr><th scope="col">Amount per serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">% DV</th></tr>
               </thead>
@@ -632,6 +632,7 @@
                 <tr><th scope="row">Zinc</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
               </tbody>
             </table>
+            <p class="facts-foot" data-f="foot" hidden></p>
             <p class="facts-note" data-f="other"><b>Other ingredients:</b> real sugar, <span class="ph">full ingredient list</span>.</p>
             <p class="facts-note" data-f="flags">Gluten-free. No artificial sweeteners, no sugar alcohols, no stevia.</p>
           </div>
@@ -696,13 +697,14 @@
             </dl>
           </li>
           <li class="lib-card" data-card="green-gummies">
-            <div class="lc-top"><span class="lc-code mono">GP-02</span><span class="pill mono">In formulation</span></div>
+            <div class="lc-top"><span class="lc-code mono">GP-02</span><span class="pill mono">Coming soon</span></div>
             <h3 class="lc-name">Green Gummies</h3>
             <p class="lc-kind">Working name</p>
             <dl class="lc-facts">
               <div><dt class="mono">Format</dt><dd>Gummy</dd></div>
-              <div><dt class="mono">Flavor</dt><dd><span class="ph">Flavor</span></dd></div>
-              <div><dt class="mono">Actives</dt><dd><span class="ph">Actives</span></dd></div>
+              <div><dt class="mono">Flavor</dt><dd>Strawberry-Watermelon</dd></div>
+              <div><dt class="mono">Actives</dt><dd>5 B vitamins + greens</dd></div>
+              <div><dt class="mono">Count</dt><dd>60 per container</dd></div>
               <div><dt class="mono">Launch</dt><dd><span class="ph">Date</span></dd></div>
             </dl>
           </li>
@@ -815,14 +817,14 @@
               </dl>
               <button class="btn btn-primary btn-block btn-lg" type="submit"><i data-lucide="shopping-bag" aria-hidden="true"></i>Add to bag</button>
               <p class="cfg-msg" role="status" aria-live="polite" data-buy-msg></p>
-              <p class="cfg-aside"><span class="cfg-aside-dot" aria-hidden="true"></span>GP-02 Green Gummies are in formulation. <button type="button" class="link-btn" data-product-jump="green-gummies">Join the waitlist</button></p>
+              <p class="cfg-aside"><span class="cfg-aside-dot" aria-hidden="true"></span>GP-02 Green Gummies are coming soon in strawberry-watermelon. <button type="button" class="link-btn" data-product-jump="green-gummies">Join the waitlist</button></p>
             </form>
 
             <!-- GP-02 / GP-03: waitlist (prototype: nothing is sent) -->
             <form class="cfg cfg--wait" data-cfg="wait" novalidate>
-              <p class="wait-kicker mono" data-bind="waitKicker">GP-02 · Green Gummies · In formulation</p>
+              <p class="wait-kicker mono" data-bind="waitKicker">GP-02 · Green Gummies · Coming soon</p>
               <h3 class="h3" data-bind="waitTitle">Be first in line for Green Gummies.</h3>
-              <p class="wait-copy" data-bind="waitCopy">Flavor, actives, count, price and launch date are all still in the lab. Join the waitlist and hear the moment they're real.</p>
+              <p class="wait-copy" data-bind="waitCopy">Strawberry-watermelon gummies with five B vitamins and an organic super-greens blend, 60 to a container. Price and launch date are still <span class="ph">to be announced</span>. Join the waitlist and hear the moment they're real.</p>
               <label class="field">
                 <span class="field-label mono">Email</span>
                 <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>

@@ -225,7 +225,7 @@
         <header class="sec-head lineup__head">
           <p class="eyebrow">The lineup</p>
           <h2 class="poster sec-title" id="lineup-title" data-split>Pick your postcard</h2>
-          <p class="lead">Strawberry is here now. Green Gummies are on their way. And a few more colors are already in the mail.</p>
+          <p class="lead">Strawberry is here now. Green Gummies, in strawberry-watermelon, are on their way. And a few more colors are already in the mail.</p>
         </header>
 
         <div class="lineup__grid">
@@ -749,11 +749,54 @@
                 <p class="eyebrow">Arriving soon</p>
                 <h3 class="waitlist__title" id="waitlist-title">Green Gummies</h3>
                 <dl class="waitlist__facts">
-                  <div><dt>Flavor</dt><dd><span class="ph">Flavor</span></dd></div>
-                  <div><dt>Per bag</dt><dd><span class="ph">Count</span></dd></div>
+                  <div><dt>Flavor</dt><dd>Strawberry-Watermelon</dd></div>
+                  <div><dt>Per container</dt><dd>60 gummies</dd></div>
                   <div><dt>Price</dt><dd>$<span class="ph">XX</span></dd></div>
                   <div><dt>Launch</dt><dd><span class="ph">Date</span></dd></div>
                 </dl>
+
+                <!-- Supplement Facts: transcribed exactly from the client's label (incl. the printed %DV column).
+                     This is the one copy; the green spec sheet in the lineup reuses this markup. -->
+                <div class="sfacts" data-sfacts>
+                  <h4 class="sfacts__q">
+                    <button class="sfacts__btn" type="button" id="sf-wl-btn" aria-expanded="true" aria-controls="sf-wl" data-sfacts-btn>
+                      <i data-lucide="scroll-text"></i>
+                      <span class="sfacts__txt"><span class="sfacts__name">Supplement facts</span><span class="sfacts__sub">Five B vitamins + organic super greens</span></span>
+                      <span class="sfacts__icon" aria-hidden="true"><i data-lucide="plus"></i></span>
+                    </button>
+                  </h4>
+                  <div class="sfacts__a" id="sf-wl"><div class="sfacts__in">
+                    <div class="sfl">
+                      <table class="sfl__table">
+                        <caption><span class="sfl__title">Supplement Facts</span><span class="sfl__serv">Serving Size 2 Gummies</span><span class="sfl__serv">Servings Per Container 30</span></caption>
+                        <thead>
+                          <tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">% Daily Value</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr><th scope="row">Calories</th><td>20</td><td></td></tr>
+                          <tr><th scope="row">Total Carbohydrate</th><td>5 g</td><td>2%</td></tr>
+                          <tr class="sfl__sub"><th scope="row">Total Sugars</th><td>3 g</td><td>2%</td></tr>
+                          <tr class="sfl__sub sfl__sub--2"><th scope="row">Added Sugars</th><td>3 g</td><td>6%</td></tr>
+                          <tr class="sfl__grp"><th scope="row">Riboflavin</th><td>0.8 mg</td><td>62%</td></tr>
+                          <tr><th scope="row">Niacin</th><td>1.4 mg NE</td><td>9%</td></tr>
+                          <tr><th scope="row">Vitamin B6</th><td>0.9 mg</td><td>53%</td></tr>
+                          <tr><th scope="row">Folate</th><td>50 mcg DFE</td><td>53%</td></tr>
+                          <tr><th scope="row">Pantothenic Acid</th><td>0.9 mg</td><td>18%</td></tr>
+                          <tr><th scope="row">Sodium</th><td>15 mg</td><td>&lt;1%</td></tr>
+                          <tr class="sfl__grp"><th scope="row">Organic Super Greens Blend</th><td>170 mg</td><td>&lt;1%*</td></tr>
+                        </tbody>
+                      </table>
+                      <p class="sfl__blend">*Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.</p>
+                      <p class="sfl__note">Percent Daily Values are based on a 2,000 calorie diet.<br>*Daily Value not established.</p>
+                    </div>
+                    <dl class="sfl__more">
+                      <div><dt>Directions</dt><dd><span class="ph">How many a day</span></dd></div>
+                      <div><dt>Other ingredients</dt><dd><span class="ph">Ingredients</span></dd></div>
+                      <div><dt>Allergens</dt><dd><span class="ph">Allergens</span></dd></div>
+                      <div><dt>Vegan / gluten-free</dt><dd><span class="ph">Status</span></dd></div>
+                    </dl>
+                  </div></div>
+                </div>
                 <form class="waitlist__form" id="waitlistForm" novalidate>
                   <label class="waitlist__label" for="wl-email">Get a postcard in your inbox when they land</label>
                   <div class="field">
@@ -800,6 +843,10 @@
           <div class="faq__item">
             <h3 class="faq__q"><button type="button" id="faq-q5" aria-expanded="false" aria-controls="faq-a5"><span>Are they gluten-free?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
             <div class="faq__a" id="faq-a5" role="region" aria-labelledby="faq-q5"><div class="faq__a-in"><p>Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that everyone can enjoy. If you have specific dietary concerns or allergies, please check the full ingredient list on the product packaging.</p></div></div>
+          </div>
+          <div class="faq__item">
+            <h3 class="faq__q"><button type="button" id="faq-q6" aria-expanded="false" aria-controls="faq-a6"><span>What’s in the Green Gummies?</span><span class="faq__icon" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="faq__a" id="faq-a6" role="region" aria-labelledby="faq-q6"><div class="faq__a-in"><p>Our first gummy is on its way, in strawberry-watermelon. A serving is two gummies, with 20 calories and 3 g of sugar, plus five B vitamins (riboflavin, niacin, vitamin B6, folate and pantothenic acid) and an organic super-greens blend of 15 ingredients. Each container holds 30 servings, or 60 gummies. Price, launch date and directions are still under wraps; the full supplement facts are on the <a href="#waitlist">Green Gummies card</a> in the beach bag.</p></div></div>
           </div>
         </div>
       </div>

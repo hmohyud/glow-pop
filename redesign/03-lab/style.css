@@ -773,6 +773,7 @@ html.menu-open .sticky-shop { visibility: hidden; transform: translateY(150%); t
 .ap-row--dose dd { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
 .ap-dose { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
 .ap-dv { color: var(--ink-3); }
+.ap-note { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13px; line-height: 1.45; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .chip {
   display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 9px;
@@ -969,6 +970,12 @@ html.menu-open .sticky-shop { visibility: hidden; transform: translateY(150%); t
 .facts-table td { padding: 8px 0 8px 10px; border-bottom: 1px solid var(--ink); text-align: right; white-space: nowrap; }
 .facts-table .ft-kcal th, .facts-table .ft-kcal td { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; border-bottom-width: 5px; }
 .facts-table tbody tr:last-child th, .facts-table tbody tr:last-child td { border-bottom-width: 12px; }
+/* printed-label details (GP-02): indented sugars, a blend with its contents set under it, the % DV footnote */
+.facts-table .ft-sub th { padding-left: 16px; }
+.facts-table .ft-sub2 th { padding-left: 32px; }
+.facts-table .ft-join th, .facts-table .ft-join td { padding-bottom: 3px; border-bottom: 0; vertical-align: baseline; }
+.facts-table .ft-blend td { padding: 0 0 10px; text-align: left; white-space: normal; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.facts-foot { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
 .facts-note { margin: 10px 0 0; font-size: 13px; color: var(--ink-2); }
 .facts-note b { color: var(--ink); }
 

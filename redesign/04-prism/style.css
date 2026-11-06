@@ -9,7 +9,7 @@
      4  Aura background
      5  Header, nav, mobile menu
      6  Hero
-     7+ Sections (lineup, benefits, orbit, sugar, night glow, compare, shop, faq, cta)
+     7+ Sections (lineup, benefits, orbit, sugar, night glow, compare, shop, supplement facts sheet, faq, cta)
      F  Footer, prototype chip, mobile shop bar
      R  Reduced motion
    ============================================================================= */
@@ -280,6 +280,15 @@ h2 .irid { white-space: nowrap; }
 }
 .tlink:hover { background-size: 100% 1.5px; }
 .tlink svg { width: 16px; height: 16px; }
+button.tlink { border: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+/* a text button inside running copy (orbit note, FAQ): solid underline, never the dashed TBD look */
+.inline-link {
+  display: inline; border: 0; padding: 0; background: none;
+  font: inherit; font-weight: 700; color: var(--accent-ink);
+  text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .2em;
+  -webkit-tap-highlight-color: transparent;
+}
+.inline-link:hover { color: var(--ink); }
 
 /* eyebrow */
 .eyebrow {
@@ -353,8 +362,8 @@ h2 .irid { white-space: nowrap; }
 .on-dark .ph::after { color: var(--film-a); -webkit-text-fill-color: var(--film-a); }
 /* inside a product-owned card (lineup, buy, waitlist) placeholders follow that
    product's color, not the page aura: no pink dashes on the green card */
-:is(.pcard, .buy, .waitlist) .ph { text-decoration-color: var(--pc); }
-:is(.pcard, .buy, .waitlist) .ph::after { color: var(--pc-ink); -webkit-text-fill-color: var(--pc-ink); }
+:is(.pcard, .buy, .waitlist, .facts-dialog) .ph { text-decoration-color: var(--pc); }
+:is(.pcard, .buy, .waitlist, .facts-dialog) .ph::after { color: var(--pc-ink); -webkit-text-fill-color: var(--pc-ink); }
 
 /* status pill */
 .status {
@@ -966,6 +975,13 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 .pcard-points { display: grid; gap: 9px; }
 .pcard-points li { display: flex; align-items: center; gap: 10px; font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); }
 .pcard-points .ic { width: 18px; height: 18px; color: var(--pc-ink); }
+/* "working name" caveat tag beside a product name that isn't final yet */
+.pcard-wn {
+  display: inline-block; vertical-align: .9em; margin-left: .1em;
+  font: 800 .6rem/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-3); white-space: nowrap;
+}
+:is(.pcard, .waitlist) .tlink { justify-self: start; color: var(--pc-ink); font-size: var(--fs-sm); }
 .pcard-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: auto; padding-top: 6px; }
 @media (max-width: 479px) {
   .pcard-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1318,6 +1334,9 @@ html.js .orbit-pause { display: inline-flex; }
   border-radius: var(--r-pill); border: 1px solid var(--glass-dark-edge);
   font: 700 var(--fs-xs)/1.3 var(--f-ui); letter-spacing: .04em; color: var(--on-dark-2);
 }
+/* a longer note (e.g. Green Gummies serving + TBD) wraps into a centered, padded
+   capsule on narrow phones; one-line notes keep the exact 34px pill (17px = half) */
+.night-note { padding-block: 6px; border-radius: 17px; text-align: center; text-wrap: balance; }
 .night-stage { position: relative; width: min(100%, 520px); height: clamp(340px, 46vw, 520px); margin: 6px auto 0; }
 .night-candy { position: absolute; inset: 0; z-index: 2; }
 .night-bloom {
@@ -1539,6 +1558,127 @@ tbody tr:last-child .col-glo { border-radius: 0 0 var(--r-md) var(--r-md); }
 .field input::placeholder { color: #8C7487; }
 .field input:focus-visible { outline: 2.5px solid var(--pc-ink); outline-offset: 2px; }
 .field input[aria-invalid="true"] { border-color: #A3001B; }
+
+/* ── 13b. Supplement facts sheet (modal <dialog>, filled by app.js) ──────── */
+/* Wears its product's color world (tokens set inline), like the cards. The label
+   itself keeps the regulatory anatomy: heavy rules, hairlines, %DV column. */
+.facts-dialog {
+  --pc: var(--accent); --pc-ink: var(--accent-ink); --pc-tint: var(--tint);
+  --pc-fa: var(--film-a); --pc-fb: var(--film-b); --pc-fc: var(--film-c);
+  width: min(100% - 24px, 480px); max-width: none; max-height: none;
+  margin: auto; padding: 0; border: 0;
+  background: none; color: var(--ink-2);
+  overflow: visible;
+}
+.facts-dialog::backdrop {
+  background: rgba(30, 10, 36, .34);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+.facts-dialog[open] .facts-sheet { animation: factsIn .5s cubic-bezier(.16, 1, .3, 1) both; }
+.facts-dialog[open]::backdrop { animation: factsFade .35s ease-out both; }
+@keyframes factsIn { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+@keyframes factsFade { from { opacity: 0; } }
+.facts-dialog :focus-visible { outline-color: var(--pc-ink); }
+html.facts-lock { scrollbar-gutter: stable; }
+html.facts-lock body { overflow: hidden; }
+.facts-sheet {
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  border-radius: var(--r-lg);
+  background: rgba(255, 252, 254, .95);
+}
+.facts-sheet::after {                            /* "more below" fade, only while scrollable (app.js: .has-more) */
+  content: ''; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 64px;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: linear-gradient(rgba(255, 252, 254, 0), rgba(255, 252, 254, .97) 80%);
+  pointer-events: none;
+  opacity: 0; transition: opacity var(--d-med);
+}
+.facts-dialog.has-more .facts-sheet::after { opacity: 1; }
+.facts-head { flex: none; display: flex; align-items: center; gap: 12px; padding: 14px 12px 12px 18px; }
+.facts-orb {
+  width: 34px; height: 34px; flex: none; border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .95) 0 10%, rgba(255, 255, 255, 0) 30%),
+    conic-gradient(from 200deg, var(--o1), var(--o2), var(--o3), var(--o1));
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, .12), 0 4px 12px -4px var(--o1);
+}
+.facts-for { flex: 1; min-width: 0; display: grid; gap: 6px; justify-items: start; }
+.facts-for .status { --dot: var(--pc); padding: 4px 10px 4px 8px; font-size: .62rem; }
+.facts-for b { font: 400 1.22rem/1.15 var(--f-display); font-variation-settings: var(--soft-axis); letter-spacing: -.01em; color: var(--ink); }
+.facts-for em { font: italic 340 1.12rem/1.15 var(--f-display); font-variation-settings: var(--soft-axis-it); color: var(--pc-ink); }
+.facts-close {
+  flex: none; align-self: flex-start;
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 50%;
+  background: rgba(255, 255, 255, .8);
+  transition: background-color var(--d-fast), border-color var(--d-fast);
+}
+.facts-close:hover { background: #fff; border-color: var(--line-2); }
+.facts-close svg { width: 18px; height: 18px; color: var(--ink); stroke-width: 2; }
+.facts-scroll {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 2px 14px 18px;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+.facts-scroll:focus-visible { outline-offset: -3px; }
+/* the label */
+.sf {
+  padding: 16px 18px 14px;
+  border-radius: var(--r-md);
+  background: #fff;
+  border: 1px solid rgba(43, 13, 42, .22);
+  box-shadow: 0 18px 40px -30px rgba(76, 18, 82, .45);
+  color: var(--ink);
+}
+.sf-title {
+  font-size: clamp(1.75rem, 1.5rem + 1vw, 2.15rem); font-weight: 560; line-height: 1; letter-spacing: -.025em;
+  padding-bottom: 8px; border-bottom: 1px solid var(--ink);
+}
+.sf-serving { display: grid; padding: 8px 0 9px; font-size: var(--fs-sm); font-weight: 650; line-height: 1.45; color: var(--ink); }
+.sf-table {
+  width: 100%; border-collapse: collapse;
+  border-top: 9px solid var(--ink); border-bottom: 6px solid var(--ink);
+  font-size: .9rem; line-height: 1.3; font-variant-numeric: tabular-nums;
+}
+.sf-table th, .sf-table td { padding: 6px 0; text-align: left; vertical-align: baseline; border-top: 1px solid rgba(43, 13, 42, .2); }
+.sf-table thead th { padding: 7px 0 6px; border-top: 0; font: 800 .66rem/1.2 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
+.sf-table tbody th { width: 100%; padding-right: 12px; font-weight: 750; color: var(--ink); }
+.sf-table td { padding-right: 12px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.sf-table :is(th, td):last-child { padding-right: 0; text-align: right; }
+.sf-table td:last-child { font-weight: 800; color: var(--ink); }
+.sf-table .sf-l1 th { padding-left: 1.1em; font-weight: 600; }
+.sf-table .sf-l2 th { padding-left: 2.2em; font-weight: 600; }
+.sf-table .sf-rule > * { border-top: 5px solid var(--ink); }
+.sf-lt { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 700; }
+.sf-blend { padding-top: 9px; font-size: .8rem; line-height: 1.5; color: var(--ink-2); }
+.sf-foot { margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(43, 13, 42, .2); font-size: .76rem; line-height: 1.5; color: var(--ink-2); }
+/* what the label doesn't answer yet */
+.facts-tbd { margin-top: 18px; padding: 0 4px; }
+.facts-tbd .opt-label { margin-bottom: 4px; }
+.facts-tbd dl { margin: 0; }
+.facts-tbd div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 14px; padding: 9px 0; border-top: 1px solid var(--line); font-size: var(--fs-xs); }
+.facts-tbd dt { font-weight: 650; color: var(--ink-2); }
+.facts-tbd dd { margin: 0; font-weight: 700; color: var(--ink); text-align: right; }
+.facts-tbd .ph { white-space: normal; }
+@media (min-width: 520px) {
+  .facts-tbd dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+  .facts-tbd div { display: grid; align-content: start; gap: 3px; }
+  .facts-tbd dd { text-align: left; }
+}
+@media (max-width: 479px) {
+  .facts-head { padding: 12px 10px 10px 14px; gap: 10px; }
+  .facts-scroll { padding: 2px 10px 14px; }
+  .sf { padding: 14px 14px 12px; }
+  .sf-table { font-size: .86rem; }
+  .sf-table thead th { letter-spacing: .04em; }
+  .sf-table tbody th, .sf-table td { padding-right: 9px; }
+}
+/* the narrowest phones: "% Daily / Value" breaks so nutrient names keep one line */
+@media (max-width: 379px) { .sf-table thead th:last-child { white-space: normal; } }
 
 /* ── 14. FAQ ─────────────────────────────────────────────────────────────── */
 .faq-grid { display: grid; gap: clamp(30px, 4vw, 64px); }

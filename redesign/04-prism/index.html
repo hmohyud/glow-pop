@@ -108,7 +108,7 @@
 
       <!-- Aura switcher (rendered from PRODUCTS in app.js; static links are the no-JS fallback) -->
       <div class="dock" id="dock" role="group" aria-label="Choose your glow">
-        <a class="dock-fallback" href="#lineup">Strawberry Pop · Green Gummies (coming soon) · More colors (in development)</a>
+        <a class="dock-fallback" href="#lineup">Strawberry Pop · Green Gummies, strawberry-watermelon (coming soon) · More colors (in development)</a>
       </div>
     </section>
 
@@ -118,11 +118,11 @@
         <header class="sec-head">
           <p class="eyebrow reveal">The lineup</p>
           <h2 id="lineup-title" class="reveal d1"><span class="sweep">One pop.</span> <span class="sweep">A whole <em class="irid">spectrum</em>.</span></h2>
-          <p class="lead reveal d2">Strawberry is here now. Green Gummies and more colors are on the way. Preview any of them and the whole page shifts into its aura.</p>
+          <p class="lead reveal d2">Strawberry is here now. Strawberry-watermelon Green&nbsp;Gummies and more colors are on the way. Preview any of them and the whole page shifts into its aura.</p>
         </header>
         <div class="lineup-grid" id="lineupGrid">
           <article class="pcard glass"><div class="pcard-body"><h3 class="pcard-title">Peptide Lollipops <em>Strawberry</em></h3><p>Available now: 47 calories per pop, 10 lollipops per bag, made with real sugar.</p></div></article>
-          <article class="pcard glass"><div class="pcard-body"><h3 class="pcard-title">Green Gummies <em>working name</em></h3><p>Coming soon: flavor, actives, count and price to be announced.</p></div></article>
+          <article class="pcard glass"><div class="pcard-body"><h3 class="pcard-title">Green Gummies <small class="pcard-wn">working name</small> <em>Strawberry-Watermelon</em></h3><p>Coming soon: five B vitamins plus an organic super-greens blend. 20 calories and 3 g sugar per 2-gummy serving, 60 gummies (30 servings) per container. Price and launch date to be announced.</p></div></article>
           <article class="pcard glass"><div class="pcard-body"><h3 class="pcard-title">More colors <em>in development</em></h3><p>Names and flavors to be announced.</p></div></article>
         </div>
       </div>
@@ -447,6 +447,10 @@
             <h3 class="faq-q"><button type="button" id="faq-q5" aria-controls="faq-a5" aria-expanded="false"><span>Are they gluten-free?</span><span class="faq-ic" aria-hidden="true"></span></button></h3>
             <div class="faq-a" id="faq-a5" role="region" aria-labelledby="faq-q5"><div class="faq-a-in"><p>Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that everyone can enjoy. If you have specific dietary concerns or allergies, please check the full ingredient list on the product packaging.</p></div></div>
           </div>
+          <div class="faq-item glass reveal d5">
+            <h3 class="faq-q"><button type="button" id="faq-q6" aria-controls="faq-a6" aria-expanded="false"><span>What are the Green Gummies?</span><span class="faq-ic" aria-hidden="true"></span></button></h3>
+            <div class="faq-a" id="faq-a6" role="region" aria-labelledby="faq-q6"><div class="faq-a-in"><p>Coming soon: strawberry-watermelon gummies with five B vitamins (riboflavin, niacin, vitamin B6, folate and pantothenic acid) plus an organic super-greens blend of 15 ingredients, from kale and spinach to wild blueberry. A serving is 2 gummies, with 20 calories and 3 g of sugar, and each container holds 30 servings (60 gummies). Price, launch date, directions and the rest of the label (other ingredients, allergens, vegan and gluten-free status) are still to come, so join the waitlist to hear first. <button class="inline-link" type="button" data-facts="green-gummies" aria-haspopup="dialog" hidden>See the full Supplement Facts</button></p></div></div>
+          </div>
         </div>
       </div>
     </section>
@@ -537,6 +541,9 @@
 
   <!-- Prototype chrome (≥1024px only) -->
   <a class="proto-chip" href="../../index.html">Proposal 04 · Prism · <span>All proposals</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+
+  <!-- Supplement Facts sheet: filled from PRODUCTS[].label by app.js when a [data-facts] trigger is used -->
+  <dialog class="facts-dialog" id="factsDialog" aria-labelledby="factsTitle factsFor"></dialog>
 
   <!-- Live region for theme announcements -->
   <p class="sr-only" id="announcer" aria-live="polite"></p>

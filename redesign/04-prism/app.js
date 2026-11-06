@@ -9,6 +9,7 @@
    7  Hero: chips swap, pointer parallax
    8  Ingredient orbit + accessible tabs
    9  Shop interactions + waitlist
+   9b Supplement facts sheet (modal, from PRODUCTS[].label)
    10 FAQ accordion
    11 Header, menu, mobile shop bar
    12 Reveal + shimmer
@@ -67,7 +68,7 @@
     },
     {
       id: 'green-gummies', kind: 'gummy', status: 'coming-soon', statusLabel: 'Coming soon',
-      name: 'Green Gummies', short: 'Green Gummies', nameNote: 'working name', flavor: null /* TBD */,
+      name: 'Green Gummies', short: 'Green Gummies', nameNote: 'working name', flavor: 'Strawberry-Watermelon',
       color: '#1FA453', deep: '#0E4D2C', tint: '#E3F6EA',
       theme: {
         'accent': '#1FA453', 'accent-ink': '#0B6B3A', 'accent-deep': '#0E4D2C', 'tint': '#E3F6EA', 'soft': '#C4F0D9',
@@ -78,26 +79,48 @@
       aura: ['#BFF4D9', '#BDEFF0', '#E0F7B8', '#D2F4E5', '#A6EDCB'],
       orb: ['#3DDC97', '#7FE7E0', '#C5F27A'],
       candy: { kind: 'gummy', color: '#1FA453' },
-      eyebrow: 'Green Gummies · Coming soon',
-      blurb: 'A brand-new green glow is on the way: ' + ph('flavor') + ', ' + ph('actives') + ' and ' + ph('launch date') + ' to be revealed.',
+      eyebrow: 'Green Gummies · Strawberry-Watermelon',
+      blurb: 'Five B vitamins and an organic super-greens blend, in a strawberry-watermelon gummy. ' + ph('Launch date') + ' to be revealed.',
       cta: { label: 'Join the waitlist', href: '#waitlist' },
       facts: [
-        { icon: 'sparkle', big: ph('Flavor'), small: 'to be revealed' },
-        { icon: 'flask-conical', big: ph('Actives'), small: 'to be revealed' },
-        { icon: 'calendar-days', big: ph('Launch'), small: 'join the waitlist' }
+        { icon: 'flame', big: '20 cal', small: 'per 2 gummies' },
+        { icon: 'sparkles', big: '5 B vitamins', small: 'B2, B3, B5, B6 &amp; folate' },
+        { icon: 'leaf', big: 'Super greens', small: 'organic blend' }
       ],
       visual: { type: 'gummy-concept' },
       card: {
-        title: 'Green Gummies', sub: 'working name',
-        points: [['sparkle', ph('Flavor')], ['flask-conical', ph('Actives')], ['package', ph('Gummies per pack')], ['tag', 'Price $' + ph('XX')]],
+        title: 'Green Gummies', sub: 'Strawberry-Watermelon',
+        points: [['flame', '20 calories, 3 g sugar per 2 gummies'], ['package', '60 gummies (30 servings) per container'], ['sparkles', '5 B vitamins + organic super greens'], ['tag', 'Price $' + ph('XX')]],
         action: { label: 'Join waitlist', href: '#waitlist', icon: 'bell' }
       },
       waitlist: {
         title: 'Be first to the <em>green glow</em>.',
-        copy: 'Green Gummies are on the way and more lollipop colors are in the lab. Flavor, actives and launch date are still under wraps, so join the list to hear first.'
+        copy: 'Green Gummies are on the way in strawberry-watermelon, with five B vitamins and an organic super-greens blend. More lollipop colors are in the lab. Price and launch date are still under wraps, so join the list to hear first.'
       },
-      bar: { name: 'Green Gummies', sub: 'Coming soon · join the waitlist', cta: 'Waitlist', href: '#waitlist' },
-      ritual: 'Green Gummies serving: ' + ph('serving size') + '.'
+      inside: 'Green Gummies have their own formula: five B vitamins plus an organic super-greens blend.',
+      bar: { name: 'Green Gummies', sub: 'Strawberry-watermelon · soon', cta: 'Waitlist', href: '#waitlist' },
+      ritual: 'Green Gummies serving: 2&nbsp;gummies · ' + ph('how many a day') + '.',
+      // Supplement Facts exactly as printed on the client's label. The %DVs are theirs:
+      // never "correct" them here. Serving size is not directions (how many a day is TBD).
+      label: {
+        serving: '2 Gummies', servings: '30',
+        rows: [
+          { n: 'Calories', a: '20', dv: '' },
+          { n: 'Total Carbohydrate', a: '5 g', dv: '2%' },
+          { n: 'Total Sugars', a: '3 g', dv: '2%', lv: 1 },
+          { n: 'Added Sugars', a: '3 g', dv: '6%', lv: 2 },
+          { n: 'Riboflavin', a: '0.8 mg', dv: '62%' },
+          { n: 'Niacin', a: '1.4 mg NE', dv: '9%' },
+          { n: 'Vitamin B6', a: '0.9 mg', dv: '53%' },
+          { n: 'Folate', a: '50 mcg DFE', dv: '53%' },
+          { n: 'Pantothenic Acid', a: '0.9 mg', dv: '18%' },
+          { n: 'Sodium', a: '15 mg', dv: '&lt;1%' },
+          { n: 'Organic Super Greens Blend', a: '170 mg', dv: '&lt;1%*', rule: true }
+        ],
+        blend: '*Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
+        foot: ['Percent Daily Values are based on a 2,000 calorie diet.', '*Daily Value not established.'],
+        tbd: [['Other ingredients', ph('base, sweetener &amp; colors')], ['Allergens', ph('allergen info')], ['Vegan / gluten-free', ph('status')], ['Directions', ph('how many a day')]]
+      }
     },
     {
       id: 'next-pop', kind: 'lollipop', status: 'in-development', statusLabel: 'In development',
@@ -188,7 +211,8 @@
     applyTheme(p);
     $$('[data-pick]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-pick') === p.id)); });
     var live = $('#announcer');
-    if (live) live.textContent = 'Now previewing ' + p.short + ', ' + p.statusLabel.toLowerCase() + '.';
+    var flavor = p.flavor && p.short.indexOf(p.flavor) < 0 ? ', ' + p.flavor.toLowerCase() : '';   // "Green Gummies, strawberry-watermelon"
+    if (live) live.textContent = 'Now previewing ' + p.short + flavor + ', ' + p.statusLabel.toLowerCase() + '.';
     listeners.forEach(function (fn) { fn(p); });
   }
 
@@ -236,6 +260,12 @@
       '<span class="sil"></span><span class="sil"></span><span class="sil"></span><span class="frost"></span>' +
       '<p class="pv-cap" aria-hidden="true">' + icon('flask-conical') + 'In the lab</p></div>';
   }
+  // opens the Supplement Facts sheet (9b) for a product that has a label; the hidden
+  // suffix keeps the visible words inside the accessible name (WCAG 2.5.3)
+  function factsBtn(p, cls) {
+    return '<button class="' + cls + '" type="button" data-facts="' + p.id + '" aria-haspopup="dialog">' +
+      (cls === 'tlink' ? icon('clipboard-list') : '') + 'See supplement facts<span class="sr-only"> for ' + p.short + '</span></button>';
+  }
   // per-product color world as CSS tokens (cards, shop, waitlist keep their own product colors)
   function tokens(p) {
     var t = p.theme;
@@ -253,8 +283,9 @@
         cardVisual(p) +
         '<div class="pcard-body">' +
           '<div class="pcard-top"><span class="status">' + p.statusLabel + '</span></div>' +
-          '<h3 class="pcard-title">' + c.title + ' <em>' + c.sub + '</em></h3>' +
+          '<h3 class="pcard-title">' + c.title + (p.nameNote ? ' <small class="pcard-wn">' + p.nameNote + '</small>' : '') + ' <em>' + c.sub + '</em></h3>' +
           '<ul class="pcard-points">' + c.points.map(function (pt) { return '<li>' + icon(pt[0], 'ic') + '<span>' + pt[1] + '</span></li>'; }).join('') + '</ul>' +
+          (p.label ? factsBtn(p, 'tlink') : '') +
           '<div class="pcard-actions">' +
             '<a class="btn ' + (p.status === 'available' ? 'btn-cta' : 'btn-ghost') + ' btn-sm" href="' + c.action.href + '">' + icon(c.action.icon) + c.action.label + '</a>' +
             '<button class="aura-btn" type="button" data-pick="' + p.id + '" aria-pressed="' + (p === current) + '" aria-label="Preview aura: ' + p.short + '">' +
@@ -309,6 +340,7 @@
         '<span class="status">' + lead.statusLabel + '</span>' +
         '<h3 class="wl-title">' + w.title + '</h3>' +
         '<p>' + w.copy + '</p>' +
+        (lead.label ? factsBtn(lead, 'tlink') : '') +
       '</div>' +
       '<form class="wl-form" novalidate>' +
         '<fieldset class="wl-opts"><legend class="opt-label">Tell me about</legend>' +
@@ -724,6 +756,77 @@
     });
   }
 
+  /* ── 9b. Supplement facts sheet ─────────────────────────────────────────── */
+  // One native modal <dialog>, filled from PRODUCTS[].label by any [data-facts]
+  // trigger (gummies card, waitlist, orbit note, FAQ). showModal() moves focus in,
+  // makes the page behind inert and closes on Esc; we add backdrop-click close,
+  // a scroll lock and focus return. It wears the product's color world, not the page's.
+  function factsHTML(p) {
+    var L = p.label;
+    var rows = L.rows.map(function (r) {
+      var cls = [r.lv ? 'sf-l' + r.lv : '', r.rule ? 'sf-rule' : ''].join(' ').trim();
+      // Manrope's "<" is a small x-height glyph that reads like "‹": set it full height
+      var dv = r.dv.replace(/&lt;/g, '<span class="sf-lt">&lt;</span>');
+      return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + r.n + '</th><td>' + r.a + '</td><td>' + dv + '</td></tr>';
+    }).join('');
+    var tbd = (L.tbd || []).map(function (t) { return '<div><dt>' + t[0] + '</dt><dd>' + t[1] + '</dd></div>'; }).join('');
+    return '<div class="facts-sheet glass glass--strong glass--film">' +
+      '<div class="facts-head">' +
+        '<span class="facts-orb" style="--o1:' + p.orb[0] + ';--o2:' + p.orb[1] + ';--o3:' + p.orb[2] + '" aria-hidden="true"></span>' +
+        '<p class="facts-for"><span class="status">' + p.statusLabel + '</span><span id="factsFor"><b>' + p.name + '</b>' + (p.flavor ? ' <em>' + p.flavor + '</em>' : '') + '</span></p>' +
+        '<button class="facts-close" type="button" autofocus>' + icon('x') + '<span class="sr-only">Close supplement facts</span></button>' +
+      '</div>' +
+      '<div class="facts-scroll" tabindex="0" role="group" aria-labelledby="factsTitle">' +
+        '<div class="sf">' +
+          '<h2 class="sf-title" id="factsTitle">Supplement Facts</h2>' +
+          '<p class="sf-serving"><span>Serving Size: ' + L.serving + '</span><span>Servings Per Container: ' + L.servings + '</span></p>' +
+          '<table class="sf-table">' +
+            '<caption class="sr-only">Amount per serving and % Daily Value</caption>' +
+            '<thead><tr><th scope="col">Amount Per Serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">%&nbsp;Daily Value</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table>' +
+          '<p class="sf-blend">' + L.blend + '</p>' +
+          '<p class="sf-foot">' + L.foot.join('<br>') + '</p>' +
+        '</div>' +
+        (tbd ? '<div class="facts-tbd"><h3 class="opt-label">Still to come</h3><dl>' + tbd + '</dl></div>' : '') +
+      '</div>' +
+    '</div>';
+  }
+  function initFacts() {
+    var dlg = $('#factsDialog');
+    if (!dlg || typeof dlg.showModal !== 'function') return;      // no <dialog>: triggers do nothing, copy still says it all
+    var opener = null, downOnBackdrop = false;
+    // soft fade at the sheet's foot while more of it sits below the fold
+    function moreCue() {
+      var sc = $('.facts-scroll', dlg);
+      dlg.classList.toggle('has-more', !!sc && sc.scrollTop + sc.clientHeight < sc.scrollHeight - 4);
+    }
+    doc.addEventListener('click', function (e) {
+      var t = e.target.closest && e.target.closest('[data-facts]');
+      var p = t && byId(t.getAttribute('data-facts'));
+      if (!p || !p.label || dlg.open) return;
+      opener = t;
+      dlg.setAttribute('style', tokens(p));
+      dlg.innerHTML = factsHTML(p);
+      drawIcons();
+      root.classList.add('facts-lock');
+      dlg.showModal();
+      $('.facts-scroll', dlg).addEventListener('scroll', moreCue, { passive: true });
+      moreCue();
+    });
+    window.addEventListener('resize', function () { if (dlg.open) moreCue(); }, { passive: true });
+    // close on a click that starts and ends on the backdrop (not a text-select drag out of the sheet)
+    dlg.addEventListener('pointerdown', function (e) { downOnBackdrop = e.target === dlg; });
+    dlg.addEventListener('click', function (e) {
+      if ((e.target === dlg && downOnBackdrop) || (e.target.closest && e.target.closest('.facts-close'))) dlg.close();
+    });
+    dlg.addEventListener('close', function () {
+      root.classList.remove('facts-lock');
+      if (opener && doc.contains(opener)) opener.focus();
+    });
+    $$('[data-facts][hidden]').forEach(function (b) { b.hidden = false; });   // static triggers (FAQ) appear once this works
+  }
+
   /* ── 10. FAQ accordion ──────────────────────────────────────────────────── */
   function initFAQ() {
     $$('.faq-item').forEach(function (item) {
@@ -886,10 +989,11 @@
     var note = $('[data-slot="orbitNote"]');
     if (note) {
       note.hidden = p.status === 'available';
-      note.innerHTML = icon('info') + '<span>Showing the Peptide Lollipop actives. ' + p.short + ': ' + ph('actives') + '.</span>';
+      note.innerHTML = icon('info') + '<span>Showing the Peptide Lollipop actives. ' + (p.inside || p.short + ': ' + ph('actives') + '.') +
+        (p.label ? ' ' + factsBtn(p, 'inline-link') : '') + '</span>';
     }
     var ritual = $('[data-slot="ritualNote"]');
-    if (ritual) ritual.innerHTML = p.ritual;
+    if (ritual) ritual.innerHTML = '<span>' + p.ritual + '</span>';   // one flex item: keeps the spaces around a placeholder
     drawIcons();
   });
   fillShopbar(current);
@@ -898,6 +1002,7 @@
   drawIcons();
   initOrbit();
   initShop();
+  initFacts();
   initFAQ();
   initSteps();
   initShopbar();

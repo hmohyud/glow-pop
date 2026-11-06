@@ -9,7 +9,7 @@
     4 · theme + product switching   11 · FAQ accordion
     5 · 3D candy (shared lib)       12 · nav + mobile menu
     6 · hero                        13 · reveal, parallax, shop bar
-    7 · the cabanas                 14 · frame loop · 15 · boot
+    7 · the cabanas (+ the gummies' Supplement Facts drawer)   14 · frame loop · 15 · boot
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -26,8 +26,8 @@
   var hexRgb = function (h) { h = h.replace('#', ''); return [parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255]; };
 
   /* ───────────────────────── 1 · Data: one product list drives everything ─────────────────────────
-     Switcher (cabanas, their drawings and still lifes), cabana card, hero copy, nav chip, shop bar,
-     theme tokens, water tint, 3D candy, menu head and waitlist all read from here.
+     Switcher (cabanas, their drawings and still lifes), cabana card (and its Supplement Facts drawer),
+     hero copy, nav chip, shop bar, theme tokens, water tint, 3D candy, menu head and waitlist all read from here.
      Adding a product = adding one object.                                                          */
   var PH = function (s) { return '<span class="ph">' + s + '</span>'; };
   var NO = 'N<span class="ord">o</span>';   // a proper numero: N and a raised, underlined o
@@ -55,25 +55,55 @@
       }
     },
     {
-      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: null /* TBD */, status: 'coming-soon', no: 2,
-      short: 'Green Gummies', statusLabel: 'Opening soon', waitlist: 'Green Gummies', tag: 'Opening soon',
+      // Flavor and the Supplement Facts come from the client's label; price, launch date, directions, other
+      // ingredients, allergens, dietary status and the final gummy shape are still unknown (placeholders).
+      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: 'Strawberry-Watermelon', status: 'coming-soon', no: 2,
+      short: 'Green Gummies', statusLabel: 'Opening soon', waitlist: 'Green Gummies', tag: 'Opening soon', bag: '60 per container',
       color: '#1FA453', deep: '#0E4D2C', btn: '#0E7A3E', text: '#0B6B36', display: '#0E7A3E', tint: '#E3F6EA', soft: '#A9DFBE',
       stripe: '#2E9E62', candy: '#1FA453', meta: '#F6FBF7',
       cabana: { c: '#2E9E62', c2: '#FFFDF8', deep: '#17683F', room: '#E2F4E9', room2: '#ADD9BF', still: ['#9BE5B8', '#1FA453', '#0E5A30'] },
       water: { deep: [0.06, 0.52, 0.56], shallow: [0.55, 0.90, 0.82], lagoon: 1 },
       copy: {
         heroEyebrow: 'Green Gummies · Opening soon', heroCta: 'Join the green list', heroHref: '#waitlist',
-        heroLede: 'The green cabana opens soon: a gummy (working name), its flavor and formula still to come. Join the list and you’ll hear first.',
-        heroProofs: '<li><i data-lucide="candy"></i><span>Flavor ' + PH('to come') + '</span></li><li><i data-lucide="sparkles"></i><span>Actives ' + PH('to come') + '</span></li><li><i data-lucide="calendar"></i><span>Launch ' + PH('date') + '</span></li>',
+        heroLede: 'Five B vitamins and an organic super-greens blend, in a <span class="nw">strawberry-watermelon</span> gummy. The green cabana opens soon: join the list and you’ll hear first.',
+        heroProofs: '<li><i data-lucide="flame"></i><span><b>20</b> cal per 2 gummies</span></li><li><i data-lucide="leaf"></i><span><b>5</b> B vitamins + super greens</span></li><li><i data-lucide="calendar"></i><span>Launch ' + PH('date') + '</span></li>',
         heroCaption: '<span class="no" aria-hidden="true">' + NO + ' 2</span> Green Gummies, concept render', heroHint: 'Touch the water · tap the gummies to squish',
         heroLabel: 'Green Gummies, concept render: three sugar-coated green gummies floating above the pool. Interactive 3D: drag to spin them, tap one to squish it.',
-        title: 'Green <em>Gummies</em>',
-        blurb: 'Our next arrival is a gummy (working name). Flavor, actives, count and price are still being finalised, so everything here is a placeholder.',
-        facts: [['Flavor', PH('To be announced')], ['In the bag', PH('To be announced')], ['Price', '$' + PH('XX')], ['Launch', PH('To be announced')]],
+        title: 'Green Gummies, <em class="nw">Strawberry<span class="hy">-</span>Watermelon</em>',
+        blurb: 'Five B vitamins and an organic blend of 15 ingredients, at 20 calories and 3&nbsp;g sugar per 2-gummy serving. Price, launch date and final name are ' + PH('still to come') + '.',
+        facts: [['Per serving', '2 gummies, <span class="nw">20 cal</span>'], ['Per container', '60 gummies'], ['Inside', '5 B vitamins + <span class="nw">super greens</span>'], ['Price', '$' + PH('XX')]],
         cardCta: 'Join the list', cardHref: '#waitlist', note: 'Concept render: the final gummy may differ',
-        barName: 'Green Gummies', barNote: 'Opening soon · details to come', barCta: 'Join list', barHref: '#waitlist',
-        pinNote: 'Shown for Strawberry Peptide Lollipops. Green Gummies actives are still to come.',
+        barName: 'Green Gummies', barNote: 'Strawberry-watermelon · soon', barCta: 'Join list', barHref: '#waitlist',
+        pinNote: 'Shown for Strawberry Peptide Lollipops. Green Gummies have five B vitamins and super greens: <a href="#cabanaLabel" data-show-label>see their supplement facts</a>.',
         ritualNote: 'Shown for Strawberry Peptide Lollipops.<span class="pin-note__more"> The Green Gummies ritual is still to come.</span>'
+      },
+      // The Supplement Facts panel, exactly as printed (the %DV column too). Rows: [name, amount per serving,
+      // % daily value, style]; style: 'top' a lead row, 'in' / 'in2' indented under the row above, 'bar' a
+      // heavier rule above (a new group). Opened from the cabana card (renderLabel).
+      label: {
+        name: 'Green Gummies supplement facts',
+        meta: 'Serving size 2 gummies · 30 servings',
+        serving: 'Serving Size 2 Gummies', servings: 'Servings Per Container 30',
+        rows: [
+          ['Calories', '20', '', 'top'],
+          ['Total Carbohydrate', '5 g', '2%', 'top'],
+          ['Total Sugars', '3 g', '2%', 'in'],
+          ['Added Sugars', '3 g', '6%', 'in2'],
+          ['Riboflavin', '0.8 mg', '62%', 'bar'],
+          ['Niacin', '1.4 mg NE', '9%'],
+          ['Vitamin B6', '0.9 mg', '53%'],
+          ['Folate', '50 mcg DFE', '53%'],
+          ['Pantothenic Acid', '0.9 mg', '18%'],
+          ['Sodium', '15 mg', '<1%'],
+          ['Organic Super Greens Blend', '170 mg', '<1%*', 'bar']
+        ],
+        notes: [
+          '*Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk & Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
+          'Percent Daily Values are based on a 2,000 calorie diet. *Daily Value not established.'
+        ],
+        // beside the label: which of its names are B vitamins, then what the label doesn't settle yet
+        key: 'Riboflavin (B2), niacin (B3), pantothenic acid (B5), vitamin B6 and folate (B9).',
+        tbd: [['Other ingredients', PH('Base, sweetener, colours')], ['Allergens', PH('To be announced')], ['Vegan / gluten-free', PH('To be confirmed')], ['Directions', PH('To come')]]
       }
     },
     {
@@ -739,6 +769,7 @@
       if (k === 'facts') el.innerHTML = c.facts.map(function (f) { return '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>'; }).join('');
       else if (c[k] != null) el.innerHTML = c[k];
     });
+    renderLabel(p);                                // the Supplement Facts drawer (only products with a label)
     icons();
     heroState.capW = 0;   // re-measure the caption
   }
@@ -1205,6 +1236,76 @@
       n.focus(); setProduct(n.getAttribute('data-product'));
     });
     if (cabScroller) updateCabanas(false);
+  }
+
+  /* The Supplement Facts drawer at the foot of the cabana card: a disclosure, drawn from the product's
+     label (PRODUCTS[].label) and hidden for products without one. Closed it is one quiet row; open, the
+     label itself is a real table (caption, column and row headers, footnotes), plus what it doesn't
+     settle yet. Links marked [data-show-label] open it (choosing that product first if they name one). */
+  var labelBox = $('#cabanaLabel'), labelBtn = $('#labelToggle'), labelPanel = $('#labelPanel'), labelFor = null;
+  var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  function labelHTML(L) {
+    var rows = L.rows.map(function (r) {
+      return '<tr' + (r[3] ? ' class="sf-' + r[3] + '"' : '') + '><th scope="row">' + esc(r[0]) + '</th>' +
+        '<td>' + esc(r[1]).replace(/ /g, '&nbsp;') + '</td><td>' + esc(r[2]) + '</td></tr>';
+    }).join('');
+    return '<div class="label-panel__inner">' +
+      '<div class="sfacts-box"><table class="sfacts">' +
+        '<caption><span class="sfacts__title">Supplement Facts</span><span class="sfacts__serving">' + esc(L.serving) + '</span><span class="sfacts__serving">' + esc(L.servings) + '</span></caption>' +
+        '<thead><tr><td></td><th scope="col">Amount Per Serving</th><th scope="col">%&nbsp;Daily Value</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+        '<tfoot><tr><td colspan="3">' + L.notes.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('') + '</td></tr></tfoot>' +
+      '</table></div>' +
+      '<div class="label-side">' +
+        '<div class="label-side__block"><p class="caption">The five B vitamins</p><p class="label-side__key">' + esc(L.key) + '</p></div>' +
+        '<div class="label-side__block"><p class="caption">Still to come</p><dl class="label-side__list">' +
+          L.tbd.map(function (t) { return '<div><dt>' + t[0] + '</dt><dd>' + t[1] + '</dd></div>'; }).join('') +
+        '</dl></div>' +
+      '</div>' +
+    '</div>';
+  }
+  function renderLabel(p) {
+    if (!labelBox || !labelBtn || !labelPanel) return;
+    var L = p.label;
+    setLabel(false, false);                        // a new product starts with its drawer closed
+    labelBox.hidden = !L;
+    if (!L || labelFor === p) return;
+    labelFor = p;
+    var meta = $('.label-toggle__meta', labelBtn); if (meta) meta.textContent = L.meta;
+    labelPanel.setAttribute('aria-label', L.name);
+    labelPanel.innerHTML = labelHTML(L);
+  }
+  function setLabel(open, animate) {
+    if (!labelBtn || !labelPanel) return;
+    var was = labelBtn.getAttribute('aria-expanded') === 'true';
+    labelBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open === was && labelPanel.hidden === !open) return;
+    var ease = animate && !reduce && labelPanel.animate;
+    if (open) {
+      labelPanel.hidden = false;
+      if (ease) labelPanel.animate([{ height: '0px', opacity: 0 }, { height: labelPanel.scrollHeight + 'px', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.16,1,.3,1)' });
+    } else if (ease && !labelPanel.hidden) {
+      var an = labelPanel.animate([{ height: labelPanel.scrollHeight + 'px', opacity: 1 }, { height: '0px', opacity: 0 }], { duration: 320, easing: 'cubic-bezier(.65,0,.35,1)' });
+      an.onfinish = function () { if (labelBtn.getAttribute('aria-expanded') !== 'true') labelPanel.hidden = true; kick(); };
+    } else labelPanel.hidden = true;
+    kick();                                        // the page below moved: let the water windows re-measure
+  }
+  function initLabel() {
+    if (!labelBtn || !labelPanel) return;
+    labelBtn.addEventListener('click', function () { setLabel(labelBtn.getAttribute('aria-expanded') !== 'true', true); });
+    doc.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('[data-show-label]'); if (!a) return;
+      var p = byId(a.getAttribute('data-show-label') || state.product.id);
+      if (!p || !p.label) return;                  // otherwise it stays a plain link
+      e.preventDefault();
+      var open = function () {
+        setLabel(true, false);
+        labelBtn.focus({ preventScroll: true });
+        labelBox.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      };
+      if (state.product !== p) { setProduct(p.id); setTimeout(open, reduce ? 0 : 340); }   // after the card's copy swap
+      else open();
+    });
   }
 
   /* ───────────────────────── 8 · Amenities: flip cards (a disclosure: the hidden face is hidden from AT) ───────────────────────── */
@@ -1793,6 +1894,7 @@
     html.classList.add('app-ready');
     applyAccent(state.product);
     initCabanas();
+    initLabel();
     icons();
     initNav();
     initRipples();
