@@ -1597,23 +1597,23 @@
     }
     function sprite(sd) {                                       // one cube, rendered once per size, stamped for every cube
       if (SPR.sd === sd && SPR.cv) return;
-      var ddx = Math.round(DX * sd), ddy = Math.round(DY * sd), el = SPR.cv || canvas();
-      el.width = sd + ddx + 2; el.height = sd + ddy + 2;
-      var c = el.getContext('2d');
+      var ddx = DX * sd, ddy = DY * sd, el = SPR.cv || canvas();
+      el.width = Math.ceil(sd + ddx) + 3; el.height = Math.ceil(sd + ddy) + 3;
+      var c = el.getContext('2d'), oy = el.height - 1;
       c.clearRect(0, 0, el.width, el.height);
-      cubeArt(c, 1, sd + ddy + 1, sd, ddx, ddy, sd >= 7 ? Math.max(1, Math.round(sd * 0.05)) : 0);
-      SPR = { sd: sd, cv: el, ox: 1, oy: sd + ddy + 1 };
+      cubeArt(c, 1, oy, sd, ddx + 0.6, ddy + 0.6, sd >= 7 ? Math.max(1, Math.round(sd * 0.05)) : 0);
+      SPR = { sd: sd, cv: el, ox: 1, oy: oy };
     }
     function sdFor(s) {                                         // device px a cube for scale s, capped at ~3 MP a cache
       var g = P.g, cap = Math.floor(Math.sqrt(3e6 / ((g.b * (1 + DX) + 1) * (g.top + 1))));
       return clamp(Math.round(s * dpr), 2, Math.max(2, cap));
     }
     function stampTo(c) {
-      return function (x, y, z) { c.drawImage(SPR.cv, P.pad + x * P.sd + z * P.ddx - SPR.ox, P.Hc - P.pad - y * P.sd - z * P.ddy - SPR.oy); };
+      return function (x, y, z) { c.drawImage(SPR.cv, P.pad + x * P.sd + Math.round(z * P.ddx) - SPR.ox, P.Hc - P.pad - y * P.sd - Math.round(z * P.ddy) - SPR.oy); };
     }
     function setup(sd) {                                        // (re)size the caches for sd device px a cube, then fill them
       var g = P.g;
-      P.sd = sd; P.ddx = Math.round(DX * sd); P.ddy = Math.round(DY * sd); P.cs = sd / dpr;
+      P.sd = sd; P.ddx = DX * sd; P.ddy = DY * sd; P.cs = sd / dpr;
       var top = 0;
       g.L.forEach(function (l) { top = Math.max(top, (l.k + 1) * sd + (l.k + l.m) * P.ddy); });
       P.Wc = Math.ceil(P.pad * 2 + g.b * (sd + P.ddx) + 2); P.Hc = Math.ceil(P.pad * 2 + top + 2);
