@@ -1487,6 +1487,11 @@
       var top = L[L.length - 1];
       return (GEO[n] = { n: n, b: b, L: L, top: topOf({ L: L }, n), sumX: X0 + top.k + top.m / 2 + (top.k + top.m / 2) * DX });
     }
+    function cleanIn(lo, hi) {
+      var sum = function (m) { var t = 0; for (; m > 0; m -= 2) t += m * m; return t; }, best = 0;
+      for (var b = 1; sum(b) <= hi; b++) if (sum(b) >= lo) best = sum(b);
+      return best || Math.round(lo);
+    }
     function topOf(g, r) {                                      // how high the first r cubes reach (projected units)
       var t = 0;
       g.L.forEach(function (l) { if (l.at < r) t = Math.max(t, l.k + 1 + (l.k + l.m) * DY); });
@@ -1507,22 +1512,8 @@
       }
     }
 
-    function forGauge(g, from, to, cull, fn) {                 // cull is ignored: a filling layer hides nothing for long
-      var out = [];
-      for (var li = 0; li < g.L.length; li++) {
-        var l = g.L[li], a = Math.max(from, l.at), e = Math.min(to, l.at + l.c);
-        if (a >= e) continue;
-        var m = l.m, fr = Math.floor(l.c / m), off = Math.floor((m - l.c % m) / 2);
-        for (var q = a - l.at; q < e - l.at; q++) {
-          var row = Math.floor(q / m), i = q % m + (row === fr ? off : 0);
-          out.push([l.k + i, l.k, l.k + row]);
-        }
-      }
-      out.sort(function (u, v) { return u[1] - v[1] || v[2] - u[2] || u[0] - v[0]; });
-      out.forEach(function (c) { fn(c[0], c[1], c[2]); });
-    }
     var W = 0, H = 0, gy = 0, dpr = 1, cam = { s: 60, x: -3, d: 2.6 }, camT = { s: 60, x: -3, d: 2.6 }, sMax = 90, moving = false;
-    var S = { k: 'sugar', fill: 0, sachet: null, frac: null, ghost: null, tag: null, tagY: 0, lift: 0 };
+    var S = { k: 'sugar', fill: 0, sachet: null, frac: null, tag: null, tagY: 0, lift: 0 };
     // the pile's cache: P.cv holds the settled cubes, P.fc the handful still dropping; both at P.sd device px a cube
     var P = { g: null, r: 0, fr: 0, sd: 0, ddx: 0, ddy: 0, cs: 1, pad: 4, Wc: 0, Hc: 0, cv: null, fc: null };
     var SPR = { sd: 0, cv: null, ox: 0, oy: 0 }, BG = null, quick = false;
@@ -1551,7 +1542,7 @@
       sMax = W < 600 ? 52 : 88;
       ground = [];
       for (var x = -8, i = 0; x <= W + 8; x += 14, i++) ground.push([x, gy + Math.sin(i * 1.7) * 1.4 + ((i * 7919) % 5 - 2) * 0.5]);
-      BG = null; P.sd = 0; SPR.sd = 0; G.sd = 0;
+      BG = null; P.sd = 0; SPR.sd = 0;
       return true;
     }
     // the backdrop (sky, two paper clouds, the sand) never moves: drawn once per size and theme
@@ -1575,7 +1566,6 @@
     function target(snap) {
       var xmax = X0 + 1.1 + DX, ymax = 1.3 + DY;                     // always room for the first cube (and the flag)
       if (P.g && P.fr) { xmax = Math.max(xmax, X0 + P.g.b * (1 + DX)); ymax = Math.max(ymax, topOf(P.g, P.fr)); }
-      if (S.ghost) { xmax = Math.max(xmax, X0 + S.ghost.b * (1 + DX)); ymax = Math.max(ymax, S.ghost.top); }
       // room on the left for the spoon and for the "us" pennant, which flies left of the reference cube
       var fw = flagW(), padTop = W < 600 ? 78 : 96, s = Math.min((W - 40) / (xmax + 7.4), (W - 60 - fw) / (xmax + 0.5), (gy - padTop) / ymax, sMax);
       if (s * dpr >= 2) s = Math.floor(s * dpr) / dpr;
@@ -1630,81 +1620,20 @@
       P.cv = P.cv || canvas(); P.fc = P.fc || canvas();
       P.cv.width = P.Wc; P.cv.height = P.Hc; P.fc.width = P.Wc; P.fc.height = P.Hc;
       sprite(sd);
-      if (!P.gauge) forCubes(g, 0, P.r, true, stampTo(P.cv.getContext('2d')));
-      if (P.fr > P.r) (P.gauge ? forGauge : forCubes)(g, P.r, P.fr, false, stampTo(P.fc.getContext('2d')));
+      forCubes(g, 0, P.r, true, stampTo(P.cv.getContext('2d')));
+      if (P.fr > P.r) forCubes(g, P.r, P.fr, false, stampTo(P.fc.getContext('2d')));
     }
     function grow(r, fr) {                                      // the next stop-motion step: settle the last handful, drop the next
       var g = P.g, r0 = P.r, f0 = P.fr;
       P.r = r; P.fr = fr;
       if (quick || !P.sd || r < r0) { P.sd = 0; return; }           // drawn fresh at the next paint
       var c = P.cv.getContext('2d'), f = P.fc.getContext('2d');
-      if (r > r0 && !P.gauge) {
+      if (r > r0) {
         if (f0 === r && f0 > r0) c.drawImage(P.fc, 0, 0);           // the dropped handful lands: one copy
         else forCubes(g, r0, r, false, stampTo(c));
       }
       f.clearRect(0, 0, P.Wc, P.Hc);
-      if (fr > r) (P.gauge ? forGauge : forCubes)(g, r, fr, false, stampTo(f));
-    }
-    // a range: the far end's pyramid, traced in pencil behind. It is stamped cube by cube on the very same lattice
-    // as the real pile (same foot, same build order, same sprite geometry), so every dashed seam runs on from a real
-    // cube's edge: the pencil cubes are the extra cubes the pile would need to reach the high end.
-    var G = { gh: null, sd: 0, cv: null, spr: null, Wc: 0, Hc: 0, ai: '' };
-    function ghostSprite(sd) {
-      var ddx = P.ddx, ddy = P.ddy, m = 2, el = canvas();
-      el.width = sd + ddx + m * 2; el.height = sd + ddy + m * 2;
-      var c = el.getContext('2d'), x = m, y = sd + ddy + m, s = sd;
-      var F = [[x, y], [x, y - s], [x + s, y - s], [x + s, y]];                       // front
-      var T = [[x, y - s], [x + ddx, y - s - ddy], [x + s + ddx, y - s - ddy], [x + s, y - s]];   // top
-      var R = [[x + s, y], [x + s, y - s], [x + s + ddx, y - s - ddy], [x + s + ddx, y - ddy]];  // right side
-      var poly = function (q, col) { c.beginPath(); q.forEach(function (v, i) { if (i) c.lineTo(v[0], v[1]); else c.moveTo(v[0], v[1]); }); c.closePath(); c.fillStyle = col; c.fill(); };
-      poly(F, C.ghost); poly(T, mixc(C.ghost, '#FFFFFF', 0.45)); poly(R, mixc(C.ghost, C.side, 0.4));
-      var dash = sd >= 14 * dpr, lw = Math.max(1, Math.round(1.1 * dpr));
-      c.strokeStyle = C.ai; c.globalAlpha = dash ? 0.7 : (sd >= 6 * dpr ? 0.2 : 0.12); c.lineWidth = lw; c.lineCap = 'butt';
-      var seg = function (a, b) {                                   // each edge gets a whole number of dashes, so seams meet cleanly
-        var len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-        if (dash) { var n = Math.max(1, Math.round(len / (7 * dpr))), per = len / n; c.setLineDash([per * 0.6, per * 0.4]); c.lineDashOffset = -per * 0.2; }
-        c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
-      };
-      seg(F[0], F[1]); seg(F[1], F[2]); seg(F[2], F[3]); seg(F[3], F[0]);
-      seg(T[0], T[1]); seg(T[1], T[2]); seg(T[2], T[3]);
-      seg(R[2], R[3]); seg(R[3], R[0]);
-      return { cv: el, ox: m, oy: sd + ddy + m };
-    }
-    // the real pile and the pencil one are one solid: every cell of either, on one lattice, stamped in a single
-    // back-to-front pass (bottom layer up, back row forward, left to right). Real cubes keep the real sprite, the
-    // rest are pencil, and a pencil cube in front of or on top of a real one hides it, as it would on a table.
-    function ghostCache(gh) {
-      var g = P.g, sd = P.sd, r = P.r;
-      if (G.gh === gh && G.g === g && G.r === r && G.sd === sd && G.ai === C.ai && G.cv) return;
-      var B = Math.max(g.b, gh ? gh.b : 0), Ly = Math.max(g.L.length, gh ? gh.L.length : 0) + 1, occ = new Uint8Array(B * B * Ly);
-      var at = function (x, y, z) { return x < 0 || z < 0 || x >= B || z >= B || y >= Ly ? 0 : occ[(y * B + z) * B + x]; };
-      if (gh) forCubes(gh, 0, gh.n, false, function (x, y, z) { occ[(y * B + z) * B + x] = 1; });
-      (P.gauge ? forGauge : forCubes)(g, 0, r, false, function (x, y, z) { occ[(y * B + z) * B + x] = 2; });
-      var top = 0, x, y, z;
-      for (y = 0; y < Ly; y++) for (z = 0; z < B; z++) for (x = 0; x < B; x++) if (occ[(y * B + z) * B + x]) top = Math.max(top, (y + 1) * sd + (z + 1) * P.ddy);
-      G.Wc = Math.ceil(P.pad * 2 + B * (sd + P.ddx) + 2); G.Hc = Math.ceil(P.pad * 2 + top + 2);
-      G.cv = G.cv || canvas(); G.cv.width = G.Wc; G.cv.height = G.Hc;
-      if (!G.spr || G.sd !== sd || G.ai !== C.ai) G.spr = ghostSprite(sd);
-      sprite(sd);
-      var c = G.cv.getContext('2d');
-      c.clearRect(0, 0, G.Wc, G.Hc);
-      for (y = 0; y < Ly; y++) for (z = B - 1; z >= 0; z--) for (x = 0; x < B; x++) {
-        var v = occ[(y * B + z) * B + x];
-        if (!v || (at(x + 1, y, z) && at(x, y + 1, z) && at(x, y, z - 1))) continue;   // all three seen faces covered
-        var sp = v === 2 ? SPR : G.spr;
-        c.drawImage(sp.cv, P.pad + x * sd + z * P.ddx - sp.ox, G.Hc - P.pad - y * sd - z * P.ddy - sp.oy);
-      }
-      G.gh = gh; G.g = g; G.r = r; G.sd = sd; G.ai = C.ai;
-    }
-    function ghostNote(gh) {                                     // a pencil note on the far slope
-      var ex = P.sd ? P.ddx / P.sd : DX, ey = P.sd ? P.ddy / P.sd : DY;
-      var l = gh.L[Math.floor(gh.L.length / 2)], e = [X(X0 + l.k + l.m + (l.k + l.m) * ex), Y(l.k + 1 + (l.k + l.m) * ey)];
-      ctx.save();
-      ctx.font = '700 ' + (W < 600 ? 17 : 21) + 'px Caveat, "Segoe Print", cursive';
-      var txt = 'up to ' + gh.n.toLocaleString('en-US'), w = ctx.measureText(txt).width;
-      ctx.translate(Math.min(W - w - 8, e[0] + 10), Math.max(18, e[1] + 4)); ctx.rotate(-5 * RAD);
-      ctx.fillStyle = C.ai; ctx.textBaseline = 'middle'; ctx.fillText(txt, 0, 0);
-      ctx.restore();
+      if (fr > r) forCubes(g, r, fr, false, stampTo(f));
     }
     // the sand is a floor seen from the same angle as the cubes: it runs back to a horizon just behind the
     // deepest pile on stage, and every pile and cube sits on it with a soft contact shadow
@@ -1729,15 +1658,14 @@
         ctx.beginPath(); q.forEach(function (v, j) { var px = X(v[0] + v[1] * DX), py = Y(v[1] * DY); if (j) ctx.lineTo(px, py); else ctx.moveTo(px, py); });
         ctx.closePath(); ctx.fillStyle = 'rgba(122,60,30,' + a + ')'; ctx.fill();
       };
-      if (S.ghost) foot(X0, X0 + S.ghost.b, 0, S.ghost.b, 0.14);
-      else if (P.g && P.r) {                                     // only under what has landed: the base fills back rows first
+      if (P.g && P.r) {                                     // only under what has landed: the base fills back rows first
         var pb = P.g.b, rows = Math.min(pb, Math.ceil(P.r / pb));
-        if (P.gauge) foot(X0, X0 + pb, 0, rows, 0.14); else foot(X0, X0 + pb, pb - rows, pb, 0.14);
+        foot(X0, X0 + pb, pb - rows, pb, 0.14);
       } else if (S.frac) foot(X0 + 0.05, X0 + 1.05, 0, 1, 0.14);
       foot(-0.5, 0.5, 0, 1, 0.16);                               // the reference cube
     }
     function depthT() {                                          // how far back the floor runs for what's on stage
-      return Math.max(1, S.ghost ? S.ghost.b : 0, P.g ? P.g.b : 0) + 1.6;
+      return Math.max(1, P.g ? P.g.b : 0) + 1.6;
     }
     function spoon() {                                          // a paper teaspoon lying on the sand, bowl up
       var s = cam.s, bx = X(-2.3), by = Y(0.5), rx = 1.05 * s, ry = 0.46 * s;
@@ -1849,15 +1777,9 @@
       if (P.g && P.fr) {
         var f = cam.s / P.cs, x0 = X(X0) - P.pad / dpr * f, y0 = Y(0) - (P.Hc - P.pad) / dpr * f, w = P.Wc / dpr * f, h = P.Hc / dpr * f;
         if (Math.abs(f - 1) < 1e-3) { x0 = Math.round(x0 * dpr) / dpr; y0 = Math.round(y0 * dpr) / dpr; }
-        if ((S.ghost || P.gauge) && P.sd) {                      // real and pencil cubes as one solid
-          ghostCache(S.ghost);
-          var gy0 = Y(0) - (G.Hc - P.pad) / dpr * f;
-          if (Math.abs(f - 1) < 1e-3) gy0 = Math.round(gy0 * dpr) / dpr;
-          ctx.drawImage(G.cv, x0, gy0, G.Wc / dpr * f, G.Hc / dpr * f);
-        } else if (P.r) ctx.drawImage(P.cv, x0, y0, w, h);
+        if (P.r) ctx.drawImage(P.cv, x0, y0, w, h);
         if (P.fr > P.r) ctx.drawImage(P.fc, x0, y0 - Math.round(S.lift * cam.s * dpr) / dpr, w, h);
       }
-      if (S.ghost && S.tag) ghostNote(S.ghost);
       if (S.frac) {                                              // less than a cube: a cube cut down, the rest traced
         var fr = S.frac, xc = X0 + 0.55;
         outline([[xc - 0.5, 0], [xc - 0.5, 1], [xc - 0.5 + DX, 1 + DY], [xc + 0.5 + DX, 1 + DY], [xc + 0.5 + DX, DY], [xc + 0.5, 0]]);
@@ -1886,21 +1808,27 @@
       F.push({ sachet: null, fill: 1 });
       // 3 · the sugar it takes to taste as sweet
       if (lo < 1) {
-        [3.2, 1.3, 0, 0.16, 0].forEach(function (y) { F.push({ frac: { lo: lo, hi: hi, y: y } }); });
+        [3.2, 1.3, 0, 0.16, 0].forEach(function (y) { F.push({ frac: { lo: hi, hi: hi, y: y } }); });
       } else {
-        // a range is one pile that fills from the bottom: the high end's pyramid, its first lo cubes real sugar, the rest pencil
-        var gh = hi > lo ? pyr(hi) : null, g = gh || pyr(lo), n = Math.round(lo);
+        var n = hi > lo ? cleanIn(lo, hi) : Math.round(lo), g = pyr(n);
         if (n === 1) {
           [2.8, 1.1, 0, 0.14].forEach(function (y) { F.push({ g: g, r: 0, fr: 1, lift: y }); });
         } else {
-          var steps = Math.round(clamp(6 + 3.2 * Math.log10(n), 8, 16)), prev = 0;
+          // each step lands whole rows (never a ragged half row), and drops only a short way, so even a
+          // 20,000-cube pile reads as rows being set down rather than slabs hovering over it
+          var ends = [];
+          g.L.forEach(function (l) { for (var q = l.m; q < l.c; q += l.m) ends.push(l.at + q); ends.push(l.at + l.c); });
+          var steps = Math.min(ends.length, Math.round(clamp(6 + 3.2 * Math.log10(n), 8, 16))), prev = 0, e = 0;
           for (var i = 1; i <= steps; i++) {
-            var c = Math.max(prev + 1, Math.min(n, Math.round(n * Math.pow(i / steps, 1.25))));
-            F.push({ g: g, gauge: !!gh, r: prev, fr: c, lift: 1.2, ghost: i > steps * 0.6 ? gh : null });
+            var want = i === steps ? n : n * Math.pow(i / steps, 1.25);
+            while (e < ends.length - 1 && (ends[e] <= prev || Math.abs(ends[e + 1] - want) < Math.abs(ends[e] - want))) e++;
+            var c = ends[e];
+            if (c <= prev) continue;
+            F.push({ g: g, r: prev, fr: c, lift: 0.45 });
             prev = c;
           }
         }
-        F.push({ g: g, gauge: !!gh, r: n, fr: n, lift: 0, ghost: gh });
+        F.push({ g: g, r: n, fr: n, lift: 0 });
       }
       // 4 · the tag is pinned on, a little drop, then still
       F.push({ tag: true, tagY: -14 }); F.push({ tag: true, tagY: 3 }); F.push({ tag: true, tagY: 0 });
@@ -1912,13 +1840,12 @@
           if (P.g) grow(Math.floor(P.r * 0.45), Math.floor(P.r * 0.45));
           if (S.frac) S.frac = { lo: S.frac.lo * 0.5, hi: S.frac.lo * 0.5, y: 0 };
           S.fill *= 0.5;
-        } else { P.g = null; P.gauge = false; P.r = P.fr = 0; P.sd = 0; S.frac = null; S.fill = 0; }
-        S.ghost = null; S.tag = null; S.sachet = null;
+        } else { P.g = null; P.r = P.fr = 0; P.sd = 0; S.frac = null; S.fill = 0; }
+        S.tag = null; S.sachet = null;
       }
-      if (f.g && P.g !== f.g) { P.g = f.g; P.gauge = !!f.gauge; P.r = P.fr = 0; P.sd = 0; }
+      if (f.g && P.g !== f.g) { P.g = f.g; P.r = P.fr = 0; P.sd = 0; }
       if ('r' in f) grow(f.r, f.fr);
       if ('lift' in f) S.lift = f.lift;
-      if ('ghost' in f) S.ghost = f.ghost;
       if ('frac' in f) S.frac = f.frac;
       if ('fill' in f) S.fill = f.fill;
       if ('sachet' in f) S.sachet = f.sachet;
@@ -1998,11 +1925,11 @@
       else { target(true); paint(); }
     }
     if ('ResizeObserver' in window) new ResizeObserver(refit).observe(stage); else on(window, 'resize', refit);
-    listeners.push(function () { setTimeout(function () { C = colors(); BG = null; SPR.sd = 0; P.sd = 0; G.sd = 0; if (started && !raf) paint(); }, 760); });
+    listeners.push(function () { setTimeout(function () { C = colors(); BG = null; SPR.sd = 0; P.sd = 0; if (started && !raf) paint(); }, 760); });
     if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { if (started && !raf) paint(); });
     // work out every packet's pyramid while the page is idle, so a tap never waits on arithmetic
     (window.requestIdleCallback || function (fn2) { return setTimeout(fn2, 400); })(function () {
-      Object.keys(D).forEach(function (k) { if (D[k][0] >= 1) { pyr(D[k][0]); pyr(D[k][1]); } });
+      Object.keys(D).forEach(function (k) { if (D[k][0] >= 1) pyr(D[k][1] > D[k][0] ? cleanIn(D[k][0], D[k][1]) : D[k][0]); });
     });
     function first() {
       started = true;
