@@ -4,8 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glo Pop · Proposal 08 · Pop Arcade</title>
-  <meta name="description" content="Glo Pop peptide lollipops: the most delicious skincare. Six actives, real sugar, 47 calories a pop. Play the Glow Grid to meet the six.">
+  <meta name="description" content="Glo Pop Collagen Boost: sugar-free strawberry beauty lollipops with seven actives, from peptides to biotin. One a day. Play the Glow Grid to meet all seven.">
   <meta name="theme-color" content="#FF2E93">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Glo Pop">
+  <meta property="og:title" content="Glo Pop · Collagen Boost beauty lollipops">
+  <meta property="og:description" content="Sugar-free strawberry beauty lollipops with seven actives, from peptides to biotin. Play the Glow Grid to meet all seven.">
+  <meta property="og:url" content="https://hmohyud.github.io/glow-pop/redesign/08-pop-arcade/">
+  <meta property="og:image" content="https://hmohyud.github.io/glow-pop/redesign/_shared/assets/product/pack-mockup.jpg">
+  <meta property="og:image:width" content="738">
+  <meta property="og:image:height" content="851">
+  <meta property="og:image:alt" content="Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops">
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +29,7 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <!-- shared SVG defs: the six original Glow Grid tokens -->
+  <!-- shared SVG defs: the seven original Glow Grid tokens (sh-6, the four-petal flower, is biotin) -->
   <svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
     <defs>
       <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
@@ -35,17 +44,18 @@
     <symbol id="sh-3" viewBox="0 0 100 100"><path d="M50 7 87 28.5v43L50 93 13 71.5v-43Z" stroke-linejoin="round"/></symbol>
     <symbol id="sh-4" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="24"/></symbol>
     <symbol id="sh-5" viewBox="0 0 100 100"><path d="M50 6 92 50 50 94 8 50Z" stroke-linejoin="round"/></symbol>
+    <symbol id="sh-6" viewBox="0 0 100 100"><path d="M16.2 50A24 24 0 0 1 50 16.2 24 24 0 0 1 83.8 50 24 24 0 0 1 50 83.8 24 24 0 0 1 16.2 50Z" stroke-linejoin="round"/></symbol>
   </svg>
 
-  <div class="topbar"><p><i data-lucide="truck"></i> Free shipping on every order <span class="topbar-x"><span aria-hidden="true">/</span> <span class="nw">Made with real sugar</span></span></p></div>
+  <div class="topbar"><p><i data-lucide="truck"></i> Free shipping on every order <span class="topbar-x"><span aria-hidden="true">/</span> <span class="nw">Collagen Boost · Sugar free</span></span></p></div>
 
   <header class="hdr" id="hdr">
     <div class="hdr-in">
-      <a class="logo" href="#top" aria-label="Glo Pop, back to top"><span class="logo-a">GLO</span><span class="logo-b">POP</span></a>
+      <a class="logo" href="#top" aria-label="Glo Pop Lab, back to top"><span class="logo-a">GLO</span><span class="logo-b">POP<span class="logo-lab">Lab</span></span></a>
       <nav class="nav" id="nav" aria-label="Main">
         <a href="#pick">Pick</a>
-        <a href="#six">Glow Grid</a>
-        <a href="#sugar">Real sugar</a>
+        <a href="#grid">Glow Grid</a>
+        <a href="#sugar">Sugar free</a>
         <a href="#ritual">Ritual</a>
         <a href="#shop">Shop</a>
         <a href="#faq">FAQ</a>
@@ -76,21 +86,21 @@
       </div>
       <div class="wrap hero-in">
         <div class="hero-copy">
-          <p class="lvl rv"><span class="lvl-n">Level 01</span><span class="lvl-t" data-bind="kicker">Peptide Lollipops · Strawberry</span></p>
+          <p class="lvl rv"><span class="lvl-n">Level 01</span><span class="lvl-t" data-bind="kicker">Collagen Boost · Strawberry</span></p>
           <h1 class="hero-h" id="hero-h">
             <span class="hl hl-1">The most</span>
             <span class="hl hl-2">delicious</span>
             <span class="hl hl-3">skincare</span>
           </h1>
-          <p class="hero-sub rv" data-bind="heroSub">Peptide-powered strawberry lollipops with collagen, hyaluronic acid and five more actives. One a day. Real sugar. Seriously good.</p>
+          <p class="hero-sub rv" data-bind="heroSub">Sugar-free strawberry beauty lollipops with peptides, hyaluronic acid and five more actives. One a day. Seriously good.</p>
           <div class="hero-ctas rv">
             <a class="btn btn--ink btn--lg" href="#shop" data-bind-href="ctaHref" data-cta><span data-bind="ctaLabel">Build your bag</span> <i data-lucide="arrow-right"></i></a>
-            <a class="btn btn--paper btn--lg" href="#six"><i data-lucide="gamepad-2"></i> Play Glow Grid</a>
+            <a class="btn btn--paper btn--lg" href="#grid"><i data-lucide="gamepad-2"></i> Play Glow Grid</a>
           </div>
           <ul class="chips rv" data-bind-list="proof">
-            <li><i data-lucide="flame"></i>47 cal a pop</li>
-            <li><i data-lucide="candy"></i>Real sugar</li>
-            <li><i data-lucide="sparkles"></i>6 actives</li>
+            <li><i data-lucide="candy"></i>Sugar free</li>
+            <li><i data-lucide="sparkles"></i>7 actives</li>
+            <li><i data-lucide="lollipop"></i>15 g pop</li>
             <li><i data-lucide="truck"></i>Free shipping</li>
           </ul>
         </div>
@@ -100,9 +110,9 @@
             <div class="css-pop" id="heroFallback" aria-hidden="true" hidden><span class="css-pop-ball"></span><span class="css-pop-stick"></span></div>
           </div>
           <p class="sticker sticker--hero" aria-hidden="true"><i data-lucide="hand"></i> Spin it. Tap for a bite.</p>
+          <button class="coin" type="button" data-coin="0" style="--cx:56%;--cy:12%"><span class="sr-only">Collect sparkle 1 of 8</span><i data-lucide="sparkle"></i></button>
         </div>
       </div>
-      <button class="coin" type="button" data-coin="0" style="--cx:56%;--cy:12%"><span class="sr-only">Collect sparkle 1 of 8</span><i data-lucide="sparkle"></i></button>
     </section>
 
     <!-- tape -->
@@ -120,13 +130,13 @@
           <button class="cart cart--pink js-pick is-on" type="button" data-product="strawberry-pop" aria-pressed="true">
             <span class="cart-art" aria-hidden="true"><span class="mini-pop"></span></span>
             <span class="cart-status"><i data-lucide="badge-check"></i> Available now</span>
-            <span class="cart-name">Strawberry Pop</span>
-            <span class="cart-sub">Peptide Lollipops</span>
+            <span class="cart-name">Collagen Boost</span>
+            <span class="cart-sub">Strawberry Beauty Lollipop</span>
           </button>
           <button class="cart cart--green js-pick" type="button" data-product="green-gummies" aria-pressed="false">
             <span class="cart-art" aria-hidden="true"><span class="mini-gum"><i></i><i></i><i></i></span></span>
             <span class="cart-status"><i data-lucide="clock"></i> Coming soon</span>
-            <span class="cart-name">Green Gummies</span>
+            <span class="cart-name">Super Greens Gummies</span>
             <span class="cart-sub">Strawberry-Watermelon</span>
           </button>
           <button class="cart cart--next js-pick" type="button" data-product="next-pop" aria-pressed="false">
@@ -141,13 +151,13 @@
       <button class="coin" type="button" data-coin="1" style="--cx:92%;--cy:10%"><span class="sr-only">Collect sparkle 2 of 8</span><i data-lucide="sparkle"></i></button>
     </section>
 
-    <!-- ═══ LEVEL 3 · THE SIX / GLOW GRID ═══ -->
-    <section class="six lv" data-next id="six" data-level="3" data-name="Glow Grid" aria-labelledby="six-h">
+    <!-- ═══ LEVEL 3 · THE SEVEN / GLOW GRID ═══ -->
+    <section class="glowgrid lv" data-next id="grid" data-level="3" data-name="Glow Grid" aria-labelledby="grid-h">
       <div class="wrap">
         <div class="sec-head sec-head--light">
-          <p class="lvl rv"><span class="lvl-n">Level 03</span><span class="lvl-t">The six actives</span></p>
-          <h2 class="h2 rv" id="six-h">Match them to meet them</h2>
-          <p class="lede rv">Six actives live in every Strawberry Pop. Swap two neighbouring tokens to line up three of a kind. Each new match unlocks that active’s card.</p>
+          <p class="lvl rv"><span class="lvl-n">Level 03</span><span class="lvl-t">The seven actives</span></p>
+          <h2 class="h2 rv" id="grid-h">Match them to meet them</h2>
+          <p class="lede rv">Seven actives live in every Collagen Boost pop. Swap two neighbouring tokens to line up three of a kind. Each new match unlocks that active’s card.</p>
         </div>
 
         <div class="game">
@@ -155,23 +165,23 @@
             <div class="cab-hud">
               <p class="stat"><span class="stat-l">Score</span><b id="gScore">0</b></p>
               <p class="stat"><span class="stat-l">Moves</span><b id="gMoves">0</b></p>
-              <p class="stat stat--wide"><span class="stat-l">Unlocked</span><b><span id="gUnl">0</span>/6</b>
-                <span class="pips" id="gPips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span></p>
+              <p class="stat stat--wide"><span class="stat-l">Unlocked</span><b><span id="gUnl">0</span>/<span id="gTot">7</span></b>
+                <span class="pips" id="gPips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></p>
             </div>
-            <div class="board-wrap">
-              <div class="board" id="board" role="group" aria-label="Glow Grid board, 6 by 6. Arrow keys move, Enter picks a token, then an arrow key swaps it." aria-describedby="gHelp"></div>
+            <div class="board-wrap" style="--n:7">
+              <div class="board" id="board" role="group" aria-label="Glow Grid board, 7 by 7. Arrow keys move, Enter picks a token, then an arrow key swaps it." aria-describedby="gHelp"></div>
               <canvas class="fx" id="fx" aria-hidden="true"></canvas>
               <div class="combo" id="combo" aria-hidden="true"></div>
               <div class="board-cover" id="cover">
                 <p class="cover-k">Glow Grid</p>
-                <p class="cover-t">Line up 3. Unlock all 6.</p>
+                <p class="cover-t">Line up 3. Unlock all 7.</p>
                 <button class="btn btn--sun btn--lg" id="gStart" type="button"><i data-lucide="play"></i> Press start</button>
                 <p class="cover-s">Tap or swipe on touch · arrows + Enter on a keyboard</p>
               </div>
               <div class="board-cover board-cover--win" id="win" hidden>
                 <p class="cover-k">Level clear!</p>
                 <p class="win-stars" id="winStars" aria-hidden="true"></p>
-                <p class="cover-t" id="winTxt">All six unlocked.</p>
+                <p class="cover-t" id="winTxt">All seven unlocked.</p>
                 <p class="cover-s">Game stars are for play only, not a rating.</p>
                 <div class="win-btns">
                   <button class="btn btn--sun" id="gAgain" type="button"><i data-lucide="rotate-ccw"></i> Play again</button>
@@ -182,45 +192,57 @@
             <div class="cab-ctrl">
               <button class="btn btn--line-l btn--sm" id="gHint" type="button"><i data-lucide="lightbulb"></i> Hint</button>
               <button class="btn btn--line-l btn--sm" id="gNew" type="button"><i data-lucide="shuffle"></i> New board</button>
-              <button class="btn btn--line-l btn--sm" id="gAll" type="button"><i data-lucide="eye"></i> Skip: show all six</button>
+              <button class="btn btn--line-l btn--sm" id="gAll" type="button"><i data-lucide="eye"></i> Skip: show all seven</button>
             </div>
-            <p class="sr-only" id="gHelp">Use arrow keys to move between tokens. Press Enter or Space to pick a token, then an arrow key to swap it with its neighbour. Escape cancels. You can also skip the game and read all six cards.</p>
+            <p class="sr-only" id="gHelp">Use arrow keys to move between tokens. Press Enter or Space to pick a token, then an arrow key to swap it with its neighbour. Escape cancels. You can also skip the game and read all seven cards.</p>
             <p class="sr-only" id="gLive" aria-live="polite"></p>
           </div>
 
-          <ol class="book" id="book" aria-label="The six actives"></ol>
+          <ol class="book" id="book" aria-label="The seven actives"></ol>
         </div>
         <p class="fine fine--light rv">Amounts per pop: <span class="ph">mg TBD</span>. Cards describe what each nutrient does in the body, not promises about the pop.</p>
       </div>
       <button class="coin coin--light" type="button" data-coin="2" style="--cx:4%;--cy:6%"><span class="sr-only">Collect sparkle 3 of 8</span><i data-lucide="sparkle"></i></button>
     </section>
 
-    <!-- ═══ LEVEL 4 · REAL SUGAR ═══ -->
-    <section class="sugar lv" data-next id="sugar" data-level="4" data-name="Real sugar" aria-labelledby="sugar-h">
+    <!-- ═══ LEVEL 4 · SUGAR FREE: pop a bubble to find that claim on the real pack ═══ -->
+    <section class="sugar lv" data-next id="sugar" data-level="4" data-name="Sugar free" aria-labelledby="sugar-h">
       <div class="wrap sugar-in">
         <div class="sugar-copy">
-          <p class="lvl rv"><span class="lvl-n">Level 04</span><span class="lvl-t">Bubble pop</span></p>
-          <h2 class="h2 rv" id="sugar-h">Real sugar. That’s the whole trick.</h2>
-          <p class="lede rv">No swaps, no stand-ins. Pop every bubble to see what’s not in a Glo Pop.</p>
+          <p class="lvl rv"><span class="lvl-n">Level 04</span><span class="lvl-t">On the pack</span></p>
+          <h2 class="h2 rv" id="sugar-h">Sugar free. Still strawberry.</h2>
+          <p class="lede rv">It says so right on the pack. Pop each bubble to find where it’s printed.</p>
           <div class="cal rv">
-            <p class="cal-n">47</p>
-            <p class="cal-t">calories a pop<br><span>gluten-free · one a day</span></p>
+            <p class="cal-n">15<small>g</small></p>
+            <p class="cal-t">each pop<br><span>sugar free · strawberry flavor</span></p>
           </div>
-          <p class="fine rv" data-bind="sugarNote"></p>
+          <p class="fine rv" data-bind="sugarNote">Sweetener: <span class="ph">TBD</span> · other ingredients &amp; allergens: <span class="ph">details</span></p>
         </div>
-        <div class="bubbles-box">
-          <ul class="bubbles" id="bubbles" aria-label="Things that are not in a Glo Pop">
-            <li><button type="button" class="bub" style="--b:#FF7AB8;--bx:4%;--by:6%;--bs:1.05">Artificial sweeteners</button></li>
-            <li><button type="button" class="bub" style="--b:#7ED957;--bx:52%;--by:0%;--bs:.95">Sugar alcohols</button></li>
-            <li><button type="button" class="bub" style="--b:#5BD1F7;--bx:30%;--by:24%;--bs:.9">Stevia</button></li>
-            <li><button type="button" class="bub" style="--b:#B79BFF;--bx:66%;--by:28%;--bs:.92">Allulose</button></li>
-            <li><button type="button" class="bub" style="--b:#FFA14A;--bx:0%;--by:44%;--bs:.92">OnoSweet</button></li>
-            <li><button type="button" class="bub" style="--b:#FF7AB8;--bx:40%;--by:50%;--bs:.95">Erythritol</button></li>
-            <li><button type="button" class="bub" style="--b:#5BD1F7;--bx:72%;--by:58%;--bs:.86">Xylitol</button></li>
-            <li><button type="button" class="bub" style="--b:#7ED957;--bx:8%;--by:72%;--bs:.98">Cornstarch</button></li>
-            <li><button type="button" class="bub" style="--b:#B79BFF;--bx:42%;--by:78%;--bs:1">Modified potato starch</button></li>
+        <div class="pack-play">
+          <div class="pack-card">
+            <a class="pack-zoom" href="../_shared/assets/product/pack-front.jpg" data-zoom data-w="638" data-h="1036" data-title="Collagen Boost pack, front" aria-haspopup="dialog">
+              <img src="../_shared/assets/product/pack-front.jpg" width="638" height="1036" alt="Front of the Collagen Boost pack: peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc; sugar free; strawberry flavor; net wt. 15 g" loading="lazy" decoding="async">
+              <span class="spots" aria-hidden="true">
+                <i class="spot" data-spot="sugar" style="--l:19.9%;--t:85.9%;--w:12.6%;--h:5.8%"></i>
+                <i class="spot" data-spot="flavor" style="--l:1.6%;--t:86.9%;--w:18.5%;--h:10.6%"></i>
+                <i class="spot" data-spot="weight" style="--l:32.3%;--t:89.4%;--w:35.7%;--h:5.4%"></i>
+                <i class="spot" data-spot="beauty" style="--l:69.6%;--t:20%;--w:22.6%;--h:12.2%"></i>
+                <i class="spot" data-spot="boost" style="--l:56.4%;--t:56.4%;--w:35.4%;--h:13.7%"></i>
+                <i class="spot" data-spot="actives" style="--l:17.2%;--t:53.3%;--w:19.4%;--h:30.3%"></i>
+                <i class="spot" data-spot="actives" style="--l:56.7%;--t:74.5%;--w:36%;--h:14.1%"></i>
+              </span>
+              <span class="zoom-pill"><i data-lucide="zoom-in"></i> Zoom<span class="sr-only"> in on the pack front</span></span>
+            </a>
+          </div>
+          <ul class="bubbles" id="bubbles" aria-label="Claims printed on the pack">
+            <li><button type="button" class="bub" data-spot="sugar" style="--b:#FF7AB8;--bx:2%;--by:2%">Sugar free</button></li>
+            <li><button type="button" class="bub" data-spot="flavor" style="--b:#FFA14A;--bx:6%;--by:36%">Strawberry flavor</button></li>
+            <li><button type="button" class="bub" data-spot="weight" style="--b:#5BD1F7;--bx:1%;--by:70%">15 g pop</button></li>
+            <li><button type="button" class="bub" data-spot="beauty" style="--b:#B79BFF;--bx:78%;--by:0%">Beauty Lollipop</button></li>
+            <li><button type="button" class="bub" data-spot="boost" style="--b:#7ED957;--bx:75%;--by:34%">Collagen Boost</button></li>
+            <li><button type="button" class="bub" data-spot="actives" style="--b:#FF9EC9;--bx:79%;--by:68%">7 actives</button></li>
           </ul>
-          <p class="bub-score" id="bubScore" aria-live="polite"><b>0</b>/9 popped</p>
+          <p class="bub-score" id="bubScore" aria-live="polite"><b>0</b>/<span id="bubT">6</span> claims found on the pack</p>
         </div>
       </div>
       <button class="coin" type="button" data-coin="3" style="--cx:95%;--cy:88%"><span class="sr-only">Collect sparkle 4 of 8</span><i data-lucide="sparkle"></i></button>
@@ -235,7 +257,7 @@
         </div>
         <ol class="steps">
           <li class="step rv"><span class="step-ico"><i data-lucide="gift"></i></span><b>Unwrap</b><span>One pop, any time of day that suits you.</span></li>
-          <li class="step rv"><span class="step-ico"><i data-lucide="lollipop"></i></span><b>Savour</b><span>Strawberry, real sugar, 47 calories. No water, no pill.</span></li>
+          <li class="step rv"><span class="step-ico"><i data-lucide="lollipop"></i></span><b>Savour</b><span>Strawberry flavor, sugar free. No water, no pill.</span></li>
           <li class="step rv"><span class="step-ico"><i data-lucide="repeat"></i></span><b>Repeat tomorrow</b><span>Consistency is the whole game.</span></li>
         </ol>
         <div class="streak rv" id="streak">
@@ -260,12 +282,12 @@
         </div>
         <div class="vs-wrap rv">
           <table class="vs">
-            <caption class="sr-only">Glo Pop compared with a pill and powder routine and typical beauty gummies</caption>
+            <caption class="sr-only">Glo Pop Collagen Boost lollipops compared with a pill and powder routine and typical beauty gummies</caption>
             <thead><tr><th scope="col"><span class="sr-only">Feature</span></th><th scope="col" class="vs-us"><span class="vs-badge">Glo Pop</span></th><th scope="col">Pills &amp; powders</th><th scope="col">Typical gummies</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Tastes like real candy</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td><td class="vs-t">Varies</td></tr>
-              <tr><th scope="row">Made with real sugar</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">n/a</td><td class="vs-t">Varies</td></tr>
-              <tr><th scope="row">Six actives in one treat</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">Often several products</td><td class="vs-t">Varies</td></tr>
+              <tr><th scope="row">Tastes like candy</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td><td class="vs-t">Varies</td></tr>
+              <tr><th scope="row">Sugar free</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">Varies</td><td class="vs-t">Varies</td></tr>
+              <tr><th scope="row">Seven actives in one treat</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">Often several products</td><td class="vs-t">Varies</td></tr>
               <tr><th scope="row">One a day</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">Varies</td><td class="vs-t">Often 2+</td></tr>
               <tr><th scope="row">No water, no mixing</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td><i data-lucide="x"></i><span class="sr-only">No</span></td><td><i data-lucide="check"></i><span class="sr-only">Yes</span></td></tr>
               <tr><th scope="row">Gluten-free</th><td class="vs-us"><i data-lucide="check"></i><span class="sr-only">Yes</span></td><td class="vs-t">Varies</td><td class="vs-t">Varies</td></tr>
@@ -282,9 +304,15 @@
         <div class="sec-head">
           <p class="lvl rv"><span class="lvl-n">Level 07</span><span class="lvl-t">Power-ups</span></p>
           <h2 class="h2 rv" id="shop-h">Stock up, glow on</h2>
-          <p class="lede rv">Strawberry Peptide Lollipops · 10 pops per bag · free shipping on every order.</p>
+          <p class="lede rv">Collagen Boost strawberry beauty lollipops · 10 pops per bag · free shipping on every order.</p>
         </div>
         <p class="shop-lock" id="shopLock" hidden></p>
+        <div class="shop-grid">
+        <figure class="cartridge rv">
+          <span class="cartridge-grip" aria-hidden="true"></span>
+          <span class="cartridge-win"><img src="../_shared/assets/product/pack-mockup.jpg" width="738" height="851" alt="Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops" loading="lazy" decoding="async"></span>
+          <figcaption class="cartridge-label"><b>Collagen Boost</b><span>Strawberry Beauty Lollipop&nbsp;· 15&nbsp;g&nbsp;pop&nbsp;· sugar free</span></figcaption>
+        </figure>
         <form class="shop-form" id="shopForm">
           <fieldset class="tiers">
             <legend class="sr-only">How many bags?</legend>
@@ -304,69 +332,107 @@
           </div>
           <p class="fine">Prototype: prices, subscription discount and delivery interval are placeholders. There’s no checkout yet.</p>
         </form>
+        </div>
       </div>
       <button class="coin" type="button" data-coin="6" style="--cx:90%;--cy:3%"><span class="sr-only">Collect sparkle 7 of 8</span><i data-lucide="sparkle"></i></button>
     </section>
 
-    <!-- ═══ BONUS LEVEL · GREEN GUMMIES ═══ -->
-    <section class="gum lv" data-next id="waitlist" data-level="B" data-name="Green Gummies" aria-labelledby="gum-h">
-      <div class="wrap gum-in">
-        <div class="gum-copy">
-          <p class="lvl rv"><span class="lvl-n">Bonus level</span><span class="lvl-t">Coming soon</span></p>
-          <h2 class="h2 rv" id="gum-h">Green Gummies are loading…</h2>
-          <p class="lede rv">Strawberry-Watermelon gummies with five B vitamins and an Organic Super Greens Blend of 15 ingredients. Get on the list to hear first.</p>
-          <div class="load rv" aria-hidden="true"><span class="load-bar"></span><span class="load-t">Launch: <span class="ph">date TBD</span></span></div>
-          <ul class="gfacts rv">
-            <li><b>2</b><span>gummies per serving</span></li>
-            <li><b>30</b><span>servings (60 gummies)</span></li>
-            <li><b>20</b><span>calories per serving</span></li>
-            <li><b>3 g</b><span>sugar per serving</span></li>
-          </ul>
-          <ul class="bs rv" aria-label="Five B vitamins">
-            <li>Riboflavin</li><li>Niacin</li><li>Vitamin B6</li><li>Folate</li><li>Pantothenic acid</li>
-          </ul>
-          <form class="wl" id="wlForm" novalidate>
-            <label class="sr-only" for="wlEmail">Email address</label>
-            <input id="wlEmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
-            <button class="btn btn--ink" type="submit"><i data-lucide="bell"></i> Join the waitlist</button>
-          </form>
-          <p class="wl-msg" id="wlMsg" aria-live="polite"></p>
-        </div>
-        <div class="gum-side">
-          <div class="gum-stage">
-            <div class="stage-shadow stage-shadow--gum" aria-hidden="true"></div>
-            <div class="candy3d candy3d--gum" id="gumCandy" role="img" aria-label="3D Green Gummies, strawberry-watermelon">
-              <div class="css-gum" id="gumFallback" aria-hidden="true" hidden><i></i><i></i><i></i></div>
+    <!-- ═══ BONUS LEVEL · SUPER GREENS GUMMIES ═══ -->
+    <section class="gum lv" data-next id="waitlist" data-level="B" data-name="Super Greens" aria-labelledby="gum-h">
+      <div class="wrap">
+        <div class="gum-in">
+          <div class="gum-copy">
+            <p class="lvl rv"><span class="lvl-n">Bonus level</span><span class="lvl-t">Coming soon</span></p>
+            <h2 class="h2 rv" id="gum-h">Super Greens Gummies are loading…</h2>
+            <p class="lede rv">Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry. Get on the list to hear first.</p>
+            <div class="load rv" aria-hidden="true"><span class="load-bar"></span><span class="load-t">Launch: <span class="ph">date TBD</span></span></div>
+            <ul class="gfacts rv">
+              <li><b>2</b><span>gummies per serving</span></li>
+              <li><b>30</b><span>servings (60 gummies)</span></li>
+              <li><b>20</b><span>calories per serving</span></li>
+              <li><b>3 g</b><span>sugars per serving</span></li>
+            </ul>
+            <ul class="bs rv" aria-label="From the front of the label">
+              <li><i data-lucide="sprout"></i>Healthy gut*</li>
+              <li><i data-lucide="shield-plus"></i>Immune support*</li>
+              <li><i data-lucide="badge-check"></i>No astragalus &amp; adaptogens</li>
+              <li><i data-lucide="vegan"></i>Vegan friendly</li>
+              <li><i data-lucide="wheat-off"></i>Gluten free</li>
+              <li><i data-lucide="flask-conical"></i>Non GMO</li>
+            </ul>
+            <form class="wl" id="wlForm" novalidate>
+              <label class="sr-only" for="wlEmail">Email address</label>
+              <input id="wlEmail" type="email" name="email" placeholder="you@email.com" autocomplete="email" required>
+              <button class="btn btn--ink" type="submit"><i data-lucide="bell"></i> Join the waitlist</button>
+            </form>
+            <p class="wl-msg" id="wlMsg" aria-live="polite"></p>
+          </div>
+          <div class="gum-side">
+            <div class="gum-stage">
+              <div class="stage-shadow stage-shadow--gum" aria-hidden="true"></div>
+              <div class="candy3d candy3d--gum" id="gumCandy" role="img" aria-label="3D Super Greens Gummies, strawberry-watermelon">
+                <div class="css-gum" id="gumFallback" aria-hidden="true" hidden><i></i><i></i><i></i></div>
+              </div>
             </div>
           </div>
+        </div>
+
+        <!-- the full wrap label, framed like the backlit marquee on top of an arcade cabinet -->
+        <figure class="marquee rv">
+          <figcaption class="marquee-top"><span class="marquee-k">Bonus stage</span> <span>The full label</span></figcaption>
+          <a class="marquee-zoom" href="../_shared/assets/product/super-greens-label.jpg" data-zoom data-w="1600" data-h="613" data-title="Super Greens Gummies label" aria-haspopup="dialog">
+            <img src="../_shared/assets/product/super-greens-label.jpg" width="1600" height="613" alt="The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings" loading="lazy" decoding="async">
+            <span class="zoom-pill"><i data-lucide="zoom-in"></i> View full size</span>
+          </a>
+        </figure>
+
+        <div class="gum-facts">
           <div class="sf" id="facts">
             <h3 class="sf-h">Supplement Facts</h3>
             <p class="sf-serv">Serving Size: 2 Gummies<br>Servings Per Container: 30</p>
             <table class="sf-table">
-              <caption class="sr-only">Supplement Facts: Green Gummies, Strawberry-Watermelon. Serving Size: 2 Gummies. Servings Per Container: 30.</caption>
-              <thead><tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">%&nbsp;Daily Value</th></tr></thead>
+              <caption class="sr-only">Supplement Facts: Super Greens Gummies, strawberry-watermelon. Serving Size: 2 Gummies. Servings Per Container: 30.</caption>
+              <thead><tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">%DV</th></tr></thead>
               <tbody>
                 <tr><th scope="row">Calories</th><td>20</td><td></td></tr>
                 <tr><th scope="row">Total Carbohydrate</th><td>5 g</td><td>2%</td></tr>
-                <tr class="sf-l1"><th scope="row">Total Sugars</th><td>3 g</td><td>2%</td></tr>
+                <tr class="sf-l1"><th scope="row">Total Sugars</th><td>3 g</td><td>*</td></tr>
                 <tr class="sf-l2"><th scope="row">Added Sugars</th><td>3 g</td><td>6%</td></tr>
-                <tr class="sf-rule"><th scope="row">Riboflavin</th><td>0.8 mg</td><td>62%</td></tr>
-                <tr><th scope="row">Niacin</th><td>1.4 mg <abbr title="niacin equivalents">NE</abbr></td><td>9%</td></tr>
-                <tr><th scope="row">Vitamin B6</th><td>0.9 mg</td><td>53%</td></tr>
-                <tr><th scope="row">Folate</th><td>50 mcg <abbr title="dietary folate equivalents">DFE</abbr></td><td>53%</td></tr>
-                <tr><th scope="row">Pantothenic Acid</th><td>0.9 mg</td><td>18%</td></tr>
-                <tr><th scope="row">Sodium</th><td>15 mg</td><td>&lt;1%</td></tr>
-                <tr class="sf-rule"><th scope="row">Organic Super Greens Blend</th><td>170 mg</td><td>&lt;1%*</td></tr>
-                <tr class="sf-blend"><td colspan="3"><span class="sr-only">Organic Super Greens Blend contains: </span>Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry</td></tr>
+                <tr class="sf-rule"><th scope="row">Riboflavin <span class="sf-src">(from Organic Sugar Cherries Blend)</span></th><td>0.8 mg</td><td>62%</td></tr>
+                <tr><th scope="row">Niacin <span class="sf-src">(from Organic Beetroot)</span></th><td>1.4 mg NE</td><td>9%</td></tr>
+                <tr><th scope="row">Vitamin B6 <span class="sf-src">(from Organic Sugar Cherries Blend)</span></th><td>0.6 mg</td><td>35%</td></tr>
+                <tr><th scope="row">Folate <span class="sf-src">(from Organic Sugar Cherries Blend)</span></th><td>80 mcg DFE <span class="sf-src">(50 mcg Folic Acid)</span></td><td>20%</td></tr>
+                <tr><th scope="row">Pantothenic Acid <span class="sf-src">(from Organic Sugar Cherries Blend)</span></th><td>0.9 mg</td><td>18%</td></tr>
+                <tr><th scope="row">Iron <span class="sf-src">(from Organic Sugar Cherries Blend)</span></th><td>0.7 mg</td><td>4%</td></tr>
+                <tr><th scope="row">Iodine <span class="sf-src">(from Organic Kelp)</span></th><td>17 mcg</td><td>11%</td></tr>
+                <tr><th scope="row">Sodium <span class="sf-src">(from Electrolyte Blend)</span></th><td>15 mg</td><td>&lt;1%</td></tr>
+                <tr><th scope="row">Potassium <span class="sf-src">(from Electrolyte Blend)</span></th><td>17 mg</td><td>&lt;1%</td></tr>
               </tbody>
             </table>
-            <p class="sf-foot">Percent Daily Values are based on a 2,000 calorie diet.<br>*Daily Value not established.</p>
+            <p class="sf-blend">Organic Kale Leaf (Brassica oleracea var. acephala DC); Organic Broccoli Stalk and Flower (Brassica oleracea L. var. italica Planch); Organic Beet Root (Beta vulgaris L.); Organic Spinach (Spinacia oleracea L.); Wild Blueberry (Vaccinium angustifolium); Organic Elderberry (Sambucus nigra); Lemon (Citrus limon L.); Organic Carrot Root (Daucus carota L. var. sativus); Maltitol; Organic Wild Blueberry (Vaccinium angustifolium); Organic Acai Berry (Euterpe oleracea Mart.); Organic Pomegranate Fruit (Punica granatum L.); Organic Goji Juice (Lycium chinense); Organic Spirulina (Spirulina); Organic Noni Fruit (Morinda citrifolia); Organic Acai Berry (Euterpe oleracea Mart.); Pea (Pisum sativum); L-ascorbyl palmitate and Natural Flavors.</p>
+            <p class="sf-foot">** Percent Daily Values are based on a 2,000 calorie diet<br>† Daily Value not established</p>
+          </div>
+          <div class="gum-label">
+            <h3 class="gl-h">From the label</h3>
+            <div class="gl-blk">
+              <h4>Suggested use</h4>
+              <p class="gl-big">Take two (2) gummies daily.</p>
+              <p>Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication, especially blood thinners or immunosuppressants. Discontinue use and call a doctor if any adverse reactions occur. Not intended to diagnose, treat, cure, or prevent any disease.</p>
+            </div>
+            <div class="gl-blk">
+              <h4>Storage</h4>
+              <p>Store in a cool, dry place.</p>
+            </div>
+            <div class="gl-blk">
+              <h4>Other ingredients</h4>
+              <p>Tapioca Syrup, Sugar, Pectin, Citric Acid, Orange Juice Concentrate, Sodium Citrate, Natural Flavor (Strawberry, Watermelon), Palm Oil, Carnauba Wax, Color Added (Purple Carrot Juice Concentrate), Stevia Leaf.</p>
+            </div>
             <dl class="sf-tbd">
-              <div><dt>Other ingredients</dt><dd><span class="ph">list</span></dd></div>
-              <div><dt>Directions</dt><dd><span class="ph">details</span></dd></div>
+              <div><dt>Pack</dt><dd>60 gummies · Dietary Supplement</dd></div>
               <div><dt>Allergens</dt><dd><span class="ph">details</span></dd></div>
               <div><dt>Price</dt><dd><span class="ph">$XX</span></dd></div>
             </dl>
+            <p class="prop65">CALIFORNIA WARNING: Consistent with the State of California’s Proposition 65, this product may expose you to chemicals including Lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm.</p>
           </div>
         </div>
       </div>
@@ -381,18 +447,18 @@
           <h2 class="h2 rv" id="faq-h">Questions, answered</h2>
         </div>
         <div class="acc" id="acc">
-          <h3><button type="button" aria-expanded="false" aria-controls="q1" id="q1b"><span>What are Glo Pop peptide lollipops?</span><i data-lucide="plus"></i></button></h3>
-          <div class="acc-p" id="q1" role="region" aria-labelledby="q1b" hidden><p>Strawberry lollipops made with real sugar and six actives: collagen peptides, hyaluronic acid, vitamin C, vitamin B12, vitamin B6 and zinc. 47 calories each, 10 per bag.</p></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="q1" id="q1b"><span>What is Glo Pop Collagen Boost?</span><i data-lucide="plus"></i></button></h3>
+          <div class="acc-p" id="q1" role="region" aria-labelledby="q1b" hidden><p>A sugar-free strawberry beauty lollipop with seven actives: peptides, vitamin C, vitamin B6, vitamin B12, vitamin B8 (biotin), hyaluronic acid and zinc. Each pop is 15 g, and there are 10 in a bag.</p></div>
           <h3><button type="button" aria-expanded="false" aria-controls="q2" id="q2b"><span>How many should I have per day?</span><i data-lucide="plus"></i></button></h3>
           <div class="acc-p" id="q2" role="region" aria-labelledby="q2b" hidden><p>One a day. Consistency is key: most notice a visible difference in radiance within 2–4 weeks of daily use.</p></div>
-          <h3><button type="button" aria-expanded="false" aria-controls="q3" id="q3b"><span>Are they made with real sugar?</span><i data-lucide="plus"></i></button></h3>
-          <div class="acc-p" id="q3" role="region" aria-labelledby="q3b" hidden><p>Yes. Real sugar: no artificial sweeteners, no sugar alcohols, no stevia, allulose or OnoSweet. Only 47 calories per lollipop.</p></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="q3" id="q3b"><span>Are they sugar free?</span><i data-lucide="plus"></i></button></h3>
+          <div class="acc-p" id="q3" role="region" aria-labelledby="q3b" hidden><p>Yes. “Sugar free” is printed right on the pack. What sweetens it: <span class="ph">TBD</span>. Other ingredients and allergens: <span class="ph">details</span>.</p></div>
           <h3><button type="button" aria-expanded="false" aria-controls="q4" id="q4b"><span>What do they taste like?</span><i data-lucide="plus"></i></button></h3>
           <div class="acc-p" id="q4" role="region" aria-labelledby="q4b" hidden><p>Like a really, really good strawberry lollipop. That’s why we call it the most delicious skincare.</p></div>
           <h3><button type="button" aria-expanded="false" aria-controls="q5" id="q5b"><span>Are they gluten-free?</span><i data-lucide="plus"></i></button></h3>
           <div class="acc-p" id="q5" role="region" aria-labelledby="q5b" hidden><p>Yes, Glo Pops are gluten-free. If you have specific dietary concerns or allergies, check the full ingredient list on the pack. Allergen details: <span class="ph">details</span>.</p></div>
-          <h3><button type="button" aria-expanded="false" aria-controls="q6" id="q6b"><span>When are Green Gummies coming?</span><i data-lucide="plus"></i></button></h3>
-          <div class="acc-p" id="q6" role="region" aria-labelledby="q6b" hidden><p>Soon. Launch date: <span class="ph">TBD</span>. <a href="#waitlist">Join the waitlist</a> and you’ll hear first.</p></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="q6" id="q6b"><span>When are Super Greens Gummies coming?</span><i data-lucide="plus"></i></button></h3>
+          <div class="acc-p" id="q6" role="region" aria-labelledby="q6b" hidden><p>Soon. Launch date: <span class="ph">TBD</span>. Heads-up: unlike the pops, the gummies are not sugar free (3 g total sugars per 2-gummy serving). <a href="#waitlist">Join the waitlist</a> and you’ll hear first.</p></div>
         </div>
       </div>
     </section>
@@ -402,10 +468,10 @@
       <div class="wrap final-in">
         <p class="lvl rv"><span class="lvl-n">Final level</span><span class="lvl-t">You made it</span></p>
         <h2 class="final-h rv" id="final-h">Game on.<br>Glow on.</h2>
-        <p class="lede rv">One pop a day. Real sugar. Six actives. Free shipping on every order.</p>
+        <p class="lede rv">One pop a day. Sugar free. Seven actives. Free shipping on every order.</p>
         <div class="hero-ctas rv">
           <a class="btn btn--ink btn--lg" href="#shop" data-bind-href="ctaHref" data-cta><span data-bind="ctaLabel">Build your bag</span> <i data-lucide="arrow-right"></i></a>
-          <a class="btn btn--paper btn--lg" href="#six"><i data-lucide="rotate-ccw"></i> Replay Glow Grid</a>
+          <a class="btn btn--paper btn--lg" href="#grid"><i data-lucide="rotate-ccw"></i> Replay Glow Grid</a>
         </div>
         <div class="final-pops" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       </div>
@@ -416,12 +482,12 @@
     <div class="wrap">
       <div class="ftr-top">
         <div class="ftr-brand">
-          <a class="logo logo--ftr" href="#top" aria-label="Glo Pop, back to top"><span class="logo-a">GLO</span><span class="logo-b">POP</span></a>
+          <a class="logo logo--ftr" href="#top" aria-label="Glo Pop Lab, back to top"><span class="logo-a">GLO</span><span class="logo-b">POP<span class="logo-lab">Lab</span></span></a>
           <p>The most delicious skincare.</p>
         </div>
         <nav class="ftr-cols" aria-label="Footer">
           <div><h2>Shop</h2><a href="#shop">Glo Pops</a><a href="#shop">Bundles</a><a href="#shop">Subscribe &amp; Save</a><a href="#shop">Gift Cards</a></div>
-          <div><h2>About</h2><a href="#top">Our Story</a><a href="#six">Ingredients</a><a href="#top">Blog</a></div>
+          <div><h2>About</h2><a href="#top">Our Story</a><a href="#grid">Ingredients</a><a href="#top">Blog</a></div>
           <div><h2>Help</h2><a href="#faq">FAQ</a><a href="#top">Contact</a><a href="#top">Shipping</a><a href="#top">Returns</a><a href="#top">Privacy</a></div>
         </nav>
       </div>
@@ -435,6 +501,19 @@
 
   <a class="proto" href="../../index.html"><b>Proposal 08</b> · Pop Arcade · All proposals <i data-lucide="arrow-right"></i></a>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- large view for the pack front and the gummies label (links fall back to the plain image without JS) -->
+  <dialog class="lb" id="lb" aria-labelledby="lbTitle">
+    <div class="lb-bar">
+      <p class="lb-title" id="lbTitle">Full size</p>
+      <button class="lb-btn" id="lbFit" type="button" aria-pressed="false"><i data-lucide="zoom-in"></i><span>Actual size</span></button>
+      <button class="lb-btn lb-x" id="lbClose" type="button"><i data-lucide="x"></i><span class="sr-only">Close</span></button>
+    </div>
+    <div class="lb-pane" id="lbPane" tabindex="0" role="group" aria-label="Image viewer: scroll or drag to pan">
+      <img id="lbImg" alt="" width="1600" height="613" decoding="async">
+    </div>
+    <p class="lb-hint"><i data-lucide="move-horizontal"></i> Drag or scroll to pan · pinch to zoom · Esc to close</p>
+  </dialog>
 
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script src="../_shared/candy3d.js"></script>

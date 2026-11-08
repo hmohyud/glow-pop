@@ -152,7 +152,7 @@ ul, ol { padding: 0; }
 .js:not(.no-motion) .swipe { --swipe: 0%; transition: background-size 1.4s var(--ease-out) .5s; }
 .js:not(.no-motion) .is-in .swipe, .js:not(.no-motion) .swipe.is-in { --swipe: 100%; background-size: 100% .07em; }
 
-/* running head: “No. 03 — The formula ———— Six actives” */
+/* running head: “No. 03 — The formula ———— Seven actives” */
 .runhead {
   display: flex; align-items: center; gap: 14px;
   margin-bottom: clamp(44px, 6.5vw, 112px); color: var(--ink-2);
@@ -216,7 +216,9 @@ ul, ol { padding: 0; }
 .hdr__issue, .hdr__logo { grid-area: 1 / 1; transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out); }
 .hdr__issue { font: 500 var(--fs-mono)/1 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2); }
 .hdr__issue i { font-style: normal; color: var(--accent-ink); padding: 0 .3em; }
-.hdr__logo { font: 400 29px/1 var(--f-display); letter-spacing: -.01em; color: var(--ink); opacity: 0; transform: translateY(10px); }
+.hdr__logo { justify-self: start; color: var(--ink); opacity: 0; transform: translateY(10px); }
+.hdr__logo .logo__word { font-size: 27px; }
+.hdr__logo .logo__lab { font-size: 7.5px; }
 .is-scrolled .hdr__issue { opacity: 0; transform: translateY(-10px); }
 .is-scrolled .hdr__logo { opacity: 1; transform: none; }
 
@@ -260,6 +262,17 @@ ul, ol { padding: 0; }
 .hdr__menu-i::after { top: 6.5px; }
 .hdr__menu[aria-expanded="true"] .hdr__menu-i::before { top: 3.25px; transform: rotate(45deg); }
 .hdr__menu[aria-expanded="true"] .hdr__menu-i::after { top: 3.25px; transform: rotate(-45deg); }
+
+/* the logo lockup, after the pack: the wordmark with a small ruled “Lab” centred under it.
+   Logo only (header + colophon): running copy, titles and meta stay “Glo Pop”. */
+.logo { display: inline-grid; justify-items: center; align-content: center; row-gap: 4px; }
+.logo__word { font-family: var(--f-display); font-weight: 400; line-height: .9; letter-spacing: -.01em; white-space: nowrap; }
+.logo__lab {
+  display: flex; align-items: center; gap: .8em;
+  font: 500 8px/1 var(--f-mono); letter-spacing: .34em; text-transform: uppercase; color: var(--accent-ink);
+}
+.logo__lab::before, .logo__lab::after { content: ''; width: 2.4em; height: 1px; background: currentColor; }
+.logo__lab::before { margin-right: .34em; }   /* matches the tracking after the last letter, so “Lab” sits dead centre */
 
 /* below 1280 the chapter folio would butt against the nav and read like a sixth link */
 @media (max-width: 1279px) { .hdr__folio { display: none; } }
@@ -448,7 +461,7 @@ ul, ol { padding: 0; }
   .cover__dateline { gap: 4px 14px; font-size: 9.5px; }
   .cover__ship { display: none; }
   .cover__proofs { margin-top: calc(var(--m) * .3); min-height: calc(var(--m) * 1.1); border-top: 0; }
-  .cover__proofs li { grid-template-columns: 52px minmax(0, 1fr); gap: 8px; padding: 7px 0; }
+  .cover__proofs li { grid-template-columns: 66px minmax(0, 1fr); gap: 8px; padding: 7px 0; }   /* room for “Sugar” */
   .cover__proofs li:last-child { border-bottom: 0; }
   .cover__proofs b { font-size: 30px; }
   .cover__proofs li > span { font-size: 9px; letter-spacing: .1em; }
@@ -623,16 +636,28 @@ ul, ol { padding: 0; }
 .label__t .is-cal th, .label__t .is-cal td { padding: 9px 0 7px; border-bottom: 4px solid var(--ink); font: 400 28px/1 var(--f-display); }
 .label__t .is-in th { padding-left: 14px; }
 .label__t .is-in2 th { padding-left: 28px; }
-.label__t .is-blend > * { border-top: 4px solid var(--ink); border-bottom: 0; }
-.label__t .is-mix td {
-  padding: 0 0 12px 14px; border-bottom: 8px solid var(--ink); text-align: left; white-space: normal;
-  font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
-}
-.label__mix-k { font-style: italic; }
+/* where a nutrient comes from, as printed: a quieter second line under its name (or under an amount) */
+.label__src { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--ink-2); white-space: normal; }
+.label__t td .label__src { white-space: nowrap; }   /* “(50 mcg Folic Acid)” holds one line under its amount */
+/* the blend, listed under the table as printed (never counted on the page) */
+.label__blend { padding: 10px 0 12px; border-bottom: 8px solid var(--ink); font-size: 12px; line-height: 1.55; color: var(--ink-2); }
 .label__foot { margin-top: 10px; font-size: 12.5px; line-height: 1.55; color: var(--ink-2); }
-.label__more { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; line-height: 1.8; color: var(--ink-2); }
+.label__other { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 12.5px; line-height: 1.55; color: var(--ink-2); }
+.label__other b { font-weight: 600; color: var(--ink); }
+/* the rest of the wrap: suggested use and storage as a spec list, then the California warning as small print */
+.label__notes { max-width: 34rem; margin-top: 18px; border-top: 1px solid var(--ink); }
+.label__notes > div { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 4px 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.label__notes dt { padding-top: 3px; font: 500 9.5px/1.4 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2); }
+.label__notes dd { font-size: 14.5px; line-height: 1.5; color: var(--ink); }
+.label__notes dd p + p { margin-top: 6px; font-size: 12.5px; color: var(--ink-2); }
+.label__warn { max-width: 34rem; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--rule); font-size: 11.5px; line-height: 1.5; color: var(--ink-2); }
+.label__more {
+  max-width: 34rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 18px;
+  margin-top: 6px; font-size: 13px; line-height: 1.8; color: var(--ink-2);
+}
+.label__zoom .ic { width: 16px; height: 16px; margin-right: 8px; color: var(--accent-ink); }
 
-/* ---------- 7.3 No. 03 — The formula, in six parts (tabs) ---------- */
+/* ---------- 7.3 No. 03 — The formula, in seven parts (tabs) ---------- */
 .formula__head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; margin-bottom: clamp(48px, 6vw, 104px); }
 .formula__head .kicker { grid-column: 1 / -1; }
 .formula__head .h2 { grid-column: 1 / span 8; }
@@ -671,6 +696,9 @@ ul, ol { padding: 0; }
 .spread__k i { font-style: normal; color: var(--ink-3); }
 .spread__t { margin-top: clamp(28px, 4vw, 72px); font: 400 clamp(54px, 6.6vw, 124px)/.86 var(--f-display); letter-spacing: -.015em; }
 .spread__t em { font-style: italic; }
+/* “Vitamin B8 (biotin)”: the pack's own name, with biotin set as a quieter annotation */
+.spread__aka { font-size: .36em; font-style: italic; letter-spacing: 0; color: var(--ink-2); white-space: nowrap; }
+.toc__aka { font-size: .72em; font-style: italic; color: var(--ink-2); white-space: nowrap; }
 .spread__copy { margin-top: clamp(20px, 2.4vw, 36px); max-width: 21em; font: 400 var(--fs-lead)/1.16 var(--f-display); }
 .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin-top: clamp(22px, 2.4vw, 36px); }
 .chip {
@@ -692,22 +720,32 @@ ul, ol { padding: 0; }
 @media (hover: hover) { .spread__next:hover { color: var(--accent-ink); background-image: linear-gradient(var(--accent), var(--accent)); background-size: 100% 2px; } }
 @media (hover: hover) { .spread__next:hover .ic { transform: translateX(4px); } }
 
-/* ---------- 7.4 No. 04 — Real sugar ---------- */
-.sugar__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: center; }
+/* ---------- 7.4 No. 04 — Sugar free (the front of the pack, read closely) ---------- */
+.sugar__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 40px; align-items: center; }
 .sugar__fig { grid-column: 1 / span 5; }
-.sugar__num {
-  font: italic 400 clamp(220px, 31vw, 600px)/.74 var(--f-display); letter-spacing: -.05em;
-  color: var(--accent); margin-left: -.04em;
-}
-.sugar__num span { display: inline-block; }
-.sugar__fig .fig { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--rule); max-width: 22em; }
+/* Fig. 04 is the pack itself: shown whole (its actives list is the point), never wider than its own pixels,
+   and on a laptop never taller than the screen */
+.sugar__fig { --plate-w: min(100%, 420px); }
+@media (min-width: 768px) { .sugar__fig { --plate-w: min(100%, 638px, calc((100svh - var(--hdr-h) - 150px) * 638 / 1036)); } }
+.sugar__plate { width: var(--plate-w); }
+.sugar__fig .fig { width: var(--plate-w); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); }
 .sugar__copy { grid-column: 7 / span 6; }
 .sugar__copy .lead { margin-top: clamp(22px, 2.4vw, 36px); max-width: 21em; }
 .sugar__body { margin-top: 18px; color: var(--ink-2); max-width: 40ch; }
-.pull { margin-top: clamp(32px, 3.6vw, 56px); padding-top: 22px; border-top: 1px solid var(--ink); }
-.pull p { font: italic 400 clamp(34px, 3.6vw, 64px)/1 var(--f-display); color: var(--ink); text-indent: -.42em; text-wrap: balance; }
-.pull p::before { content: '“'; color: var(--accent); }
-.pull p::after { content: '”'; color: var(--accent); }
+
+/* figures you can enlarge (the pack front, the Super Greens label): real links to the image, with an ink tab
+   that says so. The tab lives inside the clipped frame, so it uncovers with the picture. */
+.zoom { position: relative; display: block; color: var(--ink); text-decoration: none; cursor: zoom-in; }
+.zoom__img { position: relative; display: block; overflow: hidden; background: var(--paper-3); border: 1px solid var(--rule); }
+.zoom__img img { width: 100%; height: auto; }
+.zoom__cue {
+  position: absolute; right: 0; bottom: 0; z-index: 1; display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 11px 8px 10px; background: var(--ink); color: var(--paper);
+  font: 500 9.5px/1 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase;
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.zoom__cue .ic { width: 14px; height: 14px; }
+@media (hover: hover) { .zoom:hover .zoom__cue { background: var(--accent); color: var(--on-accent); } }
 
 .notes {
   list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--gutter);
@@ -728,20 +766,24 @@ ul, ol { padding: 0; }
   font: 500 var(--fs-mono)/1.35 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--accent-ink);
 }
 .freefrom__k .ic { width: 18px; height: 18px; flex: none; }
-.freefrom__list { grid-column: 4 / -1; list-style: none; display: flex; flex-wrap: wrap; gap: 6px clamp(24px, 3vw, 56px); }
-.freefrom__list span {
-  position: relative; display: inline-block;
-  font: 400 clamp(38px, 5vw, 92px)/1.05 var(--f-display); color: var(--ink-3);
+/* “Sugar. Still sweet. Still strawberry.” — one word struck out in lipstick, then the rest of the line arrives */
+.freefrom__list { grid-column: 4 / -1; }
+.freefrom__words {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px clamp(18px, 2.4vw, 44px);
+  font: 400 clamp(38px, 5vw, 92px)/1.05 var(--f-display); color: var(--ink);
 }
-.freefrom__list span::after {
+.freefrom__words > span { position: relative; display: inline-block; }
+.freefrom__words em { font-style: italic; color: var(--accent-ink); }
+.freefrom__words .is-struck { color: var(--ink-3); }
+.freefrom__words .is-struck::after {
   content: ''; position: absolute; left: -3%; right: -3%; top: 54%; height: max(2px, .045em);
   background: var(--accent); transform-origin: 0 50%; transform: rotate(-2.5deg) scaleX(1);
 }
-.js:not(.no-motion) .freefrom__list span::after { transform: rotate(-2.5deg) scaleX(0); transition: transform 1.2s var(--ease-out); }
-.js:not(.no-motion) .freefrom.is-in .freefrom__list span::after { transform: rotate(-2.5deg) scaleX(1); }
-.freefrom.is-in .freefrom__list li:nth-child(2) span::after { transition-delay: .14s; }
-.freefrom.is-in .freefrom__list li:nth-child(3) span::after { transition-delay: .28s; }
-.freefrom.is-in .freefrom__list li:nth-child(4) span::after { transition-delay: .42s; }
+.js:not(.no-motion) .freefrom__words .is-struck::after { transform: rotate(-2.5deg) scaleX(0); transition: transform 1.2s var(--ease-out) .1s; }
+.js:not(.no-motion) .freefrom.is-in .freefrom__words .is-struck::after { transform: rotate(-2.5deg) scaleX(1); }
+.js:not(.no-motion) .freefrom__words > span:not(.is-struck) { opacity: 0; transform: translateY(16px); transition: opacity 1s var(--ease-out), transform 1.2s var(--ease-out); }
+.js:not(.no-motion) .freefrom.is-in .freefrom__words > span:not(.is-struck) { opacity: 1; transform: none; transition-delay: .7s; }
+.js:not(.no-motion) .freefrom.is-in .freefrom__words > span:last-child { transition-delay: .95s; }
 .sugar__foot { margin-top: 28px; max-width: 46ch; color: var(--ink-2); font: italic 400 22px/1.3 var(--f-display); }
 
 /* ---------- 7.5 No. 05 — The ritual (magazine sidebar timeline) ---------- */
@@ -823,6 +865,11 @@ ul, ol { padding: 0; }
 .vs td.vs__us .ic { color: var(--accent-ink); stroke-width: 2; }
 .vs td.vs__them .ic { color: var(--ink-3); }
 .vs td.vs__them.is-yes .ic { color: var(--ink-2); }
+.vs__key {
+  display: flex; align-items: center; gap: 8px; margin-top: 14px;
+  font: 500 9.5px/1.3 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2);
+}
+.vs__key .ic { width: 16px; height: 16px; color: var(--ink-3); }
 
 /* ---------- 7.7 No. 07 — The edit (shop) ---------- */
 .edit__head { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; margin-bottom: clamp(44px, 5vw, 88px); }
@@ -831,8 +878,11 @@ ul, ol { padding: 0; }
 .edit__intro { grid-column: 9 / span 4; color: var(--ink-2); max-width: 32ch; padding-bottom: .6em; }
 .edit__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 40px; align-items: start; }
 .edit__fig { grid-column: 1 / span 6; position: sticky; top: calc(var(--hdr-h) + 24px); }
-.edit__plate { aspect-ratio: 1; overflow: hidden; background: #fff; border: 1px solid var(--rule); }
-.edit__plate img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); }
+/* Fig. 05, the pack shot: framed at the photo's own 738 × 851, never past its pixels, and (while it rides along
+   sticky beside the bundles) never taller than the screen */
+.edit__plate { width: 100%; aspect-ratio: 738 / 851; overflow: hidden; background: var(--paper-3); border: 1px solid var(--rule); }
+@media (min-width: 768px) { .edit__plate { width: min(100%, 738px, calc((100svh - var(--hdr-h) - 110px) * 738 / 851)); } }
+.edit__plate img { width: 100%; height: 100%; object-fit: cover; }
 .edit__fig .fig { margin-top: 12px; }
 
 .buy { grid-column: 8 / span 5; }
@@ -897,7 +947,10 @@ ul, ol { padding: 0; }
 .perks li { display: inline-flex; align-items: center; gap: 8px; }
 .perks .ic { width: 16px; height: 16px; color: var(--accent); }
 
-.lineup { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gutter); margin-top: clamp(64px, 8vw, 128px); }
+.lineup {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: clamp(28px, 3vw, 44px);
+  align-items: start; margin-top: clamp(64px, 8vw, 128px);
+}
 .lineup__k {
   grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; margin-bottom: 4px;
   font: 500 var(--fs-mono)/1 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase; color: var(--ink-2);
@@ -931,6 +984,19 @@ ul, ol { padding: 0; }
 .waitlist__msg { flex-basis: 100%; min-height: 1.4em; font-size: 13px; color: var(--accent-ink); }
 .look__go { margin-top: 18px; }
 .look__label { margin-top: -2px; }
+
+/* Shade 02 gets the wide card: the printed label is its plate (Fig. 06), the claims and the waitlist sit under it */
+.look { grid-column: span 6; }
+.look--feature { grid-column: 1 / span 8; grid-template-columns: minmax(0, 1fr); row-gap: clamp(20px, 2vw, 30px); }
+.look--in-development { grid-column: 9 / span 4; grid-template-columns: clamp(110px, 38%, 180px) minmax(0, 1fr); }
+.look__plate { margin: 0; }
+.look__plate .zoom__img { aspect-ratio: 1600 / 613; }
+.look__plate .fig { margin-top: 10px; }
+.look--feature .look__body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(20px, 2.8vw, 52px); row-gap: 18px; align-items: start; }
+.look__claims { margin-top: 12px; font: italic 400 clamp(19px, 1.5vw, 24px)/1.25 var(--f-display); color: var(--ink); text-wrap: balance; }
+.look__badges { margin-top: 16px; gap: 8px; }
+.look__badges .chip { padding: 8px 11px; font-size: 9.5px; }
+.look__act .look__note { margin-top: 0; }
 
 /* ---------- 7.8 No. 08 — Questions (accordion) ---------- */
 .faq__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 40px; align-items: start; }
@@ -1004,7 +1070,8 @@ ul, ol { padding: 0; }
 }
 .colophon__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: 40px; }
 .colophon__brand { grid-column: 1 / span 5; }
-.colophon__logo { font: 400 clamp(44px, 4.4vw, 72px)/.9 var(--f-display); }
+.colophon__logo { font: 400 clamp(44px, 4.4vw, 72px)/.9 var(--f-display); row-gap: clamp(6px, .6vw, 10px); }
+.colophon__logo .logo__lab { font-size: clamp(10px, .95vw, 13px); }
 .colophon__brand p:not(.colophon__logo):not(.colophon__ship) { margin-top: 16px; max-width: 34ch; color: var(--ink-2); }
 .colophon__ship {
   display: flex; align-items: center; gap: 8px; margin-top: 20px;
@@ -1029,6 +1096,64 @@ ul, ol { padding: 0; }
 }
 .colophon__base > span { text-wrap: balance; }
 .colophon__base .link { font: inherit; letter-spacing: inherit; color: var(--ink); }
+
+/* ==========================================================================
+   9b. PLATE VIEWER — a figure at full size, set on the back cover's ink.
+   Phones: the image keeps its own pixels and pans (and the page can pinch-zoom).
+   Laptops: a wide label fits the width; a tall pack keeps 1:1 and scrolls.
+   ========================================================================== */
+.viewer {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0; overflow: hidden;
+  background: var(--ink); color: var(--paper);
+}
+.viewer[open] { display: flex; flex-direction: column; animation: viewerIn var(--dur-2) var(--ease-out); }
+.viewer::backdrop { background: rgba(43, 5, 25, .5); }
+@keyframes viewerIn { from { opacity: 0; } to { opacity: 1; } }
+.viewer__bar {
+  flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; column-gap: 26px;
+  min-height: 60px; padding: calc(6px + env(safe-area-inset-top)) var(--margin) 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 18%, transparent);
+}
+.viewer__t {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px;
+  font: 500 var(--fs-mono)/1.35 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 84%, transparent);
+}
+.viewer__no { color: var(--accent); }
+.viewer__file, .viewer__close {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0; border: 0; background: none;
+  font: 500 var(--fs-mono)/1 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase;
+  color: var(--paper); text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: color var(--dur-2) var(--ease-out);
+}
+.viewer__file .ic { width: 15px; height: 15px; }
+.viewer__close { min-width: 44px; justify-content: flex-end; }
+.viewer__close .ic { width: 22px; height: 22px; }
+@media (hover: hover) { .viewer__file:hover, .viewer__close:hover { color: var(--accent); } }
+.viewer :focus-visible { outline-color: var(--paper); }
+.viewer__pane {
+  flex: 1; min-height: 0; display: flex; overflow: auto; overscroll-behavior: contain;
+  padding: clamp(14px, 2.4vw, 40px) var(--margin);
+}
+.viewer__pane:focus-visible { outline-offset: -4px; }
+/* sized by its width/height attributes (its own pixels); margin:auto centres it without hiding an overflowing edge */
+.viewer__img { flex: none; margin: auto; max-width: none; background: var(--paper-3); }
+@media (min-width: 1024px) { .viewer__img { max-width: 100%; } }
+.viewer__hint {
+  flex: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px var(--margin) calc(12px + env(safe-area-inset-bottom));
+  font: 500 9.5px/1.3 var(--f-mono); letter-spacing: var(--tr-mono); text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper) 72%, transparent);
+}
+.viewer__hint .ic { width: 16px; height: 16px; color: var(--accent); }
+.viewer:not(.is-pannable) .viewer__hint { visibility: hidden; }
+@media (max-width: 767px) {
+  .viewer__bar { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "file . close" "t t t"; }
+  .viewer__t { grid-area: t; padding-bottom: 8px; }
+  .viewer__file { grid-area: file; }
+  .viewer__close { grid-area: close; }
+}
 
 /* ==========================================================================
    10. PROTOTYPE CHROME + MOBILE SHOP BAR
@@ -1105,6 +1230,7 @@ ul, ol { padding: 0; }
   .edit__intro { grid-column: 1 / span 8; margin-top: 18px; }
   .edit__fig { grid-column: 1 / span 5; }
   .buy { grid-column: 6 / span 7; }
+  .lineup > * { grid-column: 1 / -1; }
   .faq__head { grid-column: 1 / -1; position: static; }
   .qa { grid-column: 1 / -1; }
   .backcover__in { min-height: 0; }   /* height follows the copy, so the photo isn't a 1:3 sliver at tablet sizes */
@@ -1143,13 +1269,10 @@ ul, ol { padding: 0; }
   .spread__numeral { font-size: 104px; top: -.04em; bottom: auto; }
   .spread__t { margin-top: 24px; }
   .sugar__fig, .sugar__copy { grid-column: 1 / -1; }
-  .sugar__num { font-size: clamp(200px, 66vw, 300px); }
-  .sugar__copy { margin-top: 28px; }
   .notes { grid-template-columns: 1fr; margin-top: 64px; }
   .note { padding-bottom: 6px; }
   .note + .note { border-top: 1px solid var(--rule); }
-  .freefrom__list { flex-direction: column; gap: 2px; }
-  .freefrom__list span { font-size: clamp(34px, 11vw, 52px); }
+  .freefrom__words { flex-direction: column; gap: 2px; font-size: clamp(34px, 11vw, 52px); }
   .stops { grid-template-columns: 1fr; row-gap: 22px; }
   .sidebar { padding: 18px; }
   .ruler__bracket span { font-size: 8.5px; }
@@ -1162,8 +1285,11 @@ ul, ol { padding: 0; }
   .edit__fig, .buy { grid-column: 1 / -1; }
   .edit__fig { position: relative; top: 0; }
   .tier { padding: 16px 14px; column-gap: 12px; }
-  .lineup { grid-template-columns: 1fr; }
   .look { grid-template-columns: 116px minmax(0, 1fr); column-gap: 18px; }
+  .look--feature { grid-template-columns: minmax(0, 1fr); }
+  .look--feature .look__body { grid-template-columns: minmax(0, 1fr); }
+  .zoom__cue { gap: 6px; padding: 6px 8px; font-size: 8.5px; }
+  .label__notes > div { grid-template-columns: minmax(0, 1fr); }   /* suggested use reads full width, under its label */
   .look__art .fig { padding-inline: 8px; letter-spacing: .08em; }
   .qa { --qa-fs: 22px; --qa-col: calc(22px * 1.8); }
   .qa__q { padding: 18px 0; }
@@ -1185,5 +1311,6 @@ ul, ol { padding: 0; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
   [data-reveal] { opacity: 1 !important; transform: none !important; clip-path: none !important; visibility: visible !important; }
   .swipe { --swipe: 100% !important; background-size: 100% .07em !important; }
-  .freefrom__list span::after { transform: rotate(-2.5deg) scaleX(1) !important; transition: none !important; }
+  .freefrom__words .is-struck::after { transform: rotate(-2.5deg) scaleX(1) !important; transition: none !important; }
+  .freefrom__words > span { opacity: 1 !important; transform: none !important; }
 }

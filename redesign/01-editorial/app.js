@@ -22,64 +22,96 @@
      ========================================================================== */
   var PRODUCTS = [
     {
+      // the pack (2026-11-08): Collagen Boost, a sugar-free strawberry beauty lollipop; net wt. 15 g is one pop
       id: 'strawberry-pop', kind: 'lollipop', shade: '01', shadeName: 'Strawberry Pink',
-      name: 'Peptide Lollipops', flavor: 'Strawberry', status: 'available', statusLabel: 'Available now',
+      name: 'Collagen Boost', flavor: 'Strawberry', status: 'available', statusLabel: 'Available now',
       color: '#FF1493', deep: '#7A1B4D', tint: '#FFE4F1',
       theme: { paper: '#FBF0EC', paper2: '#FFF9F5', paper3: '#F4DFD8', ink: '#4A0D2E', ink2: '#7A1B4D', ink3: '#8E5076',
                accent: '#FF1493', accentInk: '#C8006A', onAccent: '#2B0519', tint: '#FFE4F1', rule: 'rgba(74, 13, 46, .15)' },
       copy: {
         issue: 'The Strawberry Issue',
-        deck: 'Peptide-powered lollipops with collagen, hyaluronic acid and glow-boosting vitamins. Beauty has never tasted this good.',
+        deck: 'Collagen Boost is a sugar-free strawberry beauty lollipop with peptides, hyaluronic acid and five more actives. Beauty has never tasted this good.',
         photoFig: 'Cover — Strawberry season',
-        fig: 'Fig. 01 — Strawberry, 47 kcal',
+        fig: 'Fig. 01 — Collagen Boost, strawberry',
         fig3: 'Fig. 03 — Shade 01, Strawberry Pink',
         hint: 'Drag to turn<br>Tap for a bite',
         cta: 'Shop the Edit', ctaHref: '#edit',
-        proofs: [['6', 'actives'], ['47', 'calories a pop'], ['Real', 'sugar, no swaps']],
-        title: 'Peptide Lollipops <em>— Strawberry</em>',
-        specs: [['Flavor', 'Strawberry'], ['In the bag', '10 lollipops'], ['Per pop', '47 calories'],
-                ['Actives', '6'], ['Sweetened with', 'Real sugar'], ['Also', 'Gluten-free']],
-        action: ['Shop Strawberry', '#edit'],
-        barName: 'Peptide Lollipops', barMeta: 'Strawberry · 10 per bag', barCta: 'Shop',
-        announce: 'Shade 01, Strawberry Pink, available now. The page is now pink.'
+        proofs: [['7', 'actives'], ['15', 'grams a pop'], ['Sugar', 'free']],
+        title: 'Collagen Boost <em>— Strawberry</em>',
+        // the sweetener isn't confirmed yet: a visible placeholder, never a guess
+        specs: [['Flavor', 'Strawberry'], ['In the bag', '10 lollipops'], ['Each pop', '15 g'],
+                ['Actives', '7'], ['Sweetened with', PH('TBD', 1)], ['Also', 'Sugar free · gluten-free']],
+        action: ['Shop Collagen Boost', '#edit'],
+        barName: 'Collagen Boost', barMeta: 'Strawberry · 10 per bag', barCta: 'Shop',
+        announce: 'Shade 01, Collagen Boost in strawberry, available now. The page is now pink.'
       }
     },
     {
-      id: 'green-gummies', kind: 'gummy', shade: '02', shadeName: 'Green Gummies',
-      name: 'Green Gummies', flavor: 'Strawberry-Watermelon', status: 'coming-soon', statusLabel: 'Coming soon',
+      // Super Greens Gummies (coming soon), from the client's full wrap label. NOT sugar free: 3 g sugars a serving.
+      id: 'green-gummies', kind: 'gummy', shade: '02', shadeName: 'Super Greens',
+      name: 'Super Greens Gummies', flavor: 'Strawberry-Watermelon', status: 'coming-soon', statusLabel: 'Coming soon',
       color: '#1FA453', deep: '#0E4D2C', tint: '#E3F6EA',
       theme: { paper: '#EEF3EC', paper2: '#F7FAF5', paper3: '#DCE7D7', ink: '#12341F', ink2: '#1F4A2F', ink3: '#4A6B55',
                accent: '#1FA453', accentInk: '#13703A', onAccent: '#0B2414', tint: '#DDF3E4', rule: 'rgba(18, 52, 31, .15)' },
       copy: {
         issue: 'The Green Issue — coming soon',
-        deck: 'Strawberry-watermelon gummies with five&nbsp;B&nbsp;vitamins and an organic super greens blend. The launch date is ' + PH('TBD', 1) + ', so join the waitlist to hear first.',
+        deck: 'Super Greens Gummies in strawberry-watermelon, with kale, broccoli, spinach, wild blueberries and elderberry. The launch date is ' + PH('TBD', 1) + ', so join the waitlist to hear first.',
         photoFig: 'Cover — Strawberry shoot, toned green',
         fig: 'Fig. 01 — Strawberry-Watermelon, concept render',
-        fig3: 'Fig. 03 — Shade 02, Green Gummies (concept render)',
+        fig3: 'Fig. 03 — Shade 02, Super Greens Gummies (concept render)',
         hint: 'Drag to turn<br>Tap to squish',
         cta: 'Join the waitlist', ctaHref: '#waitlist',
         proofs: [['5', 'B vitamins'], ['20', 'calories per 2 gummies'], ['Soon', 'join the waitlist']],
-        title: 'Green Gummies<br><em>—&nbsp;Strawberry-Watermelon</em>',
-        specs: [['Flavor', 'Strawberry-Watermelon'], ['Per container', '60&nbsp;gummies'], ['Serving', '2&nbsp;gummies · 20&nbsp;cal'],
-                ['Actives', '5&nbsp;B&nbsp;vitamins + greens'], ['Price', '$' + PH('XX')], ['Launch', PH('Date')]],
-        note: 'Working name. Flavor&nbsp;Strawberry-Watermelon · Actives&nbsp;5&nbsp;B&nbsp;vitamins + organic super greens · Count&nbsp;60&nbsp;gummies' +
-              ' · Price&nbsp;$' + PH('XX') + ' · Launch&nbsp;' + PH('date'),
+        title: 'Super Greens Gummies<br><em>—&nbsp;Strawberry-Watermelon</em>',
+        specs: [['Flavor', 'Strawberry-Watermelon'], ['In the pack', '60&nbsp;gummies'], ['Serving', '2&nbsp;gummies · 20&nbsp;cal'],
+                ['Servings', '30'], ['Price', '$' + PH('XX')], ['Launch', PH('Date')]],
+        claims: 'Healthy gut*&nbsp;· Immune support*',                                // front-panel claims: the asterisk ties to the FDA line
+        badges: [['ban', 'No astragalus &amp; adaptogens'], ['leaf', 'Vegan friendly'], ['wheat-off', 'Gluten free'], ['flask-conical', 'Non GMO']],
+        note: 'Strawberry-watermelon, with kale, broccoli, spinach, wild blueberries and elderberry. 60&nbsp;gummies: 2&nbsp;a&nbsp;serving, 30&nbsp;servings.' +
+              ' Price&nbsp;$' + PH('XX') + ' · Launch&nbsp;' + PH('date'),
         action: ['Join the waitlist', '#waitlist'],
-        barName: 'Green Gummies', barMeta: 'Strawberry-Watermelon · coming soon', barCta: 'Waitlist',
-        announce: 'Shade 02, Green Gummies in strawberry-watermelon, coming soon. The page is now green.'
+        barName: 'Super Greens Gummies', barMeta: 'Strawberry-Watermelon · coming soon', barCta: 'Waitlist',
+        announce: 'Shade 02, Super Greens Gummies in strawberry-watermelon, coming soon. The page is now green.'
       },
-      // the client’s Supplement Facts label, transcribed as printed: amounts and the %DV column untouched
+      // the printed label itself (Fig. 06): shown in the lineup and opened full size in the plate viewer
+      label: { src: '../_shared/assets/product/super-greens-label.jpg', w: 1600, h: 613, fig: 'Fig. 06',
+               caption: 'The Super Greens Gummies label, printed flat',
+               alt: 'The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings' },
+      // the new Supplement Facts panel, transcribed as printed: names, sources, amounts and the %DV column untouched.
+      // row: [nutrient, source, amount, %DV, row style]
       facts: {
         serving: '2 Gummies', servings: '30',
-        rows: [['Calories', '20', '', 'cal'],
-               ['Total Carbohydrate', '5 g', '2%'], ['Total Sugars', '3 g', '2%', 'in'], ['Added Sugars', '3 g', '6%', 'in2'],
-               ['Riboflavin', '0.8 mg', '62%'], ['Niacin', '1.4 mg NE', '9%'], ['Vitamin B6', '0.9 mg', '53%'],
-               ['Folate', '50 mcg DFE', '53%'], ['Pantothenic Acid', '0.9 mg', '18%'], ['Sodium', '15 mg', '&lt;1%'],
-               ['Organic Super Greens Blend', '170 mg', '&lt;1%*', 'blend']],
-        blend: 'Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, ' +
-               'Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
-        foot: ['Percent Daily Values are based on a 2,000 calorie diet.', '*Daily Value not established.'],
-        pending: ['Other ingredients', 'Allergens', 'Directions']                    // not on the label yet: shown as TBD
+        rows: [['Calories', '', '20', '', 'cal'],
+               ['Total Carbohydrate', '', '5 g', '2%'],
+               ['Total Sugars', '', '3 g', '*', 'in'],
+               ['Added Sugars', '', '3 g', '6%', 'in2'],
+               ['Riboflavin', 'from Organic Sugar Cherries Blend', '0.8 mg', '62%'],
+               ['Niacin', 'from Organic Beetroot', '1.4 mg NE', '9%'],
+               ['Vitamin B6', 'from Organic Sugar Cherries Blend', '0.6 mg', '35%'],
+               ['Folate', 'from Organic Sugar Cherries Blend', '80 mcg DFE<span class="label__src">(50 mcg Folic Acid)</span>', '20%'],
+               ['Pantothenic Acid', 'from Organic Sugar Cherries Blend', '0.9 mg', '18%'],
+               ['Iron', 'from Organic Sugar Cherries Blend', '0.7 mg', '4%'],
+               ['Iodine', 'from Organic Kelp', '17 mcg', '11%'],
+               ['Sodium', 'from Electrolyte Blend', '15 mg', '&lt;1%'],
+               ['Potassium', 'from Electrolyte Blend', '17 mg', '&lt;1%']],
+        // listed under the table, as printed (the label lists the blend; it is never counted on this page)
+        blend: 'Organic Kale Leaf (Brassica oleracea var. acephala DC); Organic Broccoli Stalk and Flower (Brassica oleracea L. var. italica Planch); ' +
+               'Organic Beet Root (Beta vulgaris L.); Organic Spinach (Spinacia oleracea L.); Wild Blueberry (Vaccinium angustifolium); ' +
+               'Organic Elderberry (Sambucus nigra); Lemon (Citrus limon L.); Organic Carrot Root (Daucus carota L. var. sativus); Maltitol; ' +
+               'Organic Wild Blueberry (Vaccinium angustifolium); Organic Acai Berry (Euterpe oleracea Mart.); Organic Pomegranate Fruit (Punica granatum L.); ' +
+               'Organic Goji Juice (Lycium chinense); Organic Spirulina (Spirulina); Organic Noni Fruit (Morinda citrifolia); ' +
+               'Organic Acai Berry (Euterpe oleracea Mart.); Pea (Pisum sativum); L-ascorbyl palmitate and Natural Flavors.',
+        foot: ['** Percent Daily Values are based on a 2,000 calorie diet', '† Daily Value not established'],
+        other: 'Tapioca Syrup, Sugar, Pectin, Citric Acid, Orange Juice Concentrate, Sodium Citrate, Natural Flavor (Strawberry, Watermelon), ' +
+               'Palm Oil, Carnauba Wax, Color Added (Purple Carrot Juice Concentrate), Stevia Leaf.',
+        use: ['Take two (2) gummies daily.',
+              'Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication, ' +
+              'especially blood thinners or immunosuppressants. Discontinue use and call a doctor if any adverse reactions occur. ' +
+              'Not intended to diagnose, treat, cure, or prevent any disease.'],
+        storage: 'Store in a cool, dry place.',
+        warning: 'CALIFORNIA WARNING: Consistent with the State of California’s Proposition 65, this product may expose you to chemicals ' +
+                 'including Lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm.',
+        pending: ['Allergens']                                                        // not stated on the label: shown as TBD
       }
     },
     {
@@ -97,7 +129,7 @@
         fig3: 'Fig. 03 — Shade 03, color shown for illustration',
         hint: 'Drag to turn<br>Tap for a bite',
         cta: 'See what’s next', ctaHref: '#lineup',
-        proofs: [[PH('TBD', 1), 'flavor'], [PH('XX'), 'calories'], ['Soon', 'in development']],
+        proofs: [[PH('TBD', 1), 'name'], [PH('TBD', 1), 'flavor'], ['Soon', 'in development']],
         title: 'Next <em>Shade</em>',
         specs: [['Name', PH('TBD', 1)], ['Flavor', PH('TBD', 1)], ['Color', PH('TBD', 1)],
                 ['Format', 'Lollipop'], ['Price', '$' + PH('XX')], ['Launch', PH('Date')]],
@@ -184,26 +216,36 @@
 
   /* ---------- 2.2b the full label: a Supplement Facts disclosure that closes the spec sheet ---------- */
   function factsHTML(p, open) {
-    var f = p.facts, id = 'facts-' + p.id, blendName = '';
+    var f = p.facts, id = 'facts-' + p.id, L = p.label;
     var rows = f.rows.map(function (r) {
-      if (r[3] === 'blend') blendName = r[0];
-      return '<tr' + (r[3] ? ' class="is-' + r[3] + '"' : '') + '><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
+      return '<tr' + (r[4] ? ' class="is-' + r[4] + '"' : '') + '><th scope="row">' + r[0] +
+        (r[1] ? '<span class="label__src">(' + r[1] + ')</span>' : '') + '</th><td>' + r[2] + '</td><td>' + r[3] + '</td></tr>';
     }).join('');
     return '<div class="facts' + (open ? ' is-open' : '') + '">' +
       '<h4 class="facts__h"><button class="facts__toggle" type="button" id="' + id + '-q" aria-expanded="' + !!open + '" aria-controls="' + id + '">' +
         '<span class="facts__k">Supplement facts</span><span class="facts__v">Read the label</span>' +
         '<svg class="ic facts__ic" aria-hidden="true"><use href="#i-plus"/></svg></button></h4>' +
-      '<div class="facts__panel" id="' + id + '" role="region" aria-labelledby="' + id + '-q"><div class="facts__in"><div class="label">' +
-        '<table class="label__t"><caption><span class="label__title">Supplement <em>Facts</em></span> ' +
-          '<span class="label__serv"><span>Serving Size</span> <b>' + f.serving + '</b></span> ' +
-          '<span class="label__serv"><span>Servings Per Container</span> <b>' + f.servings + '</b></span></caption>' +
-          '<thead><tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">% Daily Value</th></tr></thead>' +
-          '<tbody>' + rows +
-            (f.blend ? '<tr class="is-mix"><td colspan="3"><span class="label__mix-k">' + blendName + ' contains:</span> ' + f.blend + '</td></tr>' : '') +
-          '</tbody></table>' +
-        '<p class="label__foot">' + f.foot.join('<br>') + '</p>' +
-        (f.pending ? '<p class="label__more">' + f.pending.map(function (k) { return k + '&nbsp;' + PH('TBD', 1); }).join(' · ') + '</p>' : '') +
-      '</div></div></div></div>';
+      '<div class="facts__panel" id="' + id + '" role="region" aria-labelledby="' + id + '-q"><div class="facts__in">' +
+        '<div class="label">' +
+          '<table class="label__t"><caption><span class="label__title">Supplement <em>Facts</em></span> ' +
+            '<span class="label__serv"><span>Serving Size</span> <b>' + f.serving + '</b></span> ' +
+            '<span class="label__serv"><span>Servings Per Container</span> <b>' + f.servings + '</b></span></caption>' +
+            '<thead><tr><th scope="col" colspan="2">Amount Per Serving</th><th scope="col">%DV</th></tr></thead>' +
+            '<tbody>' + rows + '</tbody></table>' +
+          '<p class="label__blend">' + f.blend + '</p>' +
+          '<p class="label__foot">' + f.foot.join('<br>') + '</p>' +
+          '<p class="label__other"><b>Other Ingredients:</b> ' + f.other + '</p>' +
+        '</div>' +
+        '<dl class="label__notes">' +
+          '<div><dt>Suggested use</dt><dd>' + f.use.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</dd></div>' +
+          '<div><dt>Storage</dt><dd><p>' + f.storage + '</p></dd></div>' +
+        '</dl>' +
+        '<p class="label__warn">' + f.warning + '</p>' +
+        '<p class="label__more"><span>' + f.pending.map(function (k) { return k + '&nbsp;' + PH('TBD', 1); }).join(' · ') + '</span>' +
+          (L ? '<a class="link label__zoom" href="' + L.src + '" data-zoom data-zoom-fig="' + L.fig + '" data-zoom-caption="' + L.caption + '"' +
+               ' data-zoom-w="' + L.w + '" data-zoom-h="' + L.h + '" data-zoom-alt="' + L.alt + '">' +
+               '<svg class="ic" aria-hidden="true"><use href="#i-zoom-in"/></svg>See the printed label</a>' : '') + '</p>' +
+      '</div></div></div>';
   }
   function setFacts(box, open) {
     box.classList.toggle('is-open', open);
@@ -225,21 +267,8 @@
   }
 
   /* ---------- 2.3 the rest of the lineup, in the Edit (status-aware cards) ---------- */
-  // concept plates for products with no photography yet (captioned as such)
+  // concept plate for a shade with no photography or pack yet (captioned as such)
   var ART = {
-    gummy: function () {
-      var drops = [[14, 76, -14], [60, 84, 11], [36, 40, 4]];
-      return '<svg viewBox="0 0 120 150" aria-hidden="true"><defs>' +
-        '<linearGradient id="gumFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--c);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--c);stop-opacity:.72"/></linearGradient></defs>' +
-        drops.map(function (d) {
-          var cx = d[0] + 23, cy = d[1] + 19;
-          return '<g transform="rotate(' + d[2] + ' ' + cx + ' ' + cy + ')">' +
-            '<rect x="' + d[0] + '" y="' + d[1] + '" width="46" height="38" rx="15" fill="url(#gumFill)" style="stroke:var(--c)" stroke-width=".9"/>' +
-            '<ellipse cx="' + (d[0] + 15) + '" cy="' + (d[1] + 9) + '" rx="9" ry="3.2" fill="#fff" opacity=".55"/>' +
-            '<g fill="#fff" opacity=".85"><circle cx="' + (d[0] + 30) + '" cy="' + (d[1] + 14) + '" r=".9"/><circle cx="' + (d[0] + 12) + '" cy="' + (d[1] + 24) + '" r=".8"/>' +
-            '<circle cx="' + (d[0] + 36) + '" cy="' + (d[1] + 27) + '" r=".9"/><circle cx="' + (d[0] + 22) + '" cy="' + (d[1] + 31) + '" r=".7"/></g></g>';
-        }).join('') + '</svg>';
-    },
     lollipop: function () {
       var c = ['#F26A1B', '#8B3FD6', '#0E9CAD'];
       return '<svg viewBox="0 0 120 150" aria-hidden="true">' + c.map(function (col, i) {
@@ -249,19 +278,41 @@
       }).join('') + '</svg>';
     }
   };
+  // a figure you can enlarge: a real link to the image (the plate viewer opens it in place when it can).
+  // Its accessible name is the alt text plus “Enlarge”: what the picture shows, then what the link does.
+  function zoomHTML(img) {
+    return '<a class="zoom" href="' + img.src + '" data-zoom data-zoom-fig="' + img.fig + '" data-zoom-caption="' + img.caption + '">' +
+      '<span class="zoom__img" data-reveal="clip"><img src="' + img.src + '" width="' + img.w + '" height="' + img.h + '" loading="lazy" decoding="async" alt="' + img.alt + '">' +
+      '<span class="zoom__cue"><svg class="ic" aria-hidden="true"><use href="#i-zoom-in"/></svg>Enlarge</span></span></a>';
+  }
+  function waitlistHTML(p) {
+    return '<form class="waitlist" novalidate><label class="sr-only" for="wl-' + p.id + '">Email address</label>' +
+      '<input class="waitlist__input" id="wl-' + p.id + '" type="email" name="email" placeholder="Your email" autocomplete="email">' +
+      '<button class="btn btn--ink" type="submit">Join the waitlist</button>' +
+      '<p class="waitlist__msg" role="status" aria-live="polite"></p></form>';
+  }
   function lookHTML(p) {
-    var art = '<div class="look__art" aria-hidden="true">' + (p.kind === 'gummy' ? ART.gummy() : ART.lollipop()) +
-      '<span class="fig">' + (p.kind === 'gummy' ? 'Concept sketch&nbsp;· shape TBD' : 'Silhouettes&nbsp;· colors TBD') + '</span></div>';
-    var body = '<p class="look__k">Shade ' + p.shade + ' · ' + p.statusLabel + '</p>';
+    var k = '<p class="look__k">Shade ' + p.shade + ' · ' + p.statusLabel + '</p>';
+    var title = p.name.replace(/ (\S+)$/, ' <em>$1</em>');
     if (p.status === 'coming-soon') {
-      body += '<h3 class="look__t" id="look-' + p.id + '">Green <em>Gummies</em></h3>' +
-        '<p class="look__note">' + p.copy.note + '</p>' +
-        '<form class="waitlist" novalidate><label class="sr-only" for="wl-' + p.id + '">Email address</label>' +
-        '<input class="waitlist__input" id="wl-' + p.id + '" type="email" name="email" placeholder="Your email" autocomplete="email">' +
-        '<button class="btn btn--ink" type="submit">Join the waitlist</button>' +
-        '<p class="waitlist__msg" role="status" aria-live="polite"></p></form>' +
-        (p.facts ? '<button class="link look__label" type="button" data-facts-go="' + p.id + '">See the supplement facts</button>' : '');
-    } else if (p.status === 'in-development') {
+      // the feature card: the printed label is the plate, the claims and the waitlist sit under it
+      var L = p.label;
+      return '<article class="look look--coming-soon look--feature" id="waitlist" style="--c:' + p.color + '" aria-labelledby="look-' + p.id + '">' +
+        (L ? '<figure class="look__plate">' + zoomHTML(L) +
+             '<figcaption class="fig"><span class="fig__no">' + L.fig + '</span>' + L.caption + '.</figcaption></figure>' : '') +
+        '<div class="look__body"><div class="look__intro">' + k +
+          '<h3 class="look__t" id="look-' + p.id + '">' + title + '</h3>' +
+          (p.copy.claims ? '<p class="look__claims">' + p.copy.claims + '</p>' : '') +
+          (p.copy.badges ? '<ul class="chips look__badges" aria-label="On the label">' + p.copy.badges.map(function (b) {
+            return '<li class="chip"><svg class="ic" aria-hidden="true"><use href="#i-' + b[0] + '"/></svg>' + b[1] + '</li>';
+          }).join('') + '</ul>' : '') + '</div>' +
+        '<div class="look__act"><p class="look__note">' + p.copy.note + '</p>' + waitlistHTML(p) +
+          (p.facts ? '<button class="link look__label" type="button" data-facts-go="' + p.id + '">See the supplement facts</button>' : '') +
+        '</div></div></article>';
+    }
+    var art = '<div class="look__art" aria-hidden="true">' + ART.lollipop() + '<span class="fig">Silhouettes&nbsp;· colors TBD</span></div>';
+    var body = k;
+    if (p.status === 'in-development') {
       body += '<h3 class="look__t" id="look-' + p.id + '">More shades, <em>on the way.</em></h3>' +
         '<p class="look__note">Name&nbsp;' + PH('TBD', 1) + ' · Flavor&nbsp;' + PH('TBD', 1) + ' · Color&nbsp;' + PH('TBD', 1) + '</p>' +
         '<button class="link look__go" type="button" data-product-go="' + p.id + '">Preview the shade</button>';
@@ -269,8 +320,8 @@
       body += '<h3 class="look__t" id="look-' + p.id + '">' + p.name + '</h3>' +
         '<a class="btn btn--ink look__go" href="#edit">Shop ' + p.shadeName + '</a>';
     }
-    return '<article class="look look--' + p.status + '"' + (p.status === 'coming-soon' ? ' id="waitlist"' : '') +
-      ' style="--c:' + p.color + '" aria-labelledby="look-' + p.id + '">' + art + '<div class="look__body">' + body + '</div></article>';
+    return '<article class="look look--' + p.status + '" style="--c:' + p.color + '" aria-labelledby="look-' + p.id + '">' +
+      art + '<div class="look__body">' + body + '</div></article>';
   }
   function renderLineup() {
     var host = $('#lineup');
@@ -306,6 +357,53 @@
       if (t) t.focus({ preventScroll: true });
     }, switched && motion ? 320 : 0);
   });
+
+  /* ---------- 2.3b the plate viewer: a figure at full size (the gummies label, the pack front) ---------- */
+  // Every [data-zoom] figure is a real link to its image; where <dialog> works it opens in place instead.
+  // Esc or Close shuts it and focus returns to the figure. On phones the image keeps its own pixels and pans.
+  var viewer = $('#viewer'), viewerFrom = null;
+  if (viewer && typeof viewer.showModal === 'function') {
+    var vImg = $('.viewer__img', viewer), vPane = $('.viewer__pane', viewer), vNo = $('.viewer__no', viewer),
+        vCap = $('.viewer__cap', viewer), vFile = $('.viewer__file', viewer), vHint = $('.viewer__hint-t', viewer),
+        vIcon = $('.viewer__hint use', viewer);
+    var openViewer = function (a) {
+      var thumb = $('img', a), src = a.getAttribute('href');
+      var w = thumb ? thumb.getAttribute('width') : a.getAttribute('data-zoom-w');
+      var h = thumb ? thumb.getAttribute('height') : a.getAttribute('data-zoom-h');
+      viewerFrom = a;
+      vImg.setAttribute('width', w); vImg.setAttribute('height', h);      // sized before it loads: no jump, and the pan can centre
+      vImg.alt = thumb ? thumb.alt : (a.getAttribute('data-zoom-alt') || '');
+      vImg.loading = 'eager';
+      if (vImg.getAttribute('src') !== src) vImg.src = src;
+      vNo.textContent = a.getAttribute('data-zoom-fig') || 'Fig.';
+      vCap.textContent = a.getAttribute('data-zoom-caption') || '';
+      vFile.href = src;
+      var touch = window.matchMedia('(pointer: coarse)').matches;
+      vHint.textContent = (Number(w) > Number(h) ? (touch ? 'Swipe to read the whole label' : 'Scroll sideways to read the whole label')
+                                                 : (touch ? 'Swipe to read the whole pack' : 'Scroll to read the whole pack')) + (touch ? ' · pinch to zoom' : '');
+      viewer.showModal();
+      document.body.style.overflow = 'hidden';
+      if (lenis) lenis.stop();
+      var panX = vPane.scrollWidth - vPane.clientWidth, panY = vPane.scrollHeight - vPane.clientHeight;
+      viewer.classList.toggle('is-pannable', panX > 1 || panY > 1);                  // the hint only shows when there is more to see
+      vIcon.setAttribute('href', panX > 1 && panY > 1 ? '#i-move' : panY > 1 ? '#i-move-vertical' : '#i-move-horizontal');
+      vPane.scrollLeft = Math.max(0, panX / 2);                                       // a wide label opens on its front panel
+      vPane.scrollTop = 0;
+    };
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-zoom]');
+      if (!a || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // a modified click still opens the file
+      e.preventDefault();
+      openViewer(a);
+    });
+    viewer.addEventListener('close', function () {
+      document.body.style.overflow = '';
+      if (lenis) lenis.start();
+      if (viewerFrom) { viewerFrom.focus({ preventScroll: true }); viewerFrom = null; }
+    });
+    $('.viewer__close', viewer).addEventListener('click', function () { viewer.close(); });
+    viewer.addEventListener('click', function (e) { if (e.target === viewer || e.target === vPane) viewer.close(); });   // the dark mat
+  }
 
   /* ---------- 2.4 select a product ---------- */
   var announcer = $('#announce');
@@ -667,7 +765,7 @@
         trigger: el, start: 'top 86%', once: true,
         onEnter: function () {
           gsap.to(el, { clipPath: 'inset(0% 0 0 0)', duration: 1.5, ease: 'expo.inOut' });
-          if (img) gsap.fromTo(img, { scale: 1.14 }, { scale: el.classList.contains('edit__plate') ? 1.04 : 1, duration: 2.2, ease: 'expo.out' });
+          if (img) gsap.fromTo(img, { scale: 1.14 }, { scale: 1, duration: 2.2, ease: 'expo.out' });   // packs and labels land at 1:1, uncropped
         }
       });
     });
@@ -675,7 +773,6 @@
     /* slow parallax */
     gsap.to('.cover__photo img', { yPercent: 7, ease: 'none', scrollTrigger: { trigger: '.cover', start: 'top top', end: 'bottom top', scrub: true } });
     gsap.to('.cover__mast', { y: -40, ease: 'none', scrollTrigger: { trigger: '.cover', start: 'top top', end: 'bottom top', scrub: true } });
-    gsap.fromTo('.sugar__num span', { yPercent: 8 }, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: '.sugar__grid', start: 'top bottom', end: 'bottom top', scrub: true } });
     gsap.fromTo('.shades__numeral', { yPercent: -10 }, { yPercent: 14, ease: 'none', scrollTrigger: { trigger: '.shades', start: 'top bottom', end: 'bottom top', scrub: true } });
     gsap.fromTo('.backcover__photo img', { yPercent: -8 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.backcover', start: 'top bottom', end: 'bottom top', scrub: true } });
 
@@ -685,7 +782,7 @@
       trigger: '.sidebar', start: 'top 78%', end: 'bottom 55%', scrub: true,
       onUpdate: function (st) { var n = Math.round(st.progress * days.length); days.forEach(function (d, i) { d.classList.toggle('is-on', i < n); }); }
     });
-    /* free-from: each filler gets struck out */
+    /* sugar free: the one word on the pack's claim gets struck out */
     ScrollTrigger.create({ trigger: '.freefrom', start: 'top 80%', once: true, onEnter: function () { $('.freefrom').classList.add('is-in'); } });
     /* swipes inside headings that aren't split */
     $$('.swipe').forEach(function (s) {

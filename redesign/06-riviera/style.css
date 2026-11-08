@@ -173,19 +173,19 @@ fieldset { border: 0; padding: 0; min-width: 0; }
 
 /* Bodoni below ~32px: a sturdy optical size so hairlines, hyphens and numerals hold at 1x */
 .perks h3, .cabana__name, .cabana-card__facts dd, .amenity__name, .amenity__back-name, .amenity__no,
-.stop h3, .note h3, .never__head h3, .compare__table tbody th, .compare__us, .item__name, .item__price,
+.stop h3, .note h3, .compare__table tbody th, .compare__us, .item__name, .item__price,
 .menucard__summary, .menucard__price, .waitlist h3, .faq__q, .faq__n, .foot__col a, .foot__soon,
-.shopbar__info b, .brand__word, .caption--hero .no, .cabana-card__stamp b, .pouch__tag, .perks__n,
-.postcard__caption em, .sugar__unit em, .nav__cabana b {
+.shopbar__info b, .brand__word, .caption--hero .no, .cabana-card__stamp b, .perks__n,
+.postcard__caption em, .nav__cabana b, .lightbox__title b {
   font-optical-sizing: none; font-variation-settings: var(--opsz-text);
 }
 /* Didone hyphens are hairlines: give the ones in display lines some body */
 .hy { font-variation-settings: 'opsz' 8; font-weight: 700; }
-/* on 1x screens a Didone's hairlines (the 4 in 47, the thin side of a V) fade out: a hairline stroke holds them */
+/* on 1x screens a Didone's hairlines (the 4 in 14, the thin side of a V) fade out: a hairline stroke holds them */
 @media (max-resolution: 1.5dppx) {
   .perks h3, .cabana__name, .amenity__name, .stop h3, .note h3, .compare__table tbody th, .compare__us, .item__name, .item__price,
   .waitlist h3, .faq__text, .foot__col a, .foot__soon, .shopbar__info b { -webkit-text-stroke: .4px currentColor; }
-  .cabana-card__title, .never__head h3, .menucard__price { -webkit-text-stroke: .3px currentColor; }
+  .cabana-card__title, .menucard__price, .lightbox__title b { -webkit-text-stroke: .3px currentColor; }
   .foot__soon small, .ph::after { -webkit-text-stroke: 0; }
 }
 /* numbers on badges and tags ("Nº 1", "Nº 01") stand upright in lining figures (an italic Didone 1 reads as I);
@@ -250,7 +250,16 @@ fieldset { border: 0; padding: 0; min-width: 0; }
   box-shadow: 0 0 0 1px rgba(74, 13, 46, .5), 0 3px 8px -3px rgba(74, 13, 46, .4);
 }
 .brand__mark::after { content: ''; position: absolute; inset: 42%; border-radius: 50%; background: var(--berry); }
+/* the lockup, as on the pack: the Bodoni wordmark with a small tracked "— LAB —" centred under it (logo only:
+   running copy stays "Glo Pop") */
+.brand__lockup { display: inline-grid; justify-items: center; row-gap: 5px; }
 .brand__word { font: 600 1.6rem/1 var(--serif); letter-spacing: -.015em; white-space: nowrap; }
+.brand__lab {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: 500 .6rem/1 var(--sans); letter-spacing: .38em; text-transform: uppercase; color: var(--ink-2);
+}
+.brand__lab::before, .brand__lab::after { content: ''; width: 15px; height: 1px; background: currentColor; opacity: .55; }
+.brand__lab::before { margin-right: .38em; }   /* matches the tracking after the b, so the word sits centred */
 @media (max-width: 379px) {
   .nav__bar { gap: 12px; }
   .brand { gap: 9px; }
@@ -703,9 +712,45 @@ html.has-water .lolly-fallback.is-cast .lolly-fallback__head, html.has-water .lo
 .sfacts tbody tr:last-child > * { border-bottom: 9px solid var(--ink); }
 .sfacts tfoot td { padding: 8px 0 2px; border: 0; font-size: .78rem; line-height: 1.45; color: var(--ink-2); }
 .sfacts tfoot p + p { margin-top: 6px; }
+/* "(from Organic Kelp)": set under the name, as the label sets it; the folate's folic acid under its amount */
+.sfacts .sf-src { display: block; margin-top: 1px; font-size: .8em; font-weight: 400; line-height: 1.3; color: var(--ink-2); white-space: normal; }
+.sfacts td .sf-src { white-space: nowrap; }   /* "(50 mcg Folic Acid)" stays one line under its amount */
+.sfacts tfoot .sf-blend { padding-bottom: 8px; border-bottom: 1px solid rgba(74, 13, 46, .3); color: var(--ink); }
+.sfacts tfoot .sf-other { padding-top: 8px; border-top: 4px solid var(--ink); color: var(--ink); }
+.sfacts tfoot .sf-other b { font-weight: 600; }
 .label-side { display: grid; gap: 26px; align-content: start; max-width: 540px; }
 .label-side__block { display: grid; gap: 12px; justify-items: start; }
 .label-side__key { font-size: .95rem; color: var(--ink-2); }
+.label-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.label-badges li { padding: 7px 12px; border-radius: var(--r-pill); font: 500 .8rem/1 var(--sans); color: var(--accent-deep); background: var(--accent-tint); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent); }
+.label-side__use { font: 500 1.02rem/1.4 var(--sans); color: var(--ink); }
+.label-side__fine { margin-top: -4px; font-size: .84rem; line-height: 1.5; color: var(--ink-2); }
+.label-side__warn { padding-top: 16px; border-top: 1px solid var(--line); font-size: .76rem; line-height: 1.5; color: var(--ink-2); }
+
+/* The printed label as a deckle-edged print (the postcards' edge): a real link that opens it full size in the
+   lightbox (a plain link to the image without JS). The chip says so; it lifts a touch on hover. */
+.labelprint { position: relative; display: block; text-decoration: none; color: var(--ink); border-radius: 3px; filter: drop-shadow(0 16px 16px rgba(74, 13, 46, .16)) drop-shadow(0 1px 1px rgba(74, 13, 46, .1)); }
+.labelprint__card {
+  --r: 2.5px;
+  display: block; padding: clamp(6px, .7vw, 10px); background: #FFFEFA;
+  -webkit-mask: radial-gradient(var(--r) at 50% 50%, #000 96%, #0000) round 0 0 / calc(var(--r) * 2) calc(var(--r) * 2),
+                linear-gradient(#000 0 0) 50% 50% / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
+          mask: radial-gradient(var(--r) at 50% 50%, #000 96%, #0000) round 0 0 / calc(var(--r) * 2) calc(var(--r) * 2),
+                linear-gradient(#000 0 0) 50% 50% / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat;
+}
+.labelprint__card img { width: 100%; height: auto; }
+/* the chip sits on the print's bottom edge like a sticker, so it never hides the label's words */
+.labelprint__chip {
+  position: absolute; right: clamp(16px, 2vw, 28px); bottom: 0; transform: translateY(50%);
+  display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 16px 0 13px; border-radius: var(--r-pill);
+  background: #FFFEFA; color: var(--ink); font: 500 .7rem/1 var(--sans); letter-spacing: .14em; text-transform: uppercase;
+  box-shadow: 0 0 0 1px var(--line), 0 6px 16px -8px rgba(3, 40, 70, .55); transition: transform var(--d-med) var(--ease-out), box-shadow var(--d-fast);
+}
+.labelprint__chip .lucide { width: 16px; height: 16px; color: var(--accent-text); }
+.labelprint:hover .labelprint__chip { transform: translateY(calc(50% - 2px)); box-shadow: 0 0 0 1px var(--accent-soft), 0 10px 20px -10px rgba(3, 40, 70, .6); }
+.labelprint + * { margin-top: 12px; }   /* room under the chip's lower half */
+.labelprint:focus-visible { outline: 2px solid var(--accent-btn); outline-offset: 4px; }
+.labelprint--side { width: 100%; }
 .label-side__list { width: 100%; border-top: 1px solid var(--line); }
 .label-side__list div { display: grid; align-items: baseline; gap: 6px 18px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .label-side__list dt { font: 500 var(--fs-cap)/1.3 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
@@ -721,10 +766,14 @@ html.has-water .lolly-fallback.is-cast .lolly-fallback__head, html.has-water .lo
   .sfacts thead > tr > * { letter-spacing: .08em; }
 }
 
-/* ───────────── 12 · AMENITIES (6 actives) ───────────── */
+/* ───────────── 12 · AMENITIES (the 7 actives) ─────────────
+   Seven cards: in pairs on phones and tablets with the seventh centred under them; on desktops four, then three
+   centred under those (a grid of half-columns, each card two wide).                                          */
 .amenities { background: linear-gradient(to bottom, var(--white), #FBF4EA 30%, #FBF4EA 70%, var(--white)); }
 .amenities .pin-note { margin-top: 4px; }
-.amenity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.amenity-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.amenity { grid-column: span 2; }
+.amenity:nth-child(7) { grid-column: 2 / span 2; }
 .amenity__card { position: relative; min-height: 254px; }
 .amenity__face {
   display: grid; align-content: center; justify-items: center; text-align: center; gap: 10px;
@@ -749,6 +798,7 @@ html.js .amenity__front { transform: perspective(1200px) rotateY(0); }
 .amenity:nth-child(4) .amenity__front::before { background-position: 35% 85%, 0 0; }
 .amenity:nth-child(5) .amenity__front::before { background-position: 65% 15%, 0 0; }
 .amenity:nth-child(6) .amenity__front::before { background-position: 10% 60%, 0 0; }
+.amenity:nth-child(7) .amenity__front::before { background-position: 55% 40%, 0 0; }
 .amenity__front > * { position: relative; }
 .amenity__no { position: absolute !important; left: 22px; top: 20px; font: 400 1rem/1 var(--serif); color: var(--ink-2); font-variant-numeric: lining-nums; }
 .amenity__back {
@@ -767,6 +817,7 @@ html:not(.js) .amenity__turn { display: none; }
 }
 .amenity__icon .lucide { width: 30px; height: 30px; stroke-width: 1.4; }
 .amenity__name { font: 600 1.55rem/1.1 var(--serif); letter-spacing: -.01em; margin-top: 2px; }
+.amenity__aka { font-style: italic; font-weight: 400; font-size: .74em; color: var(--ink-2); white-space: nowrap; }
 .amenity__for { font: 500 var(--fs-cap)/1 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--ink-2); }
 .amenity__back-name { font: italic 400 1.4rem/1.1 var(--serif); color: var(--accent-text); }
 .amenity__back p { color: var(--ink); max-width: 30ch; font-size: .98rem; }
@@ -848,14 +899,14 @@ html:not(.js) .amenity__turn { display: none; }
   .sunindex__arc .window .core { stroke-width: 4.5; }
 }
 
-/* the pouches: three striped bags (the real pouch: pink, striped top and bottom, the parasol mark), ten pops
-   in each, drawn in the sun's engraved line: flat fills, one hairline. app.js moves the pops. */
+/* the pouches: three bags drawn after the real pouch (a deeper pink above a soft pink wave, the brand mark), ten
+   pops in each, in the sun's engraved line: flat fills, one hairline. app.js moves the pops. */
 .pouches { display: block; height: 104px; width: auto; max-width: 100%; margin-inline: auto; overflow: visible; }
 .pouches .bag__shadow { fill: rgba(74, 13, 46, .09); }
-.pouches .bag__mouth { fill: #F28CBC; stroke: rgba(74, 13, 46, .5); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.pouches .bag__body { fill: #FFD3E6; }
-.pouches .bag__stripe { fill: #FF72B3; }
-.pouches .bag__zip { stroke: rgba(74, 13, 46, .3); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .bag__mouth { fill: #E8559F; stroke: rgba(74, 13, 46, .5); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pouches .bag__body { fill: #F7629F; }
+.pouches .bag__wave { fill: #FFBFDC; }
+.pouches .bag__zip { stroke: rgba(255, 255, 255, .62); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .pouches .bag__mark { fill: none; stroke: var(--accent); stroke-width: 4.4; }
 .pouches .bag__mark-r { fill: var(--white); stroke: rgba(74, 13, 46, .5); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .pouches .bag__mark-c { fill: var(--berry); }
@@ -998,7 +1049,9 @@ html:not(.js) .amenity__turn { display: none; }
   .is-pinned .sunindex__sheet { background: rgba(255, 253, 248, .97); }
 }
 
-/* ───────────── 14 · REAL SUGAR ───────────── */
+/* ───────────── 14 · SUGAR FREE: the front of the pack, on the sand ─────────────
+   The pack's own claim, and the only sugar claim on the page. The flat front of the pack lies on the sand as a
+   postcard print (never cropped, no warm grade: its words and pinks stay true) beside the intro and the notes. */
 .sugar { background: var(--sand); isolation: isolate; overflow: clip; --em: var(--accent-display); }
 .sugar::before { /* sun-faded cabana canvas: wide, barely-there stripes */
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
@@ -1022,16 +1075,17 @@ html:not(.js) .amenity__turn { display: none; }
 }
 .menu::after { left: -380px; bottom: -220px; animation: gobo 52s ease-in-out -20s infinite alternate-reverse; }
 @keyframes gobo { from { transform: translate3d(0, 0, 0) rotate(0deg); } to { transform: translate3d(-90px, 50px, 0) rotate(9deg); } }
-.sugar__grid { display: grid; gap: clamp(40px, 5vw, 80px); }
-.sugar__intro { display: grid; gap: 22px; align-content: start; }
-.sugar__big { display: flex; align-items: center; gap: 18px; margin-top: 10px; }
-.sugar__num { font: 500 clamp(5rem, 3rem + 7vw, 9rem)/.8 var(--serif); letter-spacing: -.03em; color: var(--accent-display); font-variant-numeric: oldstyle-nums; font-optical-sizing: none; font-variation-settings: 'opsz' 28; }
-.sugar__unit { font: 500 1rem/1.4 var(--sans); letter-spacing: .02em; color: var(--ink); }
-.sugar__unit em { font: italic 400 1.15rem/1.3 var(--serif); color: var(--ink-2); }
+.sugar__grid { display: grid; gap: clamp(40px, 5vw, 64px); grid-template-areas: "intro" "pack" "notes"; }
+.sugar__intro { grid-area: intro; display: grid; gap: 22px; align-content: start; }
 .sugar__notes {
+  grid-area: notes;
   position: relative; display: grid; gap: 0; padding: 10px clamp(12px, 1.6vw, 22px);
   background: var(--paper); border-radius: var(--r-xs); box-shadow: 0 0 0 1px rgba(74, 13, 46, .07), var(--shadow-card);
 }
+/* the pack's front as a postcard print: its own proportions, so nothing is cropped */
+.postcard--pack { grid-area: pack; justify-self: center; width: min(360px, 100% - 28px); }
+.postcard--pack .postcard__photo { aspect-ratio: 638 / 1036; background: #F0328F; }
+.postcard--pack .postmark { right: -18px; top: -52px; width: clamp(138px, 13vw, 190px); }
 .sugar__notes::after { content: ''; position: absolute; inset: 8px; border: 1px solid var(--line); pointer-events: none; }
 .note { position: relative; padding: 28px 18px 26px 74px; }
 .note + .note { border-top: 1px solid var(--line); }
@@ -1039,16 +1093,12 @@ html:not(.js) .amenity__turn { display: none; }
 .note__icon .lucide { width: 20px; height: 20px; }
 .note h3 { font: 600 1.28rem/1.15 var(--serif); margin-bottom: 6px; }
 .note p { color: var(--ink-2); font-size: .97rem; }
-.never { margin-top: clamp(40px, 5vw, 72px); }
-.never__card { display: grid; gap: 22px; padding: clamp(26px, 3vw, 40px); background: var(--paper); border-radius: var(--r-xs); box-shadow: 0 0 0 1px rgba(74, 13, 46, .08), var(--shadow-card); position: relative; }
-.never__card::after { content: ''; position: absolute; inset: 8px; border: 1px solid var(--line); pointer-events: none; }
-.never__head h3 { margin-top: 10px; font: 600 var(--fs-h3)/1.1 var(--serif); text-wrap: balance; }
-.never__list { display: flex; flex-wrap: wrap; gap: 10px; }
-.never__list li { position: relative; padding: 9px 15px; border-radius: var(--r-pill); font: 500 .88rem/1 var(--sans); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-2); }
-.never__list li::after { content: ''; position: absolute; left: 12px; right: 12px; top: 50%; height: 1px; background: var(--accent); transform: rotate(-4deg); opacity: .8; }
-.never__foot { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: .95rem; }
-.never__foot .lucide { width: 20px; height: 20px; color: var(--accent-text); }
-.never__foot b { color: var(--ink); font-weight: 600; }
+.note .ph { white-space: normal; }
+
+/* product postcards (the pack's front, the house special): the whole picture at its own proportions, and none
+   of the photos' warm grade or parallax, so the pack's pinks and words stay exactly as printed */
+.postcard--pack .postcard__photo img, .postcard--house .postcard__photo img { height: 100%; margin-top: 0; object-fit: cover; filter: none; will-change: auto; }
+.postcard--pack .postcard__photo::after, .postcard--house .postcard__photo::after { content: none; }
 
 /* ───────────── 15 · COMPARISON ───────────── */
 .compare { background: var(--white); }
@@ -1129,30 +1179,37 @@ html:not(.js) .amenity__turn { display: none; }
 .menucard__note .lucide { width: 17px; height: 17px; color: var(--accent-text); }
 .formmsg { font-size: .92rem; color: var(--accent-deep); text-align: center; min-height: 0; }
 .formmsg:not(:empty) { margin-top: 12px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--accent-tint); }
-.menu__side { display: grid; gap: 22px; grid-template-rows: 1fr auto; align-self: stretch; }
-.pouch {
-  position: relative; isolation: isolate; overflow: hidden; border-radius: var(--r-xs); box-shadow: var(--shadow-card);
-  padding: 22px 18px 24px; display: grid; justify-items: center; align-content: center;
-  background: radial-gradient(62% 50% at 50% 44%, #fff 0 40%, rgba(255, 255, 255, 0) 72%), linear-gradient(to bottom, #DDF4F8, #EEF9FB 55%, var(--paper));
+/* the house special: the pack photo as a postcard left on the sand beside the menu card */
+.menu__side { display: grid; justify-items: center; align-content: center; }
+.postcard--house { width: min(430px, 100% - 24px); }
+.postcard--house .postcard__photo { aspect-ratio: 738 / 851; background: #FBEDF3; }
+.postcard--house .postcard__caption .no { font-style: normal; font-variant-numeric: lining-nums; color: var(--accent-text); }
+.postcard--house .postmark { left: -10px; right: auto; top: -44px; width: clamp(130px, 13vw, 190px); transform: rotate(-14deg); }
+@media (min-width: 1024px) { .postcard--house .postmark { left: -40px; top: -46px; } }
+
+/* the green cabana: Super Greens Gummies, opening soon. A full-width card under the menu: the copy and the form
+   beside the printed label (wide, like the label itself), stacked on phones with the label under the words */
+.waitlist {
+  position: relative; overflow: hidden; margin-top: clamp(28px, 3.4vw, 48px);
+  display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "label" "form";
+  padding: clamp(42px, 3.8vw, 58px) clamp(20px, 3vw, 48px) clamp(26px, 3vw, 42px);
+  border-radius: var(--r-xs); background: #F1FAF4; box-shadow: 0 0 0 1px rgba(14, 122, 62, .16), var(--shadow-card);
+  --accent-text: #0B6B36; --accent-btn: var(--green);   /* the label print's chip and focus ring go green here */
 }
-.pouch::before { /* sunlight off the pool, dappling the wall around the pouch (the baked caustic frame) */
-  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .3;
-  background: var(--caustic, none) 50% 50% / cover;
-  -webkit-mask: radial-gradient(60% 52% at 50% 44%, transparent 0 46%, #000 82%); mask: radial-gradient(60% 52% at 50% 44%, transparent 0 46%, #000 82%);
-}
-.pouch::after { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(74, 13, 46, .1); pointer-events: none; }
-.pouch__tag { position: absolute; left: 22px; top: 18px; font: 400 1.2rem/1 var(--serif); font-variant-numeric: lining-nums; color: var(--accent-text); }
-.pouch img { width: min(100%, 430px); mix-blend-mode: multiply; }
-.pouch .caption { margin-top: 4px; }
-.waitlist { position: relative; overflow: hidden; padding: clamp(40px, 3.6vw, 48px) clamp(22px, 2.6vw, 34px) clamp(28px, 3vw, 38px); border-radius: var(--r-xs); background: #F1FAF4; box-shadow: 0 0 0 1px rgba(14, 122, 62, .16), var(--shadow-card); }
 .waitlist > .band { position: absolute; left: 0; right: 0; top: 0; height: 18px; }
+.waitlist__head { grid-area: head; }
+.waitlist__label { grid-area: label; display: grid; gap: 12px; min-width: 0; }
+.waitlist__form { grid-area: form; }
+.waitlist__cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; font-size: .86rem; color: var(--ink-2); }
+.waitlist__cap a { color: #0B6B36; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.waitlist__cap a:hover { text-decoration-thickness: 2px; }
 .eyebrow--green { color: #0B6B36; }
 .waitlist h3 { margin: 12px 0 10px; font: 600 1.6rem/1.12 var(--serif); text-wrap: balance; }
 .waitlist h3 em { font-style: italic; font-weight: 400; color: var(--green); }
-.waitlist > p { color: var(--ink-2); font-size: .95rem; }
+.waitlist__head > p { color: var(--ink-2); font-size: .95rem; max-width: 52ch; }
 .waitlist .ph { border-bottom-color: #1FA453; }
 .waitlist .ph::after { color: #0B6B36; }
-.waitlist__row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.waitlist__row { display: flex; flex-wrap: wrap; gap: 10px; }
 .waitlist input[type="email"] { flex: 1 1 200px; min-height: 52px; padding: 0 20px; border: 0; border-radius: var(--r-pill); background: #fff; box-shadow: inset 0 0 0 1px rgba(14, 122, 62, .3); }
 .waitlist input[type="email"][aria-invalid="true"] { box-shadow: inset 0 0 0 1.5px #B3261E; }
 .waitlist input[type="email"]:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
@@ -1254,6 +1311,50 @@ html.motion .postcard--glow[data-reveal].is-in { transform: rotate(-3.5deg); }
 .proto-chip .lucide { width: 13px; height: 13px; }
 .proto-chip:hover, .proto-chip:focus-visible { opacity: 1; }
 
+/* ───────────── 20½ · The label lightbox: the Super Greens label, full size ─────────────
+   A modal <dialog> on a sea-blue veil. Wide screens: the label fits the width (near its own 1600 px). Phones held
+   upright: it stands tall enough to read (its own size where the screen allows) and pans sideways; pinch-zoom
+   still works, and "Open image" gives the bare file. Esc, the close button or a tap outside close it.        */
+.lightbox {
+  width: min(1640px, calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); margin: auto;
+  padding: 0; border: 0; border-radius: var(--r-xs); background: var(--paper); color: var(--ink);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .5), 0 40px 90px -30px rgba(3, 30, 60, .75); overflow: hidden;
+}
+.lightbox[open] { display: flex; flex-direction: column; }
+.lightbox::backdrop { background: rgba(6, 46, 76, .68); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+.lightbox__bar { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px clamp(16px, 2vw, 26px); border-bottom: 1px solid var(--line); }
+.lightbox__title { flex: 1; min-width: 0; display: grid; gap: 5px; }
+.lightbox__k { font: 500 var(--fs-cap)/1.2 var(--sans); letter-spacing: var(--track-cap); text-transform: uppercase; color: #0B6B36; }
+.lightbox__title b { font: 600 1.3rem/1.1 var(--serif); }
+.lightbox__open {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: var(--r-pill); text-decoration: none;
+  font: 500 .72rem/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2);
+  transition: background var(--d-fast), box-shadow var(--d-fast);
+}
+.lightbox__open .lucide { width: 16px; height: 16px; }
+.lightbox__open:hover { background: var(--accent-tint); box-shadow: inset 0 0 0 1px var(--accent-soft); }
+.lightbox__close { flex: none; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--berry); color: #fff; cursor: pointer; transition: background var(--d-fast); }
+.lightbox__close .lucide { width: 20px; height: 20px; }
+.lightbox__close:hover { background: var(--accent-deep); }
+.lightbox__pan { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; background: #EDE5DA; }
+.lightbox__pan:focus-visible { outline-offset: -4px; }
+.lightbox__pan img { width: 100%; max-width: 1600px; height: auto; margin-inline: auto; }
+.lightbox__hint { display: none; }
+html.lightbox-open { overflow: hidden; }
+@media (max-width: 899px) and (orientation: portrait) {
+  .lightbox__pan img { width: auto; max-width: none; height: min(613px, calc(100svh - 196px)); margin: 0; }
+  .lightbox__hint {
+    flex: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 14px; border-top: 1px solid var(--line);
+    font: 500 .7rem/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); text-align: center;
+  }
+  .lightbox__hint .lucide { width: 16px; height: 16px; flex: none; color: #0B6B36; }
+}
+@media (max-width: 559px) {
+  .lightbox__open { width: 44px; padding: 0; justify-content: center; }
+  .lightbox__open span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .lightbox__title b { font-size: 1.15rem; }
+}
+
 /* ───────────── 21 · Reveal (only once JS has confirmed it can run them) ───────────── */
 html.motion [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 1s var(--ease-out), transform 1.1s var(--ease-out); transition-delay: var(--rd, 0s); }
 html.motion [data-reveal].is-in { opacity: 1; transform: none; }
@@ -1286,6 +1387,9 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .hero__ctas .btn { padding-inline: 18px; }
   .compare__us { flex-direction: column; gap: 6px; }   /* the parasol mark sits above the name: no "Glo / Pop" break */
   .waitlist__row .btn { flex: 1 1 100%; }
+  /* phones: the label print is short, so its "view" chip sits under it as a full-width pill, not over it */
+  .labelprint__chip, .labelprint:hover .labelprint__chip { position: static; display: flex; justify-content: center; margin-top: 10px; min-height: 44px; transform: none; }
+  .labelprint + * { margin-top: 0; }
 }
 
 /* ═══════════ RESPONSIVE ═══════════ */
@@ -1311,13 +1415,17 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .note + .note { border-top: 0; }
   .note:nth-child(n+3) { border-top: 1px solid var(--line); }
   .note:nth-child(odd) { border-right: 1px solid var(--line); }
-  /* tablets: the menu card takes the full width; the house special and the waitlist pair up beneath it */
-  .menu__side { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .postcard--pack { width: min(380px, 100%); }
   .foot__grid { grid-template-columns: repeat(3, 1fr); }
   .shopbar { display: none; }
   .postcard--club { margin-inline: var(--gutter) calc(var(--gutter) + 40px); }
   .postcard--club .postcard__photo { aspect-ratio: 16 / 11; }
   .postcard--club .postcard__photo img { object-position: 50% 22%; }
+}
+/* the green cabana: the words and the form on the left, the printed label on the right */
+@media (min-width: 900px) {
+  .waitlist { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); grid-template-areas: "head label" "form label"; column-gap: clamp(32px, 4vw, 64px); row-gap: 20px; align-items: start; }
+  .waitlist__label { align-self: center; }
 }
 @media (min-width: 1024px) {
   :root { --nav-h: 76px; }
@@ -1328,7 +1436,11 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .foot__grid { grid-template-columns: 1.6fr repeat(3, 1fr); }
   .foot__brand { grid-column: auto; }
   .menu__layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
-  .menu__side { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr auto; }
+  /* the house special lies on the sand beside the menu card, level with its middle, a little askew */
+  .menu__side { align-self: stretch; }
+  .postcard--house { width: min(520px, 92%); transform: rotate(-2deg); }
+  html.motion .postcard--house[data-reveal] { transform: rotate(-2deg) translateY(22px); }
+  html.motion .postcard--house[data-reveal].is-in { transform: rotate(-2deg); }
 
   /* hero: the headline runs wide across the shelf, the pop floats on the right third */
   .awning--hero { --sw: 46px; --sh: 32px; }
@@ -1347,11 +1459,14 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .postcard--club .postmark { right: -34px; top: -58px; }
   .club__copy { padding-inline: 0; }
 
-  .amenity-grid { grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .amenity-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 22px; }
+  .amenity:nth-child(5) { grid-column: 2 / span 2; }   /* four, then three centred under them */
+  .amenity:nth-child(7) { grid-column: span 2; }
   .amenity__card { min-height: 272px; }
-  .sugar__grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; }
-  .never__card { grid-template-columns: 240px 1fr; align-items: center; column-gap: 40px; }
-  .never__foot { grid-column: 2; }
+  /* the intro and the notes on the left, the pack's front standing on the right */
+  .sugar__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); grid-template-rows: auto 1fr; grid-template-areas: "intro pack" "notes pack"; column-gap: clamp(48px, 6vw, 104px); row-gap: 48px; align-items: start; }
+  .postcard--pack { width: min(390px, 100%); justify-self: end; }
+  .postcard--pack .postmark { right: -40px; top: -60px; }
   .compare__grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
   .faq__grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; }
   .faq__head { position: sticky; top: calc(var(--nav-h) + 48px); }
@@ -1370,11 +1485,15 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .cabana-card__inner { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.25fr) auto auto; column-gap: 36px; }
   .cabana-card__cta { grid-auto-flow: row; justify-items: start; }
 }
-/* small laptops: the sugar notes sit beside the intro, so they stack in one column rather than four narrow cells */
+/* small laptops: four amenity cards to a row are narrower, so their faces are set a size smaller */
 @media (min-width: 1024px) and (max-width: 1279px) {
-  .sugar__notes { grid-template-columns: 1fr; }
-  .note:nth-child(odd) { border-right: 0; }
-  .note + .note { border-top: 1px solid var(--line); }
+  .amenity__face { padding: 32px 14px 58px; }
+  .amenity__icon { width: 60px; height: 60px; }
+  .amenity__icon .lucide { width: 26px; height: 26px; }
+  .amenity__name { font-size: 1.3rem; }
+  .amenity__for { letter-spacing: .12em; }
+  .amenity__back p { font-size: .9rem; line-height: 1.5; }
+  .chips li { padding: 7px 10px; font-size: .76rem; }
 }
 @media (min-width: 1280px) {
   .nav__cabana { display: inline-flex; }

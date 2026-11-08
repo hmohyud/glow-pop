@@ -30,37 +30,42 @@
   }
 
   /* ── 1. PRODUCTS: one source of truth for theme + copy ──── */
+  // Facts: redesign/_qa/PACK-FACTS.md (2026-11-08). The pops are sugar free (the only sugar claim we make);
+  // the Super Greens Gummies are NOT (3 g sugars per serving), so no sugar-free copy may bind in their state.
+  var POP_NOTE = 'Sweetener: ' + PH('TBD') + ' · other ingredients &amp; allergens: ' + PH('details');
   var PRODUCTS = {
     'strawberry-pop': {
       theme: { c: '#FF2E93', c2: '#FF9AC8', deep: '#5A0F38', ink: '#2A0820', paper: '#FFF6EC', tint: '#FFE3F0', 'on-c': '#2A0820', sky: '#FFC6E0', sea2: '#FF7AB8' },
       candy: { kind: 'lollipop', color: '#FF1493' },
       ui: {
-        kicker: 'Peptide Lollipops · Strawberry',
-        heroSub: 'Peptide-powered strawberry lollipops with collagen, hyaluronic acid and four more actives. One a day. Real sugar. Seriously good.',
-        ctaLabel: 'Build your bag', ctaHref: '#shop', sugarNote: '',
-        tape: ['Real sugar', '47 cal a pop', '6 actives', 'One a day', 'Gluten-free', 'Free shipping']
+        kicker: 'Collagen Boost · Strawberry',
+        heroSub: 'Sugar-free strawberry beauty lollipops with peptides, hyaluronic acid and five more actives. One a day. Seriously good.',
+        ctaLabel: 'Build your bag', ctaHref: '#shop', sugarNote: POP_NOTE,
+        proof: [['candy', 'Sugar free'], ['sparkles', '7 actives'], ['lollipop', '15 g pop'], ['truck', 'Free shipping']],
+        tape: ['Sugar free', '7 actives', '15 g pop', 'Strawberry flavor', 'One a day', 'Gluten-free', 'Free shipping']
       },
       info: {
-        status: ['badge-check', 'Available now'], name: 'Peptide Lollipops', flavor: 'Strawberry',
-        blurb: 'Like a really, really good strawberry lollipop, because it is one. Six actives ride along inside.',
-        tiles: [['47', 'calories a pop'], ['10', 'pops per bag'], ['6', 'actives inside'], ['1', 'a day, that’s it']],
-        ctas: [['Build your bag', '#shop', 'ink'], ['Meet the six', '#six', 'paper']]
+        status: ['badge-check', 'Available now'], name: 'Collagen Boost', flavor: 'Strawberry Beauty Lollipop',
+        blurb: 'A really, really good strawberry lollipop that happens to be sugar free. Seven actives ride along inside, from peptides to biotin.',
+        tiles: [['15 g', 'each pop'], ['10', 'pops per bag'], ['7', 'actives inside'], ['1', 'a day, that’s it']],
+        ctas: [['Build your bag', '#shop', 'ink'], ['Meet the seven', '#grid', 'paper']]
       }
     },
     'green-gummies': {
       theme: { c: '#22C55E', c2: '#A3E635', deep: '#0B3B22', ink: '#062A17', paper: '#F2FCEB', tint: '#DDF7E5', 'on-c': '#062A17', sky: '#C8F5D3', sea2: '#7EE0A0' },
       candy: { kind: 'gummy', color: '#0C9A43' },
       ui: {
-        kicker: 'Green Gummies · Coming soon',
-        heroSub: 'Strawberry-Watermelon gummies with five B vitamins and an Organic Super Greens Blend. On their way to the candy shop.',
+        kicker: 'Super Greens Gummies · Coming soon',
+        heroSub: 'Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry. Vegan friendly, gluten free, non GMO. Coming soon.',
         ctaLabel: 'Join the waitlist', ctaHref: '#waitlist',
-        sugarNote: 'The bubbles above are about the Strawberry Pop. Green Gummies: 20 calories and 3 g sugar per 2-gummy serving; other ingredients ' + PH('list') + '.',
-        tape: ['Green Gummies', 'Strawberry-Watermelon', '5 B vitamins', 'Organic super greens', 'Coming soon', 'Join the waitlist']
+        sugarNote: 'This level is about the Collagen Boost pops. Super Greens Gummies are not sugar free: 3 g total sugars per 2-gummy serving.',
+        proof: [['vegan', 'Vegan friendly'], ['wheat-off', 'Gluten free'], ['flask-conical', 'Non GMO'], ['clock', 'Coming soon']],
+        tape: ['Super Greens Gummies', 'Strawberry-Watermelon', 'Vegan friendly', 'Gluten free', 'Non GMO', 'Coming soon']
       },
       info: {
-        status: ['clock', 'Coming soon'], name: 'Green Gummies', flavor: 'Strawberry-Watermelon',
-        blurb: 'Strawberry meets watermelon in a gummy. Five B vitamins and an Organic Super Greens Blend of 15 ingredients, from kale to elderberry.',
-        tiles: [['20', 'calories per serving'], ['3 g', 'sugar per serving'], ['60', 'gummies (30 servings)'], ['5', 'B vitamins inside']],
+        status: ['clock', 'Coming soon'], name: 'Super Greens Gummies', flavor: 'Strawberry-Watermelon',
+        blurb: 'Strawberry meets watermelon in a gummy, with kale, broccoli, spinach, wild blueberries and elderberry. No astragalus &amp; adaptogens.',
+        tiles: [['2', 'gummies a day'], ['30', 'servings (60 gummies)'], ['20', 'calories per serving'], ['3 g', 'sugars per serving']],
         phTiles: ['Price', 'Launch date'],
         ctas: [['Join the waitlist', '#waitlist', 'ink'], ['See Supplement Facts', '#facts', 'paper']]
       }
@@ -71,14 +76,15 @@
       ui: {
         kicker: 'More colours · In development',
         heroSub: 'More Glo Pop colours are in the works. No names, no flavours yet. Just a whole lot of colour on the way.',
-        ctaLabel: 'Get first dibs', ctaHref: '#waitlist', sugarNote: '',
+        ctaLabel: 'Get first dibs', ctaHref: '#waitlist', sugarNote: POP_NOTE,
+        proof: [['flask-conical', 'In development'], ['clock', 'Drop date ' + PH('TBD')], ['truck', 'Free shipping']],
         tape: ['More colours', 'In development', 'Stay tuned', 'Get first dibs', 'Free shipping']
       },
       info: {
         status: ['flask-conical', 'In development'], name: 'More colours', flavor: 'on the way',
         blurb: 'The colour system is built to grow. Each new pop gets its own colour world on this page the day it’s real.',
         phTiles: ['Colours', 'Flavours', 'Actives', 'Drop date'],
-        ctas: [['Get first dibs', '#waitlist', 'ink'], ['Back to Strawberry', 'strawberry-pop', 'switch']]
+        ctas: [['Get first dibs', '#waitlist', 'ink'], ['Back to Collagen Boost', 'strawberry-pop', 'switch']]
       }
     }
   };
@@ -90,6 +96,11 @@
     var m = $('meta[name="theme-color"]'); if (m) m.setAttribute('content', p.theme.c);
     $$('[data-bind]').forEach(function (el) { var v = p.ui[el.getAttribute('data-bind')]; if (v != null) el.innerHTML = v; });
     $$('[data-bind-href]').forEach(function (el) { el.setAttribute('href', p.ui[el.getAttribute('data-bind-href')]); });
+    // hero proof chips follow the product too (a "Sugar free" chip must never sit beside the gummies)
+    $$('[data-bind-list]').forEach(function (el) {
+      var v = p.ui[el.getAttribute('data-bind-list')];
+      if (v) el.innerHTML = v.map(function (x) { return '<li>' + ico(x[0]) + '<span>' + x[1] + '</span></li>'; }).join('');
+    });
     var tape = $('[data-bind-tape]');
     if (tape) {
       var one = p.ui.tape.map(function (t) { return '<span>' + t + ' ' + ico('sparkle') + '</span>'; }).join('');
@@ -98,7 +109,7 @@
     var lock = $('#shopLock');
     if (lock) {
       lock.hidden = id === 'strawberry-pop';
-      if (!lock.hidden) lock.innerHTML = ico('info') + '<span>' + (id === 'green-gummies' ? 'Green Gummies aren’t in the shop yet.' : 'New colours aren’t in the shop yet.') + ' The bundles below are Strawberry Pops. <a href="#waitlist">Join the waitlist</a></span>';
+      if (!lock.hidden) lock.innerHTML = ico('info') + '<span>' + (id === 'green-gummies' ? 'Super Greens Gummies aren’t in the shop yet.' : 'New colours aren’t in the shop yet.') + ' The bundles below are Collagen Boost pops. <a href="#waitlist">Join the waitlist</a></span>';
     }
     renderInfo(p);
     icons();
@@ -215,11 +226,13 @@
     });
   }
 
-  /* ── 7. GLOW GRID: original match-3 that teaches the six ── */
+  /* ── 7. GLOW GRID: original match-3 that teaches the seven ── */
+  // The seven actives, in the pack's wording and order of the sticker book. Token shapes live in the
+  // sprite (#sh-0 … #sh-6): circle, droplet, sunburst, hexagon, rounded square, diamond, four-petal flower.
   var A = [
-    { n: 'Collagen peptides', ab: 'CP', c: '#FF4FA3', l: '#2A0820', chip: 'Skin’s scaffold',
-      body: 'Collagen is the most abundant protein in your body. Think of it as your skin’s scaffolding. Peptides are collagen pre-cut into short chains: the “peptide” in Peptide Lollipops.',
-      fact: '“Collagen” comes from the Greek kolla, meaning glue.' },
+    { n: 'Peptides', ab: 'Pep', c: '#FF4FA3', l: '#2A0820', chip: 'Building blocks',
+      body: 'Short chains of amino acids, the building blocks of proteins. Peptides support skin’s natural firmness and elasticity*.',
+      fact: '“Peptide” comes from the Greek peptós, meaning digested.' },
     { n: 'Hyaluronic acid', ab: 'HA', c: '#2EC5F0', l: '#08283A', chip: 'Moisture molecule',
       body: 'Your skin’s own moisture molecule, famous for holding on to water. About half of your body’s HA lives in your skin.',
       fact: 'An adult recycles about a third of their HA every day.' },
@@ -231,21 +244,39 @@
       fact: 'The only vitamin with a metal at its centre: cobalt.' },
     { n: 'Vitamin B6', ab: 'B6', c: '#8BD12F', l: '#122600', chip: 'Protein metabolism',
       body: 'Contributes to normal protein and glycogen metabolism. A behind-the-scenes helper for more than 100 enzymes.',
-      fact: '“Vitamin B6” is really six related compounds.' },
+      fact: '“Vitamin B6” is really a small family of related compounds, not just one.' },
     { n: 'Zinc', ab: 'Zn', c: '#B49BFF', l: '#1A0630', chip: 'Normal skin',
       body: 'Contributes to the maintenance of normal skin, hair and nails. Your body has no zinc storage, so a steady daily supply matters.',
-      fact: 'Zinc plays a part in your sense of taste. Fitting, for a candy.' }
+      fact: 'Zinc plays a part in your sense of taste. Fitting, for a candy.' },
+    { n: 'Vitamin B8 (biotin)', ab: 'B8', c: '#FFC23D', l: '#2A1400', chip: 'Hair, skin & nails',
+      body: 'One of the B vitamins: your body uses it to unlock energy from food. Biotin supports healthy-looking hair, skin and nails*.',
+      fact: 'Biotin was first called “vitamin H”, after the German Haar und Haut: hair and skin.' }
   ];
   function tokSVG(t) {
-    return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#sh-' + t + '" class="s-body"/><use href="#sh-' + t + '" class="s-gloss" stroke="none"/>' +
-      '<ellipse class="s-hi" cx="34" cy="30" rx="11" ry="6" transform="rotate(-32 34 30)"/></svg>';
+    // the flower (biotin) gets its gloss spot on its top-left petal; the rest share one spot
+    var hi = t === 6 ? '<ellipse class="s-hi" cx="31" cy="27" rx="9" ry="5" transform="rotate(-40 31 27)"/>' : '<ellipse class="s-hi" cx="34" cy="30" rx="11" ry="6" transform="rotate(-32 34 30)"/>';
+    return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#sh-' + t + '" class="s-body"/><use href="#sh-' + t + '" class="s-gloss" stroke="none"/>' + hi + '</svg>';
   }
 
   function game() {
-    var N = 6, T = A.length;
+    // Seven token types on a 7x7 board: a 6x6 board with seven types left fewer visible matches and
+    // more dead-board shuffles. Refills lean toward actives that are still locked (BIAS) so the last
+    // cards turn up in reasonable time. (Simulated: ~6 valid moves per board, ~7 moves to clear.)
+    var N = 7, T = A.length, BIAS = 0.35, WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+    var ALL = WORDS[T] || String(T);
     var board = $('#board'), wrapEl = board.parentElement, fx = $('#fx'), comboEl = $('#combo'), live = $('#gLive');
     var grid = [], busy = false, sel = null, cur = { r: 0, c: 0 }, started = false, won = false;
     var score = 0, moves = 0, unlocked = [], idleT = 0, hintT = 0;
+    wrapEl.style.setProperty('--n', N);
+    $('#gTot').textContent = T;
+    board.setAttribute('aria-label', 'Glow Grid board, ' + N + ' by ' + N + '. Arrow keys move, Enter picks a token, then an arrow key swaps it.');
+    function spawnType() {
+      if (Math.random() < BIAS) {
+        var locked = []; for (var t = 0; t < T; t++) if (!unlocked[t]) locked.push(t);
+        if (locked.length) return locked[Math.floor(Math.random() * locked.length)];
+      }
+      return Math.floor(Math.random() * T);
+    }
 
     /* sticker book */
     var book = $('#book');
@@ -257,6 +288,7 @@
         '<div class="card-more"><p class="card-body">' + a.body + ' <span class="nw">Per pop: ' + PH('mg TBD') + '</span></p>' +
         '<p class="card-fact">' + ico('lightbulb') + '<span>' + a.fact + '</span></p></div></li>';
     }).join('');
+    $('#gPips').innerHTML = A.map(function () { return '<i></i>'; }).join('');   // one pip per active
     var pips = $$('#gPips i');
     pips.forEach(function (p, i) { p.style.setProperty('--pc', A[i].c); });
     book.addEventListener('click', function (e) {
@@ -277,7 +309,7 @@
       reveal(t);
       pips[t].classList.add('is-on');
       var n = unlocked.filter(Boolean).length; $('#gUnl').textContent = n;
-      if (!quiet) { say('Unlocked ' + A[t].n + ': ' + A[t].chip + '. ' + n + ' of 6.'); }
+      if (!quiet) { say('Unlocked ' + A[t].n + ': ' + A[t].chip + '. ' + n + ' of ' + T + '.'); }
       return true;
     }
     function say(t) { live.textContent = ''; setTimeout(function () { live.textContent = t; }, 30); }
@@ -437,7 +469,7 @@
           }
           var missing = w + 1;
           for (var r2 = w; r2 >= 0; r2--) {
-            var nt = mk(Math.floor(Math.random() * T));
+            var nt = mk(spawnType());
             grid[r2][c] = nt; place(nt, r2 - missing, c, 0);
             spawns.push([nt, r2, c, missing]); maxFall = Math.max(maxFall, missing);
           }
@@ -462,10 +494,10 @@
       won = true; clearTimeout(idleT);
       var stars = moves <= 12 ? 3 : moves <= 20 ? 2 : 1;
       $('#winStars').innerHTML = [0, 1, 2].map(function (i) { return '<i data-lucide="star"' + (i < stars ? '' : ' class="is-off"') + '></i>'; }).join('');
-      $('#winTxt').textContent = 'All six unlocked in ' + moves + ' moves · score ' + score + '.';
+      $('#winTxt').textContent = 'All ' + ALL + ' unlocked in ' + moves + ' moves · score ' + score + '.';
       icons();
       var w = $('#win'); w.hidden = false;
-      say('Level clear! All six actives unlocked in ' + moves + ' moves. ' + stars + ' of 3 game stars.');
+      say('Level clear! All ' + ALL + ' actives unlocked in ' + moves + ' moves. ' + stars + ' of 3 game stars.');
       var r = wrapEl.getBoundingClientRect();
       confetti(r.left + r.width / 2, r.top + r.height / 3, 120);
       setTimeout(function () { $('#gAgain').focus({ preventScroll: true }); }, 50);
@@ -477,7 +509,7 @@
       $('#cover').classList.add('is-gone');
       setTimeout(function () { $('#cover').hidden = true; }, D(360));
       sizeFx(); syncTab(true); idle();
-      say('Game on. Swap neighbours to line up three. Unlock all six actives.');
+      say('Game on. Swap neighbours to line up three. Unlock all ' + ALL + ' actives.');
     }
     $('#gStart').addEventListener('click', start);
     $('#gAgain').addEventListener('click', function () {
@@ -491,8 +523,8 @@
     $('#gNew').addEventListener('click', function () { if (busy) return; if (won) { $('#gAgain').click(); return; } if (!started) start(); setSel(null); fresh(true); idle(); syncTab(); });
     $('#gAll').addEventListener('click', function () {
       A.forEach(function (a, i) { reveal(i); });
-      say('All six actives shown below the board.');
-      toast('eye', 'All six cards unlocked. The game’s still there for fun.');
+      say('All ' + ALL + ' actives shown below the board.');
+      toast('eye', 'All ' + ALL + ' cards unlocked. The game’s still there for fun.');
       var c = $('#card-0'); c.setAttribute('tabindex', '-1'); c.focus({ preventScroll: false });
     });
 
@@ -577,21 +609,82 @@
     window.__glowGrid = { start: start, move: function () { var m = findMove(); if (m) { if (!started) start(); return attempt(m[0], m[1]); } }, state: function () { return { score: score, moves: moves, unlocked: unlocked.filter(Boolean).length }; } };
   }
 
-  /* ── 8. REAL SUGAR BUBBLES ────────────────────────────── */
+  /* ── 8. SUGAR-FREE BUBBLES: each bubble is a claim printed on the pack ──
+     Popping one stamps it "On the pack" and rings the spot where the real pack front prints it.
+     Every bubble is a true pack fact; nothing here names a sweetener or what the pop is free from. */
   function bubbles() {
     var bs = $$('.bub'), n = 0, out = $('#bubScore b');
+    $('#bubT').textContent = bs.length;
+    function ring(id) {
+      $$('.spot[data-spot="' + id + '"]').forEach(function (s) {
+        if (!s.classList.contains('is-on')) s.classList.add('is-on'); else bump(s, 'is-pulse');
+      });
+    }
     bs.forEach(function (b) {
-      var name = b.textContent;
+      var name = b.textContent, id = b.getAttribute('data-spot');
       b.addEventListener('click', function () {
-        if (b.classList.contains('is-popped')) return;
+        if (b.classList.contains('is-popped')) { ring(id); return; }   // tap again: show me where it is
         b.classList.add('is-popped'); b.parentElement.classList.add('is-popped');
-        b.setAttribute('aria-label', name + ': not in a Glo Pop');
-        b.setAttribute('aria-disabled', 'true');
+        b.setAttribute('aria-label', name + ': found on the pack');
+        ring(id);
         n++; out.textContent = n; bump(out.parentElement);
         var r = b.getBoundingClientRect();
         confetti(r.left + r.width / 2, r.top + r.height / 2, 18);
-        if (n === bs.length) toast('candy', 'All 9 popped. None of them are in here: just real sugar.');
+        if (n === bs.length) toast('badge-check', 'All ' + bs.length + ' claims found. Sugar free, strawberry flavor, 15 g: it’s all on the pack.');
       });
+    });
+  }
+
+  /* ── 8b. LARGE VIEW: pack front + gummies label (links work without JS too) ── */
+  function lightbox() {
+    var dlg = $('#lb'), img = $('#lbImg'), pane = $('#lbPane'), fitB = $('#lbFit'), ttl = $('#lbTitle'), opener = null, W = 0, H = 0;
+    if (!dlg || typeof dlg.showModal !== 'function') return;   // no <dialog>: the links open the image itself
+    function setActual(on) {
+      dlg.classList.toggle('is-actual', on);
+      img.style.width = on ? W + 'px' : '';      // actual = the file's own pixels, never upscaled or squeezed
+      img.style.height = on ? H + 'px' : '';
+      fitB.setAttribute('aria-pressed', String(on));
+      fitB.innerHTML = ico(on ? 'zoom-out' : 'zoom-in') + '<span>' + (on ? 'Fit to screen' : 'Actual size') + '</span>';
+      icons();
+    }
+    // mouse drag-to-pan at actual size (touch pans natively and pinch-zooms the page)
+    var drag = null;
+    pane.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || !dlg.classList.contains('is-actual')) return;
+      drag = { x: e.clientX, y: e.clientY, l: pane.scrollLeft, t: pane.scrollTop };
+      pane.classList.add('is-drag'); e.preventDefault();
+      try { pane.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    pane.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      pane.scrollLeft = drag.l - (e.clientX - drag.x); pane.scrollTop = drag.t - (e.clientY - drag.y);
+    });
+    function endDrag() { drag = null; pane.classList.remove('is-drag'); }
+    pane.addEventListener('pointerup', endDrag); pane.addEventListener('pointercancel', endDrag);
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[data-zoom]'); if (!a) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return;   // new-tab clicks keep the link
+      e.preventDefault(); opener = a;
+      var pic = a.querySelector('img');
+      W = +a.getAttribute('data-w'); H = +a.getAttribute('data-h');
+      img.width = W; img.height = H;
+      img.alt = pic ? pic.alt : '';
+      img.src = a.getAttribute('href');
+      ttl.textContent = a.getAttribute('data-title') || 'Full size';
+      root.classList.add('lb-open');
+      dlg.showModal();
+      // phones: a fitted label is unreadable, so start at actual size and let people pan
+      setActual(W > pane.clientWidth * 1.5);
+      pane.scrollLeft = 0; pane.scrollTop = 0;
+      $('#lbClose').focus();
+    });
+    fitB.addEventListener('click', function () { setActual(!dlg.classList.contains('is-actual')); });
+    img.addEventListener('dblclick', function () { setActual(!dlg.classList.contains('is-actual')); });
+    $('#lbClose').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   // backdrop
+    dlg.addEventListener('close', function () {
+      root.classList.remove('lb-open');
+      if (opener) opener.focus({ preventScroll: true });
     });
   }
 
@@ -615,7 +708,7 @@
     function q() { var c = $('input[name="tier"]:checked', f); return c ? +c.value : 1; }
     function upd() {
       var b = q();
-      sum.innerHTML = b + (b === 4 ? '+' : '') + (b > 1 ? ' bags' : ' bag') + ' · ' + b * 10 + (b === 4 ? '+' : '') + ' pops · $' + PH('XX') + (sub.checked ? ' · subscribed' : '') + ' · free shipping';
+      sum.innerHTML = b + (b === 4 ? '+' : '') + (b > 1 ? ' bags' : ' bag') + ' · ' + b * 10 + (b === 4 ? '+' : '') + ' pops · <span class="nw">$' + PH('XX') + '</span>' + (sub.checked ? ' · subscribed' : '') + ' · free shipping';
     }
     f.addEventListener('change', upd); upd();
     f.addEventListener('submit', function (e) {
@@ -717,7 +810,7 @@
   function pauseOffscreen() {
     if (!('IntersectionObserver' in window)) return;
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle('paused', !e.isIntersecting); }); });
-    $$('.hero, .tape, .sugar, .gum, .six, .coin').forEach(function (el) { io.observe(el); });
+    $$('.hero, .tape, .sugar, .gum, .glowgrid, .coin').forEach(function (el) { io.observe(el); });
   }
 
   /* ── BOOT ─────────────────────────────────────────────── */
@@ -728,6 +821,7 @@
   safe('switcher', switcher);
   safe('game', game);
   safe('bubbles', bubbles);
+  safe('lightbox', lightbox);
   safe('streak', streak);
   safe('shop', shop);
   safe('waitlist', waitlist);
@@ -746,16 +840,22 @@
   if (!hero || !sh) return;
   var t = 0;
   function seat() {
-    if (window.innerWidth < 1024) { hero.classList.remove('is-seated'); return; }
     var hr = hero.getBoundingClientRect(), sr = sh.getBoundingClientRect();
+    var st = hero.querySelector('.hero-stage').getBoundingClientRect(), sub = hero.querySelector('.hero-sub');
     var top = sr.top + sr.height / 2 - hr.top - 46;            // sand line ~46px behind the shadow centre
     var h = Math.max(70, Math.round(hr.height - top));
+    var sea = window.innerWidth >= 1024
+      ? top - (sub.getBoundingClientRect().bottom - hr.top) - 14  // waves start just under the sub card
+      : st.height * 0.42;                                         // phones: waves behind the pop's lower half
     hero.style.setProperty('--sand-h', h + 'px');
-    hero.classList.add('is-seated');
+    hero.style.setProperty('--sea-h', Math.round(Math.max(70, Math.min(260, sea)) + 8) + 'px');
+    hero.style.setProperty('--stage-t', Math.round(st.top - hr.top) + 'px');
+    if (!hero.classList.contains('is-seated')) hero.classList.add('is-seated');
   }
   function later() { clearTimeout(t); t = setTimeout(seat, 120); }
   seat();
   window.addEventListener('resize', later);
   window.addEventListener('load', seat);
+  if (window.MutationObserver) new MutationObserver(later).observe(hero, { attributes: true, attributeFilter: ['class'] }); // product switch (is-gum) re-seats
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(seat);
 })();

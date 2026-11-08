@@ -9,7 +9,8 @@
      4  Aura background
      5  Header, nav, mobile menu
      6  Hero
-     7+ Sections (lineup, benefits, orbit, sugar, night glow, compare, shop, supplement facts sheet, faq, cta)
+     7+ Sections (lineup, benefits, orbit, sugar free + framed pack photos, night glow, compare,
+        shop, Super Greens Gummies, supplement facts sheet, large photo view, faq, cta)
      F  Footer, prototype chip, mobile shop bar
      R  Reduced motion
    ============================================================================= */
@@ -53,7 +54,7 @@
   --on-dark-2: #E2CFE6;
   --on-dark-3: #C2A8C9;
 
-  /* product theme: defaults = Strawberry Pop; app.js rewrites these from PRODUCTS */
+  /* product theme: defaults = Collagen Boost (strawberry); app.js rewrites these from PRODUCTS */
   --accent: #FF1493;
   --accent-ink: #B30E66;
   --accent-deep: #7A1B4D;
@@ -436,19 +437,32 @@ html.js .reveal.is-in {
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .nav { background: rgba(255, 250, 253, .95); }
 }
+/* the pack lockup: "Glo Pop" with a small "— lab —" centered under it, set in this
+   design's eyebrow language (tracked caps between iridescent hairlines) */
 .logo {
-  display: inline-flex; align-items: baseline; gap: .12em;
-  min-height: 44px; align-items: center;
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: .28em;
+  min-height: 44px;
   font: 400 1.6rem/1 var(--f-display);
   font-variation-settings: var(--soft-axis);
   letter-spacing: -.03em;
   color: var(--ink); text-decoration: none;
 }
+.logo-word { display: inline-flex; align-items: baseline; gap: .12em; }
 .logo em {
   font-variation-settings: var(--soft-axis-it);
   font-weight: 380;
   color: var(--accent-ink);
 }
+.logo-lab {
+  display: inline-flex; align-items: center; gap: .55em;
+  font: 800 max(9px, .34em)/1 var(--f-ui); letter-spacing: .34em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.logo-lab::before, .logo-lab::after {
+  content: ''; width: 1.7em; height: 1.5px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--film-a), var(--film-b), var(--film-c));
+}
+.logo-lab::after { margin-left: -.34em; }       /* the last letter's tracking: keeps "— lab —" symmetric */
 .logo--lg { font-size: 2.4rem; }
 .nav-links { display: none; margin: 0 auto; gap: 2px; }
 .nav-links a {
@@ -479,7 +493,8 @@ html.js .reveal.is-in {
 .menu {
   position: fixed; inset: 0; z-index: -1;
   padding: calc(var(--announce-h) + var(--nav-h) + 40px) var(--gutter) 40px;
-  display: flex; flex-direction: column; justify-content: space-between;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+  overflow-y: auto;                                /* 7 links: short phones can scroll the menu */
   background: rgba(255, 246, 251, .9);
   -webkit-backdrop-filter: blur(24px) saturate(150%);
   backdrop-filter: blur(24px) saturate(150%);
@@ -506,6 +521,7 @@ body.menu-open { overflow: hidden; }
 }
 .site-header.on-dark-glass .logo { color: var(--on-dark); }
 .site-header.on-dark-glass .logo em { color: var(--film-a); }
+.site-header.on-dark-glass .logo-lab { color: var(--on-dark-2); }
 .site-header.on-dark-glass .nav-links a { color: var(--on-dark-2); }
 .site-header.on-dark-glass .nav-links a:hover { background: rgba(255, 255, 255, .1); color: #fff; }
 .site-header.on-dark-glass .menu-btn { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .2); }
@@ -566,7 +582,11 @@ body.menu-open { overflow: hidden; }
 .hero-title em { font-weight: 300; }
 /* small phones (360–374px): keep "The most delicious" on one line, so the
    headline stays two lines and the CTA isn't pushed down */
-@media (max-width: 374px) { .hero-title { font-size: clamp(2.2rem, 11.9vw, 2.85rem); } }
+@media (max-width: 374px) {
+  .hero-title { font-size: clamp(2.2rem, 11.9vw, 2.85rem); }
+  /* the product eyebrows ("Collagen Boost · Strawberry Beauty Lollipop") keep one line */
+  .eyebrow-chip { gap: 8px; padding: 0 12px 0 10px; font-size: .69rem; letter-spacing: .01em; }
+}
 
 /* the stage: candy, halo, glow, chips. A size container so the halo can be
    placed in cqh units that match the 3D camera framing (see FRAMES in app.js). */
@@ -720,7 +740,7 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 .dock {
   position: relative; z-index: 4;
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;
-  width: min(100%, 640px);
+  width: min(100%, 760px);                       /* room for "Super Greens Gummies" on one line */
   margin-top: -30px;
   padding: 5px;
   border-radius: 26px;
@@ -763,9 +783,10 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 .dock-txt small { font: 700 .64rem/1.1 var(--f-ui); color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; }
 .dock-btn[aria-pressed="true"] .dock-txt small { color: var(--accent-ink); }
 @media (max-width: 559px) {
-  .dock-txt b { font-size: .74rem; white-space: nowrap; }
+  /* "Super Greens Gummies" takes two lines here: orbs stay level, labels hang from them */
+  .dock-txt b { font-size: .74rem; text-wrap: balance; }
   .dock-txt small { font-size: .56rem; letter-spacing: .06em; white-space: nowrap; }
-  .dock-btn { padding: 10px 4px; min-height: 72px; }
+  .dock-btn { justify-content: flex-start; padding: 12px 4px 10px; min-height: 72px; }
 }
 
 @media (min-width: 560px) {
@@ -884,14 +905,14 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 @media (min-width: 720px) and (max-width: 1079px) {
   .lineup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lineup-grid .pcard:first-child { grid-column: 1 / -1; flex-direction: row; }
-  .lineup-grid .pcard:first-child .pv { width: 52%; flex: none; aspect-ratio: auto; min-height: 340px; }
+  .lineup-grid .pcard:first-child .pv { width: 52%; flex: none; aspect-ratio: auto; min-height: 400px; }
 }
 /* desktop: the available pop is the featured card (pink stays predominant);
    upcoming products stack beside it as compact cards. --rows set by app.js. */
 @media (min-width: 1080px) {
   .lineup-grid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); gap: 22px; }
   .lineup-grid .pcard:first-child { grid-row: 1 / span var(--rows, 2); }
-  .lineup-grid .pcard:first-child .pv { flex: 1; aspect-ratio: auto; min-height: 360px; }
+  .lineup-grid .pcard:first-child .pv { flex: 1; aspect-ratio: auto; min-height: 470px; }   /* tall enough for the whole pack face */
   .lineup-grid .pcard:first-child .pcard-body { flex: none; }
   .lineup-grid .pcard:not(:first-child) { flex-direction: row; }
   .lineup-grid .pcard:not(:first-child) .pv { width: 37%; flex: none; aspect-ratio: auto; }
@@ -931,7 +952,16 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
     var(--pc-tint);
   isolation: isolate;
 }
-.pv--photo img { width: 78%; height: auto; mix-blend-mode: multiply; }
+/* the pack photo (pack-mockup.jpg, its own pale pink studio set) fills the frame;
+   cover + a focal point that keeps the "Glo pop lab" lockup and "Net wt. 15g" in.
+   The source has a dark 1px column at each side edge: the photo runs 3px past the
+   frame on both sides so the frame's clip hides it (a 6px overscan, under 1%). */
+.pv--photo .pv-img, .buy-media--photo .buy-photo {
+  position: absolute; top: 0; left: -3px;
+  width: calc(100% + 6px); max-width: none; height: 100%;
+  object-fit: cover; object-position: 50% 60%;
+}
+@media (max-width: 719px) { .lineup-grid .pcard:first-child .pv { aspect-ratio: 1 / 1.04; } }
 .pv--gummy svg { width: 80%; height: auto; overflow: visible; }
 .pv-cap {
   position: absolute; left: 12px; bottom: 12px;
@@ -962,7 +992,7 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 .frost {
   position: absolute; inset: 0;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, .5) 0 18%, rgba(255, 255, 255, 0) 19% 46%, rgba(255, 255, 255, .28) 47% 52%, rgba(255, 255, 255, 0) 53%),
+    linear-gradient(120deg, rgba(255, 255, 255, .5) 0 18%, rgba(255, 255, 255, 0) 19% 46%, rgba(255, 255, 255, .28) 47% 52%, rgba(255, 255, 255, 0) 54%),
     rgba(255, 255, 255, .22);
   -webkit-backdrop-filter: blur(7px) saturate(130%);
   backdrop-filter: blur(7px) saturate(130%);
@@ -1098,8 +1128,10 @@ html[data-kind="gummy"] .hero-stage > * { --head-x: 0cqh; --head-y: 33%; --head-
 }
 @media (max-width: 699px) {
   .orbit-core { scale: .8; }
-  html.js .orbit-info .ing-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .ing-tab { justify-content: center; padding: 0 6px; font-size: .78rem; gap: 6px; }
+  /* seven tabs: rows of three, the seventh centered under them */
+  html.js .orbit-info .ing-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .ing-tab { grid-column: span 2; justify-content: center; padding: 0 6px; font-size: .78rem; gap: 6px; }
+  .ing-tab:last-child { grid-column: 3 / span 2; }
 }
 .orbit-ring {
   position: absolute; left: 50%; top: 50%;
@@ -1226,47 +1258,30 @@ html.js .orbit-pause { display: inline-flex; }
 .orbit-pause svg { width: 15px; height: 15px; }
 .orbit-pause[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-/* ── 10. Real sugar + free-from ──────────────────────────────────────────── */
-.sugar-grid { display: grid; gap: 18px; margin-top: clamp(44px, 5vw, 76px); align-items: start; }
-@media (min-width: 980px) { .sugar-grid { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 22px; align-items: stretch; } }
-.label-col { position: relative; display: grid; }
-.crystal {
-  position: absolute; right: 7%; top: -46px; z-index: 2;
-  width: clamp(74px, 8vw, 112px); height: auto;
-  filter: drop-shadow(0 18px 22px rgba(76, 18, 82, .2));
-  animation: crystalFloat 9s ease-in-out infinite;
-  pointer-events: none;
+/* ── 10. Sugar free: the pack front, framed + decoded ────────────────────── */
+.sugar-grid { display: grid; gap: clamp(44px, 6vw, 64px); margin-top: clamp(44px, 5vw, 76px); align-items: center; }
+@media (min-width: 980px) { .sugar-grid { grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: clamp(48px, 5vw, 84px); } }
+.pack-fig { position: relative; margin: 14px 0 38px; width: min(100% - 28px, 372px); justify-self: center; }
+.label-card { padding: clamp(24px, 3vw, 40px); border-radius: var(--r-xl); display: grid; gap: 18px; }
+.label-title { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); font-weight: 360; }
+/* each row: the pack's own wording (set like the pack's white "SUGAR FREE" badge), then what it means */
+.decode li {
+  display: grid; grid-template-columns: 10.6rem minmax(0, 1fr); gap: 8px 20px; align-items: baseline;
+  padding: 16px 0; border-top: 1px dashed var(--line-2);
 }
-@keyframes crystalFloat { 50% { transform: translateY(-10px) rotate(5deg); } }
-/* rows: title, lists, foot. When the card is stretched beside the why-grid
-   the foot anchors to the bottom instead of leaving a dead band under it. */
-.label-card { padding: clamp(24px, 3vw, 38px); border-radius: var(--r-xl); display: grid; grid-template-rows: auto auto 1fr; gap: 22px; }
-.label-title { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); font-weight: 360; padding-right: 90px; }
-.label-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-/* both lists share row tracks, so "Made with" and "Never added" stay level
-   even when an item wraps (e.g. "Artificial sweeteners" on a phone) */
-@supports (grid-template-rows: subgrid) {
-  .label-cols { grid-template-rows: repeat(6, auto); row-gap: 0; }
-  .label-cols > div { display: grid; grid-row: span 6; grid-template-rows: subgrid; }
-  .label-list { display: grid; grid-row: span 5; grid-template-rows: subgrid; }
+.pk {
+  justify-self: start;
+  display: inline-flex; align-items: center; min-height: 30px; padding: 0 11px;
+  border-radius: 8px; background: #fff;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  font: 800 .72rem/1 var(--f-ui); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent-ink); white-space: nowrap;
 }
-.label-h {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
-  font: 800 var(--fs-micro)/1 var(--f-ui); letter-spacing: .18em; text-transform: uppercase;
-  color: var(--accent-ink);
-}
-.label-h svg { width: 16px; height: 16px; stroke-width: 2.4; }
-.label-h--out { color: var(--ink-2); }
-.label-list li { padding: 11px 0; border-top: 1px dashed var(--line-2); font-weight: 650; font-size: var(--fs-sm); color: var(--ink); }
-.label-list--out li {
-  color: var(--ink-2);
-  text-decoration: line-through;
-  text-decoration-color: color-mix(in srgb, var(--accent) 75%, transparent);
-  text-decoration-thickness: 1.5px;
-}
+.pk-u { margin-left: .08em; text-transform: none; letter-spacing: .02em; }   /* "15g", as printed */
+.decode p { font-size: var(--fs-sm); color: var(--ink-2); }
+@media (max-width: 519px) { .decode li { grid-template-columns: minmax(0, 1fr); padding: 14px 0; } }
 .label-foot {
-  align-self: end;
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
   padding-top: 18px; border-top: 1px solid var(--line);
   font-size: var(--fs-xs); font-weight: 650; color: var(--ink-2);
 }
@@ -1279,37 +1294,59 @@ html.js .orbit-pause { display: inline-flex; }
   font-weight: 800; color: var(--ink);
 }
 .gf svg { width: 16px; height: 16px; color: var(--accent-ink); }
-.why-grid { display: grid; gap: 14px; }
-@media (min-width: 620px) { .why-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.why { padding: clamp(22px, 2.4vw, 30px); border-radius: var(--r-lg); display: grid; gap: 10px; align-content: start; }
-.why-ic {
-  width: 46px; height: 46px; border-radius: 50%; margin-bottom: 6px;
-  display: grid; place-items: center;
-  background: #fff;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent), 0 10px 22px -14px var(--accent);
+
+/* framed product photos (pack front, gummies label): a rounded print inside an offset
+   iridescent hairline, the same language as the arch + portal photos, with a glass chip.
+   The whole print is a real link to the full-size image; app.js opens it in the large
+   view (13d). Interactive, so it may lift on hover. */
+.frame-ring {
+  position: absolute; inset: -14px; border-radius: calc(var(--r-lg) + 14px);
+  padding: 1.5px;
+  background: var(--film-conic);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
-.why-ic svg { width: 21px; height: 21px; color: var(--accent-ink); stroke-width: 1.8; }
-.why h3 { font-size: 1.32rem; font-weight: 400; }
-.why p { font-size: var(--fs-sm); color: var(--ink-2); }
-/* phones: icon sits beside the heading, so four reasons read as a compact set */
-@media (max-width: 619px) {
-  .why { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; row-gap: 12px; align-items: center; padding: 20px 20px 22px; }
-  .why-ic { margin-bottom: 0; }
-  .why p { grid-column: 1 / -1; }
+.zoom-link { position: relative; display: block; border-radius: var(--r-lg); color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.zoom-pic {
+  position: relative; display: block; overflow: hidden;
+  border-radius: var(--r-lg);
+  background: var(--tint);
+  box-shadow: 0 40px 80px -40px rgba(76, 18, 82, .45);
+  transition: transform var(--d-med) var(--ease-out), box-shadow var(--d-med) var(--ease-out);
 }
-.freefrom { margin-top: 30px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; }
-.freefrom-label { font: 800 var(--fs-micro)/1.4 var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--ink-2); text-align: center; }
-.freefrom-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.freefrom-pills li {
-  display: inline-flex; align-items: center; gap: 7px;
-  min-height: 40px; padding: 0 15px 0 12px;
+.zoom-pic img { width: 100%; height: 100%; object-fit: cover; }
+/* one light sweep across the print as it first appears, like holographic foil */
+.zoom-pic::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 34%, rgba(255, 255, 255, .5) 48%, rgba(255, 255, 255, 0) 62%);
+  transform: translateX(-110%);
+}
+.reveal.is-in .zoom-pic::after { animation: foil 1.9s .45s var(--ease-io) both; }
+@keyframes foil { to { transform: translateX(110%); } }
+/* the chip hangs from the print's bottom edge, centered, so it never covers pack text */
+.zoom-chip {
+  position: absolute; left: 50%; bottom: -23px; translate: -50% 0;
+  display: inline-flex; align-items: center; gap: 9px;
+  min-height: 46px; padding: 0 18px 0 14px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, .7);
-  border: 1px solid rgba(255, 255, 255, .95);
-  box-shadow: 0 8px 20px -14px rgba(76, 18, 82, .35);
-  font-weight: 700; font-size: .88rem; color: var(--ink);
+  font: 380 1.04rem/1 var(--f-display); font-variation-settings: var(--soft-axis); color: var(--ink);
+  white-space: nowrap;
+  background: rgba(255, 255, 255, .74);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: var(--glass-shadow);
+  transition: background-color var(--d-fast), transform var(--d-med) var(--ease-out);
 }
-.freefrom-pills svg { width: 15px; height: 15px; color: var(--accent-ink); }
+.zoom-chip svg { width: 18px; height: 18px; flex: none; color: var(--accent-ink); }
+@media (hover: hover) {
+  .zoom-link:hover .zoom-pic { transform: translateY(-4px); box-shadow: 0 50px 90px -40px rgba(76, 18, 82, .55); }
+  .zoom-link:hover .zoom-chip { background: #fff; transform: translateY(-4px); }
+}
+.zoom-link:focus-visible { outline: none; }
+.zoom-link:focus-visible .zoom-pic { outline: 2.5px solid var(--accent-ink); outline-offset: 4px; }
 
 /* ── 11. Night Glow (dark ritual capsule) ────────────────────────────────── */
 .night {
@@ -1334,7 +1371,7 @@ html.js .orbit-pause { display: inline-flex; }
   border-radius: var(--r-pill); border: 1px solid var(--glass-dark-edge);
   font: 700 var(--fs-xs)/1.3 var(--f-ui); letter-spacing: .04em; color: var(--on-dark-2);
 }
-/* a longer note (e.g. Green Gummies serving + TBD) wraps into a centered, padded
+/* a longer note (e.g. the Super Greens Gummies suggested use) wraps into a centered, padded
    capsule on narrow phones; one-line notes keep the exact 34px pill (17px = half) */
 .night-note { padding-block: 6px; border-radius: 17px; text-align: center; text-wrap: balance; }
 .night-stage { position: relative; width: min(100%, 520px); height: clamp(340px, 46vw, 520px); margin: 6px auto 0; }
@@ -1446,7 +1483,8 @@ tbody tr:last-child .col-glo { border-radius: 0 0 var(--r-md) var(--r-md); }
   border-radius: var(--r-xl);
 }
 .buy { padding: 10px; display: grid; }
-@media (min-width: 820px) { .buy { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); } }
+/* two columns from 960px: narrower, the photo panel would turn into a thin sliver */
+@media (min-width: 960px) { .buy { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); } }
 .buy-media {
   position: relative; min-height: 300px;
   border-radius: calc(var(--r-xl) - 10px); overflow: hidden;
@@ -1458,7 +1496,8 @@ tbody tr:last-child .col-glo { border-radius: 0 0 var(--r-md) var(--r-md); }
     var(--pc-tint);
   isolation: isolate;
 }
-.buy-media img { width: 92%; height: auto; mix-blend-mode: multiply; }
+/* the pack photo fills the media panel (cover; sizing shared with .pv-img in section 7) */
+@media (max-width: 959px) { .buy-media--photo { width: 100%; min-height: 0; aspect-ratio: 1 / 1; max-height: 560px; } }   /* explicit width: max-height must not narrow it */
 .buy-body { padding: clamp(18px, 2.4vw, 30px); display: grid; gap: 18px; align-content: start; }
 .buy .btn-cta, .waitlist .btn-cta { background: var(--pc-cta); box-shadow: 0 14px 30px -14px var(--pc), inset 0 1px 0 rgba(255, 255, 255, .32); }
 .buy .btn-cta:hover, .waitlist .btn-cta:hover { background: var(--pc-cta-h); }
@@ -1546,7 +1585,7 @@ tbody tr:last-child .col-glo { border-radius: 0 0 var(--r-md) var(--r-md); }
 }
 .check:hover { background: #fff; border-color: var(--line-2); }
 .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--pc-cta); }
-.check small { margin-left: auto; font-weight: 700; color: var(--ink-3); font-size: var(--fs-micro); letter-spacing: .08em; text-transform: uppercase; }
+.check small { margin-left: auto; font-weight: 700; color: var(--ink-3); font-size: var(--fs-micro); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .field { display: grid; gap: 7px; font: 700 var(--fs-xs)/1 var(--f-ui); color: var(--ink-2); }
 .field input {
   min-height: 52px; padding: 0 20px;
@@ -1558,6 +1597,66 @@ tbody tr:last-child .col-glo { border-radius: 0 0 var(--r-md) var(--r-md); }
 .field input::placeholder { color: #8C7487; }
 .field input:focus-visible { outline: 2.5px solid var(--pc-ink); outline-offset: 2px; }
 .field input[aria-invalid="true"] { border-color: #A3001B; }
+
+/* ── 13c. Super Greens Gummies (coming soon) ─────────────────────────────── */
+/* The section wears the gummies' own color world, like their cards: green film and
+   accents, which also echo the lime + teal type on the (hot pink) label itself. */
+.greens {
+  --accent: #1FA453; --accent-ink: #0B6B3A; --accent-deep: #0E4D2C; --tint: #E3F6EA; --soft: #C4F0D9;
+  --cta: #0E7A3E; --cta-hover: #0A6332; --glow: #3DDC97;
+  --irid-a: #0E8F4A; --irid-b: #0B8C9E; --irid-c: #4F8A0B;
+  --film-a: #7FE8B8; --film-b: #8FE6E8; --film-c: #C8F27E; --film-d: #A8F0D0;
+  /* the composite tokens resolve where they are declared, so restate them here */
+  --film: linear-gradient(115deg, var(--film-a), var(--film-b) 34%, var(--film-c) 62%, var(--film-d) 86%, var(--film-a));
+  --film-conic: conic-gradient(from 210deg, var(--film-a), var(--film-b), var(--film-c), var(--film-d), var(--film-a));
+  --irid-text: linear-gradient(100deg, var(--irid-a) 0%, var(--irid-b) 38%, var(--irid-c) 70%, var(--irid-a) 100%);
+}
+.greens-label { position: relative; margin: clamp(44px, 5vw, 72px) auto 0; width: min(100% - 28px, 1160px); }
+.greens-label .zoom-pic { aspect-ratio: 1600 / 613; }
+.greens-label .zoom-pic img { object-position: 50% 50%; }
+/* phones: the print crops to the label's front panel; the large view shows all of it */
+@media (max-width: 699px) { .greens-label .zoom-pic { aspect-ratio: 1 / 1; } }
+.greens-grid { display: grid; gap: 18px; margin-top: clamp(44px, 5vw, 64px); align-items: stretch; }
+@media (min-width: 980px) { .greens-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; } }
+.greens-info { padding: clamp(24px, 3vw, 36px); border-radius: var(--r-xl); display: flex; flex-direction: column; gap: 18px; }
+.greens-info > .opt-label { margin: 0; }
+.greens-facts .pipe { margin: 0 .12em; font-weight: 400; color: color-mix(in srgb, var(--accent) 70%, transparent); }
+.claims { display: flex; flex-wrap: wrap; gap: 8px; }
+.claims li {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 38px; padding: 0 14px 0 11px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--tint) 70%, #fff);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  font: 700 .84rem/1 var(--f-ui); color: var(--ink);
+}
+.claims svg { width: 16px; height: 16px; flex: none; color: var(--accent-ink); }
+.greens-ing { display: flex; flex-wrap: wrap; gap: .1em .5em; font: italic 340 clamp(1.08rem, 1rem + .3vw, 1.24rem)/1.45 var(--f-display); font-variation-settings: var(--soft-axis-it); color: var(--ink); }
+.greens-ing li { white-space: nowrap; }
+/* the separator trails each name, so a wrapped line never starts with a bullet */
+.greens-ing li:not(:last-child)::after { content: '•'; margin-left: .5em; font-style: normal; color: var(--accent); }
+.greens-facts { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+.greens-facts div { display: grid; gap: 5px; align-content: start; padding: 12px 0; border-top: 1px solid var(--line); }
+.greens-facts dt { font: 800 var(--fs-micro)/1 var(--f-ui); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
+.greens-facts dd { margin: 0; font-size: var(--fs-sm); font-weight: 700; color: var(--ink); }
+.greens-sf { align-self: flex-start; margin-top: auto; }   /* pinned to the card's foot beside the taller waitlist */
+.greens-sf svg { color: var(--accent-ink); }
+/* the waitlist card shares the row with the label highlights: one column there */
+.greens .waitlist { align-content: start; }
+@media (min-width: 980px) {
+  .greens .waitlist { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .greens .wl-orbs { left: auto; right: -46px; top: -64px; }
+}
+.greens-wl-fallback { padding: clamp(24px, 3vw, 36px); border-radius: var(--r-xl); }
+/* the label's small print, verbatim, set like a pack's back panel */
+.greens-fine {
+  display: grid; gap: 18px;
+  margin-top: clamp(30px, 3.4vw, 44px); padding-top: 22px; border-top: 1px solid var(--line);
+  font-size: var(--fs-xs); line-height: 1.6; color: var(--ink-2);
+}
+@media (min-width: 820px) { .greens-fine { grid-template-columns: minmax(0, 1.35fr) minmax(0, .6fr) minmax(0, 1.25fr); gap: 32px; } }
+.greens-fine .opt-label { margin-bottom: 8px; }
+.greens-fine p + p { margin-top: 6px; }
 
 /* ── 13b. Supplement facts sheet (modal <dialog>, filled by app.js) ──────── */
 /* Wears its product's color world (tokens set inline), like the cards. The label
@@ -1677,8 +1776,94 @@ html.facts-lock body { overflow: hidden; }
   .sf-table thead th { letter-spacing: .04em; }
   .sf-table tbody th, .sf-table td { padding-right: 9px; }
 }
-/* the narrowest phones: "% Daily / Value" breaks so nutrient names keep one line */
+/* the narrowest phones: the %DV head may break so nutrient names keep their room */
 @media (max-width: 379px) { .sf-table thead th:last-child { white-space: normal; } }
+.sf-table abbr { text-decoration: none; }
+/* "(from Organic …)" sits under its nutrient, smaller, as on the printed label */
+.sf-src { display: block; margin-top: 1px; font-size: .84em; font-weight: 500; color: var(--ink-2); }
+.sf-amt { display: block; font-size: .86em; font-weight: 500; }
+.sf-other { margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(43, 13, 42, .2); font-size: .76rem; line-height: 1.5; color: var(--ink-2); }
+.sf-other b { color: var(--ink); }
+.facts-photo { margin: 0 4px 8px; font-size: var(--fs-sm); color: var(--pc-ink); }
+.facts-more { margin-top: 18px; padding: 0 4px; display: grid; gap: 14px; font-size: var(--fs-xs); line-height: 1.55; color: var(--ink-2); }
+.facts-more .opt-label { margin-bottom: 6px; }
+.facts-more p + p { margin-top: 6px; }
+.facts-warn { padding: 12px 14px; border-radius: var(--r-sm); border: 1px solid var(--line-2); background: rgba(255, 255, 255, .7); font-size: .74rem; }
+
+/* ── 13d. Large photo view (modal <dialog>, filled by app.js from [data-zoom]) ── */
+.zoom-dialog {
+  width: min(100% - 24px, 1680px); max-width: none;
+  height: calc(100vh - 24px); height: calc(100dvh - 24px); max-height: none;
+  margin: auto; padding: 0; border: 0;
+  background: none; color: var(--ink-2);
+  overflow: visible;
+}
+.zoom-dialog::backdrop {
+  background: rgba(30, 10, 36, .5);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+.zoom-dialog[open] .zoom-sheet { animation: factsIn .45s cubic-bezier(.16, 1, .3, 1) both; }
+.zoom-dialog[open]::backdrop { animation: factsFade .3s ease-out both; }
+.zoom-sheet { height: 100%; display: flex; flex-direction: column; border-radius: var(--r-lg); background: rgba(255, 252, 254, .96); }
+.zoom-head { flex: none; display: flex; align-items: center; gap: 10px; padding: 12px 12px 10px 20px; }
+.zoom-title { flex: 1; min-width: 0; font: 400 1.16rem/1.2 var(--f-display); font-variation-settings: var(--soft-axis); letter-spacing: -.01em; color: var(--ink); }
+.zoom-toggle {
+  flex: none; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px 0 13px;
+  border-radius: var(--r-pill); border: 1px solid var(--line-2);
+  background: rgba(255, 255, 255, .8);
+  font: 700 .86rem/1 var(--f-ui); color: var(--ink);
+  transition: background-color var(--d-fast), color var(--d-fast);
+}
+.zoom-toggle:hover { background: #fff; }
+.zoom-toggle svg { width: 17px; height: 17px; color: var(--accent-ink); }
+.zoom-toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.zoom-toggle[aria-pressed="true"] svg { color: #fff; }
+.zoom-close {
+  flex: none; width: 44px; height: 44px; display: grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 50%;
+  background: rgba(255, 255, 255, .8);
+  transition: background-color var(--d-fast), border-color var(--d-fast);
+}
+.zoom-close:hover { background: #fff; border-color: var(--line-2); }
+.zoom-close svg { width: 18px; height: 18px; color: var(--ink); stroke-width: 2; }
+/* the stage: fitted, the photo sits centered; zoomed, it scrolls (auto margins never
+   strand part of an oversized image off the scrollable area) */
+.zoom-scroll {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; overflow: auto; overscroll-behavior: contain;
+  margin: 0 10px; border-radius: var(--r-md);
+  background:
+    radial-gradient(60% 70% at 50% 45%, rgba(255, 255, 255, .9), transparent 75%),
+    color-mix(in srgb, var(--tint) 60%, #fff);
+}
+.zoom-scroll:focus-visible { outline-offset: -3px; }
+.zoom-img { flex: none; margin: auto; max-width: none; border-radius: 4px; box-shadow: 0 24px 50px -28px rgba(76, 18, 82, .5); -webkit-user-select: none; user-select: none; }
+.can-zoom .zoom-img { cursor: zoom-in; }
+.is-zoomed .zoom-img { cursor: zoom-out; }
+@media (pointer: fine) {
+  .is-zoomed .zoom-scroll, .is-zoomed .zoom-img { cursor: grab; }
+  .zoom-scroll.is-dragging, .zoom-scroll.is-dragging .zoom-img { cursor: grabbing; }
+}
+.zoom-foot {
+  flex: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 16px;
+  padding: 6px 20px 8px;
+  font-size: var(--fs-xs); font-weight: 650; color: var(--ink-2);
+}
+.zoom-hint { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; }
+.zoom-hint svg { width: 16px; height: 16px; flex: none; color: var(--accent-ink); }
+.zoom-file { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; color: var(--accent-ink); text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .2em; }
+.zoom-file svg { width: 14px; height: 14px; }
+@media (max-width: 559px) {
+  .zoom-head { padding: 10px 10px 8px 14px; gap: 8px; }
+  .zoom-title { font-size: 1rem; }
+  .zoom-scroll { margin: 0 6px; }
+  .zoom-foot { padding: 4px 14px 6px; }
+  /* phones: the toggle becomes a round icon button (its words stay as its accessible name) */
+  .zoom-toggle { width: 44px; padding: 0; justify-content: center; }
+  .zoom-toggle span { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
 
 /* ── 14. FAQ ─────────────────────────────────────────────────────────────── */
 .faq-grid { display: grid; gap: clamp(30px, 4vw, 64px); }
@@ -1797,8 +1982,9 @@ html.js .faq-item.is-open .faq-a { grid-template-rows: 1fr; visibility: visible;
   color: var(--on-dark-2);
   border-radius: var(--r-2xl) var(--r-2xl) 0 0;
 }
-.site-footer .logo { color: var(--on-dark); }
+.site-footer .logo { color: var(--on-dark); justify-self: start; }
 .site-footer .logo em { color: var(--film-a); }
+.site-footer .logo-lab { color: var(--on-dark-2); }
 .footer-inner {
   width: min(100%, var(--maxw)); margin: 0 auto;
   display: grid; gap: 44px;

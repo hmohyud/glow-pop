@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glo Pop — The Most Delicious Skincare</title>
-  <meta name="description" content="Glo Pop peptide lollipops: collagen, hyaluronic acid, Vitamin C, B12, B6 and Zinc in a really, really good strawberry lollipop. Made with real sugar, 47 calories a pop.">
+  <meta name="description" content="Glo Pop Collagen Boost: a sugar-free strawberry beauty lollipop with peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc. One 15 g pop a day, 10 pops per bag.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Glo Pop — The Most Delicious Skincare">
+  <meta property="og:description" content="Collagen Boost: sugar-free strawberry beauty lollipops with seven skin-loving actives. One 15 g pop a day.">
   <meta name="theme-color" content="#FF1493">
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
@@ -25,19 +28,21 @@
 
   <!-- ═══ ANNOUNCEMENT ═══ -->
   <div class="announce">
-    <p><i data-lucide="truck" aria-hidden="true"></i> Free shipping on every order <span class="announce-more"><span class="announce-sep" aria-hidden="true">/</span> Made with real sugar <span class="announce-sep" aria-hidden="true">/</span> No pop-ups, promise</span></p>
+    <p><i data-lucide="truck" aria-hidden="true"></i> Free shipping on every order <span class="announce-more"><span class="announce-sep" aria-hidden="true">/</span> <span data-bind="announce">Sugar free, still strawberry</span> <span class="announce-sep" aria-hidden="true">/</span> No pop-ups, promise</span></p>
   </div>
 
   <!-- ═══ HEADER / NAV ═══ -->
   <header class="site-header" id="siteHeader">
     <nav class="nav" aria-label="Main">
+      <!-- lockup like the pack: the candy-block wordmark with a small "— lab —" under it -->
       <a class="logo" href="#main" aria-label="Glo Pop, back to top">
-        <span class="logo-glo">Glo</span><span class="logo-pop">Pop</span>
+        <span class="logo-word"><span class="logo-glo">Glo</span><span class="logo-pop">Pop</span></span>
+        <span class="logo-lab">Lab</span>
       </a>
       <ul class="nav-links">
         <li><a href="#pick">Pick your pop</a></li>
-        <li><a href="#actives">The six</a></li>
-        <li><a href="#sugar">Real sugar</a></li>
+        <li><a href="#actives">The seven</a></li>
+        <li><a href="#sugar">Sugar free</a></li>
         <li><a href="#ritual">Ritual</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -60,8 +65,8 @@
     <div class="menu-inner">
       <ul class="menu-links">
         <li><a href="#pick">Pick your pop</a></li>
-        <li><a href="#actives">The six</a></li>
-        <li><a href="#sugar">Real sugar</a></li>
+        <li><a href="#actives">The seven</a></li>
+        <li><a href="#sugar">Sugar free</a></li>
         <li><a href="#ritual">Ritual</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -103,7 +108,7 @@
             <defs><path id="badgeCircle" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0"/></defs>
             <circle class="badge-bg" cx="100" cy="100" r="97"/>
             <circle class="badge-ring" cx="100" cy="100" r="56"/>
-            <text class="badge-text"><textPath href="#badgeCircle" textLength="470" lengthAdjust="spacing" data-bind="badge">Real sugar • 47 cal • 6 actives • </textPath></text>
+            <text class="badge-text"><textPath href="#badgeCircle" textLength="470" lengthAdjust="spacing" data-bind="badge">Sugar free • 7 actives • 15 g pop • </textPath></text>
           </svg>
           <span class="badge-core"><i data-lucide="lollipop"></i></span>
         </div>
@@ -115,16 +120,16 @@
         </p>
 
         <div class="hero-ui lay-ui">
-          <p class="hero-kicker"><span class="sticker sticker--paper" data-bind="kicker">Peptide Lollipops · Strawberry</span></p>
-          <p class="hero-sub" data-bind="heroSub">Peptide-powered lollipops with collagen, hyaluronic acid and <span class="nw">glow-boosting</span> vitamins. Beauty has never tasted this good.</p>
+          <p class="hero-kicker"><span class="sticker sticker--paper" data-bind="kicker">Collagen Boost · Strawberry</span></p>
+          <p class="hero-sub" data-bind="heroSub">Sugar-free strawberry beauty lollipops with peptides, hyaluronic acid and five more actives. Beauty has never tasted this good.</p>
           <div class="hero-ctas">
             <a class="btn btn--primary btn--lg" href="#shop" data-bind="ctaLabel" data-pop>Build your bag</a>
             <a class="btn btn--paper btn--lg" href="#pick" data-pop>Pick your pop</a>
           </div>
           <ul class="proof" data-bind="proof" aria-label="Key facts">
-            <li><i data-lucide="flame"></i>47 cal a pop</li>
-            <li><i data-lucide="candy"></i>Real sugar</li>
-            <li><i data-lucide="sparkles"></i>6 actives</li>
+            <li><i data-lucide="candy-off"></i>Sugar free</li>
+            <li><i data-lucide="sparkles"></i>7 actives</li>
+            <li><i data-lucide="lollipop"></i>15 g pop</li>
           </ul>
         </div>
       </div>
@@ -151,12 +156,13 @@
           <span class="switch-thumb" aria-hidden="true"></span>
           <button class="switch-opt js-pick" type="button" data-product="strawberry-pop" aria-pressed="true">
             <span class="switch-dot" aria-hidden="true"></span>
-            <span class="switch-name">Strawberry Pop</span>
+            <span class="switch-name">Collagen Boost</span>
             <span class="switch-status">Available now</span>
           </button>
           <button class="switch-opt js-pick" type="button" data-product="green-gummies" aria-pressed="false">
             <span class="switch-dot" aria-hidden="true"></span>
-            <span class="switch-name">Green Gummies</span>
+            <!-- the pill keeps the short name on one line; the full name is read out and shown in the panel -->
+            <span class="switch-name">Super Greens<span class="sr-only"> Gummies</span></span>
             <span class="switch-status">Coming soon</span>
           </button>
           <button class="switch-opt js-pick" type="button" data-product="next-pop" aria-pressed="false">
@@ -169,32 +175,43 @@
         <div class="pick-stage">
           <div class="pick-info lay-ui" id="pickInfo" aria-live="polite">
             <p class="status"><i data-lucide="badge-check"></i><span>Available now</span></p>
-            <h3 class="pinfo-name">Peptide Lollipops <span class="pinfo-flavor">Strawberry</span></h3>
-            <p class="pinfo-blurb">Like a really, really good strawberry lollipop, because it is one. Six skin-loving actives ride along inside.</p>
+            <h3 class="pinfo-name">Collagen Boost <small>Beauty Lollipop</small> <span class="pinfo-flavor">Strawberry</span></h3>
+            <p class="pinfo-blurb">Like a really, really good strawberry lollipop, because it is one, just sugar free. Seven skin-loving actives ride along inside, biotin included.</p>
             <ul class="facts">
-              <li><b>47</b><span>calories a pop</span></li>
+              <li><b>15&nbsp;g</b><span>per pop (net wt.)</span></li>
               <li><b>10</b><span>pops per bag</span></li>
-              <li><b>6</b><span>actives inside</span></li>
+              <li><b>7</b><span>actives inside</span></li>
               <li><b>1</b><span>a day, that’s it</span></li>
             </ul>
             <ul class="tags">
-              <li><i data-lucide="candy"></i>Real sugar</li>
+              <li><i data-lucide="candy-off"></i>Sugar free</li>
               <li><i data-lucide="wheat-off"></i>Gluten-free</li>
               <li><i data-lucide="lollipop"></i>Strawberry flavor</li>
             </ul>
             <div class="pinfo-ctas">
               <a class="btn btn--primary" href="#shop" data-pop>Build your bag</a>
-              <a class="btn btn--line" href="#actives">Meet the six</a>
+              <a class="btn btn--line" href="#actives">Meet the seven</a>
             </div>
           </div>
 
           <div class="pick-visual">
             <div class="stage-disc" aria-hidden="true"><span class="stage-ring"></span></div>
             <div class="dock dock--pick" data-dock="pick"></div>
-            <figure class="pouch-sticker lay-ui" data-show="strawberry-pop">
-              <img src="img/pouch-diecut.webp" alt="Glo Pop Peptide Lollipops pouch: pink striped bag, strawberry flavor, 10 lollipops" width="655" height="1000" loading="lazy" decoding="async">
-            </figure>
-            <figure class="ghost-pouch lay-ui" data-show="green-gummies next-pop" hidden>
+            <!-- the real pack as a candy box on a shop peg; tap opens it full size (one shared viewer, see #zoom) -->
+            <button class="cbox pack-box lay-ui" type="button" data-show="strawberry-pop" data-zoom="../_shared/assets/product/pack-mockup.jpg" data-zoom-w="738" data-zoom-h="851" data-zoom-title="Collagen Boost · the pack">
+              <span class="cbox-tab" aria-hidden="true"></span>
+              <span class="cbox-win"><img src="../_shared/assets/product/pack-mockup.jpg" alt="Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops" width="738" height="851" loading="lazy" decoding="async"></span>
+              <span class="cbox-tag" aria-hidden="true"><i data-lucide="zoom-in"></i>The pack</span>
+              <span class="sr-only">(opens full size)</span>
+            </button>
+            <!-- Super Greens Gummies: the packaging is real now, so the label replaces the "packaging TBD" ghost -->
+            <button class="cbox cbox--wide label-box lay-ui" type="button" data-show="green-gummies" hidden data-zoom="../_shared/assets/product/super-greens-label.jpg" data-zoom-w="1600" data-zoom-h="613" data-zoom-title="Super Greens Gummies · the full label">
+              <span class="cbox-tab" aria-hidden="true"></span>
+              <span class="cbox-win"><img src="../_shared/assets/product/super-greens-label.jpg" alt="The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings" width="1600" height="613" loading="lazy" decoding="async"></span>
+              <span class="cbox-tag" aria-hidden="true"><i data-lucide="zoom-in"></i>Full label</span>
+              <span class="sr-only">(opens full size)</span>
+            </button>
+            <figure class="ghost-pouch lay-ui" data-show="next-pop" hidden>
               <svg viewBox="0 0 220 300" aria-hidden="true"><path class="gp-bag" d="M30 26h160l10 22v222a16 16 0 0 1-16 16H36a16 16 0 0 1-16-16V48z"/><path class="gp-zip" d="M24 58h172"/><text class="gp-q" x="110" y="196" text-anchor="middle">?</text></svg>
               <figcaption>Packaging <span class="ph">design</span></figcaption>
             </figure>
@@ -219,61 +236,61 @@
           <ul class="benefits">
             <li>
               <span class="ico-dot"><i data-lucide="sparkles"></i></span>
-              <div><h3>Glow-boosting formula</h3><p>Collagen peptides and hyaluronic acid to support radiant, hydrated-looking skin all summer long.</p></div>
+              <div><h3>Glow-boosting formula</h3><p>Peptides and hyaluronic acid to support radiant, hydrated-looking skin all summer long.*</p></div>
             </li>
             <li>
-              <span class="ico-dot"><i data-lucide="candy"></i></span>
-              <div><h3>Only 47 calories</h3><p>Made with real sugar, not artificial sweeteners. A treat that tastes amazing.</p></div>
+              <span class="ico-dot"><i data-lucide="candy-off"></i></span>
+              <div><h3>Sugar free</h3><p>It says so right on the pack, and it still tastes like a really, really good strawberry lollipop.</p></div>
             </li>
             <li>
               <span class="ico-dot"><i data-lucide="zap"></i></span>
-              <div><h3>Vitamin powerhouse</h3><p>Vitamin C, B12, B6 and Zinc to help support your skin, energy and immunity.</p></div>
+              <div><h3>Vitamin powerhouse</h3><p>Vitamin C, B6, B12, B8 (biotin) and zinc to help support your skin, energy and immunity, plus healthy-looking hair and nails.*</p></div>
             </li>
           </ul>
-          <p class="facts-note" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i>You’re browsing a pop that’s still in the works. Benefits shown are for the Strawberry Pop.</p>
+          <p class="facts-note" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i>You’re browsing a product that’s still in the works. Benefits shown are for Collagen Boost.</p>
         </div>
       </div>
     </section>
-    <!-- ═══ 4. COLLECT ALL SIX — the 6 actives as flip-able trading cards ═══ -->
+    <!-- ═══ 4. COLLECT ALL SEVEN — the 7 actives (named as on the pack) as flip-able trading cards ═══ -->
     <section class="six sec sec--deep" id="actives" aria-labelledby="sixTitle">
       <div class="scallop scallop--top" aria-hidden="true"></div>
       <div class="wrap">
         <header class="sec-head six-head lay-ui">
           <p class="eyebrow"><span class="sticker sticker--pop">What’s inside</span></p>
-          <h2 class="display fit" id="sixTitle"><span class="fit-line">Collect all six</span></h2>
+          <h2 class="display fit" id="sixTitle"><span class="fit-line">Collect all seven</span></h2>
           <div class="six-sub">
-            <p class="lead">Six actives in every pop. Flip a card to see what each one is there for.</p>
-            <p class="collect-meter" aria-live="polite"><span class="collect-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="collect-text"><b data-collected>0</b>/6 flipped</span></p>
+            <p class="lead">Seven actives in every pop, named just like the pack. Flip a card to see what each one is there for.</p>
+            <p class="collect-meter" aria-live="polite"><span class="collect-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="collect-text"><b data-collected>0</b>/7 flipped</span></p>
           </div>
-          <p class="facts-note facts-note--deep" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i><span data-bind="sixNote">These six live in the Strawberry Pop. New pops: <span class="ph">actives</span></span></p>
+          <p class="facts-note facts-note--deep" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i><span data-bind="sixNote">These seven live in Collagen Boost. New pops: <span class="ph">actives</span></span></p>
         </header>
 
-        <ul class="tcards lay-ui" aria-label="The six actives">
+        <ul class="tcards lay-ui" aria-label="The seven actives">
           <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Collagen Peptides, active 1 of 6" aria-describedby="tc1d tc1c">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Peptides, active 1 of 7" aria-describedby="tc1d tc1c">
               <span class="tcard-inner">
                 <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 01</span><span class="tc-set">Glo Pop · Six</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 01</span><span class="tc-set">Glo Pop · Seven</span></span>
                   <span class="tc-art"><span class="tc-pop"><i data-lucide="gem"></i></span><span class="tc-stick"></span></span>
-                  <span class="tc-name">Collagen Peptides</span>
+                  <span class="tc-name">Peptides</span>
                   <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
                 </span>
                 <span class="tcard-face tcard-back">
                   <span class="tc-top"><span class="tc-no">No. 01</span><span class="tc-set">Good for your glow</span></span>
-                  <span class="tc-back-head"><span class="tc-mini"><i data-lucide="gem"></i></span><span class="tc-back-name">Collagen Peptides</span></span>
-                  <span class="tc-desc" id="tc1d">Supports skin elasticity and hydration from within for a youthful, plump complexion.</span>
+                  <span class="tc-back-head"><span class="tc-mini"><i data-lucide="gem"></i></span><span class="tc-back-name">Peptides</span></span>
+                  <span class="tc-desc" id="tc1d">Support skin’s natural firmness and elasticity for a plump, youthful-looking glow.*</span>
                   <span class="tc-label">Benefits</span>
-                  <span class="tc-chips" id="tc1c"><span class="chip"><i data-lucide="sparkles"></i>Firm &amp; Plump</span><span class="chip"><i data-lucide="droplet"></i>Hydration</span></span>
+                  <span class="tc-chips" id="tc1c"><span class="chip"><i data-lucide="sparkles"></i>Firm &amp; Plump</span><span class="chip"><i data-lucide="gem"></i>Elasticity</span></span>
                   <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
                 </span>
               </span>
             </button>
           </li>
           <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Hyaluronic Acid, active 2 of 6" aria-describedby="tc2d tc2c">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Hyaluronic Acid, active 2 of 7" aria-describedby="tc2d tc2c">
               <span class="tcard-inner">
                 <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 02</span><span class="tc-set">Glo Pop · Six</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 02</span><span class="tc-set">Glo Pop · Seven</span></span>
                   <span class="tc-art"><span class="tc-pop"><i data-lucide="droplet"></i></span><span class="tc-stick"></span></span>
                   <span class="tc-name">Hyaluronic Acid</span>
                   <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
@@ -281,7 +298,7 @@
                 <span class="tcard-face tcard-back">
                   <span class="tc-top"><span class="tc-no">No. 02</span><span class="tc-set">Good for your glow</span></span>
                   <span class="tc-back-head"><span class="tc-mini"><i data-lucide="droplet"></i></span><span class="tc-back-name">Hyaluronic Acid</span></span>
-                  <span class="tc-desc" id="tc2d">Locks in moisture for plump, dewy skin that glows from the inside out.</span>
+                  <span class="tc-desc" id="tc2d">Locks in moisture for plump, dewy skin that glows from the inside out.*</span>
                   <span class="tc-label">Benefits</span>
                   <span class="tc-chips" id="tc2c"><span class="chip"><i data-lucide="droplet"></i>Hydration</span><span class="chip"><i data-lucide="sun"></i>Dewy Glow</span></span>
                   <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
@@ -290,10 +307,10 @@
             </button>
           </li>
           <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin C, active 3 of 6" aria-describedby="tc3d tc3c">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin C, active 3 of 7" aria-describedby="tc3d tc3c">
               <span class="tcard-inner">
                 <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 03</span><span class="tc-set">Glo Pop · Six</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 03</span><span class="tc-set">Glo Pop · Seven</span></span>
                   <span class="tc-art"><span class="tc-pop"><i data-lucide="citrus"></i></span><span class="tc-stick"></span></span>
                   <span class="tc-name">Vitamin C</span>
                   <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
@@ -301,7 +318,7 @@
                 <span class="tcard-face tcard-back">
                   <span class="tc-top"><span class="tc-no">No. 03</span><span class="tc-set">Good for your glow</span></span>
                   <span class="tc-back-head"><span class="tc-mini"><i data-lucide="citrus"></i></span><span class="tc-back-name">Vitamin C</span></span>
-                  <span class="tc-desc" id="tc3d">Brightens your complexion and protects against free radicals and environmental stress.</span>
+                  <span class="tc-desc" id="tc3d">Brightens your complexion and protects against free radicals and environmental stress.*</span>
                   <span class="tc-label">Benefits</span>
                   <span class="tc-chips" id="tc3c"><span class="chip"><i data-lucide="sun"></i>Brightening</span><span class="chip"><i data-lucide="shield"></i>Antioxidant</span></span>
                   <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
@@ -310,136 +327,145 @@
             </button>
           </li>
           <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin B12, active 4 of 6" aria-describedby="tc4d tc4c">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin B6, active 4 of 7" aria-describedby="tc4d tc4c">
               <span class="tcard-inner">
                 <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 04</span><span class="tc-set">Glo Pop · Six</span></span>
-                  <span class="tc-art"><span class="tc-pop"><i data-lucide="zap"></i></span><span class="tc-stick"></span></span>
-                  <span class="tc-name">Vitamin B12</span>
-                  <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
-                </span>
-                <span class="tcard-face tcard-back">
-                  <span class="tc-top"><span class="tc-no">No. 04</span><span class="tc-set">Good for your glow</span></span>
-                  <span class="tc-back-head"><span class="tc-mini"><i data-lucide="zap"></i></span><span class="tc-back-name">Vitamin B12</span></span>
-                  <span class="tc-desc" id="tc4d">Boosts energy and supports healthy metabolism so you feel as good as you look.</span>
-                  <span class="tc-label">Benefits</span>
-                  <span class="tc-chips" id="tc4c"><span class="chip"><i data-lucide="zap"></i>Energy</span><span class="chip"><i data-lucide="activity"></i>Metabolism</span></span>
-                  <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
-                </span>
-              </span>
-            </button>
-          </li>
-          <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin B6, active 5 of 6" aria-describedby="tc5d tc5c">
-              <span class="tcard-inner">
-                <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 05</span><span class="tc-set">Glo Pop · Six</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 04</span><span class="tc-set">Glo Pop · Seven</span></span>
                   <span class="tc-art"><span class="tc-pop"><i data-lucide="sparkles"></i></span><span class="tc-stick"></span></span>
                   <span class="tc-name">Vitamin B6</span>
                   <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
                 </span>
                 <span class="tcard-face tcard-back">
-                  <span class="tc-top"><span class="tc-no">No. 05</span><span class="tc-set">Good for your glow</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 04</span><span class="tc-set">Good for your glow</span></span>
                   <span class="tc-back-head"><span class="tc-mini"><i data-lucide="sparkles"></i></span><span class="tc-back-name">Vitamin B6</span></span>
-                  <span class="tc-desc" id="tc5d">Promotes clear, radiant skin by supporting your body’s natural renewal processes.</span>
+                  <span class="tc-desc" id="tc4d">Promotes clear, radiant skin by supporting your body’s natural renewal processes.*</span>
                   <span class="tc-label">Benefits</span>
-                  <span class="tc-chips" id="tc5c"><span class="chip"><i data-lucide="smile"></i>Clear Skin</span><span class="chip"><i data-lucide="refresh-cw"></i>Renewal</span></span>
+                  <span class="tc-chips" id="tc4c"><span class="chip"><i data-lucide="smile"></i>Clear Skin</span><span class="chip"><i data-lucide="refresh-cw"></i>Renewal</span></span>
                   <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
                 </span>
               </span>
             </button>
           </li>
           <li class="tcard-slot">
-            <button class="tcard" type="button" aria-pressed="false" aria-label="Zinc, active 6 of 6" aria-describedby="tc6d tc6c">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin B12, active 5 of 7" aria-describedby="tc5d tc5c">
               <span class="tcard-inner">
                 <span class="tcard-face tcard-front">
-                  <span class="tc-top"><span class="tc-no">No. 06</span><span class="tc-set">Glo Pop · Six</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 05</span><span class="tc-set">Glo Pop · Seven</span></span>
+                  <span class="tc-art"><span class="tc-pop"><i data-lucide="zap"></i></span><span class="tc-stick"></span></span>
+                  <span class="tc-name">Vitamin B12</span>
+                  <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
+                </span>
+                <span class="tcard-face tcard-back">
+                  <span class="tc-top"><span class="tc-no">No. 05</span><span class="tc-set">Good for your glow</span></span>
+                  <span class="tc-back-head"><span class="tc-mini"><i data-lucide="zap"></i></span><span class="tc-back-name">Vitamin B12</span></span>
+                  <span class="tc-desc" id="tc5d">Boosts energy and supports healthy metabolism so you feel as good as you look.*</span>
+                  <span class="tc-label">Benefits</span>
+                  <span class="tc-chips" id="tc5c"><span class="chip"><i data-lucide="zap"></i>Energy</span><span class="chip"><i data-lucide="activity"></i>Metabolism</span></span>
+                  <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          <li class="tcard-slot">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Vitamin B8 (biotin), active 6 of 7" aria-describedby="tc6d tc6c">
+              <span class="tcard-inner">
+                <span class="tcard-face tcard-front">
+                  <span class="tc-top"><span class="tc-no">No. 06</span><span class="tc-set">Glo Pop · Seven</span></span>
+                  <span class="tc-art"><span class="tc-pop"><i data-lucide="flower-2"></i></span><span class="tc-stick"></span></span>
+                  <span class="tc-name">Vitamin B8 <span class="tc-name-sub">(biotin)</span></span>
+                  <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
+                </span>
+                <span class="tcard-face tcard-back">
+                  <span class="tc-top"><span class="tc-no">No. 06</span><span class="tc-set">Good for your glow</span></span>
+                  <span class="tc-back-head"><span class="tc-mini"><i data-lucide="flower-2"></i></span><span class="tc-back-name">Vitamin B8 (biotin)</span></span>
+                  <span class="tc-desc" id="tc6d">Supports healthy-looking hair, skin and nails,* so the glow goes way beyond your face.</span>
+                  <span class="tc-label">Benefits</span>
+                  <span class="tc-chips" id="tc6c"><span class="chip"><i data-lucide="sparkles"></i>Hair &amp; Nails</span><span class="chip"><i data-lucide="heart"></i>Skin</span></span>
+                  <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          <li class="tcard-slot">
+            <button class="tcard" type="button" aria-pressed="false" aria-label="Zinc, active 7 of 7" aria-describedby="tc7d tc7c">
+              <span class="tcard-inner">
+                <span class="tcard-face tcard-front">
+                  <span class="tc-top"><span class="tc-no">No. 07</span><span class="tc-set">Glo Pop · Seven</span></span>
                   <span class="tc-art"><span class="tc-pop"><i data-lucide="shield-check"></i></span><span class="tc-stick"></span></span>
                   <span class="tc-name">Zinc</span>
                   <span class="tc-hint"><i data-lucide="refresh-cw"></i>Tap to flip</span>
                 </span>
                 <span class="tcard-face tcard-back">
-                  <span class="tc-top"><span class="tc-no">No. 06</span><span class="tc-set">Good for your glow</span></span>
+                  <span class="tc-top"><span class="tc-no">No. 07</span><span class="tc-set">Good for your glow</span></span>
                   <span class="tc-back-head"><span class="tc-mini"><i data-lucide="shield-check"></i></span><span class="tc-back-name">Zinc</span></span>
-                  <span class="tc-desc" id="tc6d">Supports immune function and skin repair for a healthy, balanced complexion.</span>
+                  <span class="tc-desc" id="tc7d">Supports immune function and skin repair for a healthy, balanced complexion.*</span>
                   <span class="tc-label">Benefits</span>
-                  <span class="tc-chips" id="tc6c"><span class="chip"><i data-lucide="shield-check"></i>Immunity</span><span class="chip"><i data-lucide="heart-pulse"></i>Skin Repair</span></span>
+                  <span class="tc-chips" id="tc7c"><span class="chip"><i data-lucide="shield-check"></i>Immunity</span><span class="chip"><i data-lucide="heart-pulse"></i>Skin Repair</span></span>
                   <span class="tc-hint"><i data-lucide="undo-2"></i>Flip back</span>
                 </span>
               </span>
             </button>
           </li>
         </ul>
-        <p class="set-complete lay-ui" data-set-complete hidden><i data-lucide="party-popper"></i>Full set! You’ve met all six actives.</p>
+        <p class="set-complete lay-ui" data-set-complete hidden><i data-lucide="party-popper"></i>Full set! You’ve met all seven actives.</p>
       </div>
       <div class="drip" aria-hidden="true"></div>
     </section>
-    <!-- ═══ 5. REAL SUGAR + the nope list ═══ -->
+    <!-- ═══ 5. SUGAR FREE — straight off the pack: the pack's own claim, and nothing stronger ═══ -->
     <section class="sugar sec sec--paper" id="sugar" aria-labelledby="sugarTitle">
       <div class="wrap">
         <div class="sugar-top">
           <header class="sec-head sugar-head lay-ui">
-            <p class="eyebrow"><span class="sticker sticker--accent">The real sugar difference</span></p>
-            <h2 class="display sugar-title" id="sugarTitle"><span class="st-1">Made with</span> <span class="st-2">real sugar.</span></h2>
-            <p class="lead">Most sugar substitutes are far sweeter than sugar, and that can keep your brain used to extreme sweetness, driving more cravings later in the day. So we use a little real sugar instead: just 47 delicious calories a pop.</p>
+            <p class="eyebrow"><span class="sticker sticker--accent">Straight off the pack</span></p>
+            <h2 class="display sugar-title" id="sugarTitle"><span class="st-1">Sugar free.</span> <span class="st-2">Still sweet.</span></h2>
+            <p class="lead">It’s printed right on the pack: Collagen Boost is sugar free. Still a proper strawberry lollipop, one 15&nbsp;g pop a day, with seven skin-loving actives along for the ride.</p>
+            <p class="facts-note" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i><span data-bind="sugarNote">Sugar free is the Collagen Boost lollipop. New pops: <span class="ph">recipe</span></span></p>
           </header>
           <div class="sugar-visual">
             <div class="sugar-disc" aria-hidden="true">
               <svg viewBox="0 0 200 200">
                 <defs><path id="sugarCircle" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/></defs>
-                <text class="disc-text"><textPath href="#sugarCircle" textLength="496" lengthAdjust="spacing">No sweetness creep • Real sugar • 47 cal • </textPath></text>
+                <text class="disc-text"><textPath href="#sugarCircle" textLength="496" lengthAdjust="spacing">Sugar free • Still sweet • Still strawberry • </textPath></text>
               </svg>
-              <span class="disc-core"><i data-lucide="candy"></i></span>
+              <span class="disc-core"><i data-lucide="lollipop"></i></span>
             </div>
             <div class="dock dock--sugar" data-dock="sugar" data-for="strawberry-pop"></div>
           </div>
         </div>
 
-        <ul class="reasons lay-ui">
-          <li class="reason">
-            <span class="ico-dot"><i data-lucide="flame"></i></span>
-            <h3>Just 47 calories</h3>
-            <p>A little real sugar goes a long way. Each pop is mindfully portioned at just 47 calories.</p>
-          </li>
-          <li class="reason">
-            <span class="ico-dot"><i data-lucide="brain"></i></span>
-            <h3>No sweetness creep</h3>
-            <p>Super-sweet substitutes can train your palate to crave more sweetness all day. Real sugar keeps things balanced.</p>
-          </li>
-          <li class="reason">
-            <span class="ico-dot"><i data-lucide="leaf"></i></span>
-            <h3>No allulose</h3>
-            <p>We’re watching allulose closely. It’s currently banned across the UK and Europe until it’s proven safe.</p>
-          </li>
-          <li class="reason">
-            <span class="ico-dot"><i data-lucide="flask-conical"></i></span>
-            <h3>No OnoSweet</h3>
-            <p>It hasn’t secured European (EFSA) approval, which still requires extensive toxicology and safety data, so we leave it out.</p>
-          </li>
-        </ul>
-
-        <div class="nope lay-ui">
-          <div class="nope-head">
-            <h3 class="nope-title">The nope list</h3>
-            <p>Always free from:</p>
+        <!-- read the pack: the real front panel beside what it says, and what we can't tell you yet -->
+        <div class="packread lay-ui">
+          <button class="cbox packread-box" type="button" data-zoom="../_shared/assets/product/pack-front.jpg" data-zoom-w="638" data-zoom-h="1036" data-zoom-title="Collagen Boost · front of the pack">
+            <span class="cbox-tab" aria-hidden="true"></span>
+            <span class="cbox-win"><img src="../_shared/assets/product/pack-front.jpg" alt="Front of the Collagen Boost pack: peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc; sugar free; strawberry flavor; net wt. 15 g" width="638" height="1036" loading="lazy" decoding="async"></span>
+            <span class="cbox-tag" aria-hidden="true"><i data-lucide="zoom-in"></i>Zoom in</span>
+            <span class="sr-only">(opens full size)</span>
+          </button>
+          <div class="packread-body">
+            <h3 class="packread-title">Read the pack</h3>
+            <p class="packread-lead">This is what the front of every Collagen Boost pack says, word for word.</p>
+            <div class="packread-group">
+              <p class="packread-label">Printed on the front</p>
+              <ul class="yep-list">
+                <li><i data-lucide="check"></i>Sugar free</li>
+                <li><i data-lucide="check"></i>Strawberry flavor</li>
+                <li><i data-lucide="check"></i>Net wt. 15 g</li>
+              </ul>
+            </div>
+            <div class="packread-group">
+              <p class="packread-label">All seven actives</p>
+              <ul class="act-list">
+                <li>Peptides</li><li>Vitamin C</li><li>Vitamin B6</li><li>Vitamin B12</li><li>Vitamin B8 (biotin)</li><li>Hyaluronic acid</li><li>Zinc</li>
+              </ul>
+            </div>
+            <div class="packread-group">
+              <p class="packread-label">Details still to come</p>
+              <ul class="tbd-list">
+                <li><span class="ph">Sweetener</span></li><li><span class="ph">Other ingredients</span></li><li><span class="ph">Allergens</span></li><li><span class="ph">mg per active</span></li>
+              </ul>
+            </div>
           </div>
-          <ul class="nope-list">
-            <li><i data-lucide="x"></i>Artificial sweeteners</li>
-            <li><i data-lucide="x"></i>Sugar alcohols</li>
-            <li><i data-lucide="x"></i>Stevia</li>
-            <li><i data-lucide="x"></i>Allulose</li>
-            <li><i data-lucide="x"></i>OnoSweet</li>
-            <li><i data-lucide="x"></i>Cornstarch</li>
-            <li><i data-lucide="x"></i>Modified potato starch</li>
-            <li><i data-lucide="x"></i>Erythritol</li>
-            <li><i data-lucide="x"></i>Xylitol</li>
-          </ul>
-          <ul class="yep-list">
-            <li><i data-lucide="check"></i>Real sugar</li>
-            <li><i data-lucide="wheat-off"></i>Gluten-free</li>
-          </ul>
         </div>
-        <p class="facts-note" data-show="green-gummies next-pop" hidden><i data-lucide="info"></i><span data-bind="sugarNote">Recipe facts above are for the Strawberry Pop. New pops: <span class="ph">recipe</span></span></p>
       </div>
     </section>
 
@@ -457,17 +483,17 @@
           <li class="step">
             <span class="step-pop" aria-hidden="true"><span class="step-no">01</span></span>
             <h3>Unwrap &amp; enjoy</h3>
-            <p>Pop open a Glo Pop and savor every delicious lick. Strawberry flavor, made with real sugar.</p>
+            <p>Unwrap one 15&nbsp;g pop and savor every delicious lick. Strawberry flavor, sugar free.</p>
           </li>
           <li class="step">
             <span class="step-pop" aria-hidden="true"><span class="step-no">02</span></span>
             <h3>Ingredients absorb</h3>
-            <p>Collagen peptides, hyaluronic acid and vitamins get to work supporting your skin from within.</p>
+            <p>Peptides, hyaluronic acid, vitamins and zinc get to work supporting your skin from within.*</p>
           </li>
           <li class="step">
             <span class="step-pop" aria-hidden="true"><span class="step-no">03</span></span>
             <h3>Glow from within</h3>
-            <p>Keep it daily and let the glow build: radiant, hydrated-looking skin all summer long.</p>
+            <p>Keep it daily and let the glow build: radiant, hydrated-looking skin all summer long.*</p>
           </li>
         </ol>
 
@@ -491,8 +517,9 @@
         <header class="sec-head versus-head lay-ui">
           <p class="eyebrow"><span class="sticker sticker--pop">Why Glo Pop?</span></p>
           <h2 class="display versus-title" id="vsTitle"><span>Not just candy.</span> <span>It’s skincare.</span></h2>
-          <p class="lead">Most beauty supplements taste terrible or ask you to swallow pills. We took a sweeter approach.</p>
-          <p class="score"><span class="score-label">Final score</span><span class="score-num">7<i>–</i>1</span><span class="score-sub">Glo Pop vs. the pill aisle, by the table</span></p>
+          <p class="lead">Most beauty supplements taste terrible or ask you to swallow pills. We took a tastier approach.</p>
+          <!-- a tally of the table's checks (7 rows for Glo Pop; peptides + biotin for the typical pick), not a metric -->
+          <p class="score"><span class="score-label">Final score</span><span class="score-num">7<i>–</i>2</span><span class="score-sub">Glo Pop vs. the pill aisle, by the table</span></p>
         </header>
         <div class="vs-wrap lay-ui">
           <table class="vs-table">
@@ -502,11 +529,11 @@
             </thead>
             <tbody>
               <tr><th scope="row">Tastes amazing</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-              <tr><th scope="row">Collagen peptides</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--meh"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
+              <tr><th scope="row">Peptides</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--meh"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
               <tr><th scope="row">Hyaluronic acid</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
+              <tr><th scope="row">Biotin (B8)</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--meh"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
               <tr><th scope="row">No pills required</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-              <tr><th scope="row">Made with real sugar</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-              <tr><th scope="row">Under 50 calories</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--na"><i data-lucide="minus"></i></span><span class="sr-only">Varies</span></td></tr>
+              <tr><th scope="row">Sugar free</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--na"><i data-lucide="minus"></i></span><span class="sr-only">Varies</span></td></tr>
               <tr><th scope="row">Fun to use</th><td class="vs-us"><span class="mk mk--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="mk mk--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
             </tbody>
           </table>
@@ -517,7 +544,7 @@
     <div class="tape-wrap tape-wrap--b" aria-hidden="true">
       <div class="tape tape--accent" data-marquee data-speed="1.1" data-dir="1">
         <div class="tape-track">
-          <span class="tape-set" data-bind="marquee">Real sugar <i data-lucide="candy"></i> 47 cal a pop <i data-lucide="candy"></i> 6 actives <i data-lucide="candy"></i> One a day <i data-lucide="candy"></i> Gluten-free <i data-lucide="candy"></i> Free shipping <i data-lucide="candy"></i></span>
+          <span class="tape-set" data-bind="marquee">Collagen Boost <i data-lucide="candy"></i> Sugar free <i data-lucide="candy"></i> 7 actives <i data-lucide="candy"></i> One a day <i data-lucide="candy"></i> Gluten-free <i data-lucide="candy"></i> Free shipping <i data-lucide="candy"></i></span>
         </div>
       </div>
     </div>
@@ -528,7 +555,7 @@
         <header class="sec-head shop-head lay-ui">
           <p class="eyebrow"><span class="sticker sticker--accent">The shop</span></p>
           <h2 class="display fit" id="shopTitle"><span class="fit-line">Build your bag</span></h2>
-          <p class="lead">Pick how many, choose how often, and watch your bag fill up. Free shipping on every order.</p>
+          <p class="lead">Pick how many bags of Collagen Boost, choose how often, and watch your bag fill up. Free shipping on every order.</p>
         </header>
 
         <div class="shop-grid">
@@ -602,21 +629,27 @@
         </div>
 
         <div class="soon-grid">
-          <!-- Green Gummies waitlist: always shown in its own green world -->
+          <!-- Super Greens Gummies: always shown in its own green world, built around the real label -->
           <article class="waitlist" id="waitlist" data-theme="green-gummies" aria-labelledby="wlTitle">
-            <div class="wl-art" aria-hidden="true">
-              <svg viewBox="0 0 220 170">
-                <path class="gum gum-1" d="M30 112c-6-30 14-56 44-58s50 20 48 48-24 44-52 44-36-12-40-34z"/>
-                <path class="gum gum-2" d="M104 70c-2-28 20-48 48-46s46 24 42 50-28 40-52 38-36-18-38-42z"/>
-                <path class="gum gum-3" d="M98 140c-2-20 14-34 34-34s34 14 32 34-18 28-36 28-28-10-30-28z"/>
-                <g class="gum-dots"><circle cx="64" cy="86" r="3"/><circle cx="80" cy="104" r="2.5"/><circle cx="138" cy="50" r="3"/><circle cx="160" cy="66" r="2.5"/><circle cx="124" cy="128" r="2.5"/><circle cx="144" cy="140" r="3"/></g>
-              </svg>
-              <span class="wl-cap">Concept illustration</span>
+            <div class="wl-media">
+              <button class="cbox cbox--wide wl-label-box" type="button" data-zoom="../_shared/assets/product/super-greens-label.jpg" data-zoom-w="1600" data-zoom-h="613" data-zoom-title="Super Greens Gummies · the full label">
+                <span class="cbox-tab" aria-hidden="true"></span>
+                <span class="cbox-win"><img src="../_shared/assets/product/super-greens-label.jpg" alt="The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings" width="1600" height="613" loading="lazy" decoding="async"></span>
+                <span class="cbox-tag" aria-hidden="true"><i data-lucide="zoom-in"></i>Full label</span>
+                <span class="sr-only">(opens full size)</span>
+              </button>
+              <ul class="wl-badges" aria-label="Badges on the label">
+                <li><i data-lucide="vegan"></i>Vegan friendly</li>
+                <li><i data-lucide="wheat-off"></i>Gluten free</li>
+                <li><i data-lucide="dna-off"></i>Non GMO</li>
+              </ul>
             </div>
             <div class="wl-body">
               <p class="status status--soon"><i data-lucide="clock"></i><span>Coming soon</span></p>
-              <h3 class="wl-title" id="wlTitle">Green Gummies <small>(working name)</small></h3>
-              <p class="wl-copy">Strawberry-watermelon gummies are joining the color system, with five B vitamins and an organic super-greens blend inside, 60 to a container. Price and launch date are still <span class="ph">secret</span> for now. Get on the list and hear first.</p>
+              <h3 class="wl-title" id="wlTitle">Super Greens Gummies</h3>
+              <p class="wl-copy">Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry on the label. 60 gummies, two a day. Price and launch date are still <span class="ph">secret</span> for now. Get on the list and hear first.</p>
+              <!-- switches the page to the gummies and opens the accessible HTML label in the lineup -->
+              <button class="wl-sf" type="button" data-sf-jump="green-gummies"><i data-lucide="scroll-text"></i>See the Supplement Facts</button>
               <form class="wl-form" id="wlForm" novalidate>
                 <label class="wl-label" for="wlEmail">Email address</label>
                 <div class="wl-row">
@@ -675,24 +708,28 @@
         </header>
         <div class="accordion lay-ui">
           <div class="acc-item">
-            <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB1" aria-expanded="false" aria-controls="faqP1"><span class="acc-q">What are Glo Pop peptide lollipops?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
-            <div class="acc-panel" id="faqP1" role="region" aria-labelledby="faqB1" hidden><div class="acc-body"><p>Glo Pops are beauty-boosting lollipops infused with collagen peptides, hyaluronic acid, Vitamin C, B12, B6 and Zinc. They’re designed to support your skin’s radiance, hydration and overall glow, all in a delicious strawberry treat that’s only 47 calories.</p></div></div>
+            <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB1" aria-expanded="false" aria-controls="faqP1"><span class="acc-q">What is Collagen Boost?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="acc-panel" id="faqP1" role="region" aria-labelledby="faqB1" hidden><div class="acc-body"><p>Collagen Boost is Glo Pop’s strawberry beauty lollipop: sugar free, 15&nbsp;g a pop, with peptides, vitamin C, vitamin B6, vitamin B12, vitamin B8 (biotin), hyaluronic acid and zinc. It’s designed to support your skin’s radiance, hydration and overall glow,* all in a delicious strawberry treat.</p></div></div>
           </div>
           <div class="acc-item">
             <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB2" aria-expanded="false" aria-controls="faqP2"><span class="acc-q">How many should I have per day?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
             <div class="acc-panel" id="faqP2" role="region" aria-labelledby="faqB2" hidden><div class="acc-body"><p>We recommend enjoying one Glo Pop per day as part of your daily beauty routine. Consistency is key: most notice a visible difference in their skin’s radiance within 2–4 weeks of daily use.</p></div></div>
           </div>
           <div class="acc-item">
-            <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB3" aria-expanded="false" aria-controls="faqP3"><span class="acc-q">Are they made with real sugar?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
-            <div class="acc-panel" id="faqP3" role="region" aria-labelledby="faqB3" hidden><div class="acc-body"><p>Yes! Glo Pops are made with real sugar. No artificial sweeteners, no sugar alcohols, no stevia. Just real, delicious sweetness at only 47 calories per lollipop.</p></div></div>
+            <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB3" aria-expanded="false" aria-controls="faqP3"><span class="acc-q">Are they sugar free?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="acc-panel" id="faqP3" role="region" aria-labelledby="faqB3" hidden><div class="acc-body"><p>Yes. Collagen Boost is sugar free: it says so right on the pack. Still sweet, still strawberry. What sweetens it, plus the full ingredient and allergen list, will be shared here: <span class="ph">ingredients</span>.</p></div></div>
           </div>
           <div class="acc-item">
             <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB4" aria-expanded="false" aria-controls="faqP4"><span class="acc-q">What do they taste like?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
-            <div class="acc-panel" id="faqP4" role="region" aria-labelledby="faqB4" hidden><div class="acc-body"><p>Like a really, really good strawberry lollipop. We spent months perfecting the flavor so you’d never guess there are six powerful beauty ingredients inside. That’s why we call it the most delicious skincare.</p></div></div>
+            <div class="acc-panel" id="faqP4" role="region" aria-labelledby="faqB4" hidden><div class="acc-body"><p>Like a really, really good strawberry lollipop. We spent months perfecting the flavor so you’d never guess there are seven skin-loving actives inside. That’s why we call it the most delicious skincare.</p></div></div>
           </div>
           <div class="acc-item">
             <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB5" aria-expanded="false" aria-controls="faqP5"><span class="acc-q">Are they gluten-free?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
             <div class="acc-panel" id="faqP5" role="region" aria-labelledby="faqB5" hidden><div class="acc-body"><p>Yes, Glo Pops are gluten-free. We formulate with simple, clean ingredients that everyone can enjoy. If you have specific dietary concerns or allergies, please check the full ingredient list on the packaging.</p></div></div>
+          </div>
+          <div class="acc-item">
+            <h3 class="acc-h"><button class="acc-btn" type="button" id="faqB6" aria-expanded="false" aria-controls="faqP6"><span class="acc-q">Are the Super Greens Gummies sugar free too?</span><span class="acc-ico" aria-hidden="true"><i data-lucide="plus"></i></span></button></h3>
+            <div class="acc-panel" id="faqP6" role="region" aria-labelledby="faqB6" hidden><div class="acc-body"><p>No. Only the Collagen Boost lollipops are sugar free. Super Greens Gummies have 3&nbsp;g total sugars per two-gummy serving, as printed on their Supplement Facts label. They’re coming soon: launch date <span class="ph">date</span>.</p></div></div>
           </div>
         </div>
       </div>
@@ -713,7 +750,7 @@
         <div class="finale-ui lay-ui">
           <p class="finale-copy">Make Glo Pop part of your daily beauty ritual. Free shipping on every order.</p>
           <a class="btn btn--primary btn--xl" href="#shop" data-bind="ctaLabel" data-pop>Build your bag</a>
-          <p class="finale-note" data-bind="finaleNote"><span class="nw">10 lollipops per bag ·</span> <span class="nw">only 47 calories each ·</span> <span class="nw">made with real sugar</span></p>
+          <p class="finale-note" data-bind="finaleNote"><span class="nw">10 lollipops per bag ·</span> <span class="nw">15 g each ·</span> <span class="nw">sugar free</span></p>
         </div>
       </div>
     </section>
@@ -725,13 +762,13 @@
     <div class="wrap">
       <div class="footer-top">
         <div class="footer-brand">
-          <a class="logo logo--footer" href="#main" aria-label="Glo Pop, back to top"><span class="logo-glo">Glo</span><span class="logo-pop">Pop</span></a>
-          <p>The most delicious skincare. Peptide lollipops with collagen, vitamins and everything your skin craves. Beauty has never tasted this good.</p>
+          <a class="logo logo--footer" href="#main" aria-label="Glo Pop, back to top"><span class="logo-word"><span class="logo-glo">Glo</span><span class="logo-pop">Pop</span></span><span class="logo-lab">Lab</span></a>
+          <p>The most delicious skincare. Sugar-free beauty lollipops with peptides, vitamins and everything your skin craves. Beauty has never tasted this good.</p>
         </div>
         <nav class="footer-cols" aria-label="Footer">
           <div>
             <h3>Shop</h3>
-            <ul><li><a href="#shop">Glo Pops</a></li><li><a href="#shop">Bundles</a></li><li><a href="#shop">Subscribe &amp; Save</a></li><li><a href="#">Gift Cards</a></li></ul>
+            <ul><li><a href="#shop">Collagen Boost</a></li><li><a href="#waitlist">Super Greens Gummies</a></li><li><a href="#shop">Subscribe &amp; Save</a></li><li><a href="#">Gift Cards</a></li></ul>
           </div>
           <div>
             <h3>Learn</h3>
@@ -758,7 +795,7 @@
   <!-- ═══ FIXED CHROME ═══ -->
   <aside class="shopbar" id="shopbar" aria-label="Quick shop">
     <div class="shopbar-info">
-      <b data-bind="short">Strawberry Pop</b>
+      <b data-bind="short">Collagen Boost</b>
       <span data-bind="shopbarMeta">10 pops · $<span class="ph">XX</span></span>
     </div>
     <a class="btn btn--primary btn--sm" href="#shop" data-bind="ctaLabel" data-pop>Build your bag</a>
@@ -767,6 +804,21 @@
   <a class="proto-chip" href="../../index.html"><b>Proposal 02</b> · Sweet Riot · All proposals <i data-lucide="arrow-right"></i></a>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ═══ FULL-SIZE VIEWER — one modal for every [data-zoom] image (Esc / close button / backdrop).
+       Phones get the label at its real height with a sideways pan; pinch-zoom still works. ═══ -->
+  <dialog class="zoom" id="zoom" aria-labelledby="zoomTitle">
+    <div class="zoom-bar">
+      <p class="zoom-title" id="zoomTitle">Full size</p>
+      <div class="zoom-actions">
+        <button class="zoom-btn zoom-toggle" type="button" aria-pressed="false"><i data-lucide="zoom-in"></i><span>Zoom in</span></button>
+        <a class="zoom-btn zoom-file" href="../_shared/assets/product/super-greens-label.jpg" target="_blank" rel="noopener"><i data-lucide="external-link"></i><span>Open image</span></a>
+        <button class="zoom-btn zoom-close" type="button" aria-label="Close"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div class="zoom-stage" tabindex="0" role="group" aria-label="Full-size image. Scroll or swipe to pan."></div>
+    <p class="zoom-hint" aria-hidden="true"><i data-lucide="move-horizontal"></i><span>Swipe to pan · pinch to zoom</span></p>
+  </dialog>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

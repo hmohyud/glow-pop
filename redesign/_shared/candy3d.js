@@ -1,4 +1,4 @@
-/* Glo Pop — shared 3D candy for the redesign prototypes (lollipop + gummies).  v3
+/* Glo Pop — shared 3D candy for the redesign prototypes (lollipop + gummies).  v4 (the pack's lollipop)
  * Classic script, so it works from file:// as well as http. three.js is loaded from the CDN on demand
  * with a dynamic import(). Real CC0 assets (Poly Haven beach HDRIs, ambientCG paper / sugar / surface
  * imperfection maps — see assets/LICENSES.md) load relative to THIS script and never block: create()
@@ -94,17 +94,26 @@
  * LOLLIPOP
  *   lollipopMaterials(T, preset, hex, assets) -> { candy, stick, preset }
  *     candy: MeshPhysicalMaterial (no clearcoat, no bumpMap, emissive = colour at ~0.03) + shader patch:
- *     triplanar CC0 smudge roughness + micro-normal (object space: no UV poles, sticks to the candy),
- *     faint mould seam, light scattering at the terminator, baked AO (attribute gloAO) on indirect
- *     light, and the bite attribute gloBite (fresh glassy fracture, crater occlusion, stress halo).
- *     stick: MeshStandardMaterial (emissive exactly 0x000000), CC0 rolled paper + glued edge + AO.
+ *     triplanar CC0 smudge roughness + micro-normal (object space: no UV poles, sticks to the candy;
+ *     'gloss' = the pack's smooth candy, only a whisper of either), softer reflections below the
+ *     horizon (a 1k HDRI's sand would mirror as grain), light scattering at the terminator, baked AO
+ *     (attribute gloAO) on indirect light (ignored on a fresh cut), and the bite attribute gloBite
+ *     (fresh glassy fracture, crater occlusion, stress halo).
+ *     stick: MeshStandardMaterial (emissive exactly 0x000000): plain white satin, the CC0 paper only
+ *     whispers (faint fibre, barely-there glued edge) + AO.
  *   applyLollipopAssets(mats, assets)   swaps the real maps in when they arrive (no recompile)
  *   buildLollipop(T, mats, {tilt}) -> Group  userData { kind:'lollipop', size:{w:3.4,h:6}, candy,
- *     stick, collar, tilt, mats, mat, bob(t seconds) }. candy: 192x144 slightly hand-poured sphere
- *     (r 1.33 at y 1.5 in the tilt group; geometry.userData { origPositions, origNormals, radius });
- *     collar: candy meniscus around the stick (child of candy, same material); stick y -2.8 .. 0.6.
+ *     stick, collar, tilt, mats, mat, bob(t seconds) }. candy: the pack's head, ONE watertight lathe
+ *     (192 columns x ~184 rows): a true sphere (r LOLLY.RB 1.226 at y 1.5 in the tilt group) with a raised
+ *     band round its equator (outer r LOLLY.R 1.33 = the old ball's width, 0.36 tall, centred 0.012
+ *     above the equator, outer edges rounded 0.04, 0.022 fillets where it meets the ball). Its meridian
+ *     is the zero set of headSDF2 (sphere + rounded band, round union). geometry.userData
+ *     { origPositions, origNormals, radius (the ball), outerRadius (the band), center, head (profile) }.
+ *     collar: candy meniscus around the stick (child of candy, same material); stick y -2.8 .. 0.6,
+ *     r 0.135 (0.11 x the ball's diameter).
  *   bakeAO(positions, normals, occluders, {rays, dist, strength, inside}) -> Float32Array (cached per
- *     page; the ball and stick are lathes, so they bake one vertex per ring). Buried vertices get
+ *     page; the head and stick are lathes, so they bake one vertex per ring; occluders: spheres,
+ *     capsules and the band's rounded "puck", so the band shades the ball beside it). Buried vertices get
  *     `inside` (0.3): a crease still blends dark, anything a deep bite exposes is shaded, never black.
  * GUMMIES
  *   gummyMaterial(T, hex, assets) -> MeshPhysicalMaterial (bumpMap = packed sugar map from frame 1,
@@ -123,11 +132,15 @@
  *     The loop ASSIGNS the base lean, calls bob(), then ix.update() ADDS drag pitch / fling tilt /
  *     bite recoil, integrates spin inertia, squashes the candy / jiggles gummies through their own
  *     matrices, and runs the pooled shards + sparkles (added to root after lean, never in shadows).
- *     A bite = one scoop + a crescent of 7 tooth spheres, carved by Newton-projecting the ball's
- *     vertices onto smooth-max(own poured surface, -smooth-union(cutters)); crisp scalloped rims, a
- *     deeper denser interior, a stress-white edge. Hits low on the ball slide up to BITE.minY so the
- *     crater never opens the stick junction. It regrows after a pause. Shards take a free slot first
- *     (else the oldest), so three quick bites never recycle a shard mid-air.
+ *     A bite = one scoop + a crescent of 7 tooth spheres, carved onto smooth-max(own surface,
+ *     -smooth-union(cutters)): vertices are Newton-projected along its gradient, except that under a bite
+ *     centred on the band the band's vertices slide on their own elevation cones about the centre (so
+ *     its ledges never fold over the ball, and its cut ends get vertices); crisp scalloped rims, a deeper
+ *     denser interior, a stress-white edge, on the ball and the band alike. The hit test traces the
+ *     head's exact profile; a hit on the band bites in from the ball's surface under it (as deep as
+ *     anywhere). Hits low on the ball slide up to BITE.minY so the crater never opens the stick
+ *     junction. It regrows after a pause. Shards take a free slot first (else the oldest), so three
+ *     quick bites never recycle a shard mid-air.
  *   patchBiteMaterial(mat)   adds the gloBite attribute to a foreign Standard/Physical material
  */
 (function () {
@@ -684,24 +697,32 @@
 
   // ══ LOLLIPOP ═════════════════════════════════════════════════════════════════════════════════════
   // ── lollipop: materials ────────────────────────────────────────────────
-  var LOLLY = { R: 1.33, CY: 1.5, SR: 0.13, TOP: 0.6, BOT: -2.8, SEG: 192, RINGS: 144 };
+  // The pack's lollipop: a true sphere (RB) with a raised moulded band round its equator. The band's
+  // outer radius R is the old ball radius, so the head keeps its old width and every layout its framing.
+  // BAND (ball-local, y up): h full height, y centre (a hair above the equator), edge = rounding of its
+  // outer edges, fillet = the small concave round where its flat faces meet the ball.
+  var LOLLY = { R: 1.33, RB: 1.226, CY: 1.5, SR: 0.135, TOP: 0.6, BOT: -2.8, SEG: 192,
+    BAND: { h: 0.36, y: 0.012, edge: 0.04, fillet: 0.022 } };
 
   // Surface tuning per preset. rough/spots/streaks/rmin/rmax: roughness = rough + spots*S + streaks*K
   // (S, K from the CC0 Surface Imperfections maps); nrm: micro-normal strength; sss: wrap light at the
   // terminator (light scattering in the sugar); alb: colour-density variation along the pour streaks;
-  // E: emissive (near zero; 04-prism needs it non-zero).
+  // E: emissive (near zero; 04-prism needs it non-zero); ground: roughness of reflections that look
+  // below the horizon (a 1k HDRI's sand mirrors as grain on a glossy ball; real candy blurs it).
   // (sss is calibrated against the lighting rig's cut-out sun, ~4.4 at midday)
+  // 'gloss' is the pack's candy: smooth, saturated, crisp highlights; the smudge maps only break the
+  // gloss up a hair (no visible grain).
   var PRESETS = {
-    gloss:      { rough: 0.05, spots: 0.18, streaks: 0.10, rmin: 0.04, rmax: 0.38, nrm: 0.85, sss: 0.1, alb: 0.22, E: 0.03, env: 1.0 },
-    jewel:      { rough: 0.03, spots: 0.08, streaks: 0.06, rmin: 0.02, rmax: 0.22, nrm: 0.6, sss: 0.0, alb: 0.18, E: 0.04, env: 1.15 },
-    iridescent: { rough: 0.07, spots: 0.14, streaks: 0.08, rmin: 0.05, rmax: 0.34, nrm: 0.7, sss: 0.08, alb: 0.18, E: 0.03, env: 1.1 },
-    satin:      { rough: 0.34, spots: 0.16, streaks: 0.10, rmin: 0.25, rmax: 0.62, nrm: 0.45, sss: 0.09, alb: 0.2, E: 0.03, env: 1.0 }
+    gloss:      { rough: 0.045, spots: 0.035, streaks: 0.02, rmin: 0.035, rmax: 0.1, nrm: 0.1, sss: 0.1, alb: 0.035, E: 0.03, env: 1.0, ground: 0.2 },
+    jewel:      { rough: 0.03, spots: 0.05, streaks: 0.03, rmin: 0.02, rmax: 0.14, nrm: 0.25, sss: 0.0, alb: 0.1, E: 0.04, env: 1.15, ground: 0.16 },
+    iridescent: { rough: 0.06, spots: 0.08, streaks: 0.04, rmin: 0.05, rmax: 0.2, nrm: 0.3, sss: 0.08, alb: 0.1, E: 0.03, env: 1.1, ground: 0.2 },
+    satin:      { rough: 0.34, spots: 0.12, streaks: 0.08, rmin: 0.25, rmax: 0.55, nrm: 0.3, sss: 0.09, alb: 0.12, E: 0.03, env: 1.0, ground: 0.34 }
   };
   var TRI = { spots: 0.42, streaks: 0.29 };                 // triplanar tiles per object unit
-  var SEAM = { n: [0.766, 0, 0.643], w: 0.012, slope: 0.13 }; // mould seam: plane through the stick axis
-  // glued edge of the rolled paper: at object azimuth 0, where the paper's UV seam also sits; the stick
-  // mesh is turned by `turn` so the edge shows front-left at rest
-  var PAPER = { w: 0.035, slope: 0.35, dark: 0.10, turn: -2.0, aroundTiles: 0.5, normal: 1.3 };
+  // The pack's stick is plain, clean white with a soft satin sheen: the CC0 paper only whispers (a faint
+  // fibre normal, a barely-there glued edge at object azimuth 0, where the paper's UV seam also sits;
+  // the stick mesh is turned by `turn` so the edge shows front-left at rest).
+  var PAPER = { w: 0.035, slope: 0.08, dark: 0.02, turn: -2.0, aroundTiles: 0.5, normal: 0.3, rough: 0.5 };
 
   // 1x1 neutral maps until the real ones load. One set PER RENDERER (build() owns it and disposes it):
   // a texture shared by several renderers keeps every one of them reachable through its dispose
@@ -742,7 +763,7 @@
     // geometry without the attributes (the collar, foreign meshes): unoccluded, unbitten
     mat.defaultAttributeValues = { gloAO: [1], gloBite: [0, 0, 0] };
     mat.userData.gloBite = true;
-    mat.customProgramCacheKey = function () { return 'glo-candy-v3b'; };
+    mat.customProgramCacheKey = function () { return 'glo-candy-v4'; };
     mat.onBeforeCompile = function (sh) {
       Object.assign(sh.uniforms, u);
       sh.vertexShader = sh.vertexShader
@@ -758,7 +779,7 @@
           '#include <common>',
           'varying float vGloAO;', 'varying vec3 vGloP;', 'varying vec3 vGloN;', 'varying vec3 vGloBite;',
           'uniform sampler2D gloSpots;', 'uniform sampler2D gloStreaks;', 'uniform sampler2D gloNormal;',
-          'uniform vec4 gloTex;', 'uniform vec4 gloRough;', 'uniform vec4 gloSeam;', 'uniform float gloSeamW;', 'uniform float gloAlb;',
+          'uniform vec4 gloTex;', 'uniform vec4 gloRough;', 'uniform float gloAlb;', 'uniform float gloGround;',
           '#ifndef USE_NORMALMAP_OBJECTSPACE', 'uniform mat3 normalMatrix;', '#endif',
           'vec4 gloTri( sampler2D s, vec3 p, vec3 w ) {',
           '  return texture2D( s, p.zy ) * w.x + texture2D( s, p.xz ) * w.y + texture2D( s, p.xy ) * w.z;',
@@ -788,20 +809,18 @@
           '  tX = vec3( tX.xy + gN.zy, abs( tX.z ) * gN.x );',      // whiteout blend
           '  tY = vec3( tY.xy + gN.xz, abs( tY.z ) * gN.y );',
           '  tZ = vec3( tZ.xy + gN.xy, abs( tZ.z ) * gN.z );',
-          '  vec3 gNo = normalize( tX.zyx * gW.x + tY.xzy * gW.y + tZ.xyz * gW.z );',
-          '  float gd = dot( vGloP, gloSeam.xyz );',                // mould seam: a faint ridge
-          '  float gw = gloSeamW;',
-          '  #if __VERSION__ >= 300',
-          '  gw = max( gw, fwidth( gd ) * 1.5 );',
-          '  #endif',
-          '  float gk = gd / gw;',
-          '  gNo = normalize( gNo + ( 1.0 - vGloBite.x ) * gloSeam.w * ( gloSeamW / gw ) * 2.0 * gk * exp( -gk * gk ) * gloSeam.xyz );',
+          '  vec3 gNo = normalize( tX.zyx * gW.x + tY.xzy * gW.y + tZ.xyz * gW.z );',   // (the band is the mould seam now)
           '  normal = normalize( normalMatrix * gNo );',
+          '  vec3 gR = inverseTransformDirection( reflect( - normalize( vViewPosition ), normal ), viewMatrix );',
+          '  roughnessFactor = mix( roughnessFactor, max( roughnessFactor, gloGround ), 1.0 - smoothstep( -0.35, 0.02, gR.y ) );',   // the sand reflects soft (no grain)
           '}'
         ].join('\n'))
         .replace('#include <aomap_fragment>', [
           '#include <aomap_fragment>',
-          GLSL_AO_FRAG,
+          // a fresh cut is new surface: the crease AO baked for the uncut head (the band's fillets) must
+          // not ride into the crater with its vertices (the crater has its own occlusion, vGloBite.y)
+          'float gAoC = mix( vGloAO, 1.0, vGloBite.x );',
+          GLSL_AO_FRAG.replace('float gAo = vGloAO;', 'float gAo = gAoC;'),
           '{',                                                          // bite crater: depth occlusion
           '  float gOcc = 1.0 - vGloBite.y;',
           '  reflectedLight.indirectDiffuse *= gOcc;',
@@ -812,7 +831,7 @@
           'if ( gloTex.w > 0.0 ) {',                                  // light scattering through the sugar
           '  float gNL = dot( geometryNormal, directionalLights[ 0 ].direction );',
           '  float gWrap = saturate( ( gNL + 0.5 ) / 1.5 ) - saturate( gNL );',
-          '  reflectedLight.indirectDiffuse += gloTex.w * gWrap * vGloAO * vGloAO * directionalLights[ 0 ].color * material.diffuseColor * material.diffuseColor;',
+          '  reflectedLight.indirectDiffuse += gloTex.w * gWrap * gAoC * gAoC * directionalLights[ 0 ].color * material.diffuseColor * material.diffuseColor;',
           '}',
           '#endif'
         ].join('\n'));
@@ -881,15 +900,14 @@
       gloSpots: { value: N.black }, gloStreaks: { value: N.black }, gloNormal: { value: N.flat },
       gloTex: { value: new T.Vector4(TRI.spots, TRI.streaks, P.nrm, P.sss) },
       gloRough: { value: new T.Vector4(P.spots, P.streaks, P.rmin, P.rmax) },
-      gloSeam: { value: new T.Vector4(SEAM.n[0], SEAM.n[1], SEAM.n[2], SEAM.slope) },
-      gloSeamW: { value: SEAM.w },
-      gloAlb: { value: P.alb }
+      gloAlb: { value: P.alb },
+      gloGround: { value: P.ground }
     };
     patchCandy(candy, cu);
     candy._glo = cu;
 
     var stick = new T.MeshStandardMaterial({
-      color: 0xffffff, roughness: 0.9, metalness: 0, envMapIntensity: 1.0,
+      color: 0xffffff, roughness: PAPER.rough, metalness: 0, envMapIntensity: 1.0,
       map: N.white, roughnessMap: N.grey, normalMap: N.flat, normalScale: new T.Vector2(PAPER.normal, PAPER.normal)
     });
     var su = { gloPaper: { value: new T.Vector4(0, PAPER.w, PAPER.slope, PAPER.dark) } };
@@ -926,12 +944,30 @@
   }
   function occDist(o, px, py, pz) {              // signed distance to an occluder
     if (o.sphere) return Math.hypot(px - o.sphere[0], py - o.sphere[1], pz - o.sphere[2]) - o.r;
+    if (o.puck) {                                // rounded cylinder on the y axis: [centre y, half height, radius, edge]
+      var P = o.puck, qx = Math.hypot(px, pz) - P[2] + P[3], qy = Math.abs(py - P[0]) - P[1] + P[3];
+      var mx = qx > 0 ? qx : 0, my = qy > 0 ? qy : 0;
+      return Math.sqrt(mx * mx + my * my) + Math.min(Math.max(qx, qy), 0) - P[3];
+    }
     var ax = o.a[0], ay = o.a[1], az = o.a[2], bx = o.b[0] - ax, by = o.b[1] - ay, bz = o.b[2] - az;
     var t = clamp(((px - ax) * bx + (py - ay) * by + (pz - az) * bz) / (bx * bx + by * by + bz * bz), 0, 1);
     return Math.hypot(px - ax - bx * t, py - ay - by * t, pz - az - bz * t) - o.r;
   }
   function occHit(o, ox, oy, oz, dx, dy, dz) {    // ray distance to an occluder, -1 = miss
     var b, c, h;
+    if (o.puck) {                                // convex: sphere-trace its exact SDF inside its bounding sphere
+      var Q = o.puck, br = Math.hypot(Q[2], Q[1]), qy0 = oy - Q[0];
+      b = ox * dx + qy0 * dy + oz * dz; c = ox * ox + qy0 * qy0 + oz * oz - br * br; h = b * b - c;
+      if (h < 0) return -1;
+      h = Math.sqrt(h);
+      var tq = Math.max(0, -b - h), tq1 = -b + h;
+      for (var it = 0; it < 64 && tq <= tq1; it++) {
+        var dq = occDist(o, ox + dx * tq, oy + dy * tq, oz + dz * tq);
+        if (dq < 1e-4) return tq;
+        tq += dq;
+      }
+      return -1;
+    }
     if (o.sphere) {
       var px = ox - o.sphere[0], py = oy - o.sphere[1], pz = oz - o.sphere[2];
       b = px * dx + py * dy + pz * dz; c = px * px + py * py + pz * pz - o.r * o.r;
@@ -1010,48 +1046,80 @@
   }
 
   // ── lollipop: geometry ─────────────────────────────────────────────────
-  // Hand-poured, die-pressed ball: a little out of round, slightly oblate; exact near the stick so
-  // the collar meets it cleanly.
-  function ballShape(x, y, z) {
-    return 0.0042 * Math.sin(2.3 * x + 1.1 * y + 0.4)
-         + 0.0036 * Math.sin(1.9 * z - 2.1 * x + 2.2)
-         + 0.0030 * Math.sin(2.7 * y + 1.3 * z + 4.1)
-         + 0.0011 * Math.sin(6.1 * x + 4.3 * z - 3.1 * y + 0.9)
-         + 0.0009 * Math.sin(5.3 * z - 6.2 * y + 1.7 * x + 2.6)
-         - 0.005 * (y * y - 0.333);
+  // The head = a true sphere + the moulded band, as ONE watertight lathe (so a bite carves the ball and
+  // the band alike). Its meridian profile is the zero set of an exact-enough 2D signed distance (r from
+  // the axis, y from the ball centre): the sphere, a rounded rectangle for the band (from the axis out to
+  // R, outer edges rounded), joined by a round fillet (hg_sdf's fOpUnionRound: a circular fillet where
+  // the band's flat faces meet the ball). The interaction's hit test uses the same function.
+  function headSpec() {
+    var B = LOLLY.BAND;
+    return { rb: LOLLY.RB, ro: LOLLY.R, yc: B.y, hh: B.h / 2, e: B.edge, f: B.fillet };
   }
-
-  function ballArrays(T) {
-    var S = LOLLY.SEG, Rn = LOLLY.RINGS, R = LOLLY.R;
-    var geo = new T.SphereGeometry(1, S, Rn);
-    var p = geo.attributes.position;
-    for (var i = 0; i < p.count; i++) {
-      var x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-      var r = R * (1 + smooth(-0.97, -0.78, y) * ballShape(x, y, z));
-      p.setXYZ(i, x * r, y * r, z * r);
+  function headSDF2(S, r, y) {
+    var db = Math.sqrt(r * r + y * y) - S.rb;
+    var qx = Math.abs(r - S.ro * 0.5) - S.ro * 0.5 + S.e, qy = Math.abs(y - S.yc) - S.hh + S.e;
+    var mx = qx > 0 ? qx : 0, my = qy > 0 ? qy : 0;
+    var dd = Math.sqrt(mx * mx + my * my) + Math.min(Math.max(qx, qy), 0) - S.e;
+    var k = S.f, ux = k - db > 0 ? k - db : 0, uy = k - dd > 0 ? k - dd : 0;
+    return Math.max(k, Math.min(db, dd)) - Math.sqrt(ux * ux + uy * uy);
+  }
+  // The meridian, bottom pole -> top pole, traced along the zero set: steps of at most DS (the sphere
+  // gets ~1.3 deg rows, like the old 192 x 144 ball) and at most TURN of normal turn per step, so the
+  // band's small rounded edges and fillets get 8-10 rows each. Rows: [r, y, nr, ny, v] (v = arc length).
+  function headProfile(S) {
+    var DS = 0.028, DSMIN = 0.0015, TURN = 10 * DEG, h = 1e-6, pts = [];
+    function nrm(r, y) {
+      var gx = headSDF2(S, r + h, y) - headSDF2(S, r - h, y), gy = headSDF2(S, r, y + h) - headSDF2(S, r, y - h), l = Math.hypot(gx, gy) || 1;
+      return [gx / l, gy / l];
     }
-    geo.computeVertexNormals();
-    var nr = geo.attributes.normal, row = S + 1;
-    for (var iy = 0; iy <= Rn; iy++) {          // weld the UV seam and the poles
-      var a = iy * row, b = a + S;
-      if (iy === 0 || iy === Rn) {
-        var sx = 0, sy = 0, sz = 0;
-        for (var j = 0; j <= S; j++) { sx += nr.getX(a + j); sy += nr.getY(a + j); sz += nr.getZ(a + j); }
-        var l = Math.hypot(sx, sy, sz) || 1;
-        for (j = 0; j <= S; j++) nr.setXYZ(a + j, sx / l, sy / l, sz / l);
-      } else {
-        var mx = nr.getX(a) + nr.getX(b), my = nr.getY(a) + nr.getY(b), mz = nr.getZ(a) + nr.getZ(b);
-        var ml = Math.hypot(mx, my, mz) || 1;
-        nr.setXYZ(a, mx / ml, my / ml, mz / ml); nr.setXYZ(b, mx / ml, my / ml, mz / ml);
+    function snap(r, y) {
+      for (var k = 0; k < 12; k++) {
+        var d = headSDF2(S, r, y);
+        if (Math.abs(d) < 1e-10) break;
+        var n = nrm(r, y); r -= d * n[0]; y -= d * n[1];
       }
+      return [r, y];
     }
-    var out = { position: p.array.slice(), normal: nr.array.slice(), uv: geo.attributes.uv.array.slice(), index: geo.index.array.slice() };
-    geo.dispose();
-    return out;
+    var p = [0, -S.rb], n = [0, -1], s = 0, ds = DS;
+    pts.push([0, -S.rb, 0, -1, 0]);
+    for (var guard = 0; guard < 2000; guard++) {
+      var left = p[1] > 0 ? S.rb * Math.atan2(p[0], p[1]) : Infinity;   // arc still to go on the top cap
+      if (left < 1.6 * DS) {                     // finish on the sphere in equal steps, then the pole
+        var a0 = Math.atan2(p[0], p[1]), m = left < 0.8 * DS ? 1 : 2;
+        for (var k = 1; k < m; k++) {
+          var a = a0 * (1 - k / m), qq = [S.rb * Math.sin(a), S.rb * Math.cos(a)];
+          s += Math.hypot(qq[0] - p[0], qq[1] - p[1]); p = qq;
+          pts.push([qq[0], qq[1], Math.sin(a), Math.cos(a), s]);
+        }
+        s += Math.hypot(p[0], S.rb - p[1]);
+        pts.push([0, S.rb, 0, 1, s]);
+        break;
+      }
+      var tx = -n[1], ty = n[0], q, nq;
+      for (var tries = 0; ; tries++) {
+        q = snap(p[0] + tx * ds, p[1] + ty * ds);
+        nq = nrm(q[0], q[1]);
+        var turn = Math.acos(clamp(n[0] * nq[0] + n[1] * nq[1], -1, 1));
+        if (turn <= TURN || ds <= DSMIN || tries > 40) break;
+        ds = Math.max(DSMIN, ds * Math.max(0.25, 0.85 * TURN / turn));
+      }
+      s += Math.hypot(q[0] - p[0], q[1] - p[1]);
+      pts.push([q[0], q[1], nq[0], nq[1], s]);
+      p = q; n = nq;
+      ds = Math.min(DS, ds * 1.6);
+    }
+    for (var i = 0; i < pts.length; i++) pts[i][4] /= s;
+    return pts;
+  }
+  function headArrays() {
+    var S = headSpec(), prof = headProfile(S), m = ringMesh(LOLLY.SEG, function () { return prof; }, true);
+    m.spec = S; m.rows = prof.length;
+    return m;
   }
 
-  // Lathe-style ring mesh from a per-azimuth profile fn(phi) -> [[r, y, nr, ny, v], ...].
-  function ringMesh(seg, profileAt) {
+  // Lathe-style ring mesh from a per-azimuth profile fn(phi) -> [[r, y, nr, ny, v], ...]. skipPoles:
+  // rows on the axis (r = 0) emit no zero-area triangles.
+  function ringMesh(seg, profileAt, skipPoles) {
     var cols = seg + 1, prof0 = profileAt(0), rows = prof0.length;
     var pos = new Float32Array(cols * rows * 3), nrm = new Float32Array(cols * rows * 3), uv = new Float32Array(cols * rows * 2);
     for (var j = 0; j < cols; j++) {
@@ -1066,9 +1134,11 @@
     }
     var idx = [];
     for (var kk = 0; kk < rows - 1; kk++) {
+      var pole0 = skipPoles && prof0[kk][0] === 0, pole1 = skipPoles && prof0[kk + 1][0] === 0;
       for (var jj = 0; jj < seg; jj++) {
         var a = kk * cols + jj, b = (kk + 1) * cols + jj, c = kk * cols + jj + 1, d = (kk + 1) * cols + jj + 1;
-        idx.push(a, b, c, b, d, c);
+        if (!pole0) idx.push(a, b, c);
+        if (!pole1) idx.push(b, d, c);
       }
     }
     return { position: pos, normal: nrm, uv: uv, index: new Uint32Array(idx), cols: cols };
@@ -1078,7 +1148,7 @@
   // Per azimuth a circle tangent to the ball that meets the stick at a small contact angle (like a
   // meniscus, and with no depth fight against the paper); its radius wanders a little.
   function collarArrays() {
-    var R = LOLLY.R, rs = LOLLY.SR, A = 14, kap = 0.92, a0 = Math.acos(kap);
+    var R = LOLLY.RB, rs = LOLLY.SR, A = 14, kap = 0.92, a0 = Math.acos(kap);
     return ringMesh(96, function (phi) {
       var rho = 0.13 * (1 + 0.2 * Math.sin(2 * phi + 0.7) + 0.08 * Math.sin(3 * phi + 2.1) + 0.05 * Math.sin(5 * phi + 4.0));
       var rc = rs + kap * rho, yc = -Math.sqrt((R + rho) * (R + rho) - rc * rc), aB = Math.atan2(-yc, rc);
@@ -1121,16 +1191,21 @@
   var lollyCache = null;                         // geometry + AO are identical for every lollipop
   function lollipopArrays(T) {
     if (lollyCache) return lollyCache;
-    var t0 = performance.now(), R = LOLLY.R, CY = LOLLY.CY, rs = LOLLY.SR;
-    var ball = ballArrays(T), collar = collarArrays(), stick = stickArrays();
+    var t0 = performance.now(), RB = LOLLY.RB, CY = LOLLY.CY, rs = LOLLY.SR;
+    var ball = headArrays(), collar = collarArrays(), stick = stickArrays(), S = ball.spec;
     // occluders in ball-local space (stick body, a conservative proxy of the collar) and stick space
     var stickL = { a: [0, LOLLY.BOT + rs - CY, 0], b: [0, LOLLY.TOP - CY, 0], r: rs };
     // proxy for the collar, used for the ball only: inside stick+collar wherever ball vertices are visible
-    var collarL = { a: [0, -1.37, 0], b: [0, -1.33, 0], r: 0.15 };
-    // ball and stick are lathes around the y axis with on-axis occluders: bake one vertex per ring
-    ball.ao = bakeAORows(ball, LOLLY.SEG + 1, [stickL, collarL], { dist: 0.9, strength: 1.4 });
-    collar.ao = bakeAO(collar.position, collar.normal, [{ sphere: [0, 0, 0], r: R }, stickL], { dist: 0.8, strength: 1.3 });
-    stick.ao = bakeAORows(stick, stick.cols, [{ sphere: [0, CY, 0], r: R }], { dist: 1.6, strength: 1.5 });
+    var collarL = { a: [0, -RB - 0.04, 0], b: [0, -RB, 0], r: rs + 0.02 };
+    // head and stick are lathes around the y axis with on-axis occluders: bake one vertex per ring.
+    // The head also shades itself where the band meets the ball (sphere + band puck): a soft crease above
+    // and below the band, so it reads as raised in the indirect light too.
+    var cols = LOLLY.SEG + 1, aoS = bakeAORows(ball, cols, [stickL, collarL], { dist: 0.9, strength: 1.4 });
+    var aoB = bakeAORows(ball, cols, [{ sphere: [0, 0, 0], r: S.rb }, { puck: [S.yc, S.hh, S.ro, S.e] }], { dist: 0.5, strength: 1.0 });
+    for (var i = 0; i < aoS.length; i++) aoS[i] *= aoB[i];
+    ball.ao = aoS;
+    collar.ao = bakeAO(collar.position, collar.normal, [{ sphere: [0, 0, 0], r: RB }, stickL], { dist: 0.8, strength: 1.3 });
+    stick.ao = bakeAORows(stick, stick.cols, [{ sphere: [0, CY, 0], r: RB }], { dist: 1.6, strength: 1.5 });
     lollyCache = { ball: ball, collar: collar, stick: stick, ms: performance.now() - t0 };
     return lollyCache;
   }
@@ -1155,7 +1230,10 @@
     var cgeo = toGeometry(T, A.ball);
     cgeo.userData.origPositions = A.ball.position.slice();
     cgeo.userData.origNormals = A.ball.normal.slice();
-    cgeo.userData.radius = LOLLY.R;
+    cgeo.userData.radius = LOLLY.RB;             // the ball (a true sphere), centred on the mesh origin
+    cgeo.userData.outerRadius = LOLLY.R;         // the band's outer radius: the head's widest point
+    cgeo.userData.center = [0, 0, 0];
+    cgeo.userData.head = A.ball.spec;            // profile parameters: exact hit test (see headSDF2)
     var candy = new T.Mesh(cgeo, mats.candy);
     candy.position.y = LOLLY.CY;
     candy.castShadow = true;                     // the ball's own terminator does its self-shading
@@ -1789,7 +1867,7 @@
     regrowAfter: 4500,          // ms after the last bite (fewer than max bites)
     regrowAfterMax: 1500,       // ms after the final bite (shards have landed by then)
     regrowDur: 1.15,            // s
-    scoopR: 0.78, scoopDepth: 0.3,                  // the big scoop cutter (ball radius 1.33)
+    scoopR: 0.78, scoopDepth: 0.3,                  // the big scoop cutter (ball radius 1.226)
     teeth: 7, toothR: 0.19, toothDepth: 0.1,        // the crescent of tooth cutters (they notch the rim)
     arcR: 0.44, arcSpan: 4.0,                       // arc radius / angular span (rad) of the crescent
     halo: 0.03,                                     // width of the stress-whitened rim
@@ -2054,26 +2132,47 @@
       bAttr.setUsage(T.DynamicDrawUsage);
       if (!geo.boundingSphere) geo.computeBoundingSphere();
       (Array.isArray(candy.material) ? candy.material : [candy.material]).forEach(patchBiteMaterial);
-      // The poured ball is slightly out of round: its design centre / nominal radius drive the hit test,
-      // and every vertex keeps its OWN radius as the "skin" term of the carve, so carving never snaps the
-      // untouched surface around a bite onto a perfect sphere (no ring / bulge around the crater).
-      var C = geo.userData.radius ? new T.Vector3(0, 0, 0) : geo.boundingSphere.center.clone();
-      var R = geo.userData.radius || geo.boundingSphere.radius, rad0 = new Float32Array(n);
-      for (var v = 0; v < n; v++) rad0[v] = Math.hypot(orig[v * 3] - C.x, orig[v * 3 + 1] - C.y, orig[v * 3 + 2] - C.z);
+      // The head is not a plain sphere (the band stands out of it): its centre / ball radius drive the
+      // bite placement, its exact profile (userData.head, see headSDF2) the hit test, and every vertex
+      // keeps its OWN radius as the "skin" term of the carve, so carving never snaps the untouched
+      // surface around a bite onto a sphere (no ring / bulge around the crater, the band keeps its shape).
+      var ud = geo.userData;
+      var C = ud.center ? new T.Vector3().fromArray(ud.center) : ud.radius ? new T.Vector3(0, 0, 0) : geo.boundingSphere.center.clone();
+      var R = ud.radius || geo.boundingSphere.radius, rad0 = new Float32Array(n), Rout = R;
+      for (var v = 0; v < n; v++) {
+        rad0[v] = Math.hypot(orig[v * 3] - C.x, orig[v * 3 + 1] - C.y, orig[v * 3 + 2] - C.z);
+        if (rad0[v] > Rout) Rout = rad0[v];
+      }
       var L = {
         mesh: candy, geo: geo, pos: pos, nrm: nrm, bAttr: bAttr, orig: orig, origN: new Float32Array(nrm.array), n: n,
-        C: C, R: R, rad0: rad0, Rv: 0,
+        C: C, R: R, Rout: Rout, head: ud.head || null, rad0: rad0, Rv: 0,
         cutters: [], bites: 0, mark: new Uint8Array(n), list: [], regrowAt: 0, regrow: null,
         sqAxis: new T.Vector3(0, 0, 1)
       };
       geo.userData.gloBiteState = L;
       return L;
     }
-    // Signed distance of the carved ball = smooth-max(sphere, -smooth-union(cutters)). The small
-    // blend radii round the rim / tooth cusps just enough for the vertex grid to sample them without
-    // stair-steps. Writes the gradient to SG[0..2], the sphere's blend weight (1 = untouched skin,
-    // 0 = fresh cut) to SG[3] and the cutter-union distance to SG[4].
+    // Signed distance of the carved head = smooth-max(skin, -smooth-union(cutters)). The skin is the
+    // carved vertex's own radius while carving (L.Rv > 0: every vertex is carved along its own ray from
+    // the centre), else the head's exact profile (hit tests). The small blend radii round the rim /
+    // tooth cusps just enough for the vertex grid to sample them without stair-steps. Writes the
+    // gradient to SG[0..2], the skin's blend weight (1 = untouched skin, 0 = fresh cut) to SG[3] and the
+    // cutter-union distance to SG[4].
     var K_SUB = 0.018, K_UNI = 0.014, SG = new Float64Array(5);   // crisp scalloped rims (~1 vertex spacing)
+    var SK = new Float64Array(3);
+    function skin(L, sx, sy, sz, sl) {         // skin distance at C + (sx, sy, sz), |..| = sl; gradient -> SK
+      if (L.Rv > 0 || !L.head) {
+        SK[0] = sx / sl; SK[1] = sy / sl; SK[2] = sz / sl;
+        return sl - (L.Rv > 0 ? L.Rv : L.R);
+      }
+      var H = L.head, r = Math.sqrt(sx * sx + sz * sz), e = 1e-5;
+      var d = headSDF2(H, r, sy);
+      var gr = headSDF2(H, r + e, sy) - headSDF2(H, Math.abs(r - e), sy), gy = headSDF2(H, r, sy + e) - headSDF2(H, r, sy - e);
+      var gl = Math.hypot(gr, gy) || 1, rr = r > 1e-9 ? 1 / r : 0;
+      gr /= gl; gy /= gl;
+      SK[0] = gr * sx * rr; SK[1] = gy; SK[2] = gr * sz * rr;
+      return d;
+    }
     function sdf(L, x, y, z) {
       var all = L.cutters, du = Infinity, gx = 0, gy = 0, gz = 0;
       for (var k = 0; k < all.length; k++) {
@@ -2084,30 +2183,30 @@
         du = di + (du - di) * h - K_UNI * h * (1 - h);
         gx = gx * h + (dx / l) * (1 - h); gy = gy * h + (dy / l) * (1 - h); gz = gz * h + (dz / l) * (1 - h);
       }
-      var sx = x - L.C.x, sy = y - L.C.y, sz = z - L.C.z, sl = Math.sqrt(sx * sx + sy * sy + sz * sz) || 1e-9, ds = sl - (L.Rv > 0 ? L.Rv : L.R);
-      if (du === Infinity) { SG[0] = sx / sl; SG[1] = sy / sl; SG[2] = sz / sl; SG[3] = 1; SG[4] = 1e9; return ds; }
-      var a = -ds, h2 = clamp(0.5 + 0.5 * (du - a) / K_SUB, 0, 1);  // smin(-ds, du): h2 = sphere weight
+      var sx = x - L.C.x, sy = y - L.C.y, sz = z - L.C.z, sl = Math.sqrt(sx * sx + sy * sy + sz * sz) || 1e-9, ds = skin(L, sx, sy, sz, sl);
+      if (du === Infinity) { SG[0] = SK[0]; SG[1] = SK[1]; SG[2] = SK[2]; SG[3] = 1; SG[4] = 1e9; return ds; }
+      var a = -ds, h2 = clamp(0.5 + 0.5 * (du - a) / K_SUB, 0, 1);  // smin(-ds, du): h2 = skin weight
       var sm = du + (a - du) * h2 - K_SUB * h2 * (1 - h2);
-      SG[0] = h2 * sx / sl - (1 - h2) * gx; SG[1] = h2 * sy / sl - (1 - h2) * gy; SG[2] = h2 * sz / sl - (1 - h2) * gz;
+      SG[0] = h2 * SK[0] - (1 - h2) * gx; SG[1] = h2 * SK[1] - (1 - h2) * gy; SG[2] = h2 * SK[2] - (1 - h2) * gz;
       SG[3] = h2; SG[4] = du;
       return -sm;
     }
-    // Analytic hit on the carved ball (sphere-traced SDF): exact, and cheap next to a raycast
-    // through 55k triangles. Returns { local (candy space), dist (world) } or null.
+    // Analytic hit on the carved head (sphere-traced SDF inside its bounding sphere): exact, and cheap
+    // next to a raycast through 70k triangles. Returns { local (candy space), dist (world) } or null.
     function hitCandy(rayW) {
       var L = lol;
       if (!L) return null;
       _m.copy(L.mesh.matrixWorld).invert();
       var o = _a.copy(rayW.origin).applyMatrix4(_m), d = _b.copy(rayW.direction).transformDirection(_m);
-      var ox = o.x - L.C.x, oy = o.y - L.C.y, oz = o.z - L.C.z;
-      var bq = ox * d.x + oy * d.y + oz * d.z, cq = ox * ox + oy * oy + oz * oz - L.R * L.R, disc = bq * bq - cq;
+      var ox = o.x - L.C.x, oy = o.y - L.C.y, oz = o.z - L.C.z, RO = L.Rout + 1e-3;
+      var bq = ox * d.x + oy * d.y + oz * d.z, cq = ox * ox + oy * oy + oz * oz - RO * RO, disc = bq * bq - cq;
       if (disc < 0) return null;
       var sd = Math.sqrt(disc), t0 = Math.max(0, -bq - sd), t1 = -bq + sd;
       if (t1 < 0) return null;
       var t = t0;
-      if (L.cutters.length) {
+      if (L.cutters.length || L.head || RO > L.R + 2e-3) {
         var hitT = -1;
-        for (var it = 0; it < 300 && t <= t1; it++) {
+        for (var it = 0; it < 600 && t <= t1; it++) {
           var dd = sdf(L, o.x + d.x * t, o.y + d.y * t, o.z + d.z * t);
           if (dd < 2e-4) { hitT = t; break; }
           t += Math.max(dd * 0.85, 0.002);
@@ -2143,48 +2242,120 @@
       }
       return out;
     }
-    // Project every vertex near the new cutters onto the carved SDF with Newton steps along its
-    // gradient. Deep inside a cutter this is exactly v = c + normalize(v - c) * r; at the rim it
-    // lands on the small fillet. The normal is the SDF gradient (analytic), so the UV seam and the
-    // poles stay consistent by construction and nothing needs computeVertexNormals().
-    function carve(L, cut) {
+    // Newton on the carved SDF along its gradient minus the meridional part: the point stays on the cone
+    // of elevation asin(sinE) about the centre (moves in and out and sideways only, never up or down).
+    // Result -> CP; false = it left [rmin, rmax] or did not converge.
+    var CP = new Float64Array(3);
+    function coneSlide(L, x, y, z, sinE, rmin, rmax) {
+      var cx = L.C.x, cy = L.C.y, cz = L.C.z, ch = Math.sqrt(Math.max(0, 1 - sinE * sinE));
+      var wx = x - cx, wz = z - cz, wl = Math.sqrt(wx * wx + (y - cy) * (y - cy) + wz * wz), hl = Math.sqrt(wx * wx + wz * wz);
+      if (hl < 1e-9) return false;
+      x = cx + wx * wl * ch / hl; y = cy + wl * sinE; z = cz + wz * wl * ch / hl;   // onto the cone
+      var d = sdf(L, x, y, z);
+      for (var it = 0; it < 16 && Math.abs(d) > 1e-5; it++) {
+        wx = x - cx; var wy = y - cy; wz = z - cz; wl = Math.sqrt(wx * wx + wy * wy + wz * wz) || 1;
+        var sy = wy / wl, mx = -sy * wx / wl, my = 1 - sy * sy, mz = -sy * wz / wl, ml = Math.sqrt(mx * mx + my * my + mz * mz) || 1;
+        mx /= ml; my /= ml; mz /= ml;
+        var gm = SG[0] * mx + SG[1] * my + SG[2] * mz;
+        var tx = SG[0] - gm * mx, ty = SG[1] - gm * my, tz = SG[2] - gm * mz, t2 = tx * tx + ty * ty + tz * tz;
+        if (t2 < 1e-6) return false;
+        var st = clamp(d / t2, -0.12, 0.12);
+        x -= tx * st; y -= ty * st; z -= tz * st;
+        wx = x - cx; wz = z - cz; wl = Math.sqrt(wx * wx + (y - cy) * (y - cy) + wz * wz); hl = Math.sqrt(wx * wx + wz * wz) || 1;
+        x = cx + wx * wl * ch / hl; y = cy + wl * sinE; z = cz + wz * wl * ch / hl;
+        if (wl < rmin || wl > rmax) return false;
+        d = sdf(L, x, y, z);
+      }
+      CP[0] = x; CP[1] = y; CP[2] = z;
+      return Math.abs(d) <= 1e-3;
+    }
+    // Carve every vertex near the new cutters onto the carved SDF. Every point is Newton-projected along
+    // the SDF gradient (deep inside a cutter exactly v = c + normalize(v - c) * r; at the rim it lands on
+    // the small fillet): crisp scalloped rims. That is fold-free wherever the cutters' centres see the
+    // surface they carve, which holds for the band too when the bite sits above or below it (the scoop
+    // looks down onto the band's top ledge or up at its underside). A bite centred ON the band (cone:
+    // the common case) sees the ledges edge-on, and projecting them would fold the ledge over the ball
+    // beside it, so there a band vertex (it stands out of the ball) slides on its own elevation cone
+    // about the centre instead (coneSlide: in and sideways, so the band's cut ends get their share of
+    // vertices, and its rows can never cross). The ball rows above / below the band then move away from
+    // it (the scoop's centre lies at the band's height); an order-preserving floor (ceiling) keeps a
+    // jittered tooth from pushing one into the band's rows anyway.
+    // Cutters only ever remove material, so the result does not depend on the bite order. The normal is
+    // the SDF gradient (analytic, the skin part swapped for the vertex's own normal), so the UV seam and
+    // the poles stay consistent by construction and nothing needs computeVertexNormals().
+    function carve(L, cut, cone) {
       var p = L.pos.array, nn = L.nrm.array, b = L.bAttr.array, o = L.orig;
-      var cx = L.C.x, cy = L.C.y, cz = L.C.z, HALO = BITE.halo, pad = HALO + K_SUB + K_UNI;
+      var cx = L.C.x, cy = L.C.y, cz = L.C.z, HALO = BITE.halo, pad = HALO + K_SUB + K_UNI, RB = L.R;
+      var H = L.head, eTop = H ? Math.atan2(H.yc + H.hh, H.ro) : 0, eBot = H ? Math.atan2(H.yc - H.hh, H.ro) : 0;
       var mnx = Infinity, mny = Infinity, mnz = Infinity, mxx = -Infinity, mxy = -Infinity, mxz = -Infinity;
       cut.forEach(function (c) {
         mnx = Math.min(mnx, c.x - c.r - pad); mxx = Math.max(mxx, c.x + c.r + pad);
         mny = Math.min(mny, c.y - c.r - pad); mxy = Math.max(mxy, c.y + c.r + pad);
         mnz = Math.min(mnz, c.z - c.r - pad); mxz = Math.max(mxz, c.z + c.r + pad);
       });
-      var on = L.origN;
+      var on = L.origN, nc = cut.length, reach = new Float64Array(nc);
+      for (var k = 0; k < nc; k++) reach[k] = (cut[k].r + pad) * (cut[k].r + pad);
       for (var i = 0, i3 = 0; i < L.n; i++, i3 += 3) {
-        var x = p[i3], y = p[i3 + 1], z = p[i3 + 2];
+        var x0 = p[i3], y0 = p[i3 + 1], z0 = p[i3 + 2], x = x0, y = y0, z = z0;
         if (x < mnx || x > mxx || y < mny || y > mxy || z < mnz || z > mxz) continue;
-        L.Rv = L.rad0[i];                          // this vertex's own poured radius is its skin
-        var d = sdf(L, x, y, z);
-        for (var it = 0; it < 10 && Math.abs(d) > 1e-4; it++) {
-          var g2 = SG[0] * SG[0] + SG[1] * SG[1] + SG[2] * SG[2];
-          if (g2 < 1e-6) break;
-          var st = clamp(d / g2, -0.25, 0.25);
-          x -= SG[0] * st; y -= SG[1] * st; z -= SG[2] * st;
-          d = sdf(L, x, y, z);
+        for (k = 0; k < nc; k++) { var cu = cut[k], ex = x - cu.x, ey = y - cu.y, ez = z - cu.z; if (ex * ex + ey * ey + ez * ez < reach[k]) break; }
+        if (k === nc) continue;                    // out of every new cutter's reach: nothing changes here
+        var r0 = L.rad0[i], d, it, ball = true;
+        var ux = (o[i3] - cx) / r0, uy = (o[i3 + 1] - cy) / r0, uz = (o[i3 + 2] - cz) / r0;
+        L.Rv = r0;                                 // this vertex's own radius is its skin
+        if (cone && r0 > RB + 1e-5) {              // a band vertex under a bite centred on the band
+          ball = false;
+          if (coneSlide(L, x0, y0, z0, uy, 0.05, r0 + 1e-4)) { x = CP[0]; y = CP[1]; z = CP[2]; }
+          else {                                   // (no landing on its cone) down its ray from the centre,
+            var lo = 0.05, hi = r0, t = r0;         // a bracketed 1D Newton: never crosses another ray
+            d = sdf(L, cx + ux * t, cy + uy * t, cz + uz * t);
+            for (it = 0; it < 30 && Math.abs(d) > 1e-6; it++) {
+              if (d > 0) hi = t; else lo = t;
+              var g = SG[0] * ux + SG[1] * uy + SG[2] * uz;      // d(sdf)/dt along the ray
+              var tn = g > 0.05 ? t - d / g : -1;
+              if (!(tn > lo && tn < hi)) tn = 0.5 * (lo + hi);
+              t = tn;
+              d = sdf(L, cx + ux * t, cy + uy * t, cz + uz * t);
+            }
+            x = cx + ux * t; y = cy + uy * t; z = cz + uz * t;
+          }
         }
-        var moved = Math.abs(x - p[i3]) + Math.abs(y - p[i3 + 1]) + Math.abs(z - p[i3 + 2]) > 1e-6;
+        if (ball) {                                // Newton along the SDF gradient
+          d = sdf(L, x, y, z);
+          for (it = 0; it < 10 && Math.abs(d) > 1e-4; it++) {
+            var g2 = SG[0] * SG[0] + SG[1] * SG[1] + SG[2] * SG[2];
+            if (g2 < 1e-6) break;
+            var st = clamp(d / g2, -0.25, 0.25);
+            x -= SG[0] * st; y -= SG[1] * st; z -= SG[2] * st;
+            d = sdf(L, x, y, z);
+          }
+          if (cone && H && r0 <= RB + 1e-5) {      // never into the band's rows: an order-preserving floor
+            var e0 = Math.asin(clamp(uy, -1, 1)), e1 = Math.asin(clamp((y - cy) / (Math.hypot(x - cx, y - cy, z - cz) || 1), -1, 1));
+            var lim = e0 > eTop ? eTop + (e0 - eTop) * 0.5 : eBot - (eBot - e0) * 0.5;
+            if ((e0 > eTop && e1 < lim) || (e0 < eBot && e1 > lim)) {
+              if (coneSlide(L, x, y, z, Math.sin(lim), 0.05, r0 + 1e-4)) { x = CP[0]; y = CP[1]; z = CP[2]; }
+            }
+          }
+          if (L.Rv !== r0) { L.Rv = r0; sdf(L, x, y, z); }   // blend weights against its real skin
+        } else sdf(L, x, y, z);                    // (SG at the final point)
+        var moved = Math.abs(x - x0) + Math.abs(y - y0) + Math.abs(z - z0) > 1e-6;
         var fresh = 1 - SG[3], du = Math.max(0, SG[4]);
         var halo = du < HALO ? (1 - du / HALO) * (1 - du / HALO) * 0.8 * SG[3] : 0;
         if (!moved && halo <= b[i3 + 2] && fresh <= b[i3]) continue;
+        var rx = x - cx, ry = y - cy, rz = z - cz, rl = Math.hypot(rx, ry, rz) || 1;
         if (moved) {
           p[i3] = x; p[i3 + 1] = y; p[i3 + 2] = z;
           // SDF gradient with its skin part (weight SG[3]) swapped from radial to the vertex's own
           // original normal: the skin keeps its exact shading, the cut takes the cutter gradient
-          var rx = x - cx, ry = y - cy, rz = z - cz, rl = Math.hypot(rx, ry, rz) || 1, w = SG[3];
+          var w = SG[3];
           var nx = SG[0] + w * (on[i3] - rx / rl), ny = SG[1] + w * (on[i3 + 1] - ry / rl), nz = SG[2] + w * (on[i3 + 2] - rz / rl);
           var gl = Math.hypot(nx, ny, nz) || 1;
           nn[i3] = nx / gl; nn[i3 + 1] = ny / gl; nn[i3 + 2] = nz / gl;
         }
-        var r0 = Math.hypot(o[i3] - cx, o[i3 + 1] - cy, o[i3 + 2] - cz), r1 = Math.hypot(x - cx, y - cy, z - cz);
         b[i3] = Math.max(b[i3], fresh);
-        b[i3 + 1] = clamp((r0 - r1) / 0.3, 0, 1) * 0.8;             // crater occlusion: deeper = darker
+        // crater occlusion: depth below the BALL (not the band), so the band's share of a crater is
+        // shaded exactly like the ball beside it
+        b[i3 + 1] = clamp((Math.min(r0, RB) - rl) / 0.3, 0, 1) * 0.8;
         b[i3 + 2] = b[i3] > 0.98 ? 0 : Math.max(b[i3 + 2] * (1 - fresh), halo);
         if (!L.mark[i]) { L.mark[i] = 1; L.list.push(i); }
       }
@@ -2218,9 +2389,12 @@
       var N = P.clone().sub(L.C).normalize();
       L.mesh.getWorldQuaternion(_q).invert();
       var upL = new T.Vector3().setFromMatrixColumn(camera.matrixWorld, 1).applyQuaternion(_q);
-      var cut = makeCutters(L, P, N, upL);
+      // a hit on the band: the teeth go in from the ball's surface under it, so a bite there is as deep
+      // as anywhere else and takes the band out with it (shards / events keep the real hit point)
+      var Pc = P.distanceTo(L.C) > L.R ? L.C.clone().addScaledVector(N, L.R) : P;
+      var cut = makeCutters(L, Pc, N, upL), H = L.head, eN = Math.asin(clamp(N.y, -1, 1));
       Array.prototype.push.apply(L.cutters, cut);
-      carve(L, cut);
+      carve(L, cut, !!H && eN > Math.atan2(H.yc - H.hh, H.ro) && eN < Math.atan2(H.yc + H.hh, H.ro));
       L.bites++;
       var t = performance.now();
       L.regrowAt = t + (L.bites >= BITE.max ? BITE.regrowAfterMax : BITE.regrowAfter);

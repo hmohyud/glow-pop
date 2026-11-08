@@ -92,6 +92,8 @@
 /* ── 1. BASE ───────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: clip; }
+/* the full-size viewer is open: the page behind stays put (padding stands in for the scrollbar it hides) */
+html.zoom-open { overflow: hidden; padding-right: var(--sbw, 0px); }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
@@ -295,12 +297,20 @@ i[data-lucide] { display: inline-block; }
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sm);
 }
+/* lockup like the pack: the candy-block wordmark with a small "— LAB —" centred under it */
 .logo {
-  display: inline-flex; align-items: center; gap: .08em;
-  font-size: 27px; font-weight: 800; font-stretch: 75%; line-height: 1;
+  display: inline-grid; justify-items: center; row-gap: .16em;
+  font-size: 25px; font-weight: 800; font-stretch: 75%; line-height: 1;
   letter-spacing: -.005em; text-transform: uppercase; text-decoration: none; color: var(--ink);
   border-radius: 8px;
 }
+.logo-word { display: inline-flex; align-items: center; gap: .08em; }
+.logo-lab {
+  display: inline-flex; align-items: center; gap: .6em;
+  font-size: .36em; font-weight: 800; font-stretch: 100%; letter-spacing: .36em; line-height: 1;
+}
+.logo-lab::before, .logo-lab::after { content: ''; width: 1.9em; height: 2px; border-radius: 2px; background: currentColor; }
+.logo-lab::before { margin-right: .36em; }   /* matches the tracking after the last letter, so "LAB" sits centred */
 .logo-pop {
   display: inline-block; padding: .1em .16em 0; margin-left: .06em;
   background: var(--accent); color: var(--on-accent-hi);
@@ -343,7 +353,7 @@ i[data-lucide] { display: inline-block; }
 
 @media (min-width: 1024px) {
   .nav { padding: 0 8px 0 24px; gap: 20px; }
-  .logo { font-size: 31px; }
+  .logo { font-size: 29px; }
   .nav-links { display: flex; gap: 4px; margin-left: 12px; }
   .nav-links a {
     display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px;
@@ -617,7 +627,7 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
     min-height: 104px; padding: 14px 26px 12px 22px;
   }
   .switch-dot { grid-row: 1 / 3; width: 40px; height: 40px; }
-  /* sized to the option's text column so the longest name ("Strawberry Pop") always fits
+  /* sized to the option's text column so the longest name ("Collagen Boost") always fits
      on one line inside the pill (900px ≈ 24px · 1024px ≈ 30px · 1400px+ = 3.1rem) */
   .switch-name { font-size: clamp(1.5rem, 5vw - 21px, 3.1rem); white-space: nowrap; }
   .switch-status { justify-self: start; }
@@ -719,13 +729,24 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 .sf-table .sf-l1 th { padding-left: 1.1em; font-weight: 600; }
 .sf-table .sf-l2 th { padding-left: 2.2em; font-weight: 600; }
 .sf-table abbr { text-decoration: none; }
-.sf-table .sf-has-blend > * { border-bottom: 0; padding-bottom: 3px; }
-.sf-table .sf-blend td {
-  width: auto; white-space: normal; text-align: left; border-bottom: 0;
-  padding: 0 0 12px 1.1em; font-size: .84rem; font-weight: 500; line-height: 1.4;
-}
+/* the label prints each nutrient's source on a second, lighter line */
+.sf-src { display: block; margin-top: 2px; font-size: .8em; font-weight: 500; font-stretch: 100%; line-height: 1.25; }
+.sf-amt-2 { display: block; margin-top: 2px; font-size: .8em; font-weight: 600; }
+.sf-blend { padding: 12px 0 14px; font-size: .82rem; font-weight: 500; line-height: 1.45; }
 .sf-foot { font-size: .8rem; font-weight: 600; line-height: 1.45; }
 .sf-foot::before { margin-bottom: 10px; }
+.sf-other { margin-top: 14px; font-size: .84rem; font-weight: 500; line-height: 1.45; }
+.sf-other b { font-weight: 800; }
+.sf-note { display: grid; gap: 4px; margin-top: 16px; }
+.sf-note p { font-size: .92rem; font-weight: 600; line-height: 1.4; }
+.sf-sub { margin: 0; font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; line-height: 1.2; }
+.sf-note .sf-use { font-weight: 800; }
+.sf-note .sf-fine { font-size: .8rem; font-weight: 500; line-height: 1.45; }
+.sf-warn {                                 /* the Prop 65 small print, boxed like the label prints it */
+  margin-top: 16px; padding: 10px 12px;
+  border: 2px solid var(--ink); border-radius: var(--r-xs);
+  font-size: .74rem; font-weight: 600; line-height: 1.45;
+}
 .sf-tbd { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; padding-top: 12px; border-top: 2.5px dashed var(--ink); }
 .sf-tbd div { display: flex; align-items: baseline; gap: .45em; }
 .sf-tbd dt { font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
@@ -756,11 +777,69 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
   animation: spin 18s linear infinite;
 }
 .dock--pick { width: min(86%, 460px); }
-.pouch-sticker {
-  position: absolute; left: -1%; bottom: -6%;
-  width: clamp(118px, 15vw, 200px);
-  transform: rotate(-10deg);
-  filter: drop-shadow(6px 7px 0 var(--ink));
+
+/* ── CANDY BOX: how this shop frames the real product images (pack photo, pack front,
+   gummies label): a candy-stripe rim, a die-cut window, a peg tab with a euro-slot hole
+   and the page's hard down-right shadow. Each one is a zoom button (one shared viewer),
+   so it gets the same lift / press "pop" as every other button. Never cropped: the
+   window shows the whole image at its own ratio. ─────────────────────────────────── */
+.cbox {
+  --cb-rot: -3deg; --cb-rim: var(--accent-2); --cb-shadow: var(--ink);
+  position: relative; display: block; margin: 0; padding: 11px;
+  border: var(--stroke) solid var(--ink); border-radius: var(--r-md);
+  background: repeating-linear-gradient(90deg, var(--cb-rim) 0 12px, var(--sugar) 12px 24px);
+  color: var(--ink); font: inherit; text-align: left;
+  filter: drop-shadow(9px 9px 0 var(--cb-shadow));
+  transform: rotate(var(--cb-rot));
+  -webkit-tap-highlight-color: transparent;
+}
+button.cbox { cursor: zoom-in; transition: transform var(--dur-2) var(--ease-pop), filter var(--dur-2) var(--ease-out); }
+@media (hover: hover) {
+  button.cbox:hover { transform: rotate(var(--cb-rot)) translate(-3px, -4px); filter: drop-shadow(12px 13px 0 var(--cb-shadow)); }
+  button.cbox:hover .cbox-tag { transform: rotate(3deg) scale(1.06); }
+}
+button.cbox:active { transform: rotate(var(--cb-rot)) translate(4px, 4px); filter: drop-shadow(3px 3px 0 var(--cb-shadow)); transition-duration: 60ms; }
+button.cbox:focus-visible { outline: 3px solid var(--ink); outline-offset: 8px; box-shadow: none; border-radius: var(--r-md); }
+.cbox-tab {
+  position: absolute; left: 50%; bottom: 100%;
+  width: clamp(56px, 30%, 112px); height: 24px; margin-bottom: calc(var(--stroke) * -1);
+  transform: translateX(-50%);
+  background: var(--sugar); border: var(--stroke) solid var(--ink); border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+}
+.cbox-tab::before {                       /* the euro-slot hole it hangs from */
+  content: ''; position: absolute; left: 50%; top: 6px; width: 46%; height: 8px;
+  transform: translateX(-50%); border-radius: var(--r-pill); background: var(--ink);
+}
+.cbox-win {
+  display: block; overflow: hidden;
+  border: var(--stroke) solid var(--ink); border-radius: calc(var(--r-md) - 8px);
+  background: var(--sugar);
+}
+.cbox-win img { width: 100%; height: auto; }
+.cbox-tag {
+  position: absolute; right: -12px; bottom: -16px;
+  display: inline-flex; align-items: center; gap: .42em;
+  padding: .62em .9em .52em; border-radius: var(--r-pill);
+  border: var(--stroke) solid var(--ink); background: var(--accent); color: var(--on-accent);
+  box-shadow: var(--shadow-xs);
+  font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  transform: rotate(6deg);
+  transition: transform var(--dur-2) var(--ease-pop);
+}
+.cbox-tag .lucide { width: 15px; height: 15px; stroke-width: 2.6; margin-top: -2px; }
+.cbox--wide { padding: 8px; }
+.cbox--wide .cbox-win { border-radius: 10px; }
+.cbox--wide .cbox-tab { width: clamp(56px, 15%, 104px); }
+
+/* the real pack hangs off the stage (it replaces the old pouch art; zoom for the full photo) */
+.pack-box { --cb-rot: -6deg; position: absolute; left: 1%; bottom: -7%; width: clamp(150px, 18.5vw, 262px); }
+@media (min-width: 600px) and (max-width: 899px) { .pack-box { width: 25vw; } }   /* tablets: the stage is big, so is the box */
+@media (min-width: 900px) { .pack-box { left: -2%; } }
+/* Super Greens: the real label sits under the gummies (phones: below the stage, in the flow) */
+.label-box { --cb-rot: -2.5deg; position: relative; width: min(100%, 440px); margin-top: -12px; }
+@media (min-width: 900px) {
+  .label-box { position: absolute; left: 50%; bottom: -8%; width: min(94%, 480px); margin: 0 0 0 calc(min(94%, 480px) * -.5); }
 }
 .ghost-pouch {
   position: absolute; left: 0; bottom: -4%;
@@ -774,7 +853,7 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 .gp-q { font: 800 120px/1 var(--font); font-stretch: 75%; fill: var(--accent-ink); }
 .ghost-pouch figcaption { font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: var(--sugar); padding: .3em .6em; border-radius: 8px; border: 2px solid var(--ink); }
 .render-note {
-  position: absolute; right: 2%; bottom: 0;
+  position: absolute; right: 2%; top: 3%;   /* top corner: the bottom of the stage belongs to the label / pack */
   display: inline-flex; align-items: center; gap: .45em;
   padding: .5em .8em .45em; border-radius: var(--r-pill);
   background: var(--ink); color: var(--paper);
@@ -823,7 +902,7 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 .facts-note .lucide { width: 18px; height: 18px; margin-top: 1px; }
 .facts-note a { font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .2em; }   /* solid: never mistaken for a dashed placeholder */
 
-/* ── 11. COLLECT ALL SIX (trading cards) ──────────────────────────────── */
+/* ── 11. COLLECT ALL SEVEN (trading cards) ────────────────────────────── */
 .six { padding-top: calc(var(--sec-pad) + 16px); }
 .six-head .display { color: var(--paper); }
 .six-head .display .fit-line { text-shadow: .03em .03em 0 var(--accent); }
@@ -852,11 +931,14 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 }
 .tcards::-webkit-scrollbar { display: none; }
 @media (min-width: 900px) {
+  /* six half-columns: rows of three, and the seventh card closes the set in the middle of row three */
   .tcards {
-    grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row; grid-template-columns: repeat(6, minmax(0, 1fr));
     overflow: visible; margin: 0 auto; padding: 0; max-width: 1160px;
     gap: clamp(22px, 2.6vw, 40px) clamp(26px, 3.4vw, 54px);
   }
+  .tcard-slot { grid-column: span 2; }
+  .tcard-slot:nth-child(7) { grid-column: 3 / span 2; }
 }
 .tcard-slot { scroll-snap-align: center; perspective: 1500px; }
 @media (min-width: 900px) {
@@ -866,6 +948,7 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
   .tcard-slot:nth-child(4) { transform: rotate(1.2deg); }
   .tcard-slot:nth-child(5) { transform: rotate(-1.6deg) translateY(18px); }
   .tcard-slot:nth-child(6) { transform: rotate(2deg); }
+  .tcard-slot:nth-child(7) { transform: rotate(-1.2deg) translateY(6px); }
 }
 .tcard {
   position: relative; display: block; width: 100%;
@@ -940,11 +1023,13 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 .tcard-slot:nth-child(4) .tc-art { --art: var(--tint);     --pop: var(--accent); }
 .tcard-slot:nth-child(5) .tc-art { --art: var(--accent);   --pop: var(--accent-2); }
 .tcard-slot:nth-child(6) .tc-art { --art: var(--accent-2); --pop: var(--paper); }
+.tcard-slot:nth-child(7) .tc-art { --art: var(--accent-3); --pop: var(--paper); }
 .tc-name {
   display: block;
   font-size: clamp(1.75rem, 2.5vw, 2.35rem); font-weight: 800; font-stretch: 75%;
   line-height: .88; text-transform: uppercase; letter-spacing: -.005em;
 }
+.tc-name-sub { display: block; margin-top: .14em; font-size: .6em; letter-spacing: .03em; color: var(--accent-ink); }   /* "(biotin)", as the pack prints it */
 .tc-hint {
   display: inline-flex; align-items: center; gap: .45em; margin-top: 10px;
   font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; line-height: 1;
@@ -989,9 +1074,9 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
   transform: rotate(-2deg);
 }
 
-/* ── 12. REAL SUGAR + nope list ───────────────────────────────────────── */
+/* ── 12. SUGAR FREE (straight off the pack) ───────────────────────────── */
 .sugar { padding-top: calc(var(--sec-pad) + 40px); }
-.sugar-top { display: grid; gap: 28px; margin-bottom: clamp(40px, 5vw, 72px); }
+.sugar-top { display: grid; gap: 28px; }
 @media (min-width: 900px) {
   .sugar-top { grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); align-items: center; gap: 40px; }
 }
@@ -1000,6 +1085,7 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
 .sugar-title span { display: block; }
 .sugar-title .st-2 { color: var(--accent); text-shadow: .03em .03em 0 var(--ink); }
 .sugar-head .lead { max-width: 48ch; }
+.sugar-head .facts-note { margin-top: 4px; }
 .sugar-visual { position: relative; display: grid; place-items: center; min-height: 300px; }
 .sugar-disc {
   position: absolute; width: min(92%, 400px); aspect-ratio: 1;
@@ -1017,61 +1103,44 @@ html:not(.js) .switch-opt[aria-pressed="true"] { background: var(--accent); colo
   color: var(--accent-ink);
 }
 .disc-core .lucide { width: 36%; height: 36%; stroke-width: 2; transition: opacity var(--dur-2); }
-/* the live 3D pop docks on this disc for the Strawberry Pop: it replaces the icon */
+/* the live 3D pop docks on this disc for the lollipop: it replaces the icon */
 html.candy-live[data-product="strawberry-pop"] .disc-core .lucide { opacity: 0; }
 .dock--sugar { width: min(70%, 300px); }
 
-.reasons { display: grid; gap: 16px; }
-@media (min-width: 600px) { .reasons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1200px) { .reasons { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; } }
-.reason {
-  display: grid; align-content: start; gap: 12px;
-  padding: 24px 22px 26px;
-  background: var(--sugar);
-  border: var(--stroke) solid var(--ink);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow);
-}
-.reason:nth-child(even) { background: var(--tint); }
-.reason h3 { font-size: clamp(1.5rem, 2vw, 1.9rem); font-weight: 800; font-stretch: 78%; text-transform: uppercase; line-height: .95; }
-.reason p { font-weight: 500; }
-@media (max-width: 599px) {               /* phone: icon beside the title, so four cards read as a set, not a tall stack */
-  .reason { grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 14px; padding: 18px 18px 20px; }
-  .reason p { grid-column: 1 / -1; }
-}
-
-.nope {
-  display: grid; gap: 22px;
-  margin-top: clamp(28px, 4vw, 48px);
-  padding: clamp(22px, 3vw, 40px);
+/* "Read the pack": the real front panel beside what it says, word for word, and what is
+   still unknown (visible placeholders). Same ink card + chip language as the old list. */
+.packread {
+  --cb-shadow: var(--accent); --ph-bg: var(--accent-2); --ph-fg: var(--ink); --ph-line: currentColor;
+  display: grid; gap: 44px 56px; align-items: center;
+  margin-top: clamp(44px, 5vw, 76px);
+  padding: clamp(46px, 4vw, 60px) clamp(22px, 3.6vw, 56px) clamp(30px, 3.6vw, 52px);
   background: var(--ink); color: var(--paper);
   border-radius: var(--r-lg);
   box-shadow: 10px 10px 0 var(--accent);
 }
-@media (min-width: 1024px) {
-  .nope { grid-template-columns: minmax(0, .6fr) minmax(0, 2fr); align-items: start; column-gap: 40px; }
-  .yep-list { grid-column: 2; }
-}
-.nope-title { font-size: clamp(2.4rem, 4.6vw, 4.2rem); font-weight: 800; font-stretch: 75%; line-height: .88; text-transform: uppercase; color: var(--accent-2); }
-.nope-head p { margin-top: 8px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: .85rem; }
-.nope-list { display: flex; flex-wrap: wrap; gap: 10px; }
-.nope-list li {
+@media (min-width: 900px) { .packread { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); } }
+@media (min-width: 1200px) { .packread { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); column-gap: 80px; } }
+.packread-box { --cb-rot: -2.5deg; width: min(100%, 280px); justify-self: center; }
+.packread button.cbox:focus-visible { outline-color: var(--paper); }   /* an ink ring would vanish on the ink card */
+@media (min-width: 900px) { .packread-box { width: 100%; } }
+.packread-body { display: grid; gap: 24px; align-content: start; }
+.packread-title { font-size: clamp(2.4rem, 4.6vw, 4.2rem); font-weight: 800; font-stretch: 75%; line-height: .88; text-transform: uppercase; color: var(--accent-2); }
+.packread-lead { margin-top: -10px; max-width: 42ch; font-size: var(--fs-lead); font-weight: 600; line-height: 1.4; }
+.packread-group { display: grid; gap: 10px; }
+.packread-label { font-size: .78rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+.yep-list, .act-list, .tbd-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.yep-list li, .act-list li, .tbd-list li {
   display: inline-flex; align-items: center; gap: .45em;
   padding: .6em 1em .55em; border-radius: var(--r-pill);
-  background: var(--paper); color: var(--ink);
-  border: 2.5px solid var(--paper);
-  font-weight: 800; font-size: clamp(.92rem, 1.1vw, 1.05rem); line-height: 1;
-  text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: var(--accent);
+  font-weight: 800; line-height: 1;
 }
-.nope-list .lucide { width: 18px; height: 18px; color: var(--accent-ink); stroke-width: 3; }
-.yep-list { display: flex; flex-wrap: wrap; gap: 10px; }
 .yep-list li {
-  display: inline-flex; align-items: center; gap: .45em;
-  padding: .6em 1em .55em; border-radius: var(--r-pill);
   background: var(--accent); color: var(--on-accent); border: 2.5px solid var(--paper);
-  font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: .85rem; line-height: 1;
+  letter-spacing: .06em; text-transform: uppercase; font-size: .85rem;
 }
 .yep-list .lucide { width: 17px; height: 17px; stroke-width: 3; }
+.act-list li { background: var(--paper); color: var(--ink); border: 2.5px solid var(--paper); font-size: clamp(.92rem, 1.1vw, 1.05rem); }
+.tbd-list li { border: 2.5px dashed color-mix(in srgb, var(--paper) 55%, var(--ink)); font-size: .92rem; }
 
 /* ── 13. RITUAL ───────────────────────────────────────────────────────── */
 .ritual { padding-top: calc(var(--sec-pad) + 10px); padding-bottom: calc(var(--sec-pad) + 10px); }
@@ -1342,30 +1411,41 @@ html.candy-live[data-product="strawberry-pop"] .disc-core .lucide { opacity: 0; 
 .lock-title { font-size: clamp(2rem, 3.4vw, 3rem); font-weight: 800; font-stretch: 75%; line-height: .9; text-transform: uppercase; }
 .lock-copy { max-width: 34ch; font-weight: 600; }
 
-/* waitlist + teaser */
+/* waitlist + teaser: the gummies card runs full width so its real label can be big enough to
+   read (and zoom); the colors teaser becomes a strip under it */
 .soon-grid { display: grid; gap: 24px; margin-top: clamp(44px, 6vw, 84px); }
-@media (min-width: 1024px) { .soon-grid { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: stretch; } }
 .waitlist {
-  display: grid; gap: 22px;
-  padding: clamp(22px, 3vw, 38px);
+  display: grid; gap: 30px;
+  padding: clamp(22px, 3vw, 40px);
   background: var(--accent); color: var(--on-accent);
   border: var(--stroke) solid var(--ink);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
 }
-@media (min-width: 640px) { .waitlist { grid-template-columns: minmax(0, 190px) minmax(0, 1fr); align-items: center; } }
-.wl-art { display: grid; justify-items: center; gap: 8px; }
-.wl-art svg { width: 100%; max-width: 220px; overflow: visible; }
-.gum { stroke: var(--ink); stroke-width: 5; stroke-linejoin: round; }
-.gum-1 { fill: var(--accent-2); }
-.gum-2 { fill: var(--paper); }
-.gum-3 { fill: var(--accent-3); }
-.gum-dots circle { fill: var(--sugar); opacity: .9; }
-.wl-cap { font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: .35em .6em; border-radius: 6px; background: var(--ink); color: var(--paper); }
+@media (min-width: 1024px) {
+  .waitlist { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; column-gap: clamp(36px, 4vw, 64px); }
+}
+.wl-media { display: grid; gap: 30px; justify-items: center; padding-top: 22px; }   /* headroom for the peg tab */
+.wl-label-box { --cb-rot: -1.5deg; --cb-rim: var(--accent-2); width: 100%; }
+.wl-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.wl-badges li {
+  display: inline-flex; align-items: center; gap: .45em;
+  padding: .55em .9em .5em; border-radius: var(--r-pill);
+  background: var(--paper); color: var(--ink); border: 2.5px solid var(--ink);
+  font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; line-height: 1;
+}
+.wl-badges .lucide { width: 16px; height: 16px; color: var(--accent-ink); margin-top: -2px; }
 .wl-body { display: grid; gap: 14px; }
 .waitlist .status { background: var(--paper); color: var(--ink); border-color: var(--ink); }
 .wl-title { font-size: clamp(2.3rem, 4.4vw, 3.8rem); font-weight: 800; font-stretch: 75%; line-height: .88; text-transform: uppercase; }
-.wl-title small { font-size: .38em; letter-spacing: .06em; vertical-align: .6em; white-space: nowrap; }
+/* jumps to the accessible HTML label in the lineup (switches the page to the gummies first) */
+.wl-sf {
+  display: inline-flex; align-items: center; gap: .45em; width: fit-content; min-height: 44px; padding: 0;
+  border: 0; background: none; color: inherit;
+  font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .22em;
+}
+@media (hover: hover) { .wl-sf:hover { text-decoration-style: wavy; } }
+.wl-sf .lucide { width: 18px; height: 18px; }
 .wl-copy { font-weight: 600; max-width: 52ch; }
 .waitlist .ph { --ph-line: currentColor; }
 .wl-form { display: grid; gap: 10px; }
@@ -1412,6 +1492,15 @@ html.candy-live[data-product="strawberry-pop"] .disc-core .lucide { opacity: 0; 
 .teaser-facts div { display: flex; gap: .45em; align-items: baseline; }
 .teaser-facts dt { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .teaser-facts dd { margin: 0; font-weight: 700; }
+@media (min-width: 900px) {                 /* a strip: ghost pops | the words | the unknowns */
+  .teaser {
+    grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto auto;
+    align-items: center; column-gap: clamp(28px, 4vw, 60px); row-gap: 10px;
+  }
+  .ghost-pops { grid-column: 1; grid-row: 1 / -1; padding: 0; }
+  .teaser > :not(.ghost-pops):not(.teaser-facts) { grid-column: 2; }
+  .teaser-facts { grid-column: 3; grid-row: 1 / -1; flex-direction: column; }
+}
 
 /* ── 16. THE GLOW WALL (honest empty state) ───────────────────────────── */
 .wall { padding-top: calc(var(--sec-pad) + 20px); padding-bottom: calc(var(--sec-pad) * .7); }
@@ -1686,9 +1775,72 @@ html.candy-fallback .dock-fallback { display: block !important; }
 @media (min-width: 900px) { .toast { bottom: 28px; } }
 .sprinkle-canvas { position: fixed; inset: 0; z-index: 90; width: 100%; height: 100%; pointer-events: none; }
 
+/* full-size viewer: a candy-card modal; the image keeps its own ratio (sizes come from app.js) */
+.zoom {
+  width: min(1480px, calc(100vw - 20px)); height: calc(100dvh - 20px);
+  max-width: none; max-height: none; margin: auto; padding: 0;
+  border: var(--stroke) solid var(--ink); border-radius: var(--r-lg);
+  background: var(--paper); color: var(--ink);
+  box-shadow: 10px 10px 0 var(--accent);
+  overflow: hidden;
+}
+.zoom[open] { display: flex; flex-direction: column; }
+.zoom::backdrop { background: rgba(46, 6, 32, .8); }
+.zoom-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 9px 9px 18px;
+  background: var(--sugar); border-bottom: var(--stroke) solid var(--ink);
+}
+.zoom-title {
+  flex: 1; min-width: 0;
+  font-size: 1.05rem; font-weight: 800; font-stretch: 85%; letter-spacing: .03em; line-height: 1.1; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.zoom-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.zoom-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45em;
+  min-width: 44px; min-height: 44px; padding: 0 14px;
+  border: 2.5px solid var(--ink); border-radius: var(--r-pill);
+  background: var(--paper); color: var(--ink);
+  font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; line-height: 1; text-decoration: none;
+  transition: background-color var(--dur-2), transform var(--dur-1) var(--ease-out);
+}
+.zoom-btn .lucide { width: 18px; height: 18px; }
+.zoom-close { padding: 0; background: var(--accent); color: var(--on-accent); }
+@media (hover: hover) { .zoom-btn:hover { background: var(--accent-2); color: var(--ink); } }
+.zoom-btn:active { transform: scale(.94); }
+@media (max-width: 599px) {                 /* phones: icon-only actions (names stay for screen readers) */
+  .zoom-bar { padding-left: 14px; gap: 8px; }
+  .zoom-title { font-size: .92rem; }
+  .zoom-btn { padding: 0; }
+  .zoom-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+.zoom-stage {
+  flex: 1; min-height: 0; display: flex; padding: 14px;
+  overflow: auto; overscroll-behavior: contain; touch-action: pan-x pan-y pinch-zoom;
+  background: repeating-linear-gradient(-45deg, var(--tint) 0 14px, var(--paper) 14px 28px);
+}
+.zoom-stage:focus-visible { outline-offset: -7px; box-shadow: none; border-radius: 0; }
+.zoom-img {
+  flex: none; margin: auto; max-width: none;
+  border-radius: 8px; background: var(--sugar);
+  box-shadow: 0 0 0 3px var(--ink), 7px 7px 0 3px var(--ink);
+  user-select: none; -webkit-user-drag: none;
+}
+.zoom-img.is-zoomable { cursor: zoom-in; }
+.zoom-img.is-actual { cursor: zoom-out; }
+.zoom-stage.is-dragging, .zoom-stage.is-dragging .zoom-img { cursor: grabbing; }
+.zoom-hint {
+  display: flex; align-items: center; justify-content: center; gap: .5em;
+  padding: 9px 14px 10px;
+  background: var(--sugar); border-top: var(--stroke) solid var(--ink);
+  font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; line-height: 1;
+}
+.zoom-hint .lucide { width: 16px; height: 16px; color: var(--accent-ink); }
+
 /* ── 23. REVEALS (only once JS is running; never hides content otherwise) ─ */
-.js:not(.no-anim) :is(.sec-head > *, .benefits > li, .reason, .step, .weeks, .vs-wrap, .bagviz, .builder-wrap,
-  .waitlist, .teaser, .slot, .acc-item, .nope, .photo-sticker, .switch, .pick-info, .tcard-slot, .finale-ui > *, .score):not(.is-in) {
+.js:not(.no-anim) :is(.sec-head > *, .benefits > li, .step, .weeks, .vs-wrap, .bagviz, .builder-wrap,
+  .waitlist, .teaser, .slot, .acc-item, .packread, .photo-sticker, .switch, .pick-info, .tcard-slot, .finale-ui > *, .score):not(.is-in) {
   opacity: 0;
 }
 .js:not(.no-anim) :is(.hero-title .hl, .hero-ui > *, .badge-spin, .grab-hint):not(.is-in) { opacity: 0; }
@@ -1707,8 +1859,8 @@ html.theme-fade, html.theme-fade * {
   /* no transitions at all (a tiny duration would still make JS measurements read stale values) */
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
   .badge-svg, .stage-ring, .sugar-disc > svg { animation: none !important; }
-  .js :is(.sec-head > *, .benefits > li, .reason, .step, .weeks, .vs-wrap, .bagviz, .builder-wrap,
-    .waitlist, .teaser, .slot, .acc-item, .nope, .photo-sticker, .switch, .pick-info, .tcard-slot, .finale-ui > *, .score),
+  .js :is(.sec-head > *, .benefits > li, .step, .weeks, .vs-wrap, .bagviz, .builder-wrap,
+    .waitlist, .teaser, .slot, .acc-item, .packread, .photo-sticker, .switch, .pick-info, .tcard-slot, .finale-ui > *, .score),
   .js :is(.hero-title .hl, .hero-ui > *, .badge-spin, .grab-hint) { opacity: 1 !important; }
   .tcard-inner { transition: none; }
 }

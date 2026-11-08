@@ -3,13 +3,14 @@
    1  Helpers
    2  Data: PRODUCTS (single source of truth), INGREDIENTS, BUNDLES
    3  Theme + product state
-   4  Renderers (dock, lineup, shop)
+   4  Renderers (dock, lineup, shop, gummies waitlist)
    5  Aura canvas (one low-res 2D canvas, pointer-reactive, palette morph)
    6  3D candy (hero + night glow, max 2 WebGL contexts)
    7  Hero: chips swap, pointer parallax
    8  Ingredient orbit + accessible tabs
    9  Shop interactions + waitlist
    9b Supplement facts sheet (modal, from PRODUCTS[].label)
+   9c Large view for the pack + label photos (modal, from [data-zoom] links)
    10 FAQ accordion
    11 Header, menu, mobile shop bar
    12 Reveal + shimmer
@@ -33,10 +34,11 @@
 
   /* ── 2. Data ────────────────────────────────────────────────────────────── */
   // One object per product drives the switcher, lineup, shop, theme, aura and 3D.
+  // Facts follow redesign/_qa/PACK-FACTS.md (client pack images, 2026-11-07).
   var PRODUCTS = [
     {
       id: 'strawberry-pop', kind: 'lollipop', status: 'available', statusLabel: 'Available now',
-      name: 'Peptide Lollipops', short: 'Strawberry Pop', flavor: 'Strawberry',
+      name: 'Collagen Boost', short: 'Collagen Boost', flavor: 'Strawberry', descriptor: 'Strawberry Beauty Lollipop',
       color: '#FF1493', deep: '#7A1B4D', tint: '#FFE4F1',
       theme: {
         'accent': '#FF1493', 'accent-ink': '#B30E66', 'accent-deep': '#7A1B4D', 'tint': '#FFE4F1', 'soft': '#FFC9E4',
@@ -47,28 +49,28 @@
       aura: ['#FFC4E3', '#E5D3FF', '#CAEBFF', '#FFDDCC', '#FFB8DC'],   // last = cursor core (kept light: text sits on it)
       orb: ['#FF5FB0', '#C9A7FF', '#8FE3FF'],
       candy: { kind: 'lollipop', color: '#FF1493' },
-      eyebrow: 'Peptide Lollipops · Strawberry',
-      blurb: 'Collagen peptides, hyaluronic acid and glow-boosting vitamins, in a really, really good strawberry lollipop.',
+      eyebrow: 'Collagen Boost · Strawberry Beauty Lollipop',
+      blurb: 'Peptides, hyaluronic acid and five more actives, in a really, really good strawberry lollipop. Sugar free.',
       cta: { label: 'Shop the Pop', href: '#shop' },
       facts: [
-        { icon: 'flame', big: '47 cal', small: 'per pop' },
-        { icon: 'candy', big: 'Real sugar', small: 'no fake sweeteners' },
-        { icon: 'sparkles', big: '6 actives', small: 'for skin &amp; glow' }
+        { icon: 'candy', big: 'Sugar free', small: 'strawberry flavor' },
+        { icon: 'sparkles', big: '7 actives', small: 'for skin &amp; glow' },
+        { icon: 'lollipop', big: '15 g pop', small: '10 per bag' }
       ],
-      visual: { type: 'photo', src: '../../images/peptide_lollipops.webp', w: 1600, h: 1600,
-        alt: 'Glo Pop Peptide Lollipops pouch: strawberry flavor, 10 lollipops, with Vitamin C and collagen' },
+      visual: { type: 'photo', src: '../_shared/assets/product/pack-mockup.jpg', w: 738, h: 851,
+        alt: 'Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops' },
       card: {
-        title: 'Peptide Lollipops', sub: 'Strawberry',
-        points: [['flame', '47 calories per pop'], ['package', '10 lollipops per bag'], ['sparkles', '6 glow actives'], ['candy', 'Made with real sugar']],
+        title: 'Collagen Boost', sub: 'Strawberry Beauty Lollipop',
+        points: [['candy', 'Sugar free, strawberry flavor'], ['package', '10 pops per bag, 15 g each'], ['sparkles', '7 actives, biotin included'], ['calendar-check', 'One a day']],
         action: { label: 'Shop now', href: '#shop', icon: 'shopping-bag' }
       },
-      pack: '10 lollipops per bag',
-      bar: { name: 'Peptide Lollipops · Strawberry', sub: 'From $' + ph('XX') + ' · free shipping', cta: 'Shop', href: '#shop' },
-      ritual: 'One Strawberry Pop a day.'
+      pack: '10 pops per bag · 15 g each',
+      bar: { name: 'Collagen Boost · Strawberry', sub: 'From $' + ph('XX') + ' · free shipping', cta: 'Shop', href: '#shop' },
+      ritual: 'One Collagen Boost pop a day.'
     },
     {
       id: 'green-gummies', kind: 'gummy', status: 'coming-soon', statusLabel: 'Coming soon',
-      name: 'Green Gummies', short: 'Green Gummies', nameNote: 'working name', flavor: 'Strawberry-Watermelon',
+      name: 'Super Greens Gummies', short: 'Super Greens Gummies', flavor: 'Strawberry-Watermelon',
       color: '#1FA453', deep: '#0E4D2C', tint: '#E3F6EA',
       theme: {
         'accent': '#1FA453', 'accent-ink': '#0B6B3A', 'accent-deep': '#0E4D2C', 'tint': '#E3F6EA', 'soft': '#C4F0D9',
@@ -79,47 +81,55 @@
       aura: ['#BFF4D9', '#BDEFF0', '#E0F7B8', '#D2F4E5', '#A6EDCB'],
       orb: ['#3DDC97', '#7FE7E0', '#C5F27A'],
       candy: { kind: 'gummy', color: '#1FA453' },
-      eyebrow: 'Green Gummies · Strawberry-Watermelon',
-      blurb: 'Five B vitamins and an organic super-greens blend, in a strawberry-watermelon gummy. ' + ph('Launch date') + ' to be revealed.',
+      eyebrow: 'Super Greens Gummies · Strawberry-Watermelon',
+      blurb: 'Kale, broccoli, spinach, wild blueberries and elderberry, plus five B vitamins, in a strawberry-watermelon gummy. ' + ph('Launch date') + ' to be revealed.',
       cta: { label: 'Join the waitlist', href: '#waitlist' },
       facts: [
-        { icon: 'flame', big: '20 cal', small: 'per 2 gummies' },
-        { icon: 'sparkles', big: '5 B vitamins', small: 'B2, B3, B5, B6 &amp; folate' },
-        { icon: 'leaf', big: 'Super greens', small: 'organic blend' }
+        { icon: 'leaf', big: 'Super greens', small: 'kale, broccoli &amp; spinach' },
+        { icon: 'shield-check', big: 'Immune support*', small: 'and healthy gut*' },
+        { icon: 'package', big: '60 gummies', small: '2 per serving · 30 servings' }
       ],
       visual: { type: 'gummy-concept' },
       card: {
-        title: 'Green Gummies', sub: 'Strawberry-Watermelon',
-        points: [['flame', '20 calories, 3 g sugar per 2 gummies'], ['package', '60 gummies (30 servings) per container'], ['sparkles', '5 B vitamins + organic super greens'], ['tag', 'Price $' + ph('XX')]],
+        title: 'Super Greens Gummies', sub: 'Strawberry-Watermelon',
+        points: [['leaf', 'Super greens + five B vitamins'], ['shield-check', 'Healthy gut* · immune support*'], ['package', '60 gummies, 2 per serving'], ['tag', 'Price $' + ph('XX')]],
         action: { label: 'Join waitlist', href: '#waitlist', icon: 'bell' }
       },
       waitlist: {
         title: 'Be first to the <em>green glow</em>.',
-        copy: 'Green Gummies are on the way in strawberry-watermelon, with five B vitamins and an organic super-greens blend. More lollipop colors are in the lab. Price and launch date are still under wraps, so join the list to hear first.'
+        copy: 'Super Greens Gummies are on the way, and more lollipop colors are in the lab. Price and launch date are still under wraps, so join the list to hear first.'
       },
-      inside: 'Green Gummies have their own formula: five B vitamins plus an organic super-greens blend.',
-      bar: { name: 'Green Gummies', sub: 'Strawberry-watermelon · soon', cta: 'Waitlist', href: '#waitlist' },
-      ritual: 'Green Gummies serving: 2&nbsp;gummies · ' + ph('how many a day') + '.',
-      // Supplement Facts exactly as printed on the client's label. The %DVs are theirs:
-      // never "correct" them here. Serving size is not directions (how many a day is TBD).
+      inside: 'Super Greens Gummies have their own formula: five B vitamins plus a super-greens blend.',
+      bar: { name: 'Super Greens Gummies', sub: 'Strawberry-watermelon · soon', cta: 'Waitlist', href: '#waitlist' },
+      ritual: 'Super Greens Gummies: take two (2) gummies daily.',
+      // The full new label (PACK-FACTS.md), exactly as printed, footnote marks included.
+      // The %DVs are the client's: never "correct" them here.
       label: {
+        photo: '../_shared/assets/product/super-greens-label.jpg', photoW: 1600, photoH: 613,
+        photoAlt: 'The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings',
         serving: '2 Gummies', servings: '30',
         rows: [
           { n: 'Calories', a: '20', dv: '' },
           { n: 'Total Carbohydrate', a: '5 g', dv: '2%' },
-          { n: 'Total Sugars', a: '3 g', dv: '2%', lv: 1 },
+          { n: 'Total Sugars', a: '3 g', dv: '*', lv: 1 },
           { n: 'Added Sugars', a: '3 g', dv: '6%', lv: 2 },
-          { n: 'Riboflavin', a: '0.8 mg', dv: '62%' },
-          { n: 'Niacin', a: '1.4 mg NE', dv: '9%' },
-          { n: 'Vitamin B6', a: '0.9 mg', dv: '53%' },
-          { n: 'Folate', a: '50 mcg DFE', dv: '53%' },
-          { n: 'Pantothenic Acid', a: '0.9 mg', dv: '18%' },
-          { n: 'Sodium', a: '15 mg', dv: '&lt;1%' },
-          { n: 'Organic Super Greens Blend', a: '170 mg', dv: '&lt;1%*', rule: true }
+          { n: 'Riboflavin', src: 'from Organic Sugar Cherries Blend', a: '0.8 mg', dv: '62%' },
+          { n: 'Niacin', src: 'from Organic Beetroot', a: '1.4 mg NE', dv: '9%' },
+          { n: 'Vitamin B6', src: 'from Organic Sugar Cherries Blend', a: '0.6 mg', dv: '35%' },
+          { n: 'Folate', src: 'from Organic Sugar Cherries Blend', a: '80 mcg DFE <span class="sf-amt">(50 mcg Folic Acid)</span>', dv: '20%' },
+          { n: 'Pantothenic Acid', src: 'from Organic Sugar Cherries Blend', a: '0.9 mg', dv: '18%' },
+          { n: 'Iron', src: 'from Organic Sugar Cherries Blend', a: '0.7 mg', dv: '4%' },
+          { n: 'Iodine', src: 'from Organic Kelp', a: '17 mcg', dv: '11%' },
+          { n: 'Sodium', src: 'from Electrolyte Blend', a: '15 mg', dv: '&lt;1%' },
+          { n: 'Potassium', src: 'from Electrolyte Blend', a: '17 mg', dv: '&lt;1%' }
         ],
-        blend: '*Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk &amp; Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
-        foot: ['Percent Daily Values are based on a 2,000 calorie diet.', '*Daily Value not established.'],
-        tbd: [['Other ingredients', ph('base, sweetener &amp; colors')], ['Allergens', ph('allergen info')], ['Vegan / gluten-free', ph('status')], ['Directions', ph('how many a day')]]
+        blend: 'Organic Kale Leaf (Brassica oleracea var. acephala DC); Organic Broccoli Stalk and Flower (Brassica oleracea L. var. italica Planch); Organic Beet Root (Beta vulgaris L.); Organic Spinach (Spinacia oleracea L.); Wild Blueberry (Vaccinium angustifolium); Organic Elderberry (Sambucus nigra); Lemon (Citrus limon L.); Organic Carrot Root (Daucus carota L. var. sativus); Maltitol; Organic Wild Blueberry (Vaccinium angustifolium); Organic Acai Berry (Euterpe oleracea Mart.); Organic Pomegranate Fruit (Punica granatum L.); Organic Goji Juice (Lycium chinense); Organic Spirulina (Spirulina); Organic Noni Fruit (Morinda citrifolia); Organic Acai Berry (Euterpe oleracea Mart.); Pea (Pisum sativum); L-ascorbyl palmitate and Natural Flavors.',
+        foot: ['** Percent Daily Values are based on a 2,000 calorie diet', '† Daily Value not established'],
+        other: 'Tapioca Syrup, Sugar, Pectin, Citric Acid, Orange Juice Concentrate, Sodium Citrate, Natural Flavor (Strawberry, Watermelon), Palm Oil, Carnauba Wax, Color Added (Purple Carrot Juice Concentrate), Stevia Leaf.',
+        use: ['Take two (2) gummies daily.', 'Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication, especially blood thinners or immunosuppressants. Discontinue use and call a doctor if any adverse reactions occur. Not intended to diagnose, treat, cure, or prevent any disease.'],
+        storage: 'Store in a cool, dry place.',
+        warning: 'CALIFORNIA WARNING: Consistent with the State of California\'s Proposition 65, this product may expose you to chemicals including Lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm.',
+        tbd: [['Price', '$' + ph('XX')], ['Launch date', ph('date')], ['Allergens', ph('allergen info')]]
       }
     },
     {
@@ -160,24 +170,29 @@
     }
   ];
 
+  // The seven actives, in the pack's order and wording. Drives the orbit bubbles;
+  // the tab + panel markup in index.html must stay in this same order.
   var INGREDIENTS = [
-    { id: 'collagen', name: 'Collagen Peptides', short: 'Collagen', icon: 'gem',
-      desc: 'Supports skin elasticity and hydration from within for a youthful, plump complexion.',
-      chips: [['sparkles', 'Firm &amp; Plump'], ['droplet', 'Hydration']] },
-    { id: 'hyaluronic', name: 'Hyaluronic Acid', short: 'Hyaluronic', icon: 'droplet',
-      desc: 'Helps lock in moisture for plump, dewy skin that glows from the inside out.',
-      chips: [['droplet', 'Hydration'], ['sun', 'Dewy Glow']] },
+    { id: 'peptides', name: 'Peptides', short: 'Peptides', icon: 'gem',
+      desc: 'Peptides support skin’s natural firmness and elasticity, for a youthful, plump-looking complexion.*',
+      chips: [['sparkles', 'Firm &amp; Plump'], ['waves', 'Elasticity']] },
     { id: 'vitamin-c', name: 'Vitamin C', short: 'Vitamin C', icon: 'citrus',
-      desc: 'Helps brighten your complexion and protect against free radicals and environmental stress.',
+      desc: 'Helps brighten your complexion and protect against free radicals and environmental stress.*',
       chips: [['sun', 'Brightening'], ['shield', 'Antioxidant']] },
-    { id: 'b12', name: 'Vitamin B12', short: 'B12', icon: 'zap',
-      desc: 'Supports energy and a healthy metabolism, so you feel as good as you look.',
-      chips: [['zap', 'Energy'], ['activity', 'Metabolism']] },
     { id: 'b6', name: 'Vitamin B6', short: 'B6', icon: 'sparkles',
-      desc: 'Promotes clear, radiant skin by supporting your body’s natural renewal processes.',
+      desc: 'Promotes clear, radiant skin by supporting your body’s natural renewal processes.*',
       chips: [['smile', 'Clear Skin'], ['refresh-cw', 'Renewal']] },
+    { id: 'b12', name: 'Vitamin B12', short: 'B12', icon: 'zap',
+      desc: 'Supports energy and a healthy metabolism, so you feel as good as you look.*',
+      chips: [['zap', 'Energy'], ['activity', 'Metabolism']] },
+    { id: 'biotin', name: 'Vitamin B8 (biotin)', short: 'Biotin', icon: 'feather',
+      desc: 'Supports healthy-looking hair, skin and nails.*',
+      chips: [['feather', 'Hair'], ['hand', 'Nails']] },
+    { id: 'hyaluronic', name: 'Hyaluronic Acid', short: 'Hyaluronic', icon: 'droplet',
+      desc: 'Helps lock in moisture for plump, dewy skin that glows from the inside out.*',
+      chips: [['droplet', 'Hydration'], ['sun', 'Dewy Glow']] },
     { id: 'zinc', name: 'Zinc', short: 'Zinc', icon: 'shield-check',
-      desc: 'Supports immune function and skin repair for a healthy, balanced complexion.',
+      desc: 'Supports immune function and skin repair for a healthy, balanced complexion.*',
       chips: [['shield-check', 'Immunity'], ['heart-pulse', 'Skin Repair']] }
   ];
 
@@ -211,7 +226,7 @@
     applyTheme(p);
     $$('[data-pick]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-pick') === p.id)); });
     var live = $('#announcer');
-    var flavor = p.flavor && p.short.indexOf(p.flavor) < 0 ? ', ' + p.flavor.toLowerCase() : '';   // "Green Gummies, strawberry-watermelon"
+    var flavor = p.flavor && p.short.indexOf(p.flavor) < 0 ? ', ' + p.flavor.toLowerCase() : '';   // "Super Greens Gummies, strawberry-watermelon"
     if (live) live.textContent = 'Now previewing ' + p.short + flavor + ', ' + p.statusLabel.toLowerCase() + '.';
     listeners.forEach(function (fn) { fn(p); });
   }
@@ -247,13 +262,17 @@
       '<filter id="gmSoft" x="-25%" y="-25%" width="150%" height="170%"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#0E4D2C" flood-opacity=".22"/></filter>' +
       '</defs>' + g(84, 150, -15) + g(232, 160, 13) + g(160, 82, 4) + '</svg>';
   }
+  // the pack photo fills its frame (object-fit: cover, framed in style.css); never stretched
+  function photoHTML(v, cls) {
+    return '<img class="' + cls + '" src="' + v.src + '" width="' + v.w + '" height="' + v.h + '" alt="' + v.alt + '" loading="lazy" decoding="async">';
+  }
   function cardVisual(p) {
     var v = p.visual || {};
     if (v.type === 'photo') {
-      return '<div class="pv pv--photo"><img src="' + v.src + '" width="' + v.w + '" height="' + v.h + '" alt="' + v.alt + '" loading="lazy" decoding="async"></div>';
+      return '<div class="pv pv--photo">' + photoHTML(v, 'pv-img') + '</div>';
     }
     if (v.type === 'gummy-concept') {
-      return '<div class="pv pv--gummy" role="img" aria-label="Concept render of Green Gummies, final look to be announced">' + gummySVG() +
+      return '<div class="pv pv--gummy" role="img" aria-label="Concept render of ' + p.name + ', final look to be announced">' + gummySVG() +
         '<p class="pv-cap" aria-hidden="true">' + icon('sparkles') + 'Concept render</p></div>';
     }
     return '<div class="pv pv--sil" role="img" aria-label="Lollipop silhouettes in teaser colors behind frosted glass">' +
@@ -296,17 +315,16 @@
     }).join('');
   }
 
-  // shop: a buy module per available product + one waitlist for everything not yet available
+  // shop: a buy module per available product. Everything not yet available gets one
+  // waitlist, which lives in the Super Greens Gummies section (renderWaitlist).
   function buyHTML(p) {
     var id = p.id, v = p.visual;
-    var media = v.type === 'photo'
-      ? '<img src="' + v.src + '" width="' + v.w + '" height="' + v.h + '" alt="' + v.alt + '" loading="lazy" decoding="async">'
-      : cardVisual(p);
+    var media = v.type === 'photo' ? photoHTML(v, 'buy-photo') : cardVisual(p);
     return '<form class="buy glass glass--strong glass--film reveal" data-buy="' + id + '" style="' + tokens(p) + '" novalidate>' +
-      '<div class="buy-media">' + media + (p.pack ? '<p class="pv-cap">' + icon('package') + p.pack + '</p>' : '') + '</div>' +
+      '<div class="buy-media' + (v.type === 'photo' ? ' buy-media--photo' : '') + '">' + media + (p.pack ? '<p class="pv-cap">' + icon('package') + p.pack + '</p>' : '') + '</div>' +
       '<div class="buy-body">' +
         '<div class="pcard-top"><span class="status">' + p.statusLabel + '</span></div>' +
-        '<h3 class="buy-title">' + p.name + ' <em>' + (p.flavor || ph('Flavor')) + '</em></h3>' +
+        '<h3 class="buy-title">' + p.name + ' <em>' + (p.descriptor || p.flavor || ph('Flavor')) + '</em></h3>' +
         '<fieldset class="seg-wrap"><legend class="opt-label">How would you like it?</legend><div class="seg">' +
           '<label class="seg-opt is-checked"><input type="radio" name="ptype-' + id + '" value="once" checked><span>One-time</span></label>' +
           '<label class="seg-opt"><input type="radio" name="ptype-' + id + '" value="sub"><span>Subscribe &amp; save ' + ph('X%') + '</span></label>' +
@@ -334,13 +352,12 @@
   function waitlistHTML(list) {
     if (!list.length) return '';
     var lead = list[0], w = lead.waitlist || { title: 'Be first to know.', copy: 'Join the list to hear first.' };
-    return '<div class="waitlist glass glass--strong glass--film reveal d2" id="waitlist" style="' + tokens(lead) + '">' +
+    return '<div class="waitlist glass glass--strong glass--film reveal d1" id="waitlist" style="' + tokens(lead) + '">' +
       '<div class="wl-orbs" aria-hidden="true"><span></span><span></span><span></span></div>' +
       '<div class="wl-copy">' +
         '<span class="status">' + lead.statusLabel + '</span>' +
         '<h3 class="wl-title">' + w.title + '</h3>' +
         '<p>' + w.copy + '</p>' +
-        (lead.label ? factsBtn(lead, 'tlink') : '') +
       '</div>' +
       '<form class="wl-form" novalidate>' +
         '<fieldset class="wl-opts"><legend class="opt-label">Tell me about</legend>' +
@@ -357,9 +374,12 @@
   function renderShop() {
     var grid = $('#shopGrid');
     if (!grid) return;
-    var avail = PRODUCTS.filter(function (p) { return p.status === 'available'; });
-    var later = PRODUCTS.filter(function (p) { return p.status !== 'available'; });
-    grid.innerHTML = avail.map(buyHTML).join('') + waitlistHTML(later);
+    grid.innerHTML = PRODUCTS.filter(function (p) { return p.status === 'available'; }).map(buyHTML).join('');
+  }
+  function renderWaitlist() {
+    var mount = $('#waitlistMount');
+    if (!mount) return;
+    mount.outerHTML = waitlistHTML(PRODUCTS.filter(function (p) { return p.status !== 'available'; }));
   }
 
   /* ── 5. Aura canvas ─────────────────────────────────────────────────────── */
@@ -767,9 +787,14 @@
       var cls = [r.lv ? 'sf-l' + r.lv : '', r.rule ? 'sf-rule' : ''].join(' ').trim();
       // Manrope's "<" is a small x-height glyph that reads like "‹": set it full height
       var dv = r.dv.replace(/&lt;/g, '<span class="sf-lt">&lt;</span>');
-      return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + r.n + '</th><td>' + r.a + '</td><td>' + dv + '</td></tr>';
+      // the label prints each nutrient's source on its own line under the name
+      var name = r.n + (r.src ? ' <span class="sf-src">(' + r.src + ')</span>' : '');
+      return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th scope="row">' + name + '</th><td>' + r.a + '</td><td>' + dv + '</td></tr>';
     }).join('');
     var tbd = (L.tbd || []).map(function (t) { return '<div><dt>' + t[0] + '</dt><dd>' + t[1] + '</dd></div>'; }).join('');
+    var more = (L.use ? '<div><h3 class="opt-label">Suggested use</h3>' + L.use.map(function (u) { return '<p>' + u + '</p>'; }).join('') + '</div>' : '') +
+      (L.storage ? '<div><h3 class="opt-label">Storage</h3><p>' + L.storage + '</p></div>' : '') +
+      (L.warning ? '<p class="facts-warn">' + L.warning + '</p>' : '');
     return '<div class="facts-sheet glass glass--strong glass--film">' +
       '<div class="facts-head">' +
         '<span class="facts-orb" style="--o1:' + p.orb[0] + ';--o2:' + p.orb[1] + ';--o3:' + p.orb[2] + '" aria-hidden="true"></span>' +
@@ -777,17 +802,20 @@
         '<button class="facts-close" type="button" autofocus>' + icon('x') + '<span class="sr-only">Close supplement facts</span></button>' +
       '</div>' +
       '<div class="facts-scroll" tabindex="0" role="group" aria-labelledby="factsTitle">' +
+        (L.photo ? '<a class="tlink facts-photo" href="' + L.photo + '" data-zoom data-zoom-title="' + p.name + ': the full label" data-zoom-alt="' + L.photoAlt + '" data-zoom-w="' + L.photoW + '" data-zoom-h="' + L.photoH + '">' + icon('image') + 'View the printed label</a>' : '') +
         '<div class="sf">' +
           '<h2 class="sf-title" id="factsTitle">Supplement Facts</h2>' +
           '<p class="sf-serving"><span>Serving Size: ' + L.serving + '</span><span>Servings Per Container: ' + L.servings + '</span></p>' +
           '<table class="sf-table">' +
             '<caption class="sr-only">Amount per serving and % Daily Value</caption>' +
-            '<thead><tr><th scope="col">Amount Per Serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">%&nbsp;Daily Value</th></tr></thead>' +
+            '<thead><tr><th scope="col">Amount Per Serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">%<abbr title="Daily Value">DV</abbr></th></tr></thead>' +
             '<tbody>' + rows + '</tbody>' +
           '</table>' +
           '<p class="sf-blend">' + L.blend + '</p>' +
           '<p class="sf-foot">' + L.foot.join('<br>') + '</p>' +
+          (L.other ? '<p class="sf-other"><b>Other Ingredients:</b> ' + L.other + '</p>' : '') +
         '</div>' +
+        (more ? '<div class="facts-more">' + more + '</div>' : '') +
         (tbd ? '<div class="facts-tbd"><h3 class="opt-label">Still to come</h3><dl>' + tbd + '</dl></div>' : '') +
       '</div>' +
     '</div>';
@@ -821,10 +849,109 @@
       if ((e.target === dlg && downOnBackdrop) || (e.target.closest && e.target.closest('.facts-close'))) dlg.close();
     });
     dlg.addEventListener('close', function () {
-      root.classList.remove('facts-lock');
+      if (!anyModalOpen()) root.classList.remove('facts-lock');
       if (opener && doc.contains(opener)) opener.focus();
     });
-    $$('[data-facts][hidden]').forEach(function (b) { b.hidden = false; });   // static triggers (FAQ) appear once this works
+    $$('[data-facts][hidden]').forEach(function (b) { b.hidden = false; });   // static triggers (FAQ, gummies) appear once this works
+  }
+  function anyModalOpen() { return $$('dialog').some(function (d) { return d.open; }); }
+
+  /* ── 9c. Large view for the pack + label photos ─────────────────────────── */
+  // [data-zoom] links point at the image file itself, so without JS (or <dialog>)
+  // they simply open the full-size image. With JS they open this modal: the photo
+  // fitted to the screen, a Zoom toggle to its natural size (sharp: never upscaled),
+  // drag (mouse) or swipe (touch) to pan, pinch-zoom left to the browser, Esc to close.
+  function initZoom() {
+    var dlg = $('#zoomDialog');
+    if (!dlg || typeof dlg.showModal !== 'function') return;
+    var opener = null, downOnBackdrop = false, W = 0, H = 0, zoomed = false, canZoom = false, drag = null, dragMoved = 0;
+    $$('[data-zoom]').forEach(function (a) { a.setAttribute('aria-haspopup', 'dialog'); });
+    function zoomHTML(src, alt, title) {
+      return '<div class="zoom-sheet glass glass--strong glass--film">' +
+        '<div class="zoom-head">' +
+          '<p class="zoom-title" id="zoomTitle">' + title + '</p>' +
+          '<button class="zoom-toggle" type="button" aria-pressed="false"></button>' +
+          '<button class="zoom-close" type="button" autofocus>' + icon('x') + '<span class="sr-only">Close large view</span></button>' +
+        '</div>' +
+        '<div class="zoom-scroll" tabindex="0" role="region" aria-label="' + title + ' (scrollable)">' +
+          '<img class="zoom-img" src="' + src + '" width="' + W + '" height="' + H + '" alt="' + alt + '" decoding="async" draggable="false">' +
+        '</div>' +
+        '<p class="zoom-foot"><span class="zoom-hint">' + icon('move') + '<span data-hint></span></span>' +
+          '<a class="zoom-file" href="' + src + '" target="_blank" rel="noopener">Open the image file' + icon('external-link') + '</a></p>' +
+      '</div>';
+    }
+    function sizeZoom() {
+      var sc = $('.zoom-scroll', dlg), img = $('.zoom-img', dlg), btn = $('.zoom-toggle', dlg);
+      if (!sc || !img) return;
+      var fit = Math.min(1, (sc.clientWidth - 24) / W, (sc.clientHeight - 24) / H);
+      canZoom = fit < .97;
+      var on = zoomed && canZoom, s = on ? 1 : fit;
+      img.style.width = Math.round(W * s) + 'px';
+      img.style.height = Math.round(H * s) + 'px';
+      dlg.classList.toggle('is-zoomed', on);
+      dlg.classList.toggle('can-zoom', canZoom);
+      btn.hidden = !canZoom;
+      btn.setAttribute('aria-pressed', String(on));
+      btn.innerHTML = icon(on ? 'zoom-out' : 'zoom-in') + '<span>' + (on ? 'Fit to screen' : 'Zoom in') + '</span>';
+      $('[data-hint]', dlg).textContent = !canZoom ? 'Shown at full size' : on ? (finePointer ? 'Drag to pan around the image' : 'Swipe to pan, pinch to zoom') : 'Zoom in to read the small print';
+      drawIcons();
+    }
+    function setZoom(on, fx, fy) {
+      zoomed = on;
+      sizeZoom();
+      var sc = $('.zoom-scroll', dlg);
+      if (sc) { sc.scrollLeft = (sc.scrollWidth - sc.clientWidth) * fx; sc.scrollTop = (sc.scrollHeight - sc.clientHeight) * fy; }
+    }
+    doc.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('[data-zoom]');
+      if (!a || dlg.open || e.metaKey || e.ctrlKey || e.shiftKey) return;   // modifier-clicks still open the file
+      e.preventDefault();
+      var img = $('img', a);
+      W = +(a.getAttribute('data-zoom-w') || (img && img.getAttribute('width')));
+      H = +(a.getAttribute('data-zoom-h') || (img && img.getAttribute('height')));
+      var alt = a.getAttribute('data-zoom-alt') || (img && img.getAttribute('alt')) || '';
+      var focus = (a.getAttribute('data-zoom-focus') || '.5 .5').split(' ').map(Number);
+      opener = a;
+      dlg.innerHTML = zoomHTML(a.getAttribute('href'), alt, a.getAttribute('data-zoom-title') || alt);
+      root.classList.add('facts-lock');
+      dlg.showModal();
+      // a wide label on a phone opens at full size, ready to pan; everything else opens fitted
+      var sc = $('.zoom-scroll', dlg);
+      setZoom(W > sc.clientWidth * 2, focus[0], focus[1]);
+    });
+    window.addEventListener('resize', function () { if (dlg.open) sizeZoom(); }, { passive: true });
+    dlg.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.zoom-toggle')) { setZoom(!zoomed, .5, .5); return; }
+      // a click on the photo zooms in on that spot (or back out), unless it ended a drag
+      var img = e.target.closest && e.target.closest('.zoom-img');
+      if (img && canZoom && dragMoved < 6) {
+        var r = img.getBoundingClientRect();
+        setZoom(!zoomed, clamp((e.clientX - r.left) / r.width, 0, 1), clamp((e.clientY - r.top) / r.height, 0, 1));
+        return;
+      }
+      if ((e.target === dlg && downOnBackdrop) || (e.target.closest && e.target.closest('.zoom-close'))) dlg.close();
+    });
+    dlg.addEventListener('pointerdown', function (e) {
+      downOnBackdrop = e.target === dlg;
+      dragMoved = 0;
+      var sc = e.target.closest && e.target.closest('.zoom-scroll');
+      if (!sc || e.pointerType !== 'mouse' || !dlg.classList.contains('is-zoomed')) return;
+      drag = { x: e.clientX, y: e.clientY, l: sc.scrollLeft, t: sc.scrollTop, sc: sc };
+      sc.classList.add('is-dragging');
+      e.preventDefault();
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      dragMoved = Math.max(dragMoved, Math.abs(dx) + Math.abs(dy));
+      drag.sc.scrollLeft = drag.l - dx; drag.sc.scrollTop = drag.t - dy;
+    });
+    window.addEventListener('pointerup', function () { if (drag) { drag.sc.classList.remove('is-dragging'); drag = null; } });
+    dlg.addEventListener('close', function () {
+      dlg.classList.remove('is-zoomed', 'can-zoom');
+      if (!anyModalOpen()) root.classList.remove('facts-lock');
+      if (opener && doc.contains(opener)) opener.focus();
+    });
   }
 
   /* ── 10. FAQ accordion ──────────────────────────────────────────────────── */
@@ -878,12 +1005,13 @@
   function initShopbar() {
     var bar = $('#shopbar');
     if (!bar || !('IntersectionObserver' in window)) return;
-    var heroOut = false, shopIn = false, footIn = false;
-    function upd() { bar.classList.toggle('is-on', heroOut && !shopIn && !footIn); }
+    var heroOut = false, shopIn = false, footIn = false, wlIn = false;
+    function upd() { bar.classList.toggle('is-on', heroOut && !shopIn && !footIn && !wlIn); }
     new IntersectionObserver(function (e) { heroOut = !e[0].isIntersecting; upd(); }, { rootMargin: '0px 0px -55% 0px' }).observe($('#hero'));
-    var shop = $('#shop'), foot = $('.site-footer');
+    var shop = $('#shop'), foot = $('.site-footer'), wl = $('#waitlist');
     if (shop) new IntersectionObserver(function (e) { shopIn = e[0].isIntersecting; upd(); }).observe(shop);
     if (foot) new IntersectionObserver(function (e) { footIn = e[0].isIntersecting; upd(); }).observe(foot);
+    if (wl) new IntersectionObserver(function (e) { wlIn = e[0].isIntersecting; upd(); }).observe(wl);   // never cover the waitlist form
   }
   function fillShopbar(p) {
     var b = p.bar || {};
@@ -977,6 +1105,7 @@
   renderDock();
   renderLineup();
   renderShop();
+  renderWaitlist();
   onProduct(function (p) {
     var hint = $('.drag-hint [data-hint]');
     if (hint) hint.textContent = p.kind === 'gummy' ? 'Drag to spin · tap to squish' : 'Drag to spin · tap for a bite';
@@ -989,7 +1118,7 @@
     var note = $('[data-slot="orbitNote"]');
     if (note) {
       note.hidden = p.status === 'available';
-      note.innerHTML = icon('info') + '<span>Showing the Peptide Lollipop actives. ' + (p.inside || p.short + ': ' + ph('actives') + '.') +
+      note.innerHTML = icon('info') + '<span>Showing the Collagen Boost actives. ' + (p.inside || p.short + ': ' + ph('actives') + '.') +
         (p.label ? ' ' + factsBtn(p, 'inline-link') : '') + '</span>';
     }
     var ritual = $('[data-slot="ritualNote"]');
@@ -1003,6 +1132,7 @@
   initOrbit();
   initShop();
   initFacts();
+  initZoom();
   initFAQ();
   initSteps();
   initShopbar();

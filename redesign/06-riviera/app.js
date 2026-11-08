@@ -9,7 +9,7 @@
     4 · theme + product switching   11 · FAQ accordion
     5 · 3D candy (shared lib)       12 · nav + mobile menu
     6 · hero                        13 · reveal, parallax, shop bar
-    7 · the cabanas (+ the gummies' Supplement Facts drawer)   14 · frame loop · 15 · boot
+    7 · the cabanas (+ the gummies' Supplement Facts drawer and their label's lightbox)   14 · frame loop · 15 · boot
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -33,77 +33,93 @@
   var NO = 'N<span class="ord">o</span>';   // a proper numero: N and a raised, underlined o
   var PRODUCTS = [
     {
-      id: 'strawberry-pop', kind: 'lollipop', name: 'Peptide Lollipops', flavor: 'Strawberry', status: 'available', no: 1,
-      short: 'Strawberry', statusLabel: 'Available now', bag: '10 per bag',
+      // From the pack (2026-11-07): Collagen Boost, a sugar-free strawberry Beauty Lollipop, net wt. 15 g a pop, seven
+      // actives. "Sugar free" is the only sugar claim; the sweetener, other ingredients and amounts are unknown (placeholders).
+      id: 'strawberry-pop', kind: 'lollipop', name: 'Collagen Boost', flavor: 'Strawberry', status: 'available', no: 1,
+      short: 'Collagen Boost', statusLabel: 'Available now', bag: '10 per bag',
       color: '#FF1493', deep: '#7A1B4D', btn: '#E0007C', text: '#BF0068', display: '#E0007C', tint: '#FFE4F1', soft: '#FFB8DA',
       stripe: '#FF1493', candy: '#FF1493', meta: '#FFFDF8',
       cabana: { c: '#FF1493', c2: '#FFFDF8', deep: '#B5005E', room: '#FCE4EF', room2: '#E8B4CB', still: ['#FF8CC6', '#FF1493', '#A3005A'] },
       water: { deep: [0.10, 0.56, 0.80], shallow: [0.55, 0.89, 0.94], lagoon: 0 },
       copy: {
-        heroEyebrow: 'Peptide Lollipops · Strawberry', heroCta: 'Shop strawberry pops', heroHref: '#menu',
-        heroLede: 'Collagen, hyaluronic acid and glow-boosting vitamins, in a really, really good strawberry lollipop.',
-        heroProofs: '<li><i data-lucide="flame"></i><span><b>47</b> cal a pop</span></li><li><i data-lucide="candy"></i><span>Made with <b>real sugar</b></span></li><li><i data-lucide="sparkles"></i><span><b>6</b> skin-loving actives</span></li>',
+        heroEyebrow: 'Collagen Boost · Strawberry', heroCta: 'Shop Collagen Boost', heroHref: '#menu',
+        heroLede: 'Peptides, hyaluronic acid and five more glow-boosting actives, in a really, really good sugar-free strawberry lollipop.',
+        heroProofs: '<li><i data-lucide="lollipop"></i><span><b>Sugar free</b></span></li><li><i data-lucide="sparkles"></i><span><b>7</b> skin-loving actives</span></li><li><i data-lucide="weight"></i><span><b>15&nbsp;g</b> a pop</span></li>',
         heroCaption: '<span class="no" aria-hidden="true">' + NO + ' 1</span> Strawberry, poolside', heroHint: 'Touch the water · tap the pop for a bite',
-        heroLabel: 'A glossy pink Glo Pop strawberry lollipop floating above the pool. Interactive 3D: drag to spin it, tap it to take a bite.',
-        title: 'Peptide Lollipops, <em>Strawberry</em>',
-        blurb: 'A really, really good strawberry lollipop with collagen, hyaluronic acid, vitamins C, B12 and B6, and zinc.',
-        facts: [['Calories', '47 a pop'], ['In the bag', '10 lollipops'], ['Actives', '6 for skin &amp; energy'], ['Sweetened with', 'Real sugar']],
-        cardCta: 'Shop strawberry', cardHref: '#menu', note: 'Free shipping on every order',
-        barName: 'Strawberry Pops', barNote: '10 per bag · free shipping', barCta: 'Shop', barHref: '#menu',
-        pinNote: 'Shown for Strawberry Peptide Lollipops.',
-        ritualNote: 'Shown for Strawberry Peptide Lollipops.'
+        heroLabel: 'A glossy pink Glo Pop Collagen Boost strawberry lollipop floating above the pool. Interactive 3D: drag to spin it, tap it to take a bite.',
+        title: 'Collagen Boost, <em>Strawberry</em>',
+        blurb: 'A sugar-free strawberry beauty lollipop with peptides, hyaluronic acid, vitamins C, B6, B12 and B8 (biotin), and zinc.',
+        facts: [['On the pack', 'Sugar free'], ['Each pop', '15 g'], ['Actives', '7 for skin &amp; energy'], ['In the bag', '10 lollipops']],
+        cardCta: 'Shop Collagen Boost', cardHref: '#menu', note: 'Free shipping on every order',
+        barName: 'Collagen Boost', barNote: 'Sugar free · 10 per bag', barCta: 'Shop', barHref: '#menu',
+        pinNote: 'Shown for Collagen Boost strawberry pops.',
+        ritualNote: 'Shown for Collagen Boost strawberry pops.'
       }
     },
     {
-      // Flavor and the Supplement Facts come from the client's label; price, launch date, directions, other
-      // ingredients, allergens, dietary status and the final gummy shape are still unknown (placeholders).
-      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: 'Strawberry-Watermelon', status: 'coming-soon', no: 2,
-      short: 'Green Gummies', statusLabel: 'Opening soon', waitlist: 'Green Gummies', tag: 'Opening soon', bag: '60 per container',
+      // Super Greens Gummies (coming soon): the name, claims, suggested use, warnings and the Supplement Facts are from
+      // the client's full label (2026-11-07); price, launch date, allergens and the final gummy shape are unknown.
+      // The id stays 'green-gummies' (the waitlist field name and links use it).
+      id: 'green-gummies', kind: 'gummy', name: 'Super Greens Gummies', flavor: 'Strawberry-Watermelon', status: 'coming-soon', no: 2,
+      short: 'Super Greens', statusLabel: 'Opening soon', waitlist: 'Super Greens Gummies', tag: 'Opening soon', bag: '60 gummies',
       color: '#1FA453', deep: '#0E4D2C', btn: '#0E7A3E', text: '#0B6B36', display: '#0E7A3E', tint: '#E3F6EA', soft: '#A9DFBE',
       stripe: '#2E9E62', candy: '#1FA453', meta: '#F6FBF7',
       cabana: { c: '#2E9E62', c2: '#FFFDF8', deep: '#17683F', room: '#E2F4E9', room2: '#ADD9BF', still: ['#9BE5B8', '#1FA453', '#0E5A30'] },
       water: { deep: [0.06, 0.52, 0.56], shallow: [0.55, 0.90, 0.82], lagoon: 1 },
       copy: {
-        heroEyebrow: 'Green Gummies · Opening soon', heroCta: 'Join the green list', heroHref: '#waitlist',
-        heroLede: 'Five B vitamins and an organic super-greens blend, in a <span class="nw">strawberry-watermelon</span> gummy. The green cabana opens soon: join the list and you’ll hear first.',
-        heroProofs: '<li><i data-lucide="flame"></i><span><b>20</b> cal per 2 gummies</span></li><li><i data-lucide="leaf"></i><span><b>5</b> B vitamins + super greens</span></li><li><i data-lucide="calendar"></i><span>Launch ' + PH('date') + '</span></li>',
-        heroCaption: '<span class="no" aria-hidden="true">' + NO + ' 2</span> Green Gummies, concept render', heroHint: 'Touch the water · tap the gummies to squish',
-        heroLabel: 'Green Gummies, concept render: three sugar-coated green gummies floating above the pool. Interactive 3D: drag to spin them, tap one to squish it.',
-        title: 'Green Gummies, <em class="nw">Strawberry<span class="hy">-</span>Watermelon</em>',
-        blurb: 'Five B vitamins and an organic blend of 15 ingredients, at 20 calories and 3&nbsp;g sugar per 2-gummy serving. Price, launch date and final name are ' + PH('still to come') + '.',
-        facts: [['Per serving', '2 gummies, <span class="nw">20 cal</span>'], ['Per container', '60 gummies'], ['Inside', '5 B vitamins + <span class="nw">super greens</span>'], ['Price', '$' + PH('XX')]],
+        heroEyebrow: 'Super Greens Gummies · Opening soon', heroCta: 'Join the green list', heroHref: '#waitlist',
+        heroLede: 'Kale, broccoli, spinach, wild blueberries and elderberry, in a <span class="nw">strawberry-watermelon</span> gummy. The green cabana opens soon: join the list and you’ll hear first.',
+        heroProofs: '<li><i data-lucide="flame"></i><span><b>20</b> cal per 2 gummies</span></li><li><i data-lucide="leaf"></i><span><b>Vegan</b> friendly · non GMO</span></li><li><i data-lucide="calendar"></i><span>Launch ' + PH('date') + '</span></li>',
+        heroCaption: '<span class="no" aria-hidden="true">' + NO + ' 2</span> Super Greens Gummies, concept render', heroHint: 'Touch the water · tap the gummies to squish',
+        heroLabel: 'Super Greens Gummies, concept render: three frosted green gummies floating above the pool. Interactive 3D: drag to spin them, tap one to squish it.',
+        title: 'Super Greens Gummies, <em class="nw">Strawberry<span class="hy">-</span>Watermelon</em>',
+        blurb: 'Kale, broccoli, spinach, wild blueberries and elderberry, with five B vitamins: 20 calories and 3&nbsp;g sugars per 2-gummy serving. Price and launch date are ' + PH('still to come') + '.',
+        facts: [['Per serving', '2 gummies, <span class="nw">20 cal</span>'], ['Per container', '60 gummies'], ['On the label', 'Vegan friendly, <span class="nw">non GMO</span>'], ['Price', '$' + PH('XX')]],
         cardCta: 'Join the list', cardHref: '#waitlist', note: 'Concept render: the final gummy may differ',
-        barName: 'Green Gummies', barNote: 'Strawberry-watermelon · soon', barCta: 'Join list', barHref: '#waitlist',
-        pinNote: 'Shown for Strawberry Peptide Lollipops. Green Gummies have five B vitamins and super greens: <a href="#cabanaLabel" data-show-label>see their supplement facts</a>.',
-        ritualNote: 'Shown for Strawberry Peptide Lollipops.<span class="pin-note__more"> The Green Gummies ritual is still to come.</span>'
+        barName: 'Super Greens', barNote: 'Strawberry-watermelon · soon', barCta: 'Join list', barHref: '#waitlist',
+        pinNote: 'Shown for Collagen Boost strawberry pops. Super Greens Gummies have five B vitamins and a greens blend: <a href="#cabanaLabel" data-show-label>see their supplement facts</a>.',
+        ritualNote: 'Shown for Collagen Boost strawberry pops.<span class="pin-note__more"> Super Greens Gummies: two gummies a day.</span>'
       },
-      // The Supplement Facts panel, exactly as printed (the %DV column too). Rows: [name, amount per serving,
-      // % daily value, style]; style: 'top' a lead row, 'in' / 'in2' indented under the row above, 'bar' a
-      // heavier rule above (a new group). Opened from the cabana card (renderLabel).
+      // The Supplement Facts panel, exactly as printed on the new label (the %DV column, the blend and the footnotes
+      // too). Rows: n name, src its source ("from …", set under the name as the label does), a amount per serving
+      // (a2 a second line), dv % daily value, s style: 'top' a lead row, 'in' / 'in2' indented under the row above,
+      // 'bar' a heavier rule above (a new group). Opened from the cabana card (renderLabel). Beside it: the printed
+      // label itself (it opens full size in the lightbox), then the label's own words.
       label: {
-        name: 'Green Gummies supplement facts',
+        name: 'Super Greens Gummies supplement facts',
         meta: 'Serving size 2 gummies · 30 servings',
-        serving: 'Serving Size 2 Gummies', servings: 'Servings Per Container 30',
+        serving: 'Serving Size: 2 Gummies', servings: 'Servings Per Container: 30',
         rows: [
-          ['Calories', '20', '', 'top'],
-          ['Total Carbohydrate', '5 g', '2%', 'top'],
-          ['Total Sugars', '3 g', '2%', 'in'],
-          ['Added Sugars', '3 g', '6%', 'in2'],
-          ['Riboflavin', '0.8 mg', '62%', 'bar'],
-          ['Niacin', '1.4 mg NE', '9%'],
-          ['Vitamin B6', '0.9 mg', '53%'],
-          ['Folate', '50 mcg DFE', '53%'],
-          ['Pantothenic Acid', '0.9 mg', '18%'],
-          ['Sodium', '15 mg', '<1%'],
-          ['Organic Super Greens Blend', '170 mg', '<1%*', 'bar']
+          { n: 'Calories', a: '20', dv: '', s: 'top' },
+          { n: 'Total Carbohydrate', a: '5 g', dv: '2%', s: 'top' },
+          { n: 'Total Sugars', a: '3 g', dv: '*', s: 'in' },
+          { n: 'Added Sugars', a: '3 g', dv: '6%', s: 'in2' },
+          { n: 'Riboflavin', src: 'from Organic Sugar Cherries Blend', a: '0.8 mg', dv: '62%', s: 'bar' },
+          { n: 'Niacin', src: 'from Organic Beetroot', a: '1.4 mg NE', dv: '9%' },
+          { n: 'Vitamin B6', src: 'from Organic Sugar Cherries Blend', a: '0.6 mg', dv: '35%' },
+          { n: 'Folate', src: 'from Organic Sugar Cherries Blend', a: '80 mcg DFE', a2: '(50 mcg Folic Acid)', dv: '20%' },
+          { n: 'Pantothenic Acid', src: 'from Organic Sugar Cherries Blend', a: '0.9 mg', dv: '18%' },
+          { n: 'Iron', src: 'from Organic Sugar Cherries Blend', a: '0.7 mg', dv: '4%' },
+          { n: 'Iodine', src: 'from Organic Kelp', a: '17 mcg', dv: '11%' },
+          { n: 'Sodium', src: 'from Electrolyte Blend', a: '15 mg', dv: '<1%' },
+          { n: 'Potassium', src: 'from Electrolyte Blend', a: '17 mg', dv: '<1%' }
         ],
-        notes: [
-          '*Organic Super Greens Blend contains: Kale Leaf, Broccoli Stalk & Flower, Beet Root, Guava Extract, Spinach Leaf, Lemon Extract, Carrot Root, Wild Blueberry, Mango Extract, Pomegranate Fruit, Goji Juice, Spirulina, Noni Fruit, Acai Berry, Elderberry.',
-          'Percent Daily Values are based on a 2,000 calorie diet. *Daily Value not established.'
-        ],
-        // beside the label: which of its names are B vitamins, then what the label doesn't settle yet
-        key: 'Riboflavin (B2), niacin (B3), pantothenic acid (B5), vitamin B6 and folate (B9).',
-        tbd: [['Other ingredients', PH('Base, sweetener, colours')], ['Allergens', PH('To be announced')], ['Vegan / gluten-free', PH('To be confirmed')], ['Directions', PH('To come')]]
+        // listed under the table, as printed (not counted anywhere on the page)
+        blend: 'Organic Kale Leaf (Brassica oleracea var. acephala DC); Organic Broccoli Stalk and Flower (Brassica oleracea L. var. italica Planch); Organic Beet Root (Beta vulgaris L.); Organic Spinach (Spinacia oleracea L.); Wild Blueberry (Vaccinium angustifolium); Organic Elderberry (Sambucus nigra); Lemon (Citrus limon L.); Organic Carrot Root (Daucus carota L. var. sativus); Maltitol; Organic Wild Blueberry (Vaccinium angustifolium); Organic Acai Berry (Euterpe oleracea Mart.); Organic Pomegranate Fruit (Punica granatum L.); Organic Goji Juice (Lycium chinense); Organic Spirulina (Spirulina); Organic Noni Fruit (Morinda citrifolia); Organic Acai Berry (Euterpe oleracea Mart.); Pea (Pisum sativum); L-ascorbyl palmitate and Natural Flavors.',
+        notes: ['** Percent Daily Values are based on a 2,000 calorie diet', '† Daily Value not established'],
+        other: 'Tapioca Syrup, Sugar, Pectin, Citric Acid, Orange Juice Concentrate, Sodium Citrate, Natural Flavor (Strawberry, Watermelon), Palm Oil, Carnauba Wax, Color Added (Purple Carrot Juice Concentrate), Stevia Leaf.',
+        // the printed label (the lightbox shows it full size); its badges and front-panel claims, verbatim
+        image: { src: '../_shared/assets/product/super-greens-label.jpg', w: 1600, h: 613, alt: 'The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings' },
+        badges: ['Vegan friendly', 'Gluten free', 'Non GMO'],
+        claims: ['No astragalus & adaptogens', 'Healthy gut*', 'Immune support*'],
+        greens: 'Kale • Broccoli • Spinach • Wild Blueberries • Elderberry',
+        pack: '60 Gummies | Dietary Supplement',
+        use: 'Take two (2) gummies daily.',
+        caution: 'Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication, especially blood thinners or immunosuppressants. Discontinue use and call a doctor if any adverse reactions occur. Not intended to diagnose, treat, cure, or prevent any disease.',
+        storage: 'Store in a cool, dry place.',
+        warning: 'CALIFORNIA WARNING: Consistent with the State of California\'s Proposition 65, this product may expose you to chemicals including Lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm.',
+        // what the label doesn't settle yet
+        tbd: [['Price', '$' + PH('XX')], ['Launch date', PH('To be announced')], ['Allergens', PH('To be announced')]]
       }
     },
     {
@@ -124,8 +140,8 @@
         facts: [['Colour', PH('To be announced')], ['Flavor', PH('To be announced')], ['Formula', PH('To be announced')], ['Launch', PH('To be announced')]],
         cardCta: 'Get notified', cardHref: '#waitlist', note: 'Uncoloured concept render: the colour is not decided',
         barName: 'More colours', barNote: 'In development · colour to come', barCta: 'Notify me', barHref: '#waitlist',
-        pinNote: 'Shown for Strawberry Peptide Lollipops. The next colour’s formula is still to come.',
-        ritualNote: 'Shown for Strawberry Peptide Lollipops.<span class="pin-note__more"> The next colour’s ritual is still to come.</span>'
+        pinNote: 'Shown for Collagen Boost strawberry pops. The next colour’s formula is still to come.',
+        ritualNote: 'Shown for Collagen Boost strawberry pops.<span class="pin-note__more"> The next colour’s ritual is still to come.</span>'
       }
     }
   ];
@@ -1240,27 +1256,44 @@
 
   /* The Supplement Facts drawer at the foot of the cabana card: a disclosure, drawn from the product's
      label (PRODUCTS[].label) and hidden for products without one. Closed it is one quiet row; open, the
-     label itself is a real table (caption, column and row headers, footnotes), plus what it doesn't
-     settle yet. Links marked [data-show-label] open it (choosing that product first if they name one). */
+     label itself is a real table (caption, column and row headers, the blend, footnotes and other
+     ingredients), beside the printed label (a link that opens it full size) and the label's own words:
+     its badges and claims, suggested use, storage, the California warning, and what it doesn't settle yet.
+     Links marked [data-show-label] open it (choosing that product first if they name one). */
   var labelBox = $('#cabanaLabel'), labelBtn = $('#labelToggle'), labelPanel = $('#labelPanel'), labelFor = null;
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
   function labelHTML(L) {
     var rows = L.rows.map(function (r) {
-      return '<tr' + (r[3] ? ' class="sf-' + r[3] + '"' : '') + '><th scope="row">' + esc(r[0]) + '</th>' +
-        '<td>' + esc(r[1]).replace(/ /g, '&nbsp;') + '</td><td>' + esc(r[2]) + '</td></tr>';
+      return '<tr' + (r.s ? ' class="sf-' + r.s + '"' : '') + '><th scope="row">' + esc(r.n) + (r.src ? '<span class="sf-src">(' + esc(r.src) + ')</span>' : '') + '</th>' +
+        '<td>' + esc(r.a).replace(/ /g, '&nbsp;') + (r.a2 ? '<span class="sf-src">' + esc(r.a2) + '</span>' : '') + '</td><td>' + esc(r.dv) + '</td></tr>';
     }).join('');
+    var I = L.image;
     return '<div class="label-panel__inner">' +
       '<div class="sfacts-box"><table class="sfacts">' +
         '<caption><span class="sfacts__title">Supplement Facts</span><span class="sfacts__serving">' + esc(L.serving) + '</span><span class="sfacts__serving">' + esc(L.servings) + '</span></caption>' +
-        '<thead><tr><td></td><th scope="col">Amount Per Serving</th><th scope="col">%&nbsp;Daily Value</th></tr></thead>' +
+        '<thead><tr><td></td><th scope="col">Amount Per Serving</th><th scope="col">%DV</th></tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
-        '<tfoot><tr><td colspan="3">' + L.notes.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('') + '</td></tr></tfoot>' +
+        '<tfoot><tr><td colspan="3">' +
+          '<p class="sf-blend">' + esc(L.blend) + '</p>' +
+          L.notes.map(function (n) { return '<p>' + esc(n) + '</p>'; }).join('') +
+          '<p class="sf-other"><b>Other Ingredients:</b> ' + esc(L.other) + '</p>' +
+        '</td></tr></tfoot>' +
       '</table></div>' +
       '<div class="label-side">' +
-        '<div class="label-side__block"><p class="caption">The five B vitamins</p><p class="label-side__key">' + esc(L.key) + '</p></div>' +
+        '<a class="labelprint labelprint--side" href="' + I.src + '" data-lightbox aria-haspopup="dialog">' +
+          '<img src="' + I.src + '" width="' + I.w + '" height="' + I.h + '" loading="lazy" decoding="async" alt="' + esc(I.alt) + '">' +
+          '<span class="labelprint__chip"><i data-lucide="zoom-in" aria-hidden="true"></i>View the full label</span></a>' +
+        '<div class="label-side__block"><p class="caption">On the label</p>' +
+          '<ul class="label-badges">' + L.badges.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' +
+          '<p class="label-side__key">' + L.claims.map(esc).join(' <span aria-hidden="true">·</span> ') + '</p>' +
+          '<p class="label-side__key">' + esc(L.greens) + '</p>' +
+          '<p class="label-side__key">' + esc(L.pack) + '</p></div>' +
+        '<div class="label-side__block"><p class="caption">Suggested use</p><p class="label-side__use">' + esc(L.use) + '</p><p class="label-side__fine">' + esc(L.caution) + '</p></div>' +
+        '<div class="label-side__block"><p class="caption">Storage</p><p class="label-side__use">' + esc(L.storage) + '</p></div>' +
         '<div class="label-side__block"><p class="caption">Still to come</p><dl class="label-side__list">' +
           L.tbd.map(function (t) { return '<div><dt>' + t[0] + '</dt><dd>' + t[1] + '</dd></div>'; }).join('') +
         '</dl></div>' +
+        '<p class="label-side__warn">' + esc(L.warning) + '</p>' +
       '</div>' +
     '</div>';
   }
@@ -1305,6 +1338,32 @@
       };
       if (state.product !== p) { setProduct(p.id); setTimeout(open, reduce ? 0 : 340); }   // after the card's copy swap
       else open();
+    });
+  }
+
+  /* The printed Super Greens label, full size: every [data-lightbox] link (the waitlist's print, the drawer's,
+     the FAQ's) is a plain link to the image, so without JS (or <dialog>) it simply opens the image. With JS it
+     opens the modal instead: Esc (native), the close button or a tap on the backdrop shuts it, and focus goes
+     back to the link. On phones the label stands tall enough to read and pans sideways (CSS); pinch-zoom works. */
+  function initLightbox() {
+    var box = $('#labelBox'), pan = box && $('.lightbox__pan', box), opener = null;
+    if (!box || typeof box.showModal !== 'function') return;
+    doc.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('[data-lightbox]');
+      if (!a || e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;   // a new tab still works
+      e.preventDefault();
+      opener = a;
+      if (!box.open) box.showModal();
+      html.classList.add('lightbox-open');
+      if (pan) { pan.scrollLeft = 0; pan.scrollTop = 0; }
+    });
+    box.addEventListener('click', function (e) {
+      if (e.target === box || (e.target.closest && e.target.closest('[data-close]'))) box.close();
+    });
+    box.addEventListener('close', function () {
+      html.classList.remove('lightbox-open');
+      if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+      opener = null;
     });
   }
 
@@ -1365,15 +1424,12 @@
       }
       var front = el('g', {}, gb);
       el('path', { class: 'bag__body', d: BODY }, front);
-      var stripes = el('g', { 'clip-path': 'url(#' + clipId + ')' }, front);
-      for (var x = -2; x < 58; x += 8) {
-        el('rect', { class: 'bag__stripe', x: x, y: 0, width: 4, height: 12 }, stripes);
-        el('rect', { class: 'bag__stripe', x: x, y: 54, width: 4, height: 12 }, stripes);
-      }
-      el('line', { class: 'bag__zip', x1: 3.2, y1: 16, x2: 52.8, y2: 16 }, front);
-      el('circle', { class: 'bag__mark-r', cx: 28, cy: 34, r: 6.4 }, front);   // the parasol mark, seen from above
-      el('circle', { class: 'bag__mark', cx: 28, cy: 34, r: 3.4, 'stroke-dasharray': (Math.PI * 6.8 / 16).toFixed(3) }, front);
-      el('circle', { class: 'bag__mark-c', cx: 28, cy: 34, r: 1.3 }, front);
+      // the new pouch's two pinks: a deeper pink above, a soft pink wave across the lower part
+      el('path', { class: 'bag__wave', d: 'M-2 41C8 34 17 36 27 40S45 45 58 37V70H-2Z', 'clip-path': 'url(#' + clipId + ')' }, front);
+      el('line', { class: 'bag__zip', x1: 3.2, y1: 14, x2: 52.8, y2: 14 }, front);
+      el('circle', { class: 'bag__mark-r', cx: 28, cy: 27, r: 6.4 }, front);   // the parasol mark, seen from above
+      el('circle', { class: 'bag__mark', cx: 28, cy: 27, r: 3.4, 'stroke-dasharray': (Math.PI * 6.8 / 16).toFixed(3) }, front);
+      el('circle', { class: 'bag__mark-c', cx: 28, cy: 27, r: 1.3 }, front);
       el('path', { class: 'bag__line', d: BODY }, front);
       bags.push({ g: gb, mouth: mouth, key: '' });
     }
@@ -1895,6 +1951,7 @@
     applyAccent(state.product);
     initCabanas();
     initLabel();
+    initLightbox();
     icons();
     initNav();
     initRipples();

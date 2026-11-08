@@ -42,7 +42,7 @@ ul, ol { padding: 0; list-style: none; }
 .skip { position: fixed; left: 12px; top: -60px; z-index: 200; background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 12px; font-weight: 700; }
 .skip:focus { top: 12px; }
 :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 6px #fff; border-radius: 10px; }
-.six :focus-visible, .ftr :focus-visible { outline-color: var(--sun); box-shadow: 0 0 0 6px var(--arcade); }
+.glowgrid :focus-visible, .ftr :focus-visible { outline-color: var(--sun); box-shadow: 0 0 0 6px var(--arcade); }
 [data-lucide], .lucide { width: 1.1em; height: 1.1em; flex: none; stroke-width: 2.4; }
 
 /* placeholders: visible, honest, dashed */
@@ -151,7 +151,7 @@ main { overflow-x: clip; }
 .hero-stage { position: relative; height: clamp(360px, 42vw, 580px); transform: translateY(clamp(24px, 3.5vw, 56px)); }
 /* candy scallop edge: bumps of the NEXT section's colour along the bottom */
 .lv[data-next]::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 18px; pointer-events: none; background: radial-gradient(circle at 50% 100%, var(--nx) 0 13px, transparent 13.5px) 0 100% / 34px 18px repeat-x; }
-.pick { --nx: var(--arcade); } .six { --nx: var(--sun); } .sugar { --nx: var(--tint); } .ritual { --nx: var(--c); }
+.pick { --nx: var(--arcade); } .glowgrid { --nx: var(--sun); } .sugar { --nx: var(--tint); } .ritual { --nx: var(--c); }
 .versus { --nx: var(--paper); } .shop { --nx: #0E7A3A; } .gum { --nx: var(--tint); } .faq { --nx: var(--c); } .final { --nx: var(--ink); }
 .hl { line-height: .92; }
 .candy3d { position: absolute; inset: 0; touch-action: pan-y; }
@@ -210,11 +210,11 @@ main { overflow-x: clip; }
 .tiles--ph li { background: transparent; border-style: dashed; place-content: center; text-align: center; min-height: 72px; }
 .pinfo-note { grid-column: 1 / -1; font-size: .9rem; font-weight: 600; }
 
-/* ── SIX / GLOW GRID ─────────────────────────────────────── */
-.six { background: var(--arcade); color: #FFF6EC; background-image: radial-gradient(circle at 15% 20%, rgba(255,46,147,.25), transparent 40%), radial-gradient(circle at 85% 80%, rgba(44,198,242,.2), transparent 45%); }
-.six .lvl { box-shadow: 0 4px 0 #000; border-color: #000; }
-.six .h2 { color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; }
-.six .lede { color: #FFE9F4; }
+/* ── GLOW GRID (seven actives) ─────────────────────────────────────── */
+.glowgrid { background: var(--arcade); color: #FFF6EC; background-image: radial-gradient(circle at 15% 20%, rgba(255,46,147,.25), transparent 40%), radial-gradient(circle at 85% 80%, rgba(44,198,242,.2), transparent 45%); }
+.glowgrid .lvl { box-shadow: 0 4px 0 #000; border-color: #000; }
+.glowgrid .h2 { color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; }
+.glowgrid .lede { color: #FFE9F4; }
 .game { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
 .cab { background: linear-gradient(180deg, #3B1356, #250A37); border: 4px solid #000; border-radius: 32px; padding: 16px; box-shadow: 0 8px 0 #000, inset 0 0 0 3px rgba(255,255,255,.08); }
 .cab-hud { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; margin-bottom: 12px; }
@@ -223,21 +223,21 @@ main { overflow-x: clip; }
 .stat b { font-family: var(--display); font-weight: 400; font-size: 1.5rem; line-height: 1.05; color: var(--sun); font-variant-numeric: tabular-nums; }
 .stat b.is-bump { display: inline-block; animation: squash .4s var(--ease-pop); }
 .stat--wide { position: relative; }
-.pips { position: absolute; right: 10px; top: 50%; translate: 0 -50%; display: grid; grid-template-columns: repeat(3, 12px); gap: 4px; }
+.pips { position: absolute; right: 10px; top: 50%; translate: 0 -50%; display: grid; grid-template-columns: repeat(4, 12px); gap: 4px; }
 .pips i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); }
 .pips i.is-on { border-color: #fff; background: var(--pc); animation: squash .4s var(--ease-pop); }
-.board-wrap { position: relative; aspect-ratio: 1; border-radius: 22px; background: #160520; border: 3px solid #000; overflow: hidden; touch-action: pan-y; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: calc(100% / 6) calc(100% / 6); }
+.board-wrap { --n: 7; position: relative; aspect-ratio: 1; border-radius: 22px; background: #160520; border: 3px solid #000; overflow: hidden; touch-action: pan-y; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: calc(100% / var(--n)) calc(100% / var(--n)); }
 .board-wrap.is-live { touch-action: none; }
 .board { position: absolute; inset: 0; }
 .board.is-shake { animation: shake .35s; }
 @keyframes shake { 20% { translate: -6px 2px; } 40% { translate: 5px -3px; } 60% { translate: -4px 1px; } 80% { translate: 3px 0; } }
-.tok { position: absolute; left: 0; top: 0; width: calc(100% / 6); height: calc(100% / 6); padding: 0; display: grid; place-items: center; border: 0; background: none; transform: translate(calc(var(--x) * 100%), calc(var(--y) * 100%)); transition: transform var(--dur, .2s) cubic-bezier(.3, .0, .3, 1); -webkit-tap-highlight-color: transparent; touch-action: none; }
+.tok { position: absolute; left: 0; top: 0; width: calc(100% / var(--n, 7)); height: calc(100% / var(--n, 7)); padding: 0; display: grid; place-items: center; border: 0; background: none; transform: translate(calc(var(--x) * 100%), calc(var(--y) * 100%)); transition: transform var(--dur, .2s) cubic-bezier(.3, .0, .3, 1); -webkit-tap-highlight-color: transparent; touch-action: none; }
 .tok-b { position: relative; display: block; width: 86%; height: 86%; transition: transform .18s var(--ease-pop); }
 .tok svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .tok .s-body { fill: var(--tc); stroke: #12031C; stroke-width: 5; }
 .tok .s-gloss { fill: url(#gloss); }
 .tok .s-hi { fill: #fff; opacity: .75; }
-.tok-l { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(.85rem, 4.2vw, 1.5rem); color: var(--tl); line-height: 1; padding-top: 4%; letter-spacing: .01em; text-shadow: 0 1px 0 rgba(255,255,255,.25); }
+.tok-l { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(.78rem, 3.6vw, 1.3rem); color: var(--tl); line-height: 1; padding-top: 4%; letter-spacing: .01em; text-shadow: 0 1px 0 rgba(255,255,255,.25); }
 .tok[data-t="2"] .tok-l, .tok[data-t="1"] .tok-l { padding-top: 14%; }
 .tok:hover .tok-b { transform: scale(1.08); }
 .tok.is-sel .tok-b { transform: scale(1.14); animation: sel 0.9s ease-in-out infinite; }
@@ -294,10 +294,11 @@ main { overflow-x: clip; }
 .card.is-new { animation: unlock .7s var(--ease-pop); }
 @keyframes unlock { 0% { transform: scale(.85) rotate(-4deg); } 50% { transform: scale(1.06) rotate(2deg); } 100% { transform: none; } }
 
-/* ── REAL SUGAR ──────────────────────────────────────────── */
+/* ── SUGAR FREE (LVL 4): bubbles are claims printed on the pack ── */
 .sugar { background: var(--sun); }
 .sugar .h2 { color: var(--paper); max-width: 13ch; }
-.sugar-in { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(24px, 5vw, 64px); align-items: center; }
+@media (min-width: 1024px) { .sugar .h2 { font-size: clamp(2.3rem, 4.6vw, 4.4rem); } }   /* "strawberry." must fit the copy column */
+.sugar-in { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(24px, 5vw, 64px); align-items: center; }
 .cal { display: inline-flex; align-items: center; gap: 14px; margin-top: 24px; background: var(--paper); border: var(--line) solid var(--ink); border-radius: 24px; padding: 8px 20px 8px 14px; box-shadow: 0 6px 0 var(--ink); transform: rotate(-2deg); }
 .cal-n { font-family: var(--display); font-size: clamp(3.6rem, 7vw, 5.4rem); line-height: 1; color: var(--c); text-shadow: 3px 3px 0 var(--ink); transition: color .5s; }
 .cal-t { font-weight: 800; text-transform: uppercase; letter-spacing: .05em; line-height: 1.15; }
@@ -306,9 +307,8 @@ main { overflow-x: clip; }
 .bubbles { position: relative; height: clamp(380px, 40vw, 480px); }
 .bub { position: absolute; left: var(--bx); top: var(--by); width: calc(140px * var(--bs)); aspect-ratio: 1; border-radius: 50%; border: var(--line) solid var(--ink); background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0 9%, transparent 10%), radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--b) 55%, #fff), var(--b)); color: var(--ink); font-weight: 800; font-size: .86rem; line-height: 1.15; padding: 12px; display: grid; place-items: center; text-align: center; box-shadow: 0 5px 0 var(--ink); animation: bob 3.4s ease-in-out infinite; animation-delay: calc(var(--bs) * -7s); transition: transform .2s var(--ease-pop); }
 .bub:hover { transform: scale(1.08); }
-.bub.is-popped { animation: popout .45s var(--ease-pop); background: rgba(255,255,255,.4); border-style: dashed; box-shadow: none; text-decoration: line-through; text-decoration-thickness: 3px; cursor: default; }
-.bub.is-popped:hover { transform: none; }
-.bub.is-popped::after { content: 'Not in here'; position: absolute; left: 50%; bottom: -6px; translate: -50% 0; rotate: -8deg; white-space: nowrap; background: var(--ink); color: var(--sun); font-weight: 800; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; border-radius: 8px; animation: stamp .4s var(--ease-pop) .15s both; }
+.bub.is-popped { animation: popout .45s var(--ease-pop); background: rgba(255,255,255,.55); border-style: dashed; box-shadow: none; }
+.bub.is-popped::after { content: 'On the pack'; position: absolute; left: 50%; bottom: -6px; translate: -50% 0; rotate: -8deg; white-space: nowrap; background: var(--ink); color: var(--sun); font-weight: 800; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; border-radius: 8px; animation: stamp .4s var(--ease-pop) .15s both; }
 @keyframes bob { 50% { translate: 0 -10px; } }
 @keyframes popout { 0% { transform: scale(1.3); } 50% { transform: scale(.85); } 100% { transform: scale(1); } }
 @keyframes stamp { 0% { opacity: 0; scale: 2; } 100% { opacity: 1; scale: 1; } }
@@ -489,7 +489,7 @@ main { overflow-x: clip; }
 }
 @media (max-width: 1023px) {
   .nav { display: none; position: absolute; left: var(--gutter); right: var(--gutter); top: 74px; flex-direction: column; background: var(--paper); border: var(--line) solid var(--ink); border-radius: 24px; padding: 10px; box-shadow: 0 6px 0 var(--ink); margin: 0; }
-  .nav.is-open { display: flex; }
+  .nav.is-open { display: flex; z-index: 3; }   /* above the HUD fill, which paints as a layer (transform) */
   .nav a { font-size: 1.1rem; padding: 12px 14px; }
   .menu-btn { display: grid; }
   .hdr-cta { display: none; }
@@ -587,3 +587,194 @@ main { overflow-x: clip; }
 .hero.is-seated .sea { bottom: calc(var(--sand-h) - 8px); }
 .hero.is-gum .hero-stage .stage-shadow { bottom: 16%; width: 58%; }
 @media (min-width: 701px) { .hero.is-gum .sticker--hero { bottom: 3%; } }
+
+/* ── HERO v2: same pieces, better layout ─────────────────────────────────────
+   Desktop: the hero is one capped scene (no tall sand on tall screens); the copy column sits
+   on the left, the larger pop stands centre-right on the sand, the sun sits up-left of it
+   (where candy3d's beach sun is), clouds frame the top. app.js sets --sand-h (sand line just
+   behind the contact shadow) and --sea-h (waves start under the sub card, never through it).
+   Phones/tablets: headline, then the beach scene with the CTAs on the left and the pop on the
+   right, all inside the first screen; the sub card follows on the sand. */
+.hero { --sand-h: 18%; --sea-h: 22%; }
+.hero .sand { height: var(--sand-h); }
+.hero .sea { bottom: calc(var(--sand-h) - 8px); height: var(--sea-h); }
+.hero-stage .coin { left: auto; top: auto; right: 4%; bottom: 7%; z-index: 3; }
+@media (min-width: 1024px) {
+  .hero { min-height: 0; height: clamp(600px, calc(100svh - 165px), 800px); padding: 0; display: grid; }
+  .hero-in { height: 100%; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: stretch; gap: 0; }
+  .hero-copy { align-self: center; position: relative; z-index: 2; padding: 26px 0 30px; }
+  .hero-h { margin-bottom: 18px; }
+  .hero-ctas { margin-top: 20px; }
+  .chips { margin-top: 18px; }
+  .hero-stage { transform: none; align-self: end; height: calc(100% - 14px); margin-left: -12%; }
+  .sun { right: auto; top: 5%; left: calc(50% - min(7vw, 105px)); width: clamp(200px, 21vw, 300px); }
+  .cloud--a { left: auto; right: max(3%, calc(50% - 700px)); top: 9%; }
+  .cloud--b { left: max(3%, calc(50% - 690px)); top: 5%; }
+  .sticker--hero { left: 0; bottom: 15%; }
+}
+@media (max-width: 1023px) {
+  .hero { padding: 14px 0 34px; min-height: 0; }
+  .hero-in { grid-template-columns: 1fr; grid-template-areas: "lvl" "h" "scene" "sub" "chips"; gap: 0; }
+  .hero-copy { display: contents; }
+  .hero .lvl { grid-area: lvl; justify-self: start; margin-bottom: 12px; }
+  .hero-h { grid-area: h; margin-bottom: 0; position: relative; z-index: 2; }
+  .hero-ctas { grid-area: scene; align-self: end; justify-self: start; flex-direction: column; align-items: stretch; gap: 10px; margin: 0 0 4px; width: min(56%, 300px); position: relative; z-index: 3; }
+  .hero-ctas .btn { width: 100%; font-size: 1rem; padding: .78em .9em; }
+  .hero-stage { grid-area: scene; justify-self: end; width: 64%; margin: 0 -2% 0 0; transform: none; height: clamp(290px, calc(100svh - 238px - 44vw), 440px); }
+  .hero-sub { grid-area: sub; margin-top: 22px; position: relative; z-index: 2; }
+  .hero .chips { grid-area: chips; }
+  .cloud { display: block; height: 34px; }
+  .cloud--a { width: 104px; left: auto; right: 5%; top: 30%; }
+  .cloud--b { width: 84px; left: auto; right: 4%; top: 56px; }
+  .sun { width: clamp(150px, 40vw, 300px); right: auto; bottom: auto; }
+  .sticker--hero { left: auto; right: 30%; bottom: auto; top: 6%; font-size: .68rem; padding: 5px 9px; white-space: nowrap; transform: rotate(6deg); }
+  .hero-stage .coin { right: 2%; bottom: 4%; width: 38px; height: 38px; }
+}
+@media (max-width: 700px) { .hero .chips { display: none; } }
+@media (min-width: 701px) and (max-width: 1023px) { .hero-ctas { width: 300px; } .hero-stage { width: 58%; height: clamp(380px, 56vw, 520px); } }
+@media (max-width: 1023px) {
+  .sun { left: 17%; top: calc(var(--stage-t, 300px) - 12px); }
+  .cloud--a { top: calc(var(--stage-t, 300px) + 34px); right: auto; left: 1%; }
+}
+@media (max-width: 1023px) { .hero.is-gum .hero-stage .stage-shadow { bottom: 25%; width: 62%; } }
+@media (max-width: 400px) { .cloud--b { width: 70px; } }
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .hero .chips { display: none; }   /* same four facts run in the tape right under the hero */
+  .cloud--b { left: 41%; top: 3%; }
+}
+@media (min-width: 1024px) {
+  /* the gummy trio frames shorter than the pop: drop the stage so it stands on the same sand line */
+  .hero.is-gum .hero-stage { transform: translateY(12%); }
+  .hero.is-gum .sticker--hero { left: -2%; bottom: 26%; }
+}
+
+/* ── PACK UPDATE (2026-11-08): logo "Lab", the three pack images, seven actives ────────────────
+   Facts: redesign/_qa/PACK-FACTS.md. Images are framed in the arcade's own language: the pack front
+   is a die-cut sticker (LVL 4), the studio photo is a game cartridge (shop), and the gummies' wrap
+   label is the backlit marquee on top of a cabinet (bonus level). All three keep their aspect ratio. */
+
+/* Logo: a small "LAB" pill sits on the POP sticker's bottom edge, so the sticker's ink border reads
+   as the "— lab —" rules either side of it, like the pack lockup. Running copy stays "Glo Pop". */
+.logo-b { position: relative; }
+.logo-lab { position: absolute; left: 50%; bottom: -8px; translate: -50% 0; padding: 2px 5px 2px 7px; border-radius: 99px; background: var(--ink); color: var(--sun); font-family: var(--body); font-size: max(.38em, 9px); font-weight: 800; letter-spacing: .16em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
+.logo--ftr .logo-lab { background: var(--sun); color: #2A0820; }
+
+/* Glow Grid · seven cards in a two-column book: the odd last card (biotin) spans the row, no hole */
+.book .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+/* LVL 4 · the pack front as a die-cut sticker; popped bubbles ring the claim where it is printed */
+.cal-n small { font-size: .42em; margin-left: .05em; text-shadow: 2px 2px 0 var(--ink); }
+.cal-t span { display: inline-block; text-wrap: balance; }
+.pack-play { position: relative; display: grid; justify-items: center; }
+.pack-card { position: relative; z-index: 1; width: clamp(236px, 23vw, 330px); padding: 9px; background: #fff; border: var(--line) solid var(--ink); border-radius: 24px; box-shadow: 0 8px 0 var(--ink); rotate: -2deg; }
+.pack-zoom { position: relative; display: block; border-radius: 16px; }
+.pack-zoom img { width: 100%; height: auto; border: 2.5px solid var(--ink); border-radius: 16px; background: #EE2E8F; }
+.spots { position: absolute; inset: 2.5px; pointer-events: none; }
+.spot { position: absolute; left: var(--l); top: var(--t); width: var(--w); height: var(--h); border: 3px solid var(--sun); outline: 2px solid var(--ink); border-radius: 9px; box-shadow: 0 0 12px 2px rgba(255, 210, 63, .85); opacity: 0; scale: 1.6; transition: opacity .2s, scale .5s var(--ease-pop); }
+.spot.is-on { opacity: 1; scale: 1; }
+.spot.is-pulse { animation: spotpulse .55s var(--ease-pop); }
+@keyframes spotpulse { 45% { scale: 1.22; } }
+.zoom-pill { position: absolute; right: -14px; bottom: -16px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 2.5px solid var(--ink); border-radius: 99px; background: var(--ink); color: var(--paper); font-size: .76rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 4px 0 rgba(42, 8, 32, .3); transition: transform .2s var(--ease-pop); }
+.zoom-pill .lucide { color: var(--sun); }
+.pack-zoom:hover .zoom-pill, .marquee-zoom:hover .zoom-pill { transform: translateY(-3px) scale(1.04); }
+.pack-play .bubbles { position: absolute; inset: 0 0 58px; z-index: 2; height: auto; pointer-events: none; }
+.pack-play .bub { width: clamp(104px, 9vw, 122px); pointer-events: auto; font-size: .84rem; }
+.pack-play .bub-score { margin-top: 28px; }
+.sugar .fine .ph { border-color: rgba(42, 8, 32, .7); }
+
+/* LVL 7 · the studio photo as a game cartridge (always the strawberry product, so fixed colours) */
+.shop-grid { display: grid; grid-template-columns: minmax(0, 330px) minmax(0, 1fr); gap: clamp(22px, 3vw, 40px); align-items: start; }
+.shop-grid .tiers { grid-template-columns: repeat(2, 1fr); row-gap: 26px; }
+.cartridge { position: relative; margin-top: 6px; padding: 30px 14px 14px; background: #FF2E93; border: var(--line) solid #2A0820; border-radius: 26px 26px 20px 20px; box-shadow: 0 8px 0 #2A0820; rotate: -1.5deg; }
+.cartridge-grip { position: absolute; left: 50%; top: 10px; width: 46%; height: 10px; translate: -50% 0; border-radius: 99px; background: repeating-linear-gradient(90deg, rgba(42, 8, 32, .55) 0 3px, transparent 3px 9px); }
+.cartridge-win { display: block; overflow: hidden; border: 2.5px solid #2A0820; border-radius: 16px; background: #FBE3EE; }
+.cartridge-win img { width: 100%; height: auto; }
+.cartridge-label { display: grid; gap: 3px; margin-top: 12px; padding: 10px 12px; background: #FFF6EC; color: #2A0820; border: 2.5px solid #2A0820; border-radius: 14px; }
+.cartridge-label b { font-family: var(--display); font-weight: 400; font-size: 1.55rem; line-height: 1; }
+.cartridge-label span { font-size: .8rem; font-weight: 700; line-height: 1.3; }
+/* the bar is narrower beside the cartridge: options on top, then the summary and the CTA */
+.shop-grid .shop-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px 20px; align-items: center; }
+.shop-grid .sub-toggle { grid-column: 1 / -1; }
+.shop-grid .shop-sum { margin-left: 0; }
+
+/* Bonus level · Super Greens Gummies */
+.gum-in { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; }
+.gum-stage { height: clamp(240px, 30vw, 420px); }
+.bs li { display: inline-flex; align-items: center; gap: 6px; }
+.bs .lucide { width: 15px; height: 15px; }
+.marquee { position: relative; margin: clamp(36px, 5vw, 60px) 0 0; padding: 12px clamp(10px, 1.6vw, 18px) clamp(12px, 1.8vw, 20px); background: #062A17; border: 4px solid #021A0D; border-radius: 28px; box-shadow: 0 8px 0 #021A0D, inset 0 0 0 3px rgba(184, 243, 90, .16); }
+/* four bezel bolts */
+.marquee::before { content: ''; position: absolute; inset: 8px; pointer-events: none;
+  background: radial-gradient(circle at 5px 5px, #4F7F5F 0 3px, transparent 3.5px) left top / 10px 10px no-repeat,
+              radial-gradient(circle at 5px 5px, #4F7F5F 0 3px, transparent 3.5px) right top / 10px 10px no-repeat,
+              radial-gradient(circle at 5px 5px, #4F7F5F 0 3px, transparent 3.5px) left bottom / 10px 10px no-repeat,
+              radial-gradient(circle at 5px 5px, #4F7F5F 0 3px, transparent 3.5px) right bottom / 10px 10px no-repeat; }
+.marquee-top { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 10px; color: #B8F35A; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.marquee-k { padding: 3px 10px; border-radius: 99px; background: #B8F35A; color: #062A17; }
+.marquee-zoom { position: relative; display: block; border-radius: 16px; }
+.marquee-zoom img { width: 100%; height: auto; border: 2.5px solid #000; border-radius: 16px; box-shadow: 0 0 0 4px rgba(255, 46, 147, .28), 0 0 28px rgba(255, 46, 147, .5); }
+.marquee .zoom-pill { right: 14px; bottom: 14px; background: #B8F35A; color: #062A17; border-color: #062A17; box-shadow: 0 4px 0 rgba(0, 0, 0, .35); }
+.marquee .zoom-pill .lucide { color: #062A17; }
+.gum-facts { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(20px, 3vw, 40px); margin-top: clamp(30px, 4vw, 48px); align-items: start; }
+.gum-facts .sf { margin-top: 0; }
+.sf-src { display: block; font-weight: 400; font-size: .9em; line-height: 1.25; }
+.sf-table td .sf-src { white-space: normal; }
+.sf-blend { padding: 6px 0 7px; font-size: .78rem; line-height: 1.4; border-bottom: 4px solid #000; }
+.gum-label { display: grid; gap: 14px; padding: clamp(16px, 2.4vw, 24px); background: #F2FCEB; color: #062A17; border: var(--line) solid #062A17; border-radius: 24px; box-shadow: 0 8px 0 #062A17; }
+.gl-h { font-family: var(--display); font-weight: 400; font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1; color: #0E7A3A; }
+.gl-blk h4 { margin: 0 0 4px; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #0E7A3A; }
+.gl-blk p { font-size: .9rem; line-height: 1.45; }
+.gl-blk p + p { margin-top: 6px; }
+.gl-blk .gl-big { font-size: 1.05rem; font-weight: 800; }
+.gum-label .sf-tbd { margin: 0; grid-template-columns: 1fr; font-size: .86rem; }
+.prop65 { padding: 9px 11px; font-size: .74rem; line-height: 1.4; background: #fff; border: 2px solid #062A17; border-radius: 12px; }
+
+/* Large view (dialog) for the pack front and the gummies label */
+html.lb-open { overflow: hidden; }
+.lb { width: min(1700px, calc(100vw - 32px)); height: min(calc(100vh - 32px), 1000px); height: min(calc(100dvh - 32px), 1000px); max-width: none; max-height: none; padding: 0; border: var(--line) solid #2A0820; border-radius: 24px; background: #FFF6EC; color: #2A0820; box-shadow: 0 10px 0 rgba(0, 0, 0, .35); overflow: hidden; }
+.lb[open] { display: flex; flex-direction: column; }
+.lb::backdrop { background: rgba(26, 4, 22, .8); }
+.lb-bar { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 18px; border-bottom: var(--line) solid #2A0820; }
+.lb-title { margin-right: auto; min-width: 0; font-family: var(--display); font-size: clamp(1.05rem, 2vw, 1.35rem); line-height: 1.1; }
+.lb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 16px; border: 2.5px solid #2A0820; border-radius: 99px; background: #FFF6EC; color: #2A0820; font-size: .85rem; font-weight: 800; white-space: nowrap; box-shadow: 0 3px 0 #2A0820; transition: transform .15s var(--ease-pop); }
+.lb-btn:hover { transform: translateY(-2px); }
+.lb-x { width: 44px; padding: 0; background: #FF2E93; }
+.lb-x .lucide { width: 22px; height: 22px; }
+.lb-pane { flex: 1; min-height: 0; display: flex; overflow: auto; overscroll-behavior: contain; background: #2A0B3D; }
+.lb-pane img { width: 100%; height: 100%; max-width: none; padding: 14px; object-fit: contain; margin: auto; }
+.lb.is-actual .lb-pane { cursor: grab; }
+.lb.is-actual .lb-pane.is-drag { cursor: grabbing; }
+.lb.is-actual .lb-pane img { flex: none; padding: 0; object-fit: fill; }
+.lb-hint { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 14px; font-size: .78rem; font-weight: 700; text-align: center; border-top: 2px solid rgba(42, 8, 32, .15); }
+
+@media (min-width: 701px) { .sf-table th .sf-src { display: inline; } }   /* as on the printed label: "Iodine (from Organic Kelp)" */
+@media (min-width: 701px) and (max-width: 1023px) { .pack-play { justify-self: center; width: min(100%, 600px); } }   /* tablet: keep the bubbles near the pack */
+@media (min-width: 1024px) {
+  /* the facts panel is the long one: let "From the label" ride alongside it instead of leaving a hole */
+  .gum { overflow: hidden; overflow: clip; }
+  .gum-label { position: sticky; top: 150px; }
+}
+@media (max-width: 1023px) {
+  .gum-in { grid-template-columns: 1fr; }
+  .shop-grid { grid-template-columns: minmax(0, 250px) minmax(0, 1fr); }
+  .gum-facts { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  /* longer product names: the "Selected" badge becomes a tab on the card's top edge */
+  .carts { gap: 22px; }
+  .cart.is-on::after { top: -12px; bottom: auto; right: 16px; }
+  .pinfo-name small { display: block; margin-top: 6px; }
+  .pack-play { display: block; }
+  .pack-card { width: min(100%, 268px); margin: 4px auto 0; }
+  .pack-play .bubbles { position: static; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 10px; margin-top: 30px; pointer-events: auto; }
+  .pack-play .bub { position: relative; left: auto; top: auto; width: 100px; padding: 8px; font-size: .74rem; }
+  .pack-play .bub-score { text-align: center; }
+  .shop-grid { grid-template-columns: 1fr; }
+  .shop-grid .shop-bar { grid-template-columns: 1fr; }
+  .cartridge { width: min(100%, 300px); margin: 0 auto 8px; }
+  .cartridge-win img { aspect-ratio: 1; object-fit: cover; object-position: 50% 58%; }
+  .marquee .zoom-pill { position: static; display: flex; width: max-content; margin: 10px auto 0; }
+  .lb { width: 100vw; height: 100vh; height: 100dvh; border: 0; border-radius: 0; }
+  .lb-bar { padding: 8px 8px 8px 14px; }
+  .lb-btn { padding: 0 12px; font-size: .8rem; }
+}

@@ -1,7 +1,7 @@
 /* Glo Pop · Proposal 07 · Paper Sun
  * One classic script (works from file:// and over http). Modules, in order:
  * Data, Theme, Motion (the paper theatre, stop-motion cast and confetti), Reveal, Nav, Explorer, Map,
- * Taste test, Sieve, Sticks, Moments, Planner, Formats, Lineup, Shop, Waitlist, FAQ, Sources, Grain, Real3D.
+ * Taste test, Sticks, Moments, Planner, Formats, Lineup, Shop, Waitlist, FAQ, Sources, Zoom, Grain, Real3D.
  * Everything the page says is already in the HTML; this file only adds the toys, the re-theming and
  * the progressive bits. */
 (function () {
@@ -28,51 +28,53 @@
   /* ================================ Data ================================ */
   var PRODUCTS = [
     {
-      id: 'strawberry-pop', kind: 'lollipop', name: 'Strawberry Pops', full: 'Peptide Lollipops', flavor: 'Strawberry',
+      // From the pack (Nov 2026): Collagen Boost, a strawberry Beauty Lollipop by Glo Pop. Sugar free; net wt. 15 g a pop;
+      // seven actives in the pack's words: peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc.
+      id: 'strawberry-pop', kind: 'lollipop', name: 'Collagen Boost', full: 'Strawberry Beauty Lollipop', flavor: 'Strawberry',
       status: 'available', statusLabel: 'Available now', tabNote: 'available',
       candy: { kind: 'lollipop', color: '#FF1493' },
-      card: 'Peptide Lollipops in strawberry. 47 calories per pop, 10 per bag, six actives, made with real sugar.',
+      card: 'Strawberry Beauty Lollipop with peptides, hyaluronic acid and five more actives. Sugar free, 15&nbsp;g a pop, 10 per bag.',
       link: { href: '#shop', label: 'Shop' },
       copy: {}                                   // strawberry copy ships in the HTML (captured at start-up)
     },
     {
-      // The client's facts (draft Supplement Facts, Nov 2026): strawberry-watermelon; 2 gummies a serving,
-      // 30 servings a container; 20 calories, 3 g sugar (all added); five B vitamins and a 170 mg Organic
-      // Super Greens Blend of 15 ingredients. Still TBD: price, launch date, directions, other ingredients,
-      // allergens, vegan / gluten-free status, final shape.
-      id: 'green-gummies', kind: 'gummy', name: 'Green Gummies', flavor: 'Strawberry-Watermelon',
+      // From the full label (Nov 2026): Super Greens Gummies by Glo Pop, strawberry-watermelon; 2 gummies a serving,
+      // 30 servings (60 gummies); 20 calories, 3 g sugars (all added); five B vitamins, iron, iodine, sodium, potassium;
+      // kale, broccoli, spinach, wild blueberries and elderberry. Vegan friendly, gluten free, non GMO. NOT sugar free.
+      // Still TBD: price, launch date, final gummy shape.
+      id: 'green-gummies', kind: 'gummy', name: 'Super Greens Gummies', flavor: 'Strawberry-Watermelon',
       status: 'coming-soon', statusLabel: 'Coming soon', tabNote: 'waitlist',
       candy: { kind: 'gummy', color: '#1FA453' },
-      card: 'Strawberry-watermelon gummies with five B vitamins and an Organic Super Greens Blend. 2 gummies a serving, 30 servings a container, 20 calories a serving. Price and launch: ' + TBD + '.',
+      card: 'Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry, plus five B vitamins. 2 gummies a serving, 30 servings a container. Price and launch: ' + TBD + '.',
       facts: '#gummy-facts',
       link: { href: '#waitlist', label: 'Join the waitlist' },
       copy: {
-        'hero.eyebrow': 'Green Gummies · Coming soon',
+        'hero.eyebrow': 'Super Greens Gummies · Coming soon',
         'hero.h1': 'Something <span class="cut in"><span class="strip">green</span></span> is coming.',
-        'hero.lead': 'Strawberry-watermelon gummies with five B vitamins and an Organic Super Greens Blend: 20 calories in a serving of 2. Price and launch date: ' + TBD + '. Want to hear first?',
+        'hero.lead': 'Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry: 20 calories in a serving of 2. Price and launch date: ' + TBD + '. Want to hear first?',
         'hero.cta': 'Join the waitlist', 'hero.href': '#waitlist', 'hero.note': 'concept illustration', 'hero.inside': '#gummy-facts',
-        'hero.proof': proof([['candy', 'Strawberry-watermelon'], ['leaf', 'Five B vitamins + a greens blend'], ['clipboard-list', '20 calories per 2 gummies'], ['package', '60 gummies a container']]),
-        'pop.eyebrow': 'The gummies', 'pop.h2': 'Green Gummies, annotated.',
-        'pop.lead': 'Strawberry-watermelon gummies with five B vitamins and an Organic Super Greens Blend. Coming soon; the price and launch date are still ' + TBD + '.',
-        'pop.amounts': 'Every amount is on the draft label. <a class="tlink" href="#gummy-facts">See the Supplement Facts' + icon('arrow-right') + '</a>',
-        'pop.title': 'A concept illustration of three green gummies and a container, annotated: strawberry-watermelon flavor, five B vitamins, 20 calories in a 2-gummy serving, an Organic Super Greens Blend, 60 gummies per container. Price and launch date are still to be decided.',
+        'hero.proof': proof([['candy', 'Strawberry-watermelon'], ['leaf', 'Vegan friendly, gluten free, non GMO'], ['clipboard-list', '20 calories per 2 gummies'], ['package', '60 gummies a container']]),
+        'pop.eyebrow': 'The gummies', 'pop.h2': 'Super Greens Gummies, annotated.',
+        'pop.lead': 'Strawberry-watermelon gummies with kale, broccoli, spinach, wild blueberries and elderberry. Coming soon; the price and launch date are still ' + TBD + '.',
+        'pop.amounts': 'Every amount is on the label. <a class="tlink" href="#gummy-facts">See the Supplement Facts' + icon('arrow-right') + '</a>',
+        'pop.title': 'A concept illustration of three green gummies and a container, annotated: strawberry-watermelon flavor, five B vitamins, 20 calories in a 2-gummy serving, kale, broccoli and spinach in the blend, two gummies daily, 60 gummies per container. Price and launch date are still to be decided.',
         'pop.n1': hand('strawberry-watermelon', 'The flavor. Final gummy shape: ' + TBD + '.'),
         'pop.n2': hand('five B vitamins', 'Riboflavin, niacin, B6, folate and pantothenic acid.'),
-        'pop.n3': hand('20 calories a serving', 'A serving is 2 gummies, with 3 g of sugar.'),
-        'pop.n4': hand('super greens blend', '170 mg a serving of the Organic Super Greens Blend: 15 ingredients.'),
-        'pop.n5': null, 'pop.gf': null,
+        'pop.n3': hand('20 calories a serving', 'A serving is 2 gummies, with 3&nbsp;g of sugars.'),
+        'pop.n4': hand('kale, broccoli, spinach', 'Plus wild blueberries and elderberry, in the greens blend.'),
+        'pop.n5': hand('two a day', 'The label says: take two (2) gummies daily.'), 'pop.gf': icon('leaf') + '<span>And the label badges: <b>vegan friendly, gluten free, non GMO</b>.</span>',
         'pop.n6': hand('60 gummies', '30 servings of 2 per container. Price and launch: ' + TBD + '.'),
-        'pop.n1.href': '#gummy-facts', 'pop.n2.href': '#gummy-facts', 'pop.n3.href': '#gummy-facts', 'pop.n4.href': '#gummy-facts', 'pop.n6.href': '#waitlist',
-        'final.lead': 'Strawberry-watermelon Green Gummies are on their way. Join the waitlist and you\'ll hear first.',
-        'shop.h2': 'Green Gummies are on their way.',
+        'pop.n1.href': '#gummy-facts', 'pop.n2.href': '#gummy-facts', 'pop.n3.href': '#gummy-facts', 'pop.n4.href': '#gummy-facts', 'pop.n5.href': '#gummy-facts', 'pop.n6.href': '#waitlist',
+        'final.lead': 'Strawberry-watermelon Super Greens Gummies are on their way. Join the waitlist and you\'ll hear first.',
+        'shop.h2': 'Super Greens Gummies are on their way.',
         'final.cta': 'Join the waitlist', 'final.href': '#waitlist',
-        'final.line': 'Green Gummies · Strawberry-watermelon · 2 gummies a serving · 30 servings a container · Price and launch ' + TBD,
-        'bar.text': '<b>Green Gummies</b><span>Strawberry-watermelon · coming soon</span>', 'bar.cta': 'Join the waitlist', 'bar.href': '#waitlist',
+        'final.line': 'Super Greens Gummies · Strawberry-watermelon · 2 gummies a serving · 30 servings a container · Price and launch ' + TBD,
+        'bar.text': '<b>Super Greens Gummies</b><span>Strawberry-watermelon · coming soon</span>', 'bar.cta': 'Join the waitlist', 'bar.href': '#waitlist',
         notice: {
-          inside: 'Heads up: these six actives are in the Strawberry Pop. Green Gummies have their own formula: five B vitamins and an Organic Super Greens Blend. <a class="tlink tlink--in" href="#gummy-facts">See their Supplement Facts</a>.',
-          sugar: 'Heads up: this chapter is about the Strawberry Pop. Green Gummies list 3 g of added sugars in a 2-gummy serving; what sweetens them is ' + TBD + '.'
+          inside: 'Heads up: these seven actives are in Collagen Boost, the lollipop. Super Greens Gummies have their own formula: five B vitamins, iron, iodine, sodium and potassium, plus a greens blend. <a class="tlink tlink--in" href="#gummy-facts">See their Supplement Facts</a>.',
+          sugar: 'Heads up: this chapter is about Collagen Boost, the lollipop. Super Greens Gummies aren\'t sugar free: their label lists 3&nbsp;g of added sugars in a 2-gummy serving.'
         },
-        live: 'Now showing Green Gummies: strawberry-watermelon, coming soon.'
+        live: 'Now showing Super Greens Gummies: strawberry-watermelon, coming soon.'
       }
     },
     {
@@ -101,31 +103,31 @@
         'wl.text': 'Name ' + TBD + ', flavor ' + TBD + ', date ' + TBD + '. Get notified and you\'ll hear the moment it\'s real.',
         'wl.cap': 'colors ' + TBD,
         notice: {
-          inside: 'Heads up: these six actives are in the Strawberry Pop. The next color\'s formula is ' + TBD + '.',
-          sugar: 'Heads up: this chapter is about the Strawberry Pop. The next color\'s recipe is ' + TBD + '.'
+          inside: 'Heads up: these seven actives are in Collagen Boost. The next color\'s formula is ' + TBD + '.',
+          sugar: 'Heads up: this chapter is about Collagen Boost. The next color\'s recipe is ' + TBD + '.'
         },
         live: 'Now showing the next color: still in development.'
       }
     }
   ];
-  PRODUCTS[0].copy.live = 'Now showing Strawberry Pops: available now.';
+  PRODUCTS[0].copy.live = 'Now showing Collagen Boost: available now.';
   function proof(items) {
     return items.map(function (it) { return '<li>' + icon(it[0]) + it[1] + '</li>'; }).join('');
   }
   var byId = {};
   PRODUCTS.forEach(function (p) { byId[p.id] = p; });
 
-  var ACTIVE_NAMES = { collagen: 'Collagen peptides', ha: 'Hyaluronic acid', vitc: 'Vitamin C', b12: 'Vitamin B12', b6: 'Vitamin B6', zinc: 'Zinc' };
+  var ACTIVE_NAMES = { peptides: 'Peptides', vitc: 'Vitamin C', b6: 'Vitamin B6', b12: 'Vitamin B12', biotin: 'Biotin (B8)', ha: 'Hyaluronic acid', zinc: 'Zinc' };
   var FUNCTIONS = [
     { id: 'collagen', name: 'Collagen formation', a: ['vitc'], line: 'Vitamin C contributes to normal collagen formation for the normal function of skin.' },
-    { id: 'skin', name: 'Normal skin, hair and nails', a: ['zinc'], line: 'Zinc contributes to the maintenance of normal skin, hair and nails.' },
+    { id: 'skin', name: 'Normal skin and hair', a: ['zinc', 'biotin'], line: 'Zinc contributes to the maintenance of normal skin, hair and nails, and biotin to normal skin and hair.' },
     { id: 'oxid', name: 'Antioxidant (cell protection)', a: ['vitc', 'zinc'], line: 'Vitamin C and zinc contribute to the protection of cells from oxidative stress.' },
     { id: 'immune', name: 'Immune function', a: ['vitc', 'b6', 'b12', 'zinc'], line: 'Vitamin C, vitamin B6, vitamin B12 and zinc contribute to normal immune function.' },
-    { id: 'energy', name: 'Energy-yielding metabolism', a: ['vitc', 'b6', 'b12'], line: 'Vitamin C, vitamin B6 and vitamin B12 contribute to normal energy-yielding metabolism.' },
+    { id: 'energy', name: 'Energy-yielding metabolism', a: ['vitc', 'b6', 'b12', 'biotin'], line: 'Vitamin C, vitamin B6, vitamin B12 and biotin contribute to normal energy-yielding metabolism.' },
     { id: 'tired', name: 'Less tiredness and fatigue', a: ['vitc', 'b6', 'b12'], line: 'Vitamin C, vitamin B6 and vitamin B12 contribute to the reduction of tiredness and fatigue.' },
     { id: 'rbc', name: 'Red blood cell formation', a: ['b6', 'b12'], line: 'Vitamin B6 and vitamin B12 contribute to normal red blood cell formation.' },
     { id: 'protein', name: 'Protein metabolism', a: ['b6', 'zinc'], line: 'Vitamin B6 contributes to normal protein and glycogen metabolism, and zinc to normal protein synthesis.' },
-    { id: 'moist', name: 'Studied for skin moisture', a: ['collagen', 'ha'], dashed: true, line: 'Collagen peptides and hyaluronic acid have been studied for skin moisture. The research is promising and still debated, and there\'s no authorized wording.' }
+    { id: 'moist', name: 'Studied for skin moisture', a: ['peptides', 'ha'], dashed: true, line: 'Peptides and hyaluronic acid have been studied for skin moisture. The research is promising and still debated, and there\'s no authorized wording.' }
   ];
   var MOMENTS = {
     coffee: 'One pop while the coffee brews.',
@@ -868,7 +870,7 @@
 
   /* ---- paper offcuts tumbling down the seams between some sheets (they slip behind the next sheet) ---- */
   // A small handful at a time, each piece stepped by hand like the sky confetti: the pop sheet sheds
-  // strawberry achenes, the Real sugar sheet sheds sugar crystals, and so on.
+  // strawberry achenes, the sugar-free sheet sheds white paper offcuts, and so on.
   function seam(sheet, kinds) {
     var band = doc.createElement('div');
     band.className = 'flutter'; band.setAttribute('aria-hidden', 'true');
@@ -949,9 +951,9 @@
       });
     })();
     // seams: offcuts that fit the sheet they fall from
-    var TEAR = '0 0 16 20', CHIP = '0 0 16 16', CRYS = '0 0 24 24';
+    var TEAR = '0 0 16 20', CHIP = '0 0 16 16';
     [['#pop', [['sh-tear', TEAR, 'var(--accent)', 'var(--deep)'], ['sh-chip', CHIP, 'var(--deep)', 'var(--accent)'], ['sh-tear', TEAR, 'var(--accent-soft)', 'var(--accent)']]],
-      ['#sugar', [['sh-crystal', CRYS, '#fff'], ['sh-crystal', CRYS, '#fff'], ['sh-chip', CHIP, '#fff', 'var(--tint)']]],
+      ['#sugar', [['sh-chip', CHIP, '#fff', 'var(--tint)'], ['sh-tear', TEAR, '#fff', 'var(--tint)'], ['sh-chip', CHIP, 'var(--tint)', '#fff']]],
       ['#sticks', [['sh-tear', TEAR, 'var(--accent)', 'var(--deep)'], ['sh-chip', CHIP, '#fff', 'var(--tint)'], ['sh-tear', TEAR, 'var(--deep)', 'var(--accent)']]],
       ['#formats', [['sh-chip', CHIP, 'var(--accent)', 'var(--deep)'], ['sh-tear', TEAR, '#FFB21E', '#FFC83D'], ['sh-chip', CHIP, 'var(--accent-soft)', 'var(--accent)']]]
     ].forEach(function (s) { var el = $(s[0]); if (el) seam(el, s[1]); });
@@ -1424,7 +1426,8 @@
   /* ================================ Taste test (how sweet is sweet?) ================================ */
   // Tap a packet: a cube's weight of it tips onto the paper spoon, then sugar cubes drop in, in
   // stop-motion, until the pile would taste as sweet. The camera pulls back on its own to fit the pile
-  // (the zoom is the payoff) and the reference cube, "sugar · 1×", stays in view as a tiny yardstick.
+  // (the zoom is the payoff) and the reference cube, "sugar · 1×", stays in view as a tiny yardstick. Table sugar is
+  // only that yardstick: the sachets are common sugar swaps, general education. Nothing here says what sweetens Glo Pop.
   // One canvas: up to ~900 single cubes, beyond that a cut-paper mountain. It only runs while something
   // moves and never offscreen. Reduced motion or Pause motion: the finished pile, no animation.
   (function taste() {
@@ -1450,10 +1453,12 @@
       var a = src[i];
       return a ? '<sup class="fn"><a href="' + a.getAttribute('href') + '" aria-label="' + (a.getAttribute('aria-label') || '') + '">' + a.textContent + '</a></sup>' : '';
     }
-    var FAM = { sugar: '#FFFFFF', rare: '#FFC83D', alc: '#7FD3CC', plant: '#F6C18E', art: '#B88AA3' };
+    var FAM = { sugar: '#D9B98C', rare: '#FFC83D', alc: '#7FD3CC', plant: '#F6C18E', art: '#B88AA3' };   // the yardstick is plain kraft, no brand colour
+    // Relative sweetness by weight, all approximate, from 07-research/facts.md §3.1: FDA (aspartame and other sweeteners),
+    // EFSA 2025 (allulose), Msomi et al. 2021 (sugar alcohols). Each caption cites its source.
     // [low, high, family, name, type, caption, footnote, sugar cubes, times as sweet]
     var D = {
-      sugar: [1, 1, 'sugar', 'Sugar', 'real sugar, what we use', 'The 1× every other sweetener is measured against: a cube of it tastes like a cube.', -1, '1 sugar cube', '1×'],
+      sugar: [1, 1, 'sugar', 'Table sugar', 'the yardstick', 'The 1× every sweetener is measured against: a cube of it tastes like a cube.', -1, '1 sugar cube', '1×'],
       allulose: [0.7, 0.7, 'rare', 'Allulose', 'rare sugar', 'Gram for gram, about 0.7× as sweet as sugar: a cube of it tastes like about 0.7 of a sugar cube.', 1, '≈ 0.7 of a sugar cube', 'about 0.7×'],
       erythritol: [0.6, 0.8, 'alc', 'Erythritol', 'sugar alcohol', 'Gram for gram, about 0.6–0.8× as sweet as sugar: a cube of it tastes like 0.6 to 0.8 of a sugar cube.', 2, '0.6–0.8 of a sugar cube', 'about 0.6–0.8×'],
       xylitol: [1, 1, 'alc', 'Xylitol', 'sugar alcohol', 'Gram for gram, about as sweet as sugar (about 1×): a cube of it tastes like about one sugar cube.', 2, '≈ 1 sugar cube', 'about 1×'],
@@ -1535,7 +1540,7 @@
     function size() {
       var r = stage.getBoundingClientRect();
       W = r.width; H = r.height;
-      if (!W || !H) return false;
+      if (W < 200 || H < 140) { W = 0; return false; }         // not laid out yet (a sheet mid-layout can measure ~70px): wait for the real size
       dpr = Math.min(2, window.devicePixelRatio || 1);
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       gy = H - (W < 600 ? 26 : 34);
@@ -1566,8 +1571,9 @@
     function target(snap) {
       var xmax = X0 + 1.1 + DX, ymax = 1.3 + DY;                     // always room for the first cube (and the flag)
       if (P.g && P.fr) { xmax = Math.max(xmax, X0 + P.g.b * (1 + DX)); ymax = Math.max(ymax, topOf(P.g, P.fr)); }
-      // room on the left for the spoon and for the "us" pennant, which flies left of the reference cube
+      // room on the left for the spoon and for the yardstick's pennant, which flies left of the reference cube
       var fw = flagW(), padTop = W < 600 ? 78 : 96, s = Math.min((W - 40) / (xmax + 7.4), (W - 60 - fw) / (xmax + 0.5), (gy - padTop) / ymax, sMax);
+      if (!(s > 0.5)) s = 0.5;                                    // never a zero or negative scale, even for a frame
       if (s * dpr >= 2) s = Math.floor(s * dpr) / dpr;
       var xmin = Math.min(-6.9, -(fw + 20) / s);
       camT.s = s; camT.x = (xmin + xmax + 0.5) / 2; camT.d = depthT();
@@ -1698,19 +1704,19 @@
       ctx.save(); ctx.translate(cx, cy); ctx.rotate(p.tilt * RAD);
       ctx.fillStyle = 'rgba(74,13,46,.18)'; ctx.fillRect(-s * 0.42 + 1.5, -s * 0.62 + 2, s * 0.84, s * 1.24);
       ctx.fillStyle = '#fff'; ctx.fillRect(-s * 0.42, -s * 0.62, s * 0.84, s * 1.24);
-      ctx.fillStyle = fam === 'sugar' ? C.acc : FAM[fam]; ctx.fillRect(-s * 0.42, -s * 0.18, s * 0.84, s * 0.36);
+      ctx.fillStyle = FAM[fam]; ctx.fillRect(-s * 0.42, -s * 0.18, s * 0.84, s * 0.36);
       ctx.restore();
-      ctx.fillStyle = fam === 'sugar' ? C.tint : FAM[fam];
+      ctx.fillStyle = fam === 'sugar' ? '#fff' : FAM[fam];
       (p.grains || []).forEach(function (g) { ctx.fillRect(cx + g[0] * s, cy + g[1] * s, Math.max(2, s * 0.08), Math.max(2, s * 0.08)); });
     }
     function spaced(px) { if ('letterSpacing' in ctx) ctx.letterSpacing = px; }
-    function flagText() { return W < 600 ? 'US · 1×' : 'US · SUGAR 1×'; }
+    function flagText() { return 'SUGAR · 1×'; }
     function flagW() {                                          // the pennant's width, so the camera leaves it room
       ctx.save(); ctx.font = '800 11px Archivo, Arial, sans-serif'; spaced('0.8px');
       var w = ctx.measureText(flagText()).width + 22; spaced('0px'); ctx.restore();
       return w;
     }
-    function flag(x, y, text) {                                 // "us": a brand-pink paper pennant on the reference cube
+    function flag(x, y, text) {                                 // the yardstick: a kraft paper pennant on the reference cube
       var bx = X(x), by = Y(y);
       ctx.save();
       ctx.fillStyle = C.ink2; ctx.fillRect(bx - 0.75, by - 34, 1.5, 34);
@@ -1719,28 +1725,28 @@
       flagBox = [bx - w - 2, by - 36, bx + 2, by - 14];          // it flies left, over the spoon, clear of the pile
       ctx.beginPath(); ctx.moveTo(bx - 0.75, by - 34); ctx.lineTo(bx - w, by - 34); ctx.lineTo(bx - w + 7, by - 25); ctx.lineTo(bx - w, by - 16); ctx.lineTo(bx - 0.75, by - 16); ctx.closePath();
       ctx.fillStyle = 'rgba(74,13,46,.18)'; ctx.save(); ctx.translate(1, 1.5); ctx.fill(); ctx.restore();
-      ctx.fillStyle = C.acc; ctx.fill();
+      ctx.fillStyle = FAM.sugar; ctx.fill();
       ctx.fillStyle = C.ink; ctx.textBaseline = 'middle'; ctx.fillText(text, bx - w + 13, by - 24.5);
       spaced('0px');
       ctx.restore();
     }
-    function tag(x, y, dy) {                                     // the pile's paper tag: who, how sweet, how many cubes
-      var d = D[S.k], us = d[2] === 'sugar', small = W < 600;
-      var l1 = (us ? 'US · ' : 'OTHERS · ') + d[3].toUpperCase(), l2 = d[8] + (us ? ', the yardstick' : ' as sweet'), l3 = '1 cube of it ' + (d[7].charAt(0) === '≈' ? d[7] : '= ' + d[7]);
+    function tag(x, y, dy) {                                     // the pile's paper tag: which sweetener, how sweet, how many cubes
+      var d = D[S.k], ref = d[2] === 'sugar', small = W < 600;
+      var l1 = d[3].toUpperCase() + (ref ? '' : ' · ' + d[4].toUpperCase()), l2 = d[8] + (ref ? ', the yardstick' : ' as sweet'), l3 = '1 cube of it ' + (d[7].charAt(0) === '≈' ? d[7] : '= ' + d[7]);
       var f1 = '800 10.5px Archivo, Arial, sans-serif', f2 = '800 ' + (small ? 14 : 16) + 'px Archivo, Arial, sans-serif', f3 = '600 ' + (small ? 11.5 : 12.5) + 'px Archivo, Arial, sans-serif';
       ctx.save();
       ctx.font = f1; spaced('0.9px'); var w1 = ctx.measureText(l1).width; spaced('0px');
       ctx.font = f2; var w2 = ctx.measureText(l2).width;
       ctx.font = f3; var w3 = ctx.measureText(l3).width;
       var w = Math.max(w1, w2, w3) + 30, h = small ? 54 : 58, bx = Math.min(W - w - 8, Math.max(8, X(x) - w / 2)), by = Math.max(8, Y(y) - h - 14);
-      var fb = flagBox;                                          // never over the "us" flag: lift it clear
+      var fb = flagBox;                                          // never over the yardstick's flag: lift it clear
       if (fb && bx < fb[2] && bx + w > fb[0] && by < fb[3] && by + h > fb[1]) by = Math.max(8, fb[1] - h - 8);
       by += dy || 0;
       ctx.fillStyle = 'rgba(74,13,46,.2)'; ctx.fillRect(bx + 1.5, by + 2.5, w, h);
       ctx.fillStyle = '#fff'; ctx.fillRect(bx, by, w, h);
-      ctx.fillStyle = us ? C.acc : FAM[d[2]]; ctx.fillRect(bx, by, 7, h);       // the colour of its packet
+      ctx.fillStyle = FAM[d[2]]; ctx.fillRect(bx, by, 7, h);       // the colour of its packet
       ctx.textBaseline = 'middle';
-      ctx.font = f1; spaced('0.9px'); ctx.fillStyle = us ? C.ai : C.ink2; ctx.fillText(l1, bx + 17, by + (small ? 13 : 14)); spaced('0px');
+      ctx.font = f1; spaced('0.9px'); ctx.fillStyle = C.ink2; ctx.fillText(l1, bx + 17, by + (small ? 13 : 14)); spaced('0px');
       ctx.font = f2; ctx.fillStyle = C.ink; ctx.fillText(l2, bx + 17, by + (small ? 29 : 31));
       ctx.font = f3; ctx.fillStyle = C.ink2; ctx.fillText(l3, bx + 17, by + (small ? 44 : 47));
       ctx.restore();
@@ -1787,7 +1793,7 @@
         cubeCut(xc, fr.lo, fr.y);
       }
       spoon();
-      var s = cam.s;                                             // the reference cube: us, sugar, 1×
+      var s = cam.s;                                             // the reference cube: table sugar, 1×, the yardstick
       cubeArt(ctx, X(-0.5), Y(0), s, DX * s, DY * s, s >= 4 ? Math.max(0.6, s * 0.03) : 0);
       flag(0, 1 + DY, flagText());
       sachet();
@@ -1882,8 +1888,8 @@
     }
     function kick() { if (!raf && onScreen) { last = 0; raf = requestAnimationFrame(loop); } }
     function caption(k) {
-      var d = D[k], us = d[2] === 'sugar';
-      capEl.innerHTML = '<b>' + (us ? 'Us · ' : 'Others · ') + d[3] + '</b> · ' + d[4] + '. ' + d[5] + (d[6] >= 0 ? fn(d[6]) : '');
+      var d = D[k];
+      capEl.innerHTML = '<b>' + d[3] + '</b> · ' + d[4] + '. ' + d[5] + (d[6] >= 0 ? fn(d[6]) : '');
     }
     function select(k, focus) {
       if (!D[k]) return;
@@ -1920,7 +1926,7 @@
     function refit() {
       if (!size()) return;
       C = colors();
-      if (!started) return;
+      if (!started) { if (onScreen) first(); return; }
       if (still() || !frames.length) { if (!frames.length) { target(true); paint(); } else settle(S.k); }
       else { target(true); paint(); }
     }
@@ -1932,8 +1938,8 @@
       Object.keys(D).forEach(function (k) { if (D[k][0] >= 1) pyr(D[k][1] > D[k][0] ? cleanIn(D[k][0], D[k][1]) : D[k][0]); });
     });
     function first() {
+      if (!size()) return;                                      // the stage's own resize, or the next scroll, tries again
       started = true;
-      if (!size()) return;
       C = C || colors();
       if (still()) { settle(S.k); return; }
       target(true); cam.s = camT.s * 1.25;                        // a small pull-back on arrival
@@ -1945,65 +1951,6 @@
         if (onScreen && !started) first(); else if (onScreen) kick();
       }, { rootMargin: '0px 0px -12% 0px' }).observe(stage);
     } else { onScreen = true; first(); }
-  })();
-
-  /* ================================ Sieve ================================ */
-  (function sieve() {
-    var card = $('#sieve');
-    if (!card) return;
-    var scene = $('[data-sieve-scene]', card), btn = $('[data-sift]', card), slip = $('[data-sift-slip]', card), text = $('[data-sift-text]', card);
-    var tags = $$('.stag', card), fall = $('.sieve__fall', card), art = $('.sieve__art', card), bowl = $('.sieve__bowl', card);
-    var notes = $$('[data-sift-note]', card).map(function (n) { return n.innerHTML; });
-    scene.hidden = false; btn.hidden = false; slip.hidden = false;
-    var crystals = [], N = 10, sifted = false;
-    for (var i = 0; i < N; i++) {
-      var c = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      c.setAttribute('viewBox', '0 0 24 24');
-      c.innerHTML = '<use href="#sh-crystal" width="24" height="24"/>';
-      var fx = 41 + (i % 5) * 4.6 + (i > 4 ? 2.3 : 0), fy = i > 4 ? 84.5 : 87.5;
-      c.style.left = 'calc(' + fx + '% - 8px)';
-      c.style.top = 'calc(' + fy + '% - 8px)';
-      c.style.transform = 'rotate(' + ((i * 37) % 90) + 'deg)';
-      fall.appendChild(c); crystals.push(c);
-    }
-    function show(i) {
-      tags.forEach(function (t, j) { t.setAttribute('aria-pressed', String(i === j)); });
-      text.innerHTML = '<b>' + (i < 5 ? tags[i].textContent : 'Real sugar') + '.</b> ' + notes[i];
-    }
-    tags.forEach(function (t, i) { t.setAttribute('aria-pressed', 'false'); on(t, 'click', function () { show(i); }); });
-    function settle() {
-      var dy = dropBy();
-      tags.forEach(function (t, i) { t.style.translate = '0 ' + dy + 'px'; });
-      fall.classList.add('is-done');
-    }
-    function dropBy() {
-      var b = bowl.getBoundingClientRect(), rim = b.top + b.height * (118 / 260);
-      var bottom = Math.max.apply(null, tags.map(function (t) { return t.getBoundingClientRect().bottom - (parseFloat(t.style.translate.split(' ')[1]) || 0); }));
-      return Math.max(0, Math.round(rim - bottom + 10));
-    }
-    function sift() {
-      if (reduced() || !Element.prototype.animate) { settle(); sifted = true; done(); return; }
-      tags.forEach(function (t) { t.style.translate = ''; });
-      fall.classList.remove('is-done');
-      var dy = dropBy(), h = art.getBoundingClientRect().height;
-      tags.forEach(function (t, i) {
-        var a = t.animate([{ translate: '0 0' }, { translate: '0 ' + (dy + 8) + 'px', offset: 0.72 }, { translate: '0 ' + dy + 'px' }],
-          { duration: 620, delay: i * 70, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' });
-        a.onfinish = function () { t.style.translate = '0 ' + dy + 'px'; a.cancel(); };
-      });
-      crystals.forEach(function (c, i) {
-        c.style.opacity = '1';
-        var from = -(0.27 + (i % 3) * 0.03) * h;
-        var a = c.animate([{ translate: '0 ' + from + 'px', opacity: 0 }, { opacity: 1, offset: 0.2 }, { translate: '0 0', opacity: 1 }],
-          { duration: 640, delay: 420 + i * 55, easing: 'cubic-bezier(.55,0,.85,.4)', fill: 'backwards' });
-        a.onfinish = function () { c.style.opacity = ''; };
-      });
-      setTimeout(function () { fall.classList.add('is-done'); done(); }, 420 + N * 55 + 660);
-      sifted = true;
-    }
-    function done() { $('span', btn).textContent = 'Sift again'; show(5); }
-    on(btn, 'click', sift);
-    on(window, 'resize', function () { if (sifted) settle(); });
   })();
 
   /* ================================ Sticks (facts from a bucket) ================================ */
@@ -2140,7 +2087,7 @@
     if (!box) return;
     var wave = '<svg class="wave tile-ground" aria-hidden="true"><use href="#wave-2"/></svg>';
     var tile = {
-      'strawberry-pop': wave + '<svg class="pcard__art" viewBox="-100 -100 200 360" aria-hidden="true"><use href="#sh-sunpop" x="-100" y="-100" width="200" height="360"/></svg>',
+      'strawberry-pop': wave + '<span class="print print--card"><span class="print__paper"><img src="../_shared/assets/product/pack-mockup.jpg" width="738" height="851" alt="Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops" loading="lazy" decoding="async"></span></span>',
       'green-gummies': wave + '<svg class="pcard__art pcard__art--gummies" viewBox="0 0 200 150" aria-hidden="true"><use href="#sh-gummies" width="200" height="150"/></svg><p class="art-cap">Concept illustration</p>',
       'next-pop': '<svg class="pcard__art pcard__art--traced" viewBox="-100 -100 200 360" aria-hidden="true"><use href="#sh-traced" x="-100" y="-100" width="200" height="360"/></svg><span class="test-swatches" aria-hidden="true"><i></i><i></i><i></i></span><span class="hand" aria-hidden="true">not cut out yet</span>'
     };
@@ -2303,6 +2250,50 @@
     if (t) { layoutAll(); reveal(t); }
   });
 
+  /* ================================ Zoom (the large view for the taped prints) ================================ */
+  // The gummies label and the pack are links to the image files, so without JS they still open full size (and a
+  // phone pinch-zooms them natively). With JS they open one modal paper sheet: Esc or the close button shuts it and
+  // focus goes back to the print. When fitting would shrink an image below about half its size (the wide label on a
+  // phone) it starts at full size, so a finger pans along it.
+  (function zoom() {
+    var dlg = $('#zoom'), links = $$('[data-zoom]');
+    if (!dlg || !links.length || typeof dlg.showModal !== 'function') return;
+    var img = $('[data-zoom-img]', dlg), pan = $('[data-zoom-pan]', dlg), title = $('#zoom-t', dlg);
+    var fit = $('[data-zoom-fit]', dlg), open = $('[data-zoom-open]', dlg), close = $('[data-zoom-close]', dlg), from = null;
+    function full(on1) {
+      dlg.classList.toggle('is-full', on1);
+      $('span', fit).textContent = on1 ? 'Fit to screen' : 'Zoom in';
+      $('use', fit).setAttribute('href', on1 ? '#i-zoom-out' : '#i-zoom-in');
+    }
+    function show(a) {
+      var im = $('img', a), w = +im.getAttribute('width'), h = +im.getAttribute('height');
+      from = a;
+      img.width = w; img.height = h; img.alt = im.alt; img.src = a.getAttribute('href');
+      title.textContent = a.getAttribute('data-zoom-title') || im.alt;
+      open.setAttribute('href', a.getAttribute('href'));
+      doc.body.style.overflow = 'hidden';
+      dlg.showModal();
+      var r = pan.getBoundingClientRect(), cs = getComputedStyle(pan);
+      var aw = r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), ah = r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      full(Math.min(aw / w, ah / h) < 0.5);
+      pan.scrollTo(0, 0);
+      close.focus();
+    }
+    links.forEach(function (a) {
+      a.setAttribute('aria-haspopup', 'dialog');
+      on(a, 'click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return;     // a new tab still works
+        e.preventDefault();
+        show(a);
+      });
+    });
+    on(fit, 'click', function () { full(!dlg.classList.contains('is-full')); pan.scrollTo(0, 0); });
+    on(close, 'click', function () { dlg.close(); });
+    on(dlg, 'click', function (e) { if (e.target === dlg) dlg.close(); });     // a click on the backdrop
+    on(dlg, 'close', function () { doc.body.style.overflow = ''; if (from) from.focus(); from = null; });
+    window.PaperSun.zoom = function (i) { if (links[i || 0]) show(links[i || 0]); };   // for QA screenshots
+  })();
+
   /* ================================ Grain (paper texture) ================================ */
   idle(function grain() {
     try {
@@ -2323,7 +2314,8 @@
   });
 
   /* ================================ Real3D (the one realistic object: the pop, in the shop) ================================ */
-  // The page is all cut paper; the accurate 3D lollipop appears once, where you buy it, as "the real one".
+  // The page is cut paper (plus three taped photo prints of the pack and the gummies label); the accurate 3D lollipop
+  // appears once, where you buy it, as "the real one".
   // It loads only when the shop is near, after the page has loaded, never on save-data, and stays a paper
   // stand-in if WebGL or the CDN is missing. It always shows the strawberry pop (the shop builder it sits
   // in is only shown for that product). Reduced motion or Pause motion: it holds still, and only renders

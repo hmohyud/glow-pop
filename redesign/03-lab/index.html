@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Glo Pop: Candy, formulated. (Proposal 03, Glow Lab)</title>
-  <meta name="description" content="Glo Pop peptide lollipops: collagen peptides, hyaluronic acid, vitamin C, B12, B6 and zinc in a real-sugar strawberry pop. 47 calories, 10 per bag, one a day.">
+  <meta name="description" content="Glo Pop Collagen Boost: a sugar-free strawberry beauty lollipop with seven actives (peptides, vitamin C, B6, B12, B8 (biotin), hyaluronic acid and zinc). Each pop is 15 g, 10 per bag, one a day.">
   <meta name="theme-color" content="#FAF8F7">
   <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,9 +29,10 @@
   <!-- ============ HEADER / NAV ============ -->
   <header class="site-header" id="top">
     <div class="wrap header-inner">
-      <a class="brand" href="#top" aria-label="Glo Pop, back to top">
+      <!-- logo lockup: the wordmark with a small "— lab —" under it, as on the pack (running copy stays "Glo Pop") -->
+      <a class="brand" href="#top" aria-label="Glo Pop Lab, back to top">
         <span class="brand-mark" aria-hidden="true"></span>
-        <span class="brand-word">Glo Pop</span>
+        <span class="brand-lockup" aria-hidden="true"><span class="brand-word">Glo Pop</span><span class="brand-lab mono">Lab</span></span>
       </a>
 
       <nav class="nav" aria-label="Primary">
@@ -78,7 +79,7 @@
       <div class="wrap">
         <p class="hero-eyebrow mono">
           <span class="status-dot" aria-hidden="true"></span>
-          <span data-bind="eyebrow">GP-01 · Strawberry Pop · Available now</span>
+          <span data-bind="eyebrow">GP-01 · Collagen Boost · Available now</span>
         </p>
         <h1 class="hero-title" id="hero-title">
           <span class="ht-line"><span class="ht-inner">Candy,</span></span>
@@ -88,7 +89,7 @@
         <div class="hero-grid">
           <!-- left: lead + CTA -->
           <div class="hero-lead-col">
-            <p class="hero-lead" data-bind="lead">The most delicious skincare: a strawberry peptide lollipop with collagen, hyaluronic acid and four glow-boosting vitamins. Made with real sugar. Nothing to hide.</p>
+            <p class="hero-lead" data-bind="lead">The most delicious skincare: Collagen Boost, a sugar-free strawberry beauty lollipop with peptides, hyaluronic acid, zinc and four vitamins, biotin included.</p>
             <div class="hero-ctas">
               <a class="btn btn-primary" href="#shop" data-bind-cta><span data-bind="cta">Shop GP-01</span> <i data-lucide="arrow-right" aria-hidden="true"></i></a>
               <a class="btn btn-ghost" href="#formula">Read the formula <i data-lucide="arrow-down" aria-hidden="true"></i></a>
@@ -131,7 +132,7 @@
             <div class="stage-3d" id="stage3d" aria-hidden="true"></div>
 
             <div class="stage-hud" aria-hidden="true">
-              <span class="hud hud--tl mono">Fig. 01 <span class="hud-sep"></span> <span data-bind="code">GP-01</span> <span data-bind="short">Strawberry Pop</span></span>
+              <span class="hud hud--tl mono">Fig. 01 <span class="hud-sep"></span> <span data-bind="code">GP-01</span> <span data-bind="short">Collagen Boost</span></span>
               <span class="hud hud--tr mono"><span class="live-dot"></span>Live render</span>
               <span class="hud hud--bl mono"><i data-lucide="rotate-3d"></i>Drag to spin · tap to test</span>
               <span class="hud hud--br mono"><span>θ <span class="hud-theta">000.0</span>°</span></span>
@@ -147,12 +148,12 @@
               <div class="sw-list" data-switcher>
                 <button type="button" class="sw" data-product="strawberry-pop" aria-pressed="true">
                   <span class="sw-swatch" aria-hidden="true"></span>
-                  <span class="sw-text"><span class="sw-code mono">GP-01</span><span class="sw-name">Strawberry Pop</span></span>
+                  <span class="sw-text"><span class="sw-code mono">GP-01</span><span class="sw-name">Collagen Boost</span></span>
                   <span class="sw-status mono">Available</span>
                 </button>
                 <button type="button" class="sw" data-product="green-gummies" aria-pressed="false">
                   <span class="sw-swatch" aria-hidden="true"></span>
-                  <span class="sw-text"><span class="sw-code mono">GP-02</span><span class="sw-name">Green Gummies</span></span>
+                  <span class="sw-text"><span class="sw-code mono">GP-02</span><span class="sw-name">Super Greens Gummies</span></span>
                   <span class="sw-status mono">Soon</span>
                 </button>
                 <button type="button" class="sw" data-product="next-pop" aria-pressed="false">
@@ -169,22 +170,22 @@
             <div class="ro ro--id">
               <dt class="mono">Formula ID</dt>
               <dd class="ro-val"><span class="ro-code" data-ro="code">GP-01</span></dd>
-              <dd class="ro-sub" data-ro="name">Peptide Lollipops · Strawberry</dd>
+              <dd class="ro-sub" data-ro="name">Collagen Boost · Strawberry</dd>
             </div>
             <div class="ro">
-              <dt class="mono">Energy</dt>
-              <dd class="ro-val"><span class="ro-num" data-ro="kcal">47</span><span class="ro-unit mono">kcal</span></dd>
-              <dd class="ro-sub" data-ro="kcalSub">per pop</dd>
+              <dt class="mono" data-ro="netLabel">Net wt.</dt>
+              <dd class="ro-val"><span class="ro-num" data-ro="net">15</span><span class="ro-unit ro-unit--si mono" data-ro="netUnit">g</span></dd>
+              <dd class="ro-sub" data-ro="netSub">per pop</dd>
             </div>
             <div class="ro">
               <dt class="mono">Inside</dt>
-              <dd class="ro-val"><span class="ro-num" data-ro="actives">6</span><span class="ro-unit mono">actives</span></dd>
-              <dd class="ro-sub" data-ro="activesSub">for skin + energy</dd>
+              <dd class="ro-val"><span class="ro-num" data-ro="actives">7</span><span class="ro-unit mono" data-ro="activesUnit">actives</span></dd>
+              <dd class="ro-sub" data-ro="activesSub">biotin (B8) included</dd>
             </div>
             <div class="ro">
-              <dt class="mono">Sweetener</dt>
-              <dd class="ro-val"><span class="ro-word" data-ro="sugar">Real sugar</span></dd>
-              <dd class="ro-sub" data-ro="sugarSub">no substitutes</dd>
+              <dt class="mono">Sugar</dt>
+              <dd class="ro-val"><span class="ro-word" data-ro="sugar">Sugar free</span></dd>
+              <dd class="ro-sub" data-ro="sugarSub"><span class="ph">Sweetener</span></dd>
             </div>
             <div class="ro">
               <dt class="mono">Count</dt>
@@ -229,15 +230,15 @@
                 <span class="benefit-icon" aria-hidden="true"><i data-lucide="sparkles"></i></span>
                 <div class="benefit-body">
                   <h3 class="h3">Glow-boosting formula</h3>
-                  <p>Collagen peptides and hyaluronic acid support radiant, hydrated skin all summer long.<sup class="fn">*</sup></p>
+                  <p>Peptides and hyaluronic acid support radiant, hydrated skin all summer long.<sup class="fn">*</sup></p>
                 </div>
                 <span class="benefit-meta mono"><a class="xref" href="#formula" data-xref="0">A-01</a> + <a class="xref" href="#formula" data-xref="1">A-02</a></span>
               </li>
               <li class="benefit" data-reveal>
                 <span class="benefit-icon" aria-hidden="true"><i data-lucide="candy"></i></span>
                 <div class="benefit-body">
-                  <h3 class="h3">Only 47 calories</h3>
-                  <p>Made with real sugar, not artificial sweeteners. A treat that actually tastes like one.</p>
+                  <h3 class="h3">Sugar free. Still strawberry.</h3>
+                  <p>Sugar free, just like the pack says, and still a proper strawberry lollipop. A treat that actually tastes like one.</p>
                 </div>
                 <span class="benefit-meta mono"><a class="xref" href="#audit">Audit 01</a></span>
               </li>
@@ -245,9 +246,9 @@
                 <span class="benefit-icon" aria-hidden="true"><i data-lucide="zap"></i></span>
                 <div class="benefit-body">
                   <h3 class="h3">Vitamin powerhouse</h3>
-                  <p>Vitamin C, B12, B6 and zinc to support your skin, energy and immunity.<sup class="fn">*</sup></p>
+                  <p>Vitamin C, B6, B12, B8 (biotin) and zinc to support your skin, energy and immunity, plus healthy-looking hair and nails.<sup class="fn">*</sup></p>
                 </div>
-                <span class="benefit-meta mono"><a class="xref" href="#formula" data-xref="2">A-03</a> → <a class="xref" href="#formula" data-xref="5">A-06</a></span>
+                <span class="benefit-meta mono"><a class="xref" href="#formula" data-xref="2">A-03</a> → <a class="xref" href="#formula" data-xref="6">A-07</a></span>
               </li>
             </ul>
           </div>
@@ -262,11 +263,11 @@
           <span class="sh-index mono">02</span>
           <span class="sh-name mono">Formula explorer</span>
           <span class="sh-rule" aria-hidden="true"></span>
-          <span class="sh-meta mono"><span data-bind="code">GP-01</span> · <span data-bind="activesMeta">6 actives</span></span>
+          <span class="sh-meta mono"><span data-bind="code">GP-01</span> · <span data-bind="activesMeta">7 actives</span></span>
         </div>
 
         <div class="sec-intro">
-          <h2 class="h2" id="formula-title" data-reveal data-bind="explorerTitle">Six actives. One very good lollipop.</h2>
+          <h2 class="h2" id="formula-title" data-reveal data-bind="explorerTitle">Seven actives. One very good lollipop.</h2>
           <p class="lead" data-reveal data-bind="explorerLead">Select an active to see what it does, why it made the cut, and how much goes into every pop.</p>
         </div>
 
@@ -318,12 +319,13 @@
 
               <!-- the tablist: on desktop each tab sits at its node; on phones they flow into a grid below -->
               <div class="dg-tabs" role="tablist" aria-label="Actives in this formula" data-dg-tabs>
-                <button class="dg-node" role="tab" type="button" id="dt-0" aria-selected="true" aria-controls="ap-0"><span class="dn-dot mono">01</span><span class="dn-label"><span class="dn-name">Collagen Peptides</span><span class="dn-role mono">Bounce</span></span></button>
+                <button class="dg-node" role="tab" type="button" id="dt-0" aria-selected="true" aria-controls="ap-0"><span class="dn-dot mono">01</span><span class="dn-label"><span class="dn-name">Peptides</span><span class="dn-role mono">Bounce</span></span></button>
                 <button class="dg-node" role="tab" type="button" id="dt-1" aria-selected="false" aria-controls="ap-1"><span class="dn-dot mono">02</span><span class="dn-label"><span class="dn-name">Hyaluronic Acid</span><span class="dn-role mono">Moisture</span></span></button>
                 <button class="dg-node" role="tab" type="button" id="dt-2" aria-selected="false" aria-controls="ap-2"><span class="dn-dot mono">03</span><span class="dn-label"><span class="dn-name">Vitamin C</span><span class="dn-role mono">Brightness</span></span></button>
-                <button class="dg-node" role="tab" type="button" id="dt-3" aria-selected="false" aria-controls="ap-3"><span class="dn-dot mono">04</span><span class="dn-label"><span class="dn-name">Vitamin B12</span><span class="dn-role mono">Energy</span></span></button>
-                <button class="dg-node" role="tab" type="button" id="dt-4" aria-selected="false" aria-controls="ap-4"><span class="dn-dot mono">05</span><span class="dn-label"><span class="dn-name">Vitamin B6</span><span class="dn-role mono">Renewal</span></span></button>
-                <button class="dg-node" role="tab" type="button" id="dt-5" aria-selected="false" aria-controls="ap-5"><span class="dn-dot mono">06</span><span class="dn-label"><span class="dn-name">Zinc</span><span class="dn-role mono">Repair</span></span></button>
+                <button class="dg-node" role="tab" type="button" id="dt-3" aria-selected="false" aria-controls="ap-3"><span class="dn-dot mono">04</span><span class="dn-label"><span class="dn-name">Vitamin B6</span><span class="dn-role mono">Renewal</span></span></button>
+                <button class="dg-node" role="tab" type="button" id="dt-4" aria-selected="false" aria-controls="ap-4"><span class="dn-dot mono">05</span><span class="dn-label"><span class="dn-name">Vitamin B12</span><span class="dn-role mono">Energy</span></span></button>
+                <button class="dg-node" role="tab" type="button" id="dt-5" aria-selected="false" aria-controls="ap-5"><span class="dn-dot mono">06</span><span class="dn-label"><span class="dn-name">Vitamin B8 (biotin)</span><span class="dn-role mono">Hair &amp; Nails</span></span></button>
+                <button class="dg-node" role="tab" type="button" id="dt-6" aria-selected="false" aria-controls="ap-6"><span class="dn-dot mono">07</span><span class="dn-label"><span class="dn-name">Zinc</span><span class="dn-role mono">Repair</span></span></button>
               </div>
 
               <p class="dg-fig mono" aria-hidden="true"><span>Fig. 03</span>Formula map</p>
@@ -337,29 +339,29 @@
           <!-- panels: one per active (generated from PRODUCTS[].actives; the static copy below is the no-JS version) -->
           <div class="ap-wrap" data-ap-wrap>
             <article class="ap" role="tabpanel" id="ap-0" aria-labelledby="dt-0">
-              <header class="ap-head"><span class="mono">Active 01 / 06</span><span class="mono ap-code">A-01</span></header>
-              <h3 class="ap-name">Collagen Peptides</h3>
+              <header class="ap-head"><span class="mono">Active 01 / 07</span><span class="mono ap-code">A-01</span></header>
+              <h3 class="ap-name">Peptides</h3>
               <p class="ap-role mono">Role · Bounce</p>
               <dl class="ap-rows">
-                <div class="ap-row"><dt class="mono">What it does</dt><dd>Supports skin elasticity and hydration from within for a youthful, plump complexion.<sup class="fn">*</sup></dd></div>
-                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>It's the peptide in “peptide lollipop,” and the backbone of the formula.</dd></div>
-                <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="sparkles"></i>Firm &amp; Plump</li><li class="chip"><i data-lucide="droplet"></i>Hydration</li></ul></dd></div>
+                <div class="ap-row"><dt class="mono">What it does</dt><dd>Support skin’s natural firmness and elasticity, for a plump, youthful-looking complexion.<sup class="fn">*</sup></dd></div>
+                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>First on the pack’s list, and the backbone of Collagen Boost.</dd></div>
+                <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="sparkles"></i>Firm &amp; Plump</li><li class="chip"><i data-lucide="waves"></i>Elasticity</li></ul></dd></div>
                 <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
               </dl>
             </article>
             <article class="ap" role="tabpanel" id="ap-1" aria-labelledby="dt-1">
-              <header class="ap-head"><span class="mono">Active 02 / 06</span><span class="mono ap-code">A-02</span></header>
+              <header class="ap-head"><span class="mono">Active 02 / 07</span><span class="mono ap-code">A-02</span></header>
               <h3 class="ap-name">Hyaluronic Acid</h3>
               <p class="ap-role mono">Role · Moisture</p>
               <dl class="ap-rows">
                 <div class="ap-row"><dt class="mono">What it does</dt><dd>Helps lock in moisture for plump, dewy skin that glows from the inside out.<sup class="fn">*</sup></dd></div>
-                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>Collagen's hydration partner: the plump, dewy half of the glow.</dd></div>
+                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>The peptides’ hydration partner: the plump, dewy half of the glow.</dd></div>
                 <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="droplet"></i>Hydration</li><li class="chip"><i data-lucide="sun"></i>Dewy Glow</li></ul></dd></div>
                 <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
               </dl>
             </article>
             <article class="ap" role="tabpanel" id="ap-2" aria-labelledby="dt-2">
-              <header class="ap-head"><span class="mono">Active 03 / 06</span><span class="mono ap-code">A-03</span></header>
+              <header class="ap-head"><span class="mono">Active 03 / 07</span><span class="mono ap-code">A-03</span></header>
               <h3 class="ap-name">Vitamin C</h3>
               <p class="ap-role mono">Role · Brightness</p>
               <dl class="ap-rows">
@@ -370,18 +372,7 @@
               </dl>
             </article>
             <article class="ap" role="tabpanel" id="ap-3" aria-labelledby="dt-3">
-              <header class="ap-head"><span class="mono">Active 04 / 06</span><span class="mono ap-code">A-04</span></header>
-              <h3 class="ap-name">Vitamin B12</h3>
-              <p class="ap-role mono">Role · Energy</p>
-              <dl class="ap-rows">
-                <div class="ap-row"><dt class="mono">What it does</dt><dd>Supports energy and healthy metabolism, so you feel as good as you look.<sup class="fn">*</sup></dd></div>
-                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>Because feeling good is part of looking good.</dd></div>
-                <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="zap"></i>Energy</li><li class="chip"><i data-lucide="activity"></i>Metabolism</li></ul></dd></div>
-                <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
-              </dl>
-            </article>
-            <article class="ap" role="tabpanel" id="ap-4" aria-labelledby="dt-4">
-              <header class="ap-head"><span class="mono">Active 05 / 06</span><span class="mono ap-code">A-05</span></header>
+              <header class="ap-head"><span class="mono">Active 04 / 07</span><span class="mono ap-code">A-04</span></header>
               <h3 class="ap-name">Vitamin B6</h3>
               <p class="ap-role mono">Role · Renewal</p>
               <dl class="ap-rows">
@@ -391,8 +382,30 @@
                 <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
               </dl>
             </article>
+            <article class="ap" role="tabpanel" id="ap-4" aria-labelledby="dt-4">
+              <header class="ap-head"><span class="mono">Active 05 / 07</span><span class="mono ap-code">A-05</span></header>
+              <h3 class="ap-name">Vitamin B12</h3>
+              <p class="ap-role mono">Role · Energy</p>
+              <dl class="ap-rows">
+                <div class="ap-row"><dt class="mono">What it does</dt><dd>Supports energy and healthy metabolism, so you feel as good as you look.<sup class="fn">*</sup></dd></div>
+                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>Because feeling good is part of looking good.</dd></div>
+                <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="zap"></i>Energy</li><li class="chip"><i data-lucide="activity"></i>Metabolism</li></ul></dd></div>
+                <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
+              </dl>
+            </article>
             <article class="ap" role="tabpanel" id="ap-5" aria-labelledby="dt-5">
-              <header class="ap-head"><span class="mono">Active 06 / 06</span><span class="mono ap-code">A-06</span></header>
+              <header class="ap-head"><span class="mono">Active 06 / 07</span><span class="mono ap-code">A-06</span></header>
+              <h3 class="ap-name">Vitamin B8 (biotin)</h3>
+              <p class="ap-role mono">Role · Hair &amp; Nails</p>
+              <dl class="ap-rows">
+                <div class="ap-row"><dt class="mono">What it does</dt><dd>Supports healthy-looking hair, skin and nails.<sup class="fn">*</sup></dd></div>
+                <div class="ap-row"><dt class="mono">Why it's here</dt><dd>The B vitamin you already know from hair and nail routines.</dd></div>
+                <div class="ap-row"><dt class="mono">Benefits</dt><dd><ul class="chips"><li class="chip"><i data-lucide="feather"></i>Hair</li><li class="chip"><i data-lucide="hand"></i>Nails</li></ul></dd></div>
+                <div class="ap-row ap-row--dose"><dt class="mono">Per pop</dt><dd><span class="ap-dose"><span class="ph">— mg</span></span><span class="ap-dv mono">% DV <span class="ph">XX</span></span></dd></div>
+              </dl>
+            </article>
+            <article class="ap" role="tabpanel" id="ap-6" aria-labelledby="dt-6">
+              <header class="ap-head"><span class="mono">Active 07 / 07</span><span class="mono ap-code">A-07</span></header>
               <h3 class="ap-name">Zinc</h3>
               <p class="ap-role mono">Role · Repair</p>
               <dl class="ap-rows">
@@ -407,21 +420,59 @@
       </div>
     </section>
 
-    <!-- ============ 03 · CLEAN-LABEL AUDIT ============ -->
+    <!-- ============ 03 · PACK AUDIT ============ -->
+    <!-- Every claim, checked against the pack itself. Rows, group labels and the inspection boxes on the
+         specimen are filled per product from PRODUCTS[].audit in app.js; this static copy is GP-01 (and the no-JS page). -->
     <section class="section audit" id="audit" aria-labelledby="audit-title">
       <div class="wrap">
         <div class="sec-head" data-reveal="rule">
           <span class="sh-index mono">03</span>
-          <span class="sh-name mono">Clean-label audit</span>
+          <span class="sh-name mono">Pack audit</span>
           <span class="sh-rule" aria-hidden="true"></span>
-          <span class="sh-meta mono"><span data-bind="code">GP-01</span> · 10 checks</span>
+          <span class="sh-meta mono" data-bind="auditMeta">GP-01 · 10 checks</span>
+        </div>
+
+        <div class="sec-intro">
+          <h2 class="h2" id="audit-title" data-reveal data-bind="auditTitle">Sugar free. Still sweet. Still&nbsp;strawberry.</h2>
+          <p class="lead" data-reveal data-bind="auditLead">Sugar free is the only sugar claim on the pack, so it’s the only one we make. Every claim here is checked against the pack itself.<span class="audit-hint"> Scroll to run the checks.</span></p>
         </div>
 
         <div class="audit-grid" data-audit>
           <div class="audit-side">
             <div class="audit-sticky">
-              <h2 class="h2" id="audit-title" data-reveal data-bind="auditTitle">Nine things you won't find. One you&nbsp;will.</h2>
-              <p class="lead" data-reveal data-bind="auditLead">A little real sugar, yes. Everything else on this list, no.<span class="audit-hint"> Scroll to run the checks.</span></p>
+              <!-- Fig. 04: the specimen plate. As each check passes, its claim is boxed on the pack. -->
+              <figure class="specimen" data-specimen="front" data-reveal>
+                <div class="sp-plate">
+                  <div class="sp-grid" aria-hidden="true"></div>
+                  <span class="sp-reg sp-reg--tl" aria-hidden="true"></span>
+                  <span class="sp-reg sp-reg--tr" aria-hidden="true"></span>
+                  <span class="sp-reg sp-reg--bl" aria-hidden="true"></span>
+                  <span class="sp-reg sp-reg--br" aria-hidden="true"></span>
+                  <p class="sp-hud sp-hud--tl mono" aria-hidden="true">Fig. 04 <span class="hud-sep"></span> Specimen</p>
+                  <p class="sp-hud sp-hud--tr mono" aria-hidden="true" data-bind="specimenTag">GP-01 · Pack front</p>
+                  <a class="zoom sp-zoom" href="../_shared/assets/product/pack-front.jpg" data-lightbox data-lb-fig="Fig. 04" data-lb-name="Collagen Boost · pack front" data-lb-w="638" data-lb-h="1036" data-lb-alt="Front of the Collagen Boost pack: peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc; sugar free; strawberry flavor; net wt. 15 g">
+                    <span class="sp-img">
+                      <img class="sp-pic sp-pic--front" src="../_shared/assets/product/pack-front.jpg" width="638" height="1036" alt="Front of the Collagen Boost pack: peptides, vitamins C, B6, B12 and B8 (biotin), hyaluronic acid and zinc; sugar free; strawberry flavor; net wt. 15 g" loading="lazy" decoding="async">
+                      <img class="sp-pic sp-pic--label" src="../_shared/assets/product/super-greens-label.jpg" width="1600" height="613" alt="The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings" loading="lazy" decoding="async">
+                      <span class="sp-spots" aria-hidden="true" data-spots>
+                        <span class="spot is-on" style="--x:19.6;--y:86.3;--w:13.2;--h:5"><b class="mono">01</b></span>
+                        <span class="spot is-on tag-r" style="--x:2.4;--y:88.6;--w:18.6;--h:8.4"><b class="mono">02</b></span>
+                        <span class="spot is-on" style="--x:33;--y:89.6;--w:34;--h:4.9"><b class="mono">03</b></span>
+                        <span class="spot is-on" style="--x:18.6;--y:53.9;--w:17.2;--h:3"><b class="mono">04</b></span>
+                        <span class="spot is-on" style="--x:19;--y:57.2;--w:15.6;--h:5"><b class="mono">05</b></span>
+                        <span class="spot is-on" style="--x:19;--y:63.4;--w:15.6;--h:5"><b class="mono">06</b></span>
+                        <span class="spot is-on" style="--x:19;--y:69.6;--w:15.6;--h:5"><b class="mono">07</b></span>
+                        <span class="spot is-on" style="--x:19;--y:76;--w:15.6;--h:7"><b class="mono">08</b></span>
+                        <span class="spot is-on" style="--x:57;--y:74.8;--w:20;--h:13.6"><b class="mono">09</b></span>
+                        <span class="spot is-on" style="--x:77;--y:74.8;--w:15;--h:11.8"><b class="mono">10</b></span>
+                      </span>
+                    </span>
+                    <span class="zoom-tag mono"><i data-lucide="maximize-2" aria-hidden="true"></i>View full size</span>
+                  </a>
+                  <p class="sp-empty mono" aria-hidden="true">No pack yet</p>
+                </div>
+              </figure>
+
               <div class="audit-meter" data-reveal>
                 <div class="am-top">
                   <span class="mono am-label" data-bind="auditLabel">Checks passed</span>
@@ -434,103 +485,72 @@
           </div>
 
           <div class="audit-lists">
-            <p class="audit-group mono">Sweeteners</p>
-            <ol class="audit-list">
+            <p class="audit-group mono" data-audit-group>On the front</p>
+            <ol class="audit-list" data-audit-list>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">01</span>
-                <span class="ar-item"><span class="ar-name">Made with real sugar</span><span class="ar-note">The sweet part. Just 47 calories a pop.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Sugar free</span><span class="ar-note">The only sugar claim on the pack, so it’s the only one we make. Sweetener: <span class="ph">to be confirmed</span>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">02</span>
-                <span class="ar-item"><span class="ar-name">No artificial sweeteners</span><span class="ar-note">Super-sweet substitutes can train your palate to crave more.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Strawberry flavor</span><span class="ar-note">Printed beside the strawberry, bottom left.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">03</span>
-                <span class="ar-item"><span class="ar-name">No sugar alcohols</span><span class="ar-note">Not here.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Net wt. 15 g</span><span class="ar-note">That’s one pop. Ten pops to a bag.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
+            </ol>
+
+            <p class="audit-group mono" data-audit-group>Actives, as printed</p>
+            <ol class="audit-list" start="4" data-audit-list>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">04</span>
-                <span class="ar-item"><span class="ar-name">No stevia</span><span class="ar-note">Not here either.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Peptides</span><span class="ar-note">Top of the list. Formula map <a class="xref" href="#formula" data-xref="0">A-01</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">05</span>
-                <span class="ar-item"><span class="ar-name">No allulose</span><span class="ar-note">Currently banned across the UK and Europe until it's proven safe.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Vitamin C</span><span class="ar-note">Brightness. Formula map <a class="xref" href="#formula" data-xref="2">A-03</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">06</span>
-                <span class="ar-item"><span class="ar-name">No OnoSweet</span><span class="ar-note">It hasn't secured European (EFSA) approval, so we leave it out.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Vitamin B6</span><span class="ar-note">Renewal. Formula map <a class="xref" href="#formula" data-xref="3">A-04</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
-            </ol>
-
-            <p class="audit-group mono">Always free from ultra-processed fillers</p>
-            <ol class="audit-list" start="7">
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">07</span>
-                <span class="ar-item"><span class="ar-name">Cornstarch</span><span class="ar-note">Free from.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Vitamin B12</span><span class="ar-note">Energy. Formula map <a class="xref" href="#formula" data-xref="4">A-05</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">08</span>
-                <span class="ar-item"><span class="ar-name">Modified potato starch</span><span class="ar-note">Free from.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Vitamin B8 (biotin)</span><span class="ar-note">Hair &amp; nails. Formula map <a class="xref" href="#formula" data-xref="5">A-06</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">09</span>
-                <span class="ar-item"><span class="ar-name">Erythritol</span><span class="ar-note">Free from.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Hyaluronic acid</span><span class="ar-note">Moisture. Formula map <a class="xref" href="#formula" data-xref="1">A-02</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
               <li class="ar is-pass" data-check>
                 <span class="ar-num mono">10</span>
-                <span class="ar-item"><span class="ar-name">Xylitol</span><span class="ar-note">Free from.</span></span>
-                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">Pass</span></span>
+                <span class="ar-item"><span class="ar-name">Zinc</span><span class="ar-note">Repair. Formula map <a class="xref" href="#formula" data-xref="6">A-07</a>.</span></span>
+                <span class="ar-status"><svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg><span class="ar-word mono">On pack</span></span>
               </li>
             </ol>
+
+            <!-- GP-03 (in development): no pack, so no rows -->
+            <div class="audit-empty" data-audit-empty hidden>
+              <p class="ae-k mono">GP-03 · No pack yet</p>
+              <p class="ae-t">No pack, no checks.</p>
+              <p class="ae-c">GP-03 is still in development. Its claims get checked against its pack once there is one. Until then there’s nothing to audit, and nothing invented.</p>
+            </div>
           </div>
         </div>
-
-        <!-- Fig. 04: the sweetness creep (qualitative on purpose) -->
-        <figure class="creep" data-reveal aria-labelledby="creep-title">
-          <div class="creep-copy">
-            <p class="fig-cap mono"><span>Fig. 04</span>The sweetness creep</p>
-            <h3 class="h3 creep-title" id="creep-title">Why real sugar?</h3>
-            <p>Most sugar substitutes are far sweeter than sugar, and that can keep your brain accustomed to extreme sweetness, driving more cravings later in the day.</p>
-            <p>So we use a little real sugar instead: just 47 delicious calories a pop.</p>
-          </div>
-          <div class="creep-chart" role="img" aria-label="Diagram. With super-sweet substitutes: far sweeter than sugar, then the palate gets used to it, then more cravings later, which loops back to the start. With a little real sugar: sweet but not extreme, which keeps things balanced.">
-            <div class="lane lane--a">
-              <p class="lane-label mono">Many sugar substitutes</p>
-              <ol class="lane-steps" aria-hidden="true">
-                <li class="ln"><span class="ln-k mono">A1</span><span class="ln-t">Far sweeter</span><span class="ln-s">than sugar</span></li>
-                <li class="ln-arrow"><svg viewBox="0 0 40 12"><path d="M0 6h36m-5-4 5 4-5 4"/></svg></li>
-                <li class="ln"><span class="ln-k mono">A2</span><span class="ln-t">Palate adapts</span><span class="ln-s">to extreme sweet</span></li>
-                <li class="ln-arrow"><svg viewBox="0 0 40 12"><path d="M0 6h36m-5-4 5 4-5 4"/></svg></li>
-                <li class="ln"><span class="ln-k mono">A3</span><span class="ln-t">Craves more</span><span class="ln-s">later in the day</span></li>
-              </ol>
-              <div class="lane-loop" aria-hidden="true">
-                <svg viewBox="0 0 100 30" preserveAspectRatio="none" focusable="false"><path d="M100 0 V14 Q100 26 92 26 H8 Q0 26 0 14 V3"/></svg>
-                <span class="lane-loop-head"></span>
-              </div>
-              <p class="lane-tag mono" aria-hidden="true"><i data-lucide="repeat"></i>Loops back. That's the creep.</p>
-            </div>
-            <div class="lane lane--b">
-              <p class="lane-label mono">GP-01 · a little real sugar</p>
-              <ol class="lane-steps" aria-hidden="true">
-                <li class="ln"><span class="ln-k mono">B1</span><span class="ln-t">Real sugar</span><span class="ln-s">just a little</span></li>
-                <li class="ln-arrow"><svg viewBox="0 0 40 12"><path d="M0 6h36m-5-4 5 4-5 4"/></svg></li>
-                <li class="ln"><span class="ln-k mono">B2</span><span class="ln-t">Sweet, not extreme</span><span class="ln-s">palate stays put</span></li>
-                <li class="ln-arrow"><svg viewBox="0 0 40 12"><path d="M0 6h36m-5-4 5 4-5 4"/></svg></li>
-                <li class="ln ln--end"><span class="ln-k mono">B3</span><span class="ln-t">Balanced</span><span class="ln-s">and done</span></li>
-              </ol>
-            </div>
-            <p class="creep-note mono">Illustrative, not to scale. No numbers here: we'd rather not make them up.</p>
-          </div>
-        </figure>
       </div>
     </section>
 
@@ -568,7 +588,7 @@
               <div class="pr-text">
                 <p class="pr-time mono"><span class="pr-ic" aria-hidden="true"><i data-lucide="candy"></i></span>Day 1</p>
                 <h3 class="pr-title">Unwrap &amp; enjoy</h3>
-                <p class="pr-copy">Pop one open and savor every lick: strawberry flavor, real sugar, 47 calories. That's the whole routine.</p>
+                <p class="pr-copy">Pop one open and savor every lick: one 15 g strawberry pop, sugar free. That's the whole routine.</p>
               </div>
               <div class="pr-track" aria-hidden="true"><span class="pr-bar"><span class="pr-fill"></span></span></div>
             </li>
@@ -576,7 +596,7 @@
               <div class="pr-text">
                 <p class="pr-time mono"><span class="pr-ic" aria-hidden="true"><i data-lucide="calendar-days"></i></span>Week 1</p>
                 <h3 class="pr-title">Ingredients absorb</h3>
-                <p class="pr-copy">One a day, every day. Collagen peptides, hyaluronic acid and vitamins go to work nourishing your skin from within.<sup class="fn">*</sup></p>
+                <p class="pr-copy">One a day, every day. Peptides, hyaluronic acid and five more actives go to work nourishing your skin from within.<sup class="fn">*</sup></p>
               </div>
               <div class="pr-track" aria-hidden="true"><span class="pr-bar"><span class="pr-fill"></span></span></div>
             </li>
@@ -614,27 +634,26 @@
           <!-- Supplement-Facts-style panel (rendered per product in app.js) -->
           <div class="facts" role="group" data-reveal data-facts aria-labelledby="facts-title">
             <h3 class="facts-title" id="facts-title">Supplement Facts</h3>
-            <p class="facts-line">Serving size <b data-f="serving">1 lollipop</b></p>
+            <p class="facts-line">Serving size <b data-f="serving">1 lollipop (15 g)</b></p>
             <p class="facts-line">Servings per container <b data-f="servings">10</b></p>
             <table class="facts-table">
-              <caption class="sr-only" data-f="caption">Amounts per serving</caption>
+              <caption class="sr-only" data-f="caption">GP-01 Collagen Boost, amounts per serving</caption>
               <thead>
                 <tr><th scope="col">Amount per serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">% DV</th></tr>
               </thead>
               <tbody data-f="rows">
-                <tr class="ft-kcal"><th scope="row">Calories</th><td>47</td><td></td></tr>
-                <tr><th scope="row">Total sugars</th><td><span class="ph">— g</span></td><td><span class="ph">—</span></td></tr>
-                <tr class="ft-gap"><th scope="row">Collagen peptides</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
+                <tr><th scope="row">Peptides</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
                 <tr><th scope="row">Hyaluronic acid</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
                 <tr><th scope="row">Vitamin C</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
-                <tr><th scope="row">Vitamin B12</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
                 <tr><th scope="row">Vitamin B6</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
+                <tr><th scope="row">Vitamin B12</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
+                <tr><th scope="row">Vitamin B8 (biotin)</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
                 <tr><th scope="row">Zinc</th><td><span class="ph">— mg</span></td><td><span class="ph">—</span></td></tr>
               </tbody>
             </table>
             <p class="facts-foot" data-f="foot" hidden></p>
-            <p class="facts-note" data-f="other"><b>Other ingredients:</b> real sugar, <span class="ph">full ingredient list</span>.</p>
-            <p class="facts-note" data-f="flags">Gluten-free. No artificial sweeteners, no sugar alcohols, no stevia.</p>
+            <p class="facts-note" data-f="other"><b>Other ingredients:</b> <span class="ph">sweetener and full ingredient list</span>.</p>
+            <p class="facts-note" data-f="flags">Sugar free. Gluten-free. Allergens: <span class="ph">to be confirmed</span>.</p>
           </div>
 
           <!-- comparison vs a typical supplement -->
@@ -644,7 +663,7 @@
               <h3 class="h3">GP-01 vs. a typical supplement</h3>
             </div>
             <table class="cmp">
-              <caption class="sr-only">Glo Pop GP-01 compared with a typical supplement</caption>
+              <caption class="sr-only">Glo Pop GP-01 Collagen Boost compared with a typical supplement</caption>
               <thead>
                 <tr>
                   <th scope="col" class="mono">Criterion</th>
@@ -654,11 +673,11 @@
               </thead>
               <tbody>
                 <tr><th scope="row">Tastes amazing</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-                <tr><th scope="row">Collagen peptides</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--yes-dim"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
+                <tr><th scope="row">Peptides</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--yes-dim"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
                 <tr><th scope="row">Hyaluronic acid</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
+                <tr><th scope="row">Biotin (B8)</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--yes-dim"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td></tr>
                 <tr><th scope="row">No pills required</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-                <tr><th scope="row">Made with real sugar</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
-                <tr><th scope="row">Under 50 calories</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--na"><i data-lucide="minus"></i></span><span class="sr-only">Varies</span></td></tr>
+                <tr><th scope="row">Sugar free</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--na"><i data-lucide="minus"></i></span><span class="sr-only">Varies</span></td></tr>
                 <tr><th scope="row">Fun to use</th><td class="cmp-us"><span class="cm cm--yes"><i data-lucide="check"></i></span><span class="sr-only">Yes</span></td><td><span class="cm cm--no"><i data-lucide="x"></i></span><span class="sr-only">No</span></td></tr>
               </tbody>
             </table>
@@ -686,25 +705,25 @@
         <ul class="lib-grid" data-lib>
           <li class="lib-card" data-card="strawberry-pop">
             <div class="lc-top"><span class="lc-code mono">GP-01</span><span class="pill pill--live mono">Available now</span></div>
-            <h3 class="lc-name">Strawberry Pop</h3>
-            <p class="lc-kind">Peptide Lollipops</p>
+            <h3 class="lc-name">Collagen Boost</h3>
+            <p class="lc-kind">Strawberry Beauty Lollipop</p>
             <dl class="lc-facts">
-              <div><dt class="mono">Format</dt><dd>Lollipop</dd></div>
+              <div><dt class="mono">Format</dt><dd>Lollipop, 15 g</dd></div>
               <div><dt class="mono">Flavor</dt><dd>Strawberry</dd></div>
-              <div><dt class="mono">Actives</dt><dd>6</dd></div>
-              <div><dt class="mono">Energy</dt><dd>47 kcal</dd></div>
+              <div><dt class="mono">Actives</dt><dd>7</dd></div>
+              <div><dt class="mono">Sugar</dt><dd>Sugar free</dd></div>
               <div><dt class="mono">Count</dt><dd>10 per bag</dd></div>
             </dl>
           </li>
           <li class="lib-card" data-card="green-gummies">
             <div class="lc-top"><span class="lc-code mono">GP-02</span><span class="pill mono">Coming soon</span></div>
-            <h3 class="lc-name">Green Gummies</h3>
-            <p class="lc-kind">Working name</p>
+            <h3 class="lc-name">Super Greens Gummies</h3>
+            <p class="lc-kind">Dietary supplement gummies</p>
             <dl class="lc-facts">
               <div><dt class="mono">Format</dt><dd>Gummy</dd></div>
               <div><dt class="mono">Flavor</dt><dd>Strawberry-Watermelon</dd></div>
-              <div><dt class="mono">Actives</dt><dd>5 B vitamins + greens</dd></div>
-              <div><dt class="mono">Count</dt><dd>60 per container</dd></div>
+              <div><dt class="mono">Pack</dt><dd>60 gummies</dd></div>
+              <div><dt class="mono">Serving</dt><dd>2 a day</dd></div>
               <div><dt class="mono">Launch</dt><dd><span class="ph">Date</span></dd></div>
             </dl>
           </li>
@@ -719,6 +738,54 @@
             </dl>
           </li>
         </ul>
+
+        <!-- GP-02's record: the client's full wrap label, on file. It keeps GP-02's green whatever formula is selected,
+             like its library card; the accessible Supplement Facts live in the Spec sheet panel (its first button opens it). -->
+        <article class="rec gp02-tone" data-reveal aria-labelledby="rec-title">
+          <header class="rec-head">
+            <span class="rec-code mono"><span class="rec-dot" aria-hidden="true"></span>GP-02 · Label on file</span>
+            <span class="pill mono">Coming soon</span>
+          </header>
+          <div class="rec-grid">
+            <div class="rec-figcol">
+              <figure class="rec-fig">
+                <a class="zoom rec-zoom" href="../_shared/assets/product/super-greens-label.jpg" data-lightbox data-lb-fig="Fig. 06" data-lb-name="Super Greens Gummies · full label" data-lb-w="1600" data-lb-h="613">
+                  <img src="../_shared/assets/product/super-greens-label.jpg" width="1600" height="613" alt="The full Super Greens Gummies label, with Supplement Facts, suggested use and warnings" loading="lazy" decoding="async">
+                  <span class="zoom-tag mono"><i data-lucide="maximize-2" aria-hidden="true"></i>View full size</span>
+                </a>
+                <figcaption class="fig-cap mono"><span>Fig. 06</span>The full wrap label, as printed</figcaption>
+              </figure>
+              <div class="rec-print">
+                <div class="rp">
+                  <p class="rp-h mono">Suggested use</p>
+                  <p class="rp-lead">Take two (2) gummies daily.</p>
+                  <p>Consult your physician before use if you are pregnant, nursing, have a medical condition, or are taking any medication, especially blood thinners or immunosuppressants. Discontinue use and call a doctor if any adverse reactions occur. Not intended to diagnose, treat, cure, or prevent any disease.</p>
+                </div>
+                <div class="rp">
+                  <p class="rp-h mono">Storage</p>
+                  <p class="rp-lead">Store in a cool, dry place.</p>
+                  <p class="rp-h rp-h--warn mono">California warning</p>
+                  <p>CALIFORNIA WARNING: Consistent with the State of California's Proposition 65, this product may expose you to chemicals including Lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm.</p>
+                </div>
+              </div>
+            </div>
+            <div class="rec-copy">
+              <h3 class="rec-title" id="rec-title">Super Greens Gummies</h3>
+              <p class="rec-sub">Strawberry-watermelon · 60 gummies | Dietary Supplement</p>
+              <dl class="rec-rows">
+                <div class="rec-row"><dt class="mono">Front panel</dt><dd><ul class="chips"><li class="chip">No astragalus &amp; adaptogens</li><li class="chip">Healthy gut<sup class="fn">*</sup></li><li class="chip">Immune support<sup class="fn">*</sup></li></ul></dd></div>
+                <div class="rec-row"><dt class="mono">Badges</dt><dd><ul class="chips"><li class="chip"><i data-lucide="leaf"></i>Vegan friendly</li><li class="chip"><i data-lucide="wheat-off"></i>Gluten free</li><li class="chip"><i data-lucide="flask-conical-off"></i>Non GMO</li></ul></dd></div>
+                <div class="rec-row"><dt class="mono">Highlighted</dt><dd>Kale&nbsp;• Broccoli&nbsp;• Spinach&nbsp;• Wild&nbsp;Blueberries&nbsp;• Elderberry</dd></div>
+                <div class="rec-row"><dt class="mono">Serving</dt><dd>2 gummies per serving · 30 servings</dd></div>
+                <div class="rec-row"><dt class="mono">Sugars</dt><dd>3 g per serving, all added. Not sugar free.</dd></div>
+              </dl>
+              <div class="rec-actions">
+                <a class="btn btn-ghost btn-sm" href="#spec" data-product-go="green-gummies"><i data-lucide="file-text" aria-hidden="true"></i>Read the Supplement Facts</a>
+                <a class="btn btn-primary btn-sm" href="#shop" data-product-go="green-gummies">Join the waitlist <i data-lucide="bell" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -733,10 +800,10 @@
         </div>
 
         <div class="shop-grid">
-          <!-- Fig. 06: what's in the bag (photo for GP-01, concept drawings for the rest) -->
+          <!-- Fig. 07: what's in the bag (the client's pack photo for GP-01, concept drawings for the rest) -->
           <figure class="shop-visual" data-reveal>
             <div class="sv-frame">
-              <img class="sv-photo" src="../../images/peptide_lollipops.webp" alt="Glo Pop Peptide Lollipops pouch: pink striped bag, strawberry flavor, 10 lollipops" width="1600" height="1600" loading="lazy" decoding="async">
+              <img class="sv-photo" src="../_shared/assets/product/pack-mockup.jpg" alt="Glo Pop Collagen Boost beauty lollipop pouch, strawberry flavor, with pink lollipops" width="738" height="851" loading="lazy" decoding="async">
               <svg class="sv-concept sv-concept--gummy" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
                 <g class="svc-shapes">
                   <g transform="rotate(-16 150 252)"><rect x="84" y="203" width="132" height="98" rx="45" fill="url(#dg-head)"/><rect x="84" y="203" width="132" height="98" rx="45" fill="url(#dg-sugar)"/><ellipse class="svc-gloss" cx="124" cy="226" rx="22" ry="9"/></g>
@@ -749,12 +816,14 @@
                 <g class="svc-sil svc-sil--b"><rect x="195" y="176" width="10" height="150" rx="5"/><circle cx="200" cy="138" r="54"/></g>
                 <g class="svc-sil svc-sil--c"><rect x="294" y="196" width="10" height="130" rx="5"/><circle cx="299" cy="160" r="50"/></g>
               </svg>
-              <!-- callouts for the GP-01 pouch -->
-              <span class="sv-note sv-note--a mono" aria-hidden="true"><b>A</b>Peptide formula</span>
-              <span class="sv-note sv-note--b mono" aria-hidden="true"><b>B</b>Strawberry flavor</span>
-              <span class="sv-note sv-note--c mono" aria-hidden="true"><b>C</b>10 lollipops</span>
+              <!-- callouts for the GP-01 pouch: --tx/--ty is the point on the pack (% of the photo) each leader ends on;
+                   on a narrow frame they fold to lettered pins keyed to the legend below -->
+              <span class="sv-note sv-note--l mono" style="--tx:33;--ty:65.4" aria-hidden="true"><b>A</b><span class="sv-note-t">Seven actives</span></span>
+              <span class="sv-note sv-note--l sv-note--nr mono" style="--tx:37;--ty:80.3;--nx:43.4" aria-hidden="true"><b>B</b><span class="sv-note-t">Sugar free</span></span>
+              <span class="sv-note sv-note--r mono" style="--tx:58.6;--ty:84.2" aria-hidden="true"><b>C</b><span class="sv-note-t">15&nbsp;<span class="si">g</span> per pop</span></span>
             </div>
-            <figcaption class="fig-cap mono"><span>Fig. 06</span><span data-bind="shopCap">GP-01 pouch · 10 lollipops per bag</span></figcaption>
+            <ol class="sv-legend mono" aria-hidden="true"><li><b>A</b><span>Seven actives</span></li><li><b>B</b><span>Sugar free</span></li><li><b>C</b><span>15&nbsp;<span class="si">g</span> per pop</span></li></ol>
+            <figcaption class="fig-cap mono"><span>Fig. 07</span><span data-bind="shopCap">Collagen Boost pouch · 10 pops per bag</span></figcaption>
           </figure>
 
           <div class="shop-config">
@@ -762,8 +831,8 @@
             <p class="lead" data-reveal>Free shipping on every order. Subscribe and you'll never run out.</p>
 
             <div class="cfg-formula" role="group" aria-label="Choose a formula" data-cfg-formula>
-              <button type="button" class="cf" data-product="strawberry-pop" aria-pressed="true"><span class="sw-swatch" aria-hidden="true"></span><span class="cf-text"><span class="mono">GP-01</span><span class="cf-name">Strawberry Pop</span></span></button>
-              <button type="button" class="cf" data-product="green-gummies" aria-pressed="false"><span class="sw-swatch" aria-hidden="true"></span><span class="cf-text"><span class="mono">GP-02</span><span class="cf-name">Green Gummies</span></span></button>
+              <button type="button" class="cf" data-product="strawberry-pop" aria-pressed="true"><span class="sw-swatch" aria-hidden="true"></span><span class="cf-text"><span class="mono">GP-01</span><span class="cf-name">Collagen Boost</span></span></button>
+              <button type="button" class="cf" data-product="green-gummies" aria-pressed="false"><span class="sw-swatch" aria-hidden="true"></span><span class="cf-text"><span class="mono">GP-02</span><span class="cf-name">Super Greens Gummies</span></span></button>
               <button type="button" class="cf" data-product="next-pop" aria-pressed="false"><span class="sw-swatch" aria-hidden="true"></span><span class="cf-text"><span class="mono">GP-03</span><span class="cf-name">More colors</span></span></button>
             </div>
 
@@ -811,27 +880,27 @@
               </label>
 
               <dl class="cfg-summary">
-                <div><dt class="mono">Order</dt><dd data-sum="order">GP-01 Strawberry Pop · 1 bag · subscribe</dd></div>
+                <div><dt class="mono">Order</dt><dd data-sum="order">GP-01 Collagen Boost · 1 bag · subscribe</dd></div>
                 <div><dt class="mono">Shipping</dt><dd>Free</dd></div>
                 <div class="cfg-total"><dt class="mono">Total</dt><dd>$<span class="ph">XX</span></dd></div>
               </dl>
               <button class="btn btn-primary btn-block btn-lg" type="submit"><i data-lucide="shopping-bag" aria-hidden="true"></i>Add to bag</button>
               <p class="cfg-msg" role="status" aria-live="polite" data-buy-msg></p>
-              <p class="cfg-aside"><span class="cfg-aside-dot" aria-hidden="true"></span>GP-02 Green Gummies are coming soon in strawberry-watermelon. <button type="button" class="link-btn" data-product-jump="green-gummies">Join the waitlist</button></p>
+              <p class="cfg-aside"><span><span class="cfg-aside-dot" aria-hidden="true"></span>GP-02 Super Greens Gummies are coming soon in strawberry-watermelon.</span> <button type="button" class="link-btn" data-product-jump="green-gummies">Join the waitlist</button></p>
             </form>
 
             <!-- GP-02 / GP-03: waitlist (prototype: nothing is sent) -->
             <form class="cfg cfg--wait" data-cfg="wait" novalidate>
-              <p class="wait-kicker mono" data-bind="waitKicker">GP-02 · Green Gummies · Coming soon</p>
-              <h3 class="h3" data-bind="waitTitle">Be first in line for Green Gummies.</h3>
-              <p class="wait-copy" data-bind="waitCopy">Strawberry-watermelon gummies with five B vitamins and an organic super-greens blend, 60 to a container. Price and launch date are still <span class="ph">to be announced</span>. Join the waitlist and hear the moment they're real.</p>
+              <p class="wait-kicker mono" data-bind="waitKicker">GP-02 · Super Greens Gummies · Coming soon</p>
+              <h3 class="h3" data-bind="waitTitle">Be first in line for Super Greens Gummies.</h3>
+              <p class="wait-copy" data-bind="waitCopy">Strawberry-watermelon gummies, two a day, 60 to a pack. Vegan friendly, gluten free and non GMO, as printed on the label. Price and launch date are still <span class="ph">to be announced</span>. Join the waitlist and hear the moment they're real.</p>
               <label class="field">
                 <span class="field-label mono">Email</span>
                 <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
               </label>
               <button class="btn btn-primary btn-block btn-lg" type="submit"><i data-lucide="bell" aria-hidden="true"></i><span data-bind="waitCta">Join the waitlist</span></button>
               <p class="cfg-msg" role="status" aria-live="polite" data-wait-msg></p>
-              <p class="cfg-aside">Can't wait? <button type="button" class="link-btn" data-product-jump="strawberry-pop">Shop GP-01 Strawberry Pop</button></p>
+              <p class="cfg-aside">Can't wait? <button type="button" class="link-btn" data-product-jump="strawberry-pop">Shop GP-01 Collagen Boost</button></p>
             </form>
           </div>
         </div>
@@ -856,20 +925,20 @@
 
           <div class="faq-list" data-accordion>
             <div class="qa is-open" data-reveal>
-              <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-1" aria-expanded="true" aria-controls="qp-1"><span class="qa-num mono">Q.01</span><span class="qa-q">What are Glo Pop peptide lollipops?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
-              <div class="qa-panel" id="qp-1" role="region" aria-labelledby="qb-1"><div class="qa-inner"><p>Glo Pops are beauty-boosting lollipops infused with collagen peptides, hyaluronic acid, Vitamin C, B12, B6 and Zinc. They're designed to support your skin's radiance, hydration and overall glow, all in a delicious strawberry treat that's only 47 calories.</p></div></div>
+              <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-1" aria-expanded="true" aria-controls="qp-1"><span class="qa-num mono">Q.01</span><span class="qa-q">What is Glo Pop Collagen Boost?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
+              <div class="qa-panel" id="qp-1" role="region" aria-labelledby="qb-1"><div class="qa-inner"><p>Collagen Boost is a sugar-free strawberry beauty lollipop by Glo Pop, made with peptides, vitamin C, vitamin B6, vitamin B12, vitamin B8 (biotin), hyaluronic acid and zinc. It's designed to support your skin's radiance, hydration and overall glow,<sup class="fn">*</sup> all in a delicious strawberry treat. Each pop is 15 g.</p></div></div>
             </div>
             <div class="qa" data-reveal>
               <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-2" aria-expanded="false" aria-controls="qp-2"><span class="qa-num mono">Q.02</span><span class="qa-q">How many should I have per day?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
-              <div class="qa-panel" id="qp-2" role="region" aria-labelledby="qb-2"><div class="qa-inner"><p>We recommend enjoying one Glo Pop per day as part of your daily beauty routine. Consistency is key: most girls notice a visible difference in their skin's radiance within 2–4 weeks of daily use.</p></div></div>
+              <div class="qa-panel" id="qp-2" role="region" aria-labelledby="qb-2"><div class="qa-inner"><p>We recommend enjoying one Glo Pop per day as part of your daily beauty routine. Consistency is key: most notice a visible difference in radiance within 2–4 weeks of daily use.<sup class="fn">*</sup></p></div></div>
             </div>
             <div class="qa" data-reveal>
-              <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-3" aria-expanded="false" aria-controls="qp-3"><span class="qa-num mono">Q.03</span><span class="qa-q">Are they made with real sugar?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
-              <div class="qa-panel" id="qp-3" role="region" aria-labelledby="qb-3"><div class="qa-inner"><p>Yes! Glo Pops are made with real sugar: no artificial sweeteners, no sugar alcohols, no stevia. Just real, delicious sweetness at only 47 calories per lollipop.</p></div></div>
+              <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-3" aria-expanded="false" aria-controls="qp-3"><span class="qa-num mono">Q.03</span><span class="qa-q">Are they sugar free?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
+              <div class="qa-panel" id="qp-3" role="region" aria-labelledby="qb-3"><div class="qa-inner"><p>Yes. Collagen Boost is sugar free, as printed on the pack. The full ingredient list, including what sweetens it, is <span class="ph">to be confirmed</span>. One note: Super Greens Gummies are not sugar free. They have 3 g of sugars per serving.</p></div></div>
             </div>
             <div class="qa" data-reveal>
               <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-4" aria-expanded="false" aria-controls="qp-4"><span class="qa-num mono">Q.04</span><span class="qa-q">What do they taste like?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
-              <div class="qa-panel" id="qp-4" role="region" aria-labelledby="qb-4"><div class="qa-inner"><p>Like a really, really good strawberry lollipop. We spent months perfecting the flavor so you'd never guess there are six powerful beauty ingredients inside. That's why we call it the most delicious skincare.</p></div></div>
+              <div class="qa-panel" id="qp-4" role="region" aria-labelledby="qb-4"><div class="qa-inner"><p>Like a really, really good strawberry lollipop. We spent months perfecting the flavor so you'd never guess there are seven beauty actives inside. That's why we call it the most delicious skincare.</p></div></div>
             </div>
             <div class="qa" data-reveal>
               <h3 class="qa-h"><button class="qa-btn" type="button" id="qb-5" aria-expanded="false" aria-controls="qp-5"><span class="qa-num mono">Q.05</span><span class="qa-q">Are they gluten-free?</span><span class="qa-ic" aria-hidden="true"></span></button></h3>
@@ -893,13 +962,13 @@
               <a class="btn btn-primary btn-lg" href="#shop" data-product-go="strawberry-pop">Shop Glo Pops <i data-lucide="arrow-right" aria-hidden="true"></i></a>
               <span class="cta-ship mono"><i data-lucide="truck" aria-hidden="true"></i>Free shipping on every order</span>
             </div>
-            <p class="cta-note mono">10 lollipops per bag · 47 calories each · made with real sugar</p>
+            <p class="cta-note mono">10 pops per bag · 15&nbsp;<span class="si">g</span> each · sugar free</p>
           </div>
           <figure class="cta-photo">
             <img src="../../images/cta_model.webp" alt="Smiling woman in a pink bikini holding a pink lollipop to her lips in front of a pink-striped backdrop" width="832" height="1248" loading="lazy" decoding="async">
             <figcaption class="cta-label">
-              <span class="cl-row mono"><span>Fig. 07</span><span>GP-01</span></span>
-              <span class="cl-name">Strawberry Pop</span>
+              <span class="cl-row mono"><span>Fig. 08</span><span>GP-01</span></span>
+              <span class="cl-name">Collagen Boost</span>
               <span class="cl-row mono"><span>Dose</span><span>1 per day</span></span>
             </figcaption>
           </figure>
@@ -914,8 +983,8 @@
     <div class="wrap">
       <div class="ft-grid">
         <div class="ft-brand">
-          <a class="brand brand--light" href="#top"><span class="brand-mark" aria-hidden="true"></span><span class="brand-word">Glo Pop</span></a>
-          <p>The most delicious skincare. Peptide lollipops with collagen, vitamins and everything your skin craves. Beauty has never tasted this good.</p>
+          <a class="brand brand--light" href="#top" aria-label="Glo Pop Lab, back to top"><span class="brand-mark" aria-hidden="true"></span><span class="brand-lockup" aria-hidden="true"><span class="brand-word">Glo Pop</span><span class="brand-lab mono">Lab</span></span></a>
+          <p>The most delicious skincare. Sugar-free beauty lollipops with peptides, vitamins and everything your skin craves. Beauty has never tasted this good.</p>
         </div>
         <nav class="ft-col" aria-label="Shop">
           <h2 class="ft-h mono">Shop</h2>
@@ -960,6 +1029,23 @@
     </div>
   </footer>
 
+  <!-- large view for the pack images (Fig. 04, Fig. 06). The triggers are plain links to the image files, so
+       without JS (or without <dialog>) they still open the image itself, where phones can pinch-zoom it. -->
+  <dialog class="lb" id="lightbox" aria-labelledby="lb-title">
+    <div class="lb-bar">
+      <p class="lb-title mono" id="lb-title"><span class="lb-fig" data-lb-fig>Fig. 06</span><span class="hud-sep" aria-hidden="true"></span><span class="lb-name" data-lb-name>Full size</span></p>
+      <div class="lb-tools">
+        <button type="button" class="lb-btn" data-lb-zoom aria-pressed="false"><i data-lucide="zoom-in" aria-hidden="true"></i><span class="lb-btn-txt" data-lb-zoom-txt>Actual size</span></button>
+        <a class="lb-btn" data-lb-file href="../_shared/assets/product/super-greens-label.jpg" target="_blank" rel="noopener"><i data-lucide="external-link" aria-hidden="true"></i><span class="lb-btn-txt">Open file</span></a>
+        <button type="button" class="lb-btn lb-close" data-lb-close autofocus><i data-lucide="x" aria-hidden="true"></i><span class="sr-only">Close</span></button>
+      </div>
+    </div>
+    <div class="lb-stage" data-lb-stage role="region" aria-label="Image viewer: scroll or drag to pan" tabindex="0">
+      <img data-lb-img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" width="1" height="1" decoding="async">
+    </div>
+    <p class="lb-hint mono" aria-hidden="true"><span class="lb-hint-touch">Pinch to zoom · drag to pan</span><span class="lb-hint-key">Esc to close</span></p>
+  </dialog>
+
   <!-- prototype chrome (≥1024px) -->
   <a class="proto-chip mono" href="../../index.html"><span class="pc-dot" aria-hidden="true"></span>Proposal 03 · Glow Lab <span class="pc-sep" aria-hidden="true"></span> All proposals →</a>
 
@@ -967,7 +1053,7 @@
   <div class="sticky-shop" data-sticky>
     <div class="ss-info">
       <span class="ss-swatch" aria-hidden="true"></span>
-      <span class="ss-text"><span class="ss-name"><span data-bind="code">GP-01</span> <span data-bind="short">Strawberry Pop</span></span><span class="ss-sub mono" data-bind="stickySub">10 pops · free shipping</span></span>
+      <span class="ss-text"><span class="ss-name"><span data-bind="code">GP-01</span> <span data-bind="short">Collagen Boost</span></span><span class="ss-sub mono" data-bind="stickySub">10 pops · free shipping</span></span>
     </div>
     <a class="btn btn-primary btn-sm" href="#shop"><span data-bind="stickyCta">Shop</span></a>
   </div>
