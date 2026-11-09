@@ -232,49 +232,70 @@
   }
 
   /* ── 7. GLOW GRID: original match-3 that teaches the seven ── */
-  // The seven actives, in the pack's wording and order of the sticker book. Token shapes live in the
-  // sprite (#sh-0 … #sh-6): circle, droplet, sunburst, hexagon, rounded square, diamond, four-petal flower.
+  // The seven actives, in the pack's wording and order of the sticker book. Every candy is a pre-rendered
+  // hard candy in two layers (assets/candy/<id>.webp and <id>-shadow.webp: the candy, and its shadow on the
+  // tray, so a picked candy can lift off its shadow), lit like the hero pop: sun up-left. The SVG shapes
+  // (#sh-0 … #sh-6: circle, droplet, sunburst, hexagon, rounded square, diamond, four-petal flower) are the
+  // fallback if an image fails to load.
   var A = [
-    { n: 'Peptides', ab: 'Pep', c: '#FF4FA3', l: '#2A0820', chip: 'Building blocks',
+    { n: 'Peptides', ab: 'Pep', c: '#FF4FA3', chip: 'Building blocks',
       body: 'Short chains of amino acids, the building blocks of proteins. Peptides support skin’s natural firmness and elasticity*.',
       fact: '“Peptide” comes from the Greek peptós, meaning digested.' },
-    { n: 'Hyaluronic acid', ab: 'HA', c: '#2EC5F0', l: '#08283A', chip: 'Moisture molecule',
+    { n: 'Hyaluronic acid', ab: 'HA', c: '#2EC5F0', chip: 'Moisture molecule',
       body: 'Your skin’s own moisture molecule, famous for holding on to water. About half of your body’s HA lives in your skin.',
       fact: 'An adult recycles about a third of their HA every day.' },
-    { n: 'Vitamin C', ab: 'C', c: '#FF8A1F', l: '#2A1200', chip: 'Collagen formation',
+    { n: 'Vitamin C', ab: 'C', c: '#FF8A1F', chip: 'Collagen formation',
       body: 'Your body can’t make vitamin C, and it needs it to make collagen. It also contributes to the protection of cells from oxidative stress.',
       fact: 'Humans, guinea pigs and some bats all lost the ability to make their own.' },
-    { n: 'Vitamin B12', ab: 'B12', c: '#3D5BFF', l: '#FFFFFF', chip: 'Energy metabolism',
+    { n: 'Vitamin B12', ab: 'B12', c: '#3D5BFF', chip: 'Energy metabolism',
       body: 'Contributes to normal energy-yielding metabolism and to the reduction of tiredness and fatigue.',
       fact: 'The only vitamin with a metal at its centre: cobalt.' },
-    { n: 'Vitamin B6', ab: 'B6', c: '#8BD12F', l: '#122600', chip: 'Protein metabolism',
+    { n: 'Vitamin B6', ab: 'B6', c: '#8BD12F', chip: 'Protein metabolism',
       body: 'Contributes to normal protein and glycogen metabolism. A behind-the-scenes helper for more than 100 enzymes.',
       fact: '“Vitamin B6” is really a small family of related compounds, not just one.' },
-    { n: 'Zinc', ab: 'Zn', c: '#B49BFF', l: '#1A0630', chip: 'Normal skin',
+    { n: 'Zinc', ab: 'Zn', c: '#B49BFF', chip: 'Normal skin',
       body: 'Contributes to the maintenance of normal skin, hair and nails. Your body has no zinc storage, so a steady daily supply matters.',
       fact: 'Zinc plays a part in your sense of taste. Fitting, for a candy.' },
-    { n: 'Vitamin B8 (biotin)', ab: 'B8', c: '#FFC23D', l: '#2A1400', chip: 'Hair, skin & nails',
+    { n: 'Vitamin B8 (biotin)', ab: 'B8', c: '#FFC23D', chip: 'Hair, skin & nails',
       body: 'One of the B vitamins: your body uses it to unlock energy from food. Biotin supports healthy-looking hair, skin and nails*.',
       fact: 'Biotin was first called “vitamin H”, after the German Haar und Haut: hair and skin.' }
   ];
+  var CANDY = 'assets/candy/', IDS = ['pep', 'ha', 'c', 'b12', 'b6', 'zn', 'b8'], svgOnly = false;
   function tokSVG(t) {
     // the flower (biotin) gets its gloss spot on its top-left petal; the rest share one spot
     var hi = t === 6 ? '<ellipse class="s-hi" cx="31" cy="27" rx="9" ry="5" transform="rotate(-40 31 27)"/>' : '<ellipse class="s-hi" cx="34" cy="30" rx="11" ry="6" transform="rotate(-32 34 30)"/>';
     return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><use href="#sh-' + t + '" class="s-body"/><use href="#sh-' + t + '" class="s-gloss" stroke="none"/>' + hi + '</svg>';
   }
+  function candyArt(t) {
+    if (svgOnly) return tokSVG(t);
+    return '<img class="tok-sh" src="' + CANDY + IDS[t] + '-shadow.webp" alt="" draggable="false">' +
+      '<img class="tok-c" src="' + CANDY + IDS[t] + '.webp" alt="" draggable="false">';
+  }
+  // an image that fails swaps every candy on the page (and every later one) to the original SVG shapes,
+  // so the board never mixes the two styles
+  document.addEventListener('error', function (e) {
+    var im = e.target, box = im && im.parentElement;
+    if (!im || im.tagName !== 'IMG' || !/\btok-(c|sh)\b/.test(im.className) || !box || !box.hasAttribute('data-t')) return;
+    svgOnly = true;
+    $$('.cnd[data-t]').forEach(function (b) { if (b.querySelector('img')) b.innerHTML = tokSVG(+b.getAttribute('data-t')); });
+  }, true);
 
   function game() {
-    // Seven token types on a 7x7 board: a 6x6 board with seven types left fewer visible matches and
+    // Seven candy types on a 7x7 board: a 6x6 board with seven types left fewer visible matches and
     // more dead-board shuffles. Refills lean toward actives that are still locked (BIAS) so the last
     // cards turn up in reasonable time. (Simulated: ~6 valid moves per board, ~7 moves to clear.)
     var N = 7, T = A.length, BIAS = 0.35, WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
     var ALL = WORDS[T] || String(T);
-    var board = $('#board'), wrapEl = board.parentElement, fx = $('#fx'), comboEl = $('#combo'), live = $('#gLive');
+    var board = $('#board'), wrapEl = board.parentElement, fx = $('#fx'), live = $('#gLive');
+    var cap = $('#gCap'), capTxt = $('.cap-t', cap), capN = $('.cap-n', cap);
     var grid = [], busy = false, sel = null, cur = { r: 0, c: 0 }, started = false, won = false;
-    var score = 0, moves = 0, unlocked = [], idleT = 0, hintT = 0;
+    var score = 0, moves = 0, unlocked = [], idleT = 0, capT = 0, capKey = '', lastCap = null;
     wrapEl.style.setProperty('--n', N);
     $('#gTot').textContent = T;
-    board.setAttribute('aria-label', 'Glow Grid board, ' + N + ' by ' + N + '. Arrow keys move, Enter picks a token, then an arrow key swaps it.');
+    board.setAttribute('aria-label', 'Glow Grid board, ' + N + ' by ' + N + '. Arrow keys move, Enter picks a candy, then an arrow key swaps it.');
+    var wells = $('.wells', wrapEl);
+    wells.innerHTML = new Array(N * N + 1).join('<i></i>');
+    var wellEls = $$('i', wells);
     function spawnType() {
       if (Math.random() < BIAS) {
         var locked = []; for (var t = 0; t < T; t++) if (!unlocked[t]) locked.push(t);
@@ -283,48 +304,86 @@
       return Math.floor(Math.random() * T);
     }
 
+    /* the seven, in a row above the board: a light silhouette until matched */
+    var strip = $('#gStrip');
+    strip.innerHTML = A.map(function (a, i) {
+      return '<li style="--pc:' + a.c + '"><span class="slot"><span class="cnd" data-t="' + i + '">' + candyArt(i) + '</span></span><small>' + a.ab + '</small></li>';
+    }).join('');
+    var slots = $$('li', strip);
+
     /* sticker book */
     var book = $('#book');
     book.innerHTML = A.map(function (a, i) {
-      return '<li class="card is-locked" id="card-' + i + '" style="--pc:' + a.c + ';--pl:' + a.l + '">' +
-        '<div class="card-top"><span class="card-tok" aria-hidden="true">' + tokSVG(i) + '<b>' + a.ab + '</b></span>' +
+      return '<li class="card is-locked" id="card-' + i + '" style="--pc:' + a.c + '">' +
+        '<div class="card-top"><span class="card-tok cnd" data-t="' + i + '" aria-hidden="true">' + candyArt(i) + '</span>' +
         '<div><h3>' + a.n + '</h3><span class="card-chip">' + a.chip + '</span></div></div>' +
         '<div class="card-lock"><span>' + ico('lock') + ' Match 3 to unlock</span><button class="peek" type="button" data-peek="' + i + '">Peek' + '<span class="sr-only"> at ' + a.n + '</span> ' + ico('eye') + '</button></div>' +
         '<div class="card-more"><p class="card-body">' + a.body + ' <span class="nw">Per pop: ' + PH('mg TBD') + '</span></p>' +
         '<p class="card-fact">' + ico('lightbulb') + '<span>' + a.fact + '</span></p></div></li>';
     }).join('');
-    $('#gPips').innerHTML = A.map(function () { return '<i></i>'; }).join('');   // one pip per active
-    var pips = $$('#gPips i');
-    pips.forEach(function (p, i) { p.style.setProperty('--pc', A[i].c); });
     book.addEventListener('click', function (e) {
       var b = e.target.closest('[data-peek]'); if (!b) return;
       var i = +b.getAttribute('data-peek'); reveal(i);
       var card = $('#card-' + i); card.setAttribute('tabindex', '-1'); card.focus({ preventScroll: true });
     });
 
-    // reveal = show the card (Peek / Skip); unlock = earned in play (counts toward Level clear)
+    // reveal = show the card (Peek / Show all seven); unlock = earned in play (counts toward Level clear)
     function reveal(t) {
       var card = $('#card-' + t);
       if (!card.classList.contains('is-locked')) return;
       card.classList.remove('is-locked'); bump(card, 'is-new');
     }
+    function found() { return unlocked.filter(Boolean).length; }
     function unlock(t, quiet) {
       if (unlocked[t]) return false;
       unlocked[t] = true;
       reveal(t);
-      pips[t].classList.add('is-on');
-      var n = unlocked.filter(Boolean).length; $('#gUnl').textContent = n;
+      slots[t].classList.add('is-on'); bump(slots[t], 'is-new');
+      var n = found(); $('#gUnl').textContent = n; capN.textContent = n + '/' + T;
       if (!quiet) { say('Unlocked ' + A[t].n + ': ' + A[t].chip + '. ' + n + ' of ' + T + '.'); }
       return true;
     }
     function say(t) { live.textContent = ''; setTimeout(function () { live.textContent = t; }, 30); }
 
+    /* one line under the board: how to play, then what was just found (on phones the book is out of
+       sight), with the running count at the right */
+    var coarse = window.matchMedia('(pointer: coarse)');
+    function howTo() { return coarse.matches ? 'Tap a candy, then a neighbour, or swipe.' : 'Click two neighbours, or use the arrow keys and Enter.'; }
+    // t: the candy to show in front of the words (an unlock), if any
+    function capShow(key, txt, hold, t) {
+      clearTimeout(capT);
+      if (key !== capKey) {
+        var first = !capKey; capKey = key;
+        capTxt.innerHTML = (t == null ? '' : '<span class="cap-c cnd" data-t="' + t + '" style="--pc:' + A[t].c + '">' + candyArt(t) + '</span>') + '<span class="cap-x">' + txt + '</span>';
+        if (!first) bump(cap, 'is-new');
+      }
+      if (hold) capT = setTimeout(capIdle, hold);
+    }
+    function capIdle() {
+      if (won) return;
+      var left = [];
+      for (var t = 0; t < T; t++) if (!unlocked[t]) left.push(t);
+      if (left.length === T) capShow('how', howTo());
+      else if (left.length === 1) capShow('last', 'One to go: <b>' + A[left[0]].n + '</b>.');
+      else if (lastCap) capShow(lastCap[0], lastCap[1], 0, lastCap[2]);
+    }
+    function capUnlock(list) {
+      var names = list.map(function (t) { return '<b>' + A[t].n + '</b>'; });
+      // three or more in one go stay on the caption's two lines: "Zinc and two more unlocked"
+      var txt = names.length > 2 ? names[0] + ' and ' + (WORDS[names.length - 1] || names.length - 1) + ' more unlocked'
+        : names.length > 1 ? names[0] + ' and ' + names[1] + ' unlocked'
+        : names[0] + ' unlocked<span class="cap-sep"> · </span><span class="cap-chip">' + A[list[0]].chip + '</span>';
+      lastCap = ['u' + list.join('-'), txt, list[0]];
+      capShow(lastCap[0], lastCap[1], 3600, lastCap[2]);
+    }
+    if (coarse.addEventListener) coarse.addEventListener('change', function () { if (capKey === 'how') { capKey = '-'; capIdle(); } });
+
     /* tiles */
     function mk(t) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'tok'; b.tabIndex = -1; b.setAttribute('data-t', t);
-      b.style.setProperty('--tc', A[t].c); b.style.setProperty('--tl', A[t].l);
-      b.innerHTML = '<span class="tok-b">' + tokSVG(t) + '<span class="tok-l" aria-hidden="true">' + A[t].ab + '</span></span>';
+      b.style.setProperty('--pc', A[t].c);
+      b.innerHTML = '<span class="tok-b cnd" data-t="' + t + '">' + candyArt(t) + '</span>';
       board.appendChild(b);
       return { t: t, el: b, r: 0, c: 0 };
     }
@@ -404,11 +463,17 @@
       if (p) { grid[p.r][p.c].el.classList.add('is-sel'); grid[p.r][p.c].el.setAttribute('aria-pressed', 'true'); }
       $$('.tok[aria-pressed]', board).forEach(function (e) { if (!e.classList.contains('is-sel')) e.removeAttribute('aria-pressed'); });
     }
-    function clearHint() { $$('.tok.is-hint', board).forEach(function (e) { e.classList.remove('is-hint'); }); }
+    function clearHint() { $$('.is-hint', wrapEl).forEach(function (e) { e.classList.remove('is-hint'); }); }
     function hint() {
       clearHint(); var m = findMove(); if (!m) return;
-      m.forEach(function (p) { bump(grid[p.r][p.c].el, 'is-hint'); });
-      if (reduce) { m.forEach(function (p) { grid[p.r][p.c].el.classList.add('is-sel'); }); setTimeout(function () { setSel(sel); }, 1500); }
+      // the two candies lean toward each other along the swap until they meet, twice, and their wells light up.
+      // Measured from the sprites' alpha: side by side the widest pair touches at an 11% lean each; stacked, the
+      // tall droplet over another candy touches at about 7%, so a vertical lean stops at 8%
+      var a = grid[m[0].r][m[0].c].el, b = grid[m[1].r][m[1].c].el, dx = m[1].c - m[0].c, dy = m[1].r - m[0].r;
+      a.style.setProperty('--hx', dx * 11 + '%'); a.style.setProperty('--hy', dy * 8 + '%');
+      b.style.setProperty('--hx', -dx * 11 + '%'); b.style.setProperty('--hy', -dy * 8 + '%');
+      if (reduce) { a.classList.add('is-hint'); b.classList.add('is-hint'); setTimeout(clearHint, 2400); }
+      else { bump(a, 'is-hint'); bump(b, 'is-hint'); m.forEach(function (p) { bump(wellEls[p.r * N + p.c], 'is-hint'); }); }
       say('Hint: try swapping ' + A[grid[m[0].r][m[0].c].t].n + ' at row ' + (m[0].r + 1) + ' column ' + (m[0].c + 1) + ' with its neighbour ' + (m[1].r > m[0].r ? 'below' : 'to the right') + '.');
     }
     function idle() { clearTimeout(idleT); if (started && !won) idleT = setTimeout(function () { if (!busy) hint(); }, 9000); }
@@ -436,10 +501,10 @@
       moves++; var mv = $('#gMoves'); mv.textContent = moves; bump(mv);
       cur = { r: b.r, c: b.c };
       await cascade(rs);
-      if (!findMove()) { combo('Shuffle!'); await wait(D(500)); fresh(true); await wait(D(700)); }
+      if (!findMove()) { capShow('fresh', 'No moves left, so here’s a fresh board.', 2800); say('No moves left, so here’s a fresh board.'); await wait(D(500)); fresh(true); await wait(D(700)); }
       busy = false;
       syncTab(boardHasFocus() || document.activeElement === document.body);
-      if (!won && unlocked.filter(Boolean).length === T) win(); else idle();
+      if (!won && found() === T) win(); else idle();
     }
 
     async function cascade(rs) {
@@ -453,14 +518,11 @@
           var p = kill[k], tile = grid[p[0]][p[1]];
           counts[tile.t] = (counts[tile.t] || 0) + 1;
           tile.el.classList.add('is-pop');
-          burst(p[1], p[0], A[tile.t].c, maxLen >= 4 ? 16 : 10);
+          burst(p[1], p[0], A[tile.t].c, 1);
         });
         Object.keys(counts).forEach(function (t) { if (unlock(+t)) newly.push(+t); });
         addScore(keys.length * 10 * chain + (maxLen >= 4 ? 40 * (maxLen - 3) : 0));
-        var word = chain >= 4 ? 'Glow streak!' : chain === 3 ? 'Triple pop!' : chain === 2 ? 'Double pop!' : maxLen >= 5 ? 'Mega pop!' : maxLen === 4 ? 'Big pop!' : '';
-        if (newly.length) word = 'New: ' + A[newly[0]].ab + '!';
-        if (word) combo(word);
-        if ((chain >= 3 || maxLen >= 5) && !reduce) bump(board, 'is-shake');
+        if (newly.length) capUnlock(newly);
         await wait(D(230));
         keys.forEach(function (k) { var p = kill[k]; grid[p[0]][p[1]].el.remove(); grid[p[0]][p[1]] = null; });
         // gravity + refill
@@ -488,29 +550,22 @@
       }
     }
 
-    function addScore(n) { score += n; var s = $('#gScore'); s.textContent = score; bump(s); }
-    function combo(word) {
-      comboEl.textContent = word;
-      if (reduce) return;
-      comboEl.classList.remove('is-on'); void comboEl.offsetWidth; comboEl.classList.add('is-on');
-    }
+    function addScore(n) { score += n; }   // kept for state(); the cabinet shows the seven and moves, no score
 
     function win() {
       won = true; clearTimeout(idleT);
-      var stars = moves <= 12 ? 3 : moves <= 20 ? 2 : 1;
-      $('#winStars').innerHTML = [0, 1, 2].map(function (i) { return '<i data-lucide="star"' + (i < stars ? '' : ' class="is-off"') + '></i>'; }).join('');
-      $('#winTxt').textContent = 'All ' + ALL + ' unlocked in ' + moves + ' moves · score ' + score + '.';
-      icons();
-      var w = $('#win'); w.hidden = false;
-      say('Level clear! All ' + ALL + ' actives unlocked in ' + moves + ' moves. ' + stars + ' of 3 game stars.');
+      $('#winTxt').textContent = 'All ' + ALL + ' found in ' + moves + ' moves.';
+      $('#win').hidden = false; board.inert = true;
+      capShow('win', 'Every card in the sticker book is open.');
+      say('Level clear! All ' + ALL + ' actives unlocked in ' + moves + ' moves.');
       var r = wrapEl.getBoundingClientRect();
-      confetti(r.left + r.width / 2, r.top + r.height / 3, 120);
+      confetti(r.left + r.width / 2, r.top + r.height / 3, 90);
       setTimeout(function () { $('#gAgain').focus({ preventScroll: true }); }, 50);
     }
 
     function start() {
       if (started) return;
-      started = true; wrapEl.classList.add('is-live');
+      started = true; wrapEl.classList.add('is-live'); board.inert = false;
       $('#cover').classList.add('is-gone');
       setTimeout(function () { $('#cover').hidden = true; }, D(360));
       sizeFx(); syncTab(true); idle();
@@ -518,18 +573,17 @@
     }
     $('#gStart').addEventListener('click', start);
     $('#gAgain').addEventListener('click', function () {
-      score = 0; moves = 0; won = false; unlocked = [];
-      $('#gScore').textContent = 0; $('#gMoves').textContent = 0; $('#gUnl').textContent = 0;
-      pips.forEach(function (p) { p.classList.remove('is-on'); });
+      score = 0; moves = 0; won = false; unlocked = []; lastCap = null;
+      $('#gMoves').textContent = 0; $('#gUnl').textContent = 0; capN.textContent = '0/' + T;
+      slots.forEach(function (s) { s.classList.remove('is-on'); });
       $$('.card', book).forEach(function (c) { c.classList.add('is-locked'); });
-      $('#win').hidden = true; fresh(true); syncTab(true); idle();
+      $('#win').hidden = true; board.inert = false; clearHint(); fresh(true); syncTab(true); idle(); capIdle();
     });
-    $('#gHint').addEventListener('click', function () { if (!started) start(); hint(); });
-    $('#gNew').addEventListener('click', function () { if (busy) return; if (won) { $('#gAgain').click(); return; } if (!started) start(); setSel(null); fresh(true); idle(); syncTab(); });
+    $('#gHint').addEventListener('click', function () { if (!started) start(); if (busy || won) return; hint(); });
     $('#gAll').addEventListener('click', function () {
       A.forEach(function (a, i) { reveal(i); });
       say('All ' + ALL + ' actives shown below the board.');
-      toast('eye', 'All ' + ALL + ' cards unlocked. The game’s still there for fun.');
+      toast('eye', 'All ' + ALL + ' cards are open.');
       var c = $('#card-0'); c.setAttribute('tabindex', '-1'); c.focus({ preventScroll: false });
     });
 
@@ -583,33 +637,42 @@
     });
     board.addEventListener('focusin', function (e) { var p = posOf(e.target); if (p) cur = p; });
 
-    /* particles: one canvas, one rAF loop, only while sparks are alive */
+    /* glints: one soft round light rises from each matched candy; one canvas, one rAF loop, only while they live */
     var ctx = fx.getContext('2d'), parts = [], raf = 0, fw = 0;
     function sizeFx() { var r = fx.getBoundingClientRect(); fw = r.width; fx.width = Math.round(r.width * DPR); fx.height = Math.round(r.height * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
     window.addEventListener('resize', function () { if (started) sizeFx(); });
     function burst(c, r, col, n) {
       if (reduce) return;
-      var cell = fw / N, x = (c + .5) * cell, y = (r + .5) * cell;
+      var cell = fw / N, x = (c + .5) * cell, y = (r + .5) * cell, t0 = performance.now(), k = parseInt(col.slice(1), 16);
+      // the halo is the candy colour mixed two parts white, so it reads as light over the plum, never as a dark tint
+      var tint = [k >> 16, k >> 8 & 255, k & 255].map(function (v) { return Math.round((v + 510) / 3); }).join(',');
       for (var i = 0; i < n; i++) {
-        var a = Math.random() * Math.PI * 2, s = 1.5 + Math.random() * 4.5;
-        parts.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 2, life: 1, sz: 3 + Math.random() * 5, col: i % 3 === 0 ? '#FFFFFF' : col, star: i % 4 === 0, rot: Math.random() * 6 });
+        var a = -Math.PI / 2 + (Math.random() - .5) * 2.4, d = cell * (.14 + Math.random() * .14);
+        parts.push({ x: x + Math.cos(a) * d * .4, y: y + Math.sin(a) * d * .4, dx: Math.cos(a) * d, dy: Math.sin(a) * d - cell * .14,
+          r: cell * (.14 + Math.random() * .06), tint: tint, t0: t0, dur: 280 + Math.random() * 60 });
       }
       if (!raf) raf = requestAnimationFrame(tick);
     }
-    function tick() {
+    function tick(now) {
       ctx.clearRect(0, 0, fx.width, fx.height);
-      parts = parts.filter(function (p) { return p.life > 0; });
+      parts = parts.filter(function (p) { return now - p.t0 < p.dur; });
       parts.forEach(function (p) {
-        p.x += p.vx; p.y += p.vy; p.vy += .22; p.vx *= .98; p.life -= .028; p.rot += .2;
-        ctx.globalAlpha = Math.max(p.life, 0); ctx.fillStyle = p.col;
-        if (p.star) { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillRect(-p.sz, -1.5, p.sz * 2, 3); ctx.fillRect(-1.5, -p.sz, 3, p.sz * 2); ctx.restore(); }
-        else { ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.1, p.sz * p.life), 0, 6.283); ctx.fill(); }
+        var k = Math.max(0, now - p.t0) / p.dur, e = 1 - (1 - k) * (1 - k);   // eased travel
+        // it brightens in, then goes out by shrinking to a point while still bright (a big dim glint reads as grey dust)
+        var x = p.x + p.dx * e, y = p.y + p.dy * e, R = p.r * (.7 + .5 * e) * (k < .45 ? 1 : (1 - k) / .55), al = k < .3 ? k / .3 : 1;
+        if (R < .5) return;
+        var g = ctx.createRadialGradient(x, y, 0, x, y, R);
+        g.addColorStop(0, 'rgba(255,255,255,' + al.toFixed(3) + ')');
+        g.addColorStop(.35, 'rgba(' + p.tint + ',' + (al * .6).toFixed(3) + ')');
+        g.addColorStop(1, 'rgba(' + p.tint + ',0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, R, 0, 6.283); ctx.fill();
       });
-      ctx.globalAlpha = 1;
       raf = parts.length ? requestAnimationFrame(tick) : 0;
     }
 
     fresh(false);
+    board.inert = true;   // under the cover the candies are out of reach (Tab goes to Press start); start() wakes them
+    capN.textContent = '0/' + T; capIdle();
     // QA hook: drive the game from the screenshot tool
     window.__glowGrid = { start: start, move: function () { var m = findMove(); if (m) { if (!started) start(); return attempt(m[0], m[1]); } }, state: function () { return { score: score, moves: moves, unlocked: unlocked.filter(Boolean).length }; } };
   }

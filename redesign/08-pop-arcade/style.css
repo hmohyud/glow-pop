@@ -210,89 +210,152 @@ main { overflow-x: clip; }
 .tiles--ph li { background: transparent; border-style: dashed; place-content: center; text-align: center; min-height: 72px; }
 .pinfo-note { grid-column: 1 / -1; font-size: .9rem; font-weight: 600; }
 
-/* ── GLOW GRID (seven actives) ─────────────────────────────────────── */
-.glowgrid { background: var(--arcade); color: #FFF6EC; background-image: radial-gradient(circle at 15% 20%, rgba(255,46,147,.25), transparent 40%), radial-gradient(circle at 85% 80%, rgba(44,198,242,.2), transparent 45%); }
+/* ── GLOW GRID (seven actives) ─────────────────────────────────────────────────────────────────
+   Real candy on a calm plum tray. Each candy is a pre-rendered hard candy in two layers (assets/candy/:
+   the candy, and its shadow on the tray, so a picked candy can lift off its shadow), lit like the hero
+   pop: sun up-left, shadows down-right. The renders are calibrated to the well colour, #241932.
+   One HUD row (the seven, lit as they are found, and moves), the tray, one caption line, two buttons.
+   The page's cartoon frame stays: ink outline + offset shadow on the cabinet and the tray. */
+.glowgrid { --tray: #2A1A3A; --well: #241932; --soft: #DCCAE8; background: var(--arcade); color: #FFF6EC; background-image: radial-gradient(circle at 15% 20%, rgba(255,46,147,.25), transparent 40%), radial-gradient(circle at 85% 80%, rgba(44,198,242,.2), transparent 45%); }
 .glowgrid .lvl { box-shadow: 0 4px 0 #000; border-color: #000; }
 .glowgrid .h2 { color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; }
 .glowgrid .lede { color: #FFE9F4; }
-.game { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
-.cab { background: linear-gradient(180deg, #3B1356, #250A37); border: 4px solid #000; border-radius: 32px; padding: 16px; box-shadow: 0 8px 0 #000, inset 0 0 0 3px rgba(255,255,255,.08); }
-.cab-hud { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; margin-bottom: 12px; }
-.stat { background: #160520; border: 2px solid rgba(255,255,255,.14); border-radius: 14px; padding: 6px 10px; display: flex; flex-direction: column; }
-.stat-l { font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #FFB9DA; }
-.stat b { font-family: var(--display); font-weight: 400; font-size: 1.5rem; line-height: 1.05; color: var(--sun); font-variant-numeric: tabular-nums; }
-.stat b.is-bump { display: inline-block; animation: squash .4s var(--ease-pop); }
-.stat--wide { position: relative; }
-.pips { position: absolute; right: 10px; top: 50%; translate: 0 -50%; display: grid; grid-template-columns: repeat(4, 12px); gap: 4px; }
-.pips i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); }
-.pips i.is-on { border-color: #fff; background: var(--pc); animation: squash .4s var(--ease-pop); }
-.board-wrap { --n: 7; position: relative; aspect-ratio: 1; border-radius: 22px; background: #160520; border: 3px solid #000; overflow: hidden; touch-action: pan-y; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: calc(100% / var(--n)) calc(100% / var(--n)); }
+/* The cabinet is sized by the viewport height as well as the width: all of it (HUD, tray, caption,
+   buttons) fits under the 132px sticky header and above the fixed proposal pill (bottom left, ~53px)
+   on a 1366x768 laptop and up. Cabinet width = tray + 44px of frame; its height = tray + ~210px.
+   It also leaves the sticker book 480px less the gap: two cards side by side need ~430px (a candy and
+   the word "Vitamin" can't get narrower), so a narrow, tall screen (1024x1366) keeps the book in the page. */
+.game { display: grid; grid-template-columns: minmax(0, clamp(360px, min(100vh - 380px, 100% - 480px), 560px)) minmax(0, 1fr); grid-template-columns: minmax(0, clamp(360px, min(100svh - 380px, 100% - 480px), 560px)) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
+.cab { background: linear-gradient(180deg, #3B1556, #2C0E41); border: 4px solid #000; border-radius: 30px; padding: 16px 18px; box-shadow: 0 8px 0 #000, inset 0 2px 0 rgba(255,255,255,.07); }
+
+/* HUD: one row. The seven actives, unlit until found, then moves */
+.cab-hud { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; padding: 0 2px; }
+.strip { display: flex; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.strip li { display: grid; justify-items: center; gap: 3px; flex: 0 1 42px; min-width: 0; }
+.strip .slot { position: relative; display: block; width: 100%; aspect-ratio: 1; border-radius: 50%; background: var(--well); box-shadow: inset 2px 3px 5px rgba(0,0,0,.5), inset -1px -1px 0 rgba(255,255,255,.05); }
+.strip .cnd { position: absolute; inset: -12%; }   /* a sprite frames a whole cell; its candy fills ~70% of it */
+.strip small { font-size: .66rem; font-weight: 800; letter-spacing: .04em; line-height: 1; color: #F6ECF8; opacity: .66; transition: opacity .5s; }
+.strip li.is-on small { opacity: 1; color: #FFF6EC; }
+.strip li.is-on .slot::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--pc) 42%, transparent), transparent); }
+.strip li.is-new .cnd { animation: jfound .65s var(--ease-pop); }
+@keyframes jfound { 0% { transform: scale(.55); } 60% { transform: scale(1.14); } 100% { transform: none; } }
+.moves { display: flex; flex-direction: column; align-items: flex-end; flex: none; margin-left: auto; line-height: 1; }
+.moves-l { font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #FFB9DA; }
+.moves b { margin-top: 5px; font-family: var(--display); font-weight: 400; font-size: 1.6rem; color: var(--sun); font-variant-numeric: tabular-nums; }
+.moves b.is-bump { display: inline-block; animation: squash .4s var(--ease-pop); }
+/* not found yet: a flat light silhouette of the same candy (no shading, no shadow), in the HUD and the book */
+.strip li:not(.is-on) .cnd > *, .card.is-locked .card-tok > * { filter: brightness(0) invert(1); opacity: .28; }
+.strip li:not(.is-on) .tok-sh, .card.is-locked .card-tok .tok-sh { opacity: 0; }
+
+/* ── tray: dark plum, recessed and lit from the upper left (one soft warm falloff), soft wells ── */
+.board-wrap { --n: 7; position: relative; aspect-ratio: 1; border: 3px solid #000; border-radius: 22px; overflow: hidden; touch-action: pan-y; background: radial-gradient(140% 140% at 0 0, rgba(255, 196, 128, .11), rgba(255, 196, 128, 0) 64%), var(--tray); box-shadow: inset 4px 5px 12px rgba(0,0,0,.45), inset -2px -2px 0 rgba(255,255,255,.04); }
 .board-wrap.is-live { touch-action: none; }
-.board { position: absolute; inset: 0; }
-.board.is-shake { animation: shake .35s; }
-@keyframes shake { 20% { translate: -6px 2px; } 40% { translate: 5px -3px; } 60% { translate: -4px 1px; } 80% { translate: 3px 0; } }
-.tok { position: absolute; left: 0; top: 0; width: calc(100% / var(--n, 7)); height: calc(100% / var(--n, 7)); padding: 0; display: grid; place-items: center; border: 0; background: none; transform: translate(calc(var(--x) * 100%), calc(var(--y) * 100%)); transition: transform var(--dur, .2s) cubic-bezier(.3, .0, .3, 1); -webkit-tap-highlight-color: transparent; touch-action: none; }
-.tok-b { position: relative; display: block; width: 86%; height: 86%; transition: transform .18s var(--ease-pop); }
-.tok svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.tok .s-body { fill: var(--tc); stroke: #12031C; stroke-width: 5; }
-.tok .s-gloss { fill: url(#gloss); }
-.tok .s-hi { fill: #fff; opacity: .75; }
-.tok-l { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-size: clamp(.78rem, 3.6vw, 1.3rem); color: var(--tl); line-height: 1; padding-top: 4%; letter-spacing: .01em; text-shadow: 0 1px 0 rgba(255,255,255,.25); }
-.tok[data-t="2"] .tok-l, .tok[data-t="1"] .tok-l { padding-top: 14%; }
-.tok:hover .tok-b { transform: scale(1.08); }
-.tok.is-sel .tok-b { transform: scale(1.14); animation: sel 0.9s ease-in-out infinite; }
-.tok.is-sel::before { content: ''; position: absolute; inset: 2%; border-radius: 30%; border: 3px solid var(--sun); box-shadow: 0 0 16px var(--sun); }
-.tok:focus-visible { outline: 3px solid #fff; outline-offset: -3px; box-shadow: none; border-radius: 30%; }
-.tok.is-hint .tok-b { animation: hint .8s ease-in-out 3; }
-.tok.is-land .tok-b { animation: land .34s var(--ease-pop); }
-.tok.is-pop { transition: transform .22s ease-in, opacity .22s; }
-.tok.is-pop .tok-b { transform: scale(1.4); opacity: 0; transition: transform .22s ease-in, opacity .2s .04s; }
-.tok.is-nope .tok-b { animation: nope .35s; }
-@keyframes sel { 50% { transform: scale(1.08) rotate(-5deg); } }
-@keyframes hint { 25% { transform: rotate(-12deg) scale(1.08); } 75% { transform: rotate(12deg) scale(1.08); } }
-@keyframes land { 0% { transform: scale(1.12, .78) translateY(8%); } 60% { transform: scale(.94, 1.08); } 100% { transform: none; } }
-@keyframes nope { 25% { transform: translateX(-8%) rotate(-6deg); } 75% { transform: translateX(8%) rotate(6deg); } }
-@keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.3, .75); } 60% { transform: scale(.9, 1.15); } 100% { transform: scale(1); } }
-@keyframes lvlup { 0% { transform: scale(1); } 40% { transform: scale(1.5) rotate(-6deg); } 100% { transform: scale(1); } }
-.fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.combo { position: absolute; left: 50%; top: 50%; pointer-events: none; font-family: var(--display); font-size: clamp(2rem, 8vw, 3.4rem); color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; white-space: nowrap; opacity: 0; translate: -50% -50%; }
-.combo.is-on { animation: combo 1s var(--ease-pop) forwards; }
-@keyframes combo { 0% { opacity: 0; transform: scale(.3) rotate(-10deg); } 25% { opacity: 1; transform: scale(1.15) rotate(-4deg); } 70% { opacity: 1; transform: scale(1) rotate(-4deg); } 100% { opacity: 0; transform: scale(1) translateY(-40px) rotate(-4deg); } }
-.board-cover { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; text-align: center; padding: 20px; background: radial-gradient(circle, rgba(22, 5, 32, .88) 0 38%, rgba(22, 5, 32, .35) 75%); z-index: 3; transition: opacity .35s; }
+.board, .wells { position: absolute; inset: 5px; }
+.wells { display: grid; grid-template-columns: repeat(var(--n), 1fr); grid-template-rows: repeat(var(--n), 1fr); pointer-events: none; }
+.wells i { position: relative; margin: 4%; border-radius: 28%; background: var(--well); box-shadow: inset 2px 3px 5px rgba(0,0,0,.42), inset -1px -1px 0 rgba(255,255,255,.05); }
+.fx { position: absolute; inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); pointer-events: none; }
+
+/* ── candies: the whole cell is the button; the candy fills ~78% of it ── */
+.tok { position: absolute; left: 0; top: 0; width: calc(100% / var(--n, 7)); height: calc(100% / var(--n, 7)); padding: 0; display: grid; place-items: center; border: 0; background: none; transform: translate(calc(var(--x) * 100%), calc(var(--y) * 100%)); transition: transform var(--dur, .2s) cubic-bezier(.3, 0, .3, 1); -webkit-tap-highlight-color: transparent; touch-action: none; }
+.tok-b { position: relative; display: block; width: 100%; height: 100%; }
+.cnd { position: relative; display: block; }
+.cnd img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+.tok .cnd img { inset: -6.5%; width: 113%; height: 113%; }
+.tok .tok-c { transition: transform .24s var(--ease-pop), opacity .2s; }
+.tok .tok-sh { transition: transform .24s ease, opacity .24s; }
+@media (hover: hover) and (pointer: fine) {
+  .board-wrap.is-live .tok:not(.is-sel):hover .tok-c { transform: translate(-1.5%, -2.5%) scale(1.035); }
+  .board-wrap.is-live .tok:not(.is-sel):hover .tok-sh { transform: translate(1%, 1.5%); }
+}
+/* picked: the candy lifts off the tray toward the light, its shadow slides away down-right and softens.
+   The ring sits between the two layers (above the shadow, under the candy), and the lift is small enough
+   that every shape stays inside its ring. */
+.tok.is-sel .tok-c { transform: translate(-2%, -3%) scale(1.04); }
+.tok.is-sel .tok-sh { transform: translate(2%, 3%) scale(1.02); opacity: .7; }
+.tok::before { z-index: 1; }
+.tok .tok-c { z-index: 2; }
+.tok.is-sel::before { content: ''; position: absolute; inset: 4%; border: 2px solid rgba(255, 214, 102, .95); border-radius: 28%; }
+.tok:focus-visible { outline: 3px solid #FFF6EC; outline-offset: -2px; box-shadow: none; border-radius: 30%; }
+.tok.is-sel:focus-visible { outline-color: transparent; }   /* picked with the keys: the gold ring is the one indicator */
+/* hint: the two candies lean toward each other along the swap until they meet, twice, and a thin ring of
+   light pulses on both wells (light, never a tint: gold over the plum turns brown) */
+.tok.is-hint .tok-b { animation: jnudge 1s ease-in-out 2; }
+@keyframes jnudge { 0%, 64%, 100% { transform: none; } 32% { transform: translate(var(--hx, 0), var(--hy, 0)); } }
+.wells i.is-hint::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px rgba(255, 246, 236, .8), 0 0 10px rgba(255, 236, 200, .25); opacity: 0; animation: jglow 1s ease-in-out 2; }
+@keyframes jglow { 32% { opacity: 1; } }
+.no-anim .tok.is-hint::before { content: ''; position: absolute; inset: 4%; border: 2px dashed rgba(255, 246, 236, .85); border-radius: 28%; }
+/* land: a small settle of the candy only (its shadow stays on the tray) */
+.tok.is-land .tok-c { animation: jland .3s ease-out; }
+@keyframes jland { 0% { transform: translateY(-4%); } 55% { transform: translateY(1.2%); } 100% { transform: none; } }
+/* match: the candy flashes brighter (a quick bloom of light) and shrinks a little, then collapses into a
+   point of light. It never fades: a fading white-hot candy turns grey or olive over the plum. */
+.tok.is-pop .tok-b { animation: jpop .23s ease-in forwards; }
+.tok.is-pop .tok-sh { opacity: 0; transition: opacity .1s; }
+.tok.is-pop::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, .95), color-mix(in srgb, var(--pc) 30%, rgba(255, 255, 255, .5)) 42%, rgba(255, 255, 255, 0)); mix-blend-mode: screen; mix-blend-mode: plus-lighter; pointer-events: none; animation: jbloom .23s ease-out forwards; }
+@keyframes jpop { 0% { transform: none; filter: brightness(1) saturate(1); } 40% { transform: scale(.9); filter: brightness(1.9) saturate(.8); } 70% { transform: scale(.82); filter: brightness(2.5) saturate(.6); opacity: 1; } 90% { transform: scale(.42); filter: brightness(2.8) saturate(.55); opacity: 1; } 100% { transform: scale(0); filter: brightness(3) saturate(.5); opacity: 1; } }
+@keyframes jbloom { 0% { opacity: 0; transform: scale(.55); } 38% { opacity: .9; transform: scale(.95); } 100% { opacity: 0; transform: scale(1.15); } }
+.tok.is-nope .tok-b { animation: jnope .32s; }
+@keyframes jnope { 25% { transform: translateX(-5%); } 75% { transform: translateX(5%); } }
+/* fallback art (a candy image failed to load): the original shapes in the candy colours, no labels */
+.cnd > svg { position: absolute; inset: 14%; width: 72%; height: 72%; overflow: visible; }
+.tok .cnd > svg { inset: 7%; width: 86%; height: 86%; }
+.cnd .s-body { fill: var(--pc, #FF4FA3); stroke: #12031C; stroke-width: 5; }
+.cnd .s-gloss { fill: url(#gloss); }
+.cnd .s-hi { fill: #fff; opacity: .75; }
+
+/* ── covers: a frosted pane over the tray. The blur keeps the candies' colours clean (a heavier dark
+   veil turned yellow olive and orange rust) and lets the title stand clear of the shapes beneath ── */
+.board-cover { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 20px; text-align: center; background: radial-gradient(closest-side, rgba(30, 14, 44, .66), rgba(30, 14, 44, .3)); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); transition: opacity .35s; }
 .board-cover.is-gone { opacity: 0; pointer-events: none; }
 .board-cover[hidden] { display: none; }
-.cover-k { font-family: var(--display); font-size: clamp(2.2rem, 7vw, 3.4rem); line-height: 1; color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; }
-.cover-t { font-weight: 800; font-size: 1.15rem; }
-.cover-s { font-size: .82rem; color: #FFD3E8; }
-.win-stars { display: flex; gap: 8px; }
-.win-stars .lucide { width: 46px; height: 46px; color: var(--sun); fill: var(--sun); stroke: #000; }
-.win-stars .is-off { fill: transparent; color: rgba(255,255,255,.4); stroke: rgba(255,255,255,.4); }
-.win-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 6px; }
-.cab-ctrl { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-/* sticker book */
-.book { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.card { --pc: #FF4FA3; position: relative; background: #FFF6EC; color: #2A0820; border: 3px solid #000; border-radius: 22px; padding: 14px 16px 16px; box-shadow: 0 6px 0 #000; min-height: 100%; transition: transform .3s var(--ease-pop); }
-.card-top { display: flex; align-items: center; gap: 10px; }
-.card-tok { position: relative; width: 52px; height: 52px; flex: none; }
-.card-tok svg { width: 100%; height: 100%; overflow: visible; }
-.card-tok .s-body { fill: var(--pc); stroke: #12031C; stroke-width: 5; }
-.card-tok .s-gloss { fill: url(#gloss); }
-.card-tok .s-hi { fill: #fff; opacity: .75; }
-.card-tok b { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 400; font-size: .85rem; color: var(--pl); padding-top: 3px; }
+.cover-k { font-family: var(--display); font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1; color: var(--sun); text-shadow: 2px 2px 0 var(--c), 4px 4px 0 #000; }
+.cover-t { font-size: 1.1rem; font-weight: 700; color: #FFF6EC; text-shadow: 0 1px 3px rgba(20, 6, 30, .8); }
+.win-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+
+/* ── caption under the tray: what just happened, in words, and the running count ── */
+.cab-cap { container-type: inline-size; display: flex; align-items: center; gap: 12px; min-height: 44px; margin: 10px 0 0; padding: 0 4px 0 6px; color: var(--soft); font-size: .92rem; font-weight: 600; line-height: 1.3; }
+.cap-t { display: flex; align-items: center; gap: 8px; flex: 1 1 auto; min-width: 0; text-wrap: balance; }
+.cap-t b { color: #FFF6EC; font-weight: 800; }
+.cap-c { position: relative; flex: none; width: 38px; height: 38px; margin: -6px -2px -6px -6px; }
+.cap-n { flex: none; margin-left: auto; color: #FFF6EC; font-weight: 800; letter-spacing: .03em; font-variant-numeric: tabular-nums; }
+/* new words fade up; a new candy pops in at full strength (fading it would turn it muddy over the plum) */
+.cab-cap.is-new .cap-x { animation: jcap .45s ease-out; }
+.cab-cap.is-new .cap-c { animation: jfound .5s var(--ease-pop); }
+@keyframes jcap { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+/* a narrow caption (phones, short laptops) puts the role on its own line, not "Name unlocked ·" + a wrap */
+@container (max-width: 439px) { .cap-sep { display: none; } .cap-chip { display: block; } }
+
+/* ── controls: two, quiet ── */
+.cab-ctrl { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.cab-ctrl .btn { min-height: 44px; padding: .5em 1.05em; border-width: 2.5px; font-size: .9rem; box-shadow: 0 4px 0 rgba(0,0,0,.4); }
+.cab:has(#win:not([hidden])) .cab-ctrl { visibility: hidden; }   /* the win card has its own two buttons; no layout shift */
+
+/* ── sticker book: faint empty slots on the plum until earned, then a cream card with the real candy ── */
+.book { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
+.card { --pc: #FF4FA3; position: relative; min-height: 100%; padding: 14px 16px 16px; background: #FFF6EC; color: #2A0820; border: 3px solid #000; border-radius: 20px; box-shadow: 0 5px 0 #000; transition: transform .3s var(--ease-pop); scroll-margin-bottom: 104px; }   /* a card scrolled into view lands above the toast */
+.card-top { display: flex; align-items: center; gap: 12px; }
+.card-tok { position: relative; flex: none; width: 56px; height: 56px; }
+.card-tok img { inset: -15%; width: 130%; height: 130%; }
+.card .card-tok .tok-sh { opacity: .5; }   /* the contact shadow is tuned for the dark well; on cream paper it goes half strength */
 .card h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; line-height: 1.05; }
-.card-chip { display: inline-block; margin-top: 4px; background: var(--pc); color: var(--pl); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 99px; border: 2px solid #000; }
+.card-chip { display: inline-block; margin-top: 4px; padding: 3px 9px; border-radius: 99px; background: color-mix(in srgb, var(--pc) 26%, #FFF6EC); color: #2A0820; font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .card-body { margin-top: 10px; font-size: .92rem; line-height: 1.45; }
 .card-fact { margin-top: 8px; font-size: .82rem; font-weight: 600; color: #5A2048; display: flex; gap: 6px; }
 .card-fact .lucide { margin-top: 2px; color: #B0005C; }
 .card-lock { display: none; }
+.card.is-locked { background: rgba(72, 34, 102, .3); border: 2px dashed rgba(255, 233, 244, .2); box-shadow: none; color: #EADBF2; }
+.card.is-locked h3 { color: #F7ECFB; }
 .card.is-locked .card-more, .card.is-locked .card-chip { display: none; }
-.card.is-locked .card-lock { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: .82rem; font-weight: 700; color: #5A2048; }
-.card.is-locked { background: #E9DDEB; }
-.card.is-locked .card-tok { filter: grayscale(1) brightness(1.15); opacity: .6; }
-.peek { border: 2px solid #2A0820; background: #fff; border-radius: 99px; padding: 4px 10px; font-weight: 800; font-size: .78rem; display: inline-flex; gap: 4px; align-items: center; transition: transform .15s var(--ease-pop); }
-.peek:hover { transform: scale(1.06); }
-.card.is-new { animation: unlock .7s var(--ease-pop); }
-@keyframes unlock { 0% { transform: scale(.85) rotate(-4deg); } 50% { transform: scale(1.06) rotate(2deg); } 100% { transform: none; } }
+.card.is-locked .card-lock { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: .82rem; font-weight: 700; color: var(--soft); }
+.card-lock > span { display: inline-flex; align-items: center; gap: 6px; }   /* the lock icon sits on the line with its words */
+@media (min-width: 701px) { .card.is-locked { display: flex; flex-direction: column; justify-content: center; } }   /* a slot stretched by its row keeps its content centred */
+.peek { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 14px; border: 2px solid rgba(255, 246, 236, .32); border-radius: 99px; background: transparent; color: #F3E6F7; font-size: .8rem; font-weight: 800; transition: background-color .2s, border-color .2s; }
+.peek:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 246, 236, .6); }
+.card.is-new { animation: junlock .55s ease-out; }
+@keyframes junlock { 0% { transform: scale(.95); } 100% { transform: none; } }   /* scale only, at full strength: a fading cream card reads muddy mauve over the plum */
+/* shared bumps (the bag, the HUD, moves) */
+@keyframes squash { 0% { transform: scale(1); } 30% { transform: scale(1.3, .75); } 60% { transform: scale(.9, 1.15); } 100% { transform: scale(1); } }
+@keyframes lvlup { 0% { transform: scale(1); } 40% { transform: scale(1.5) rotate(-6deg); } 100% { transform: scale(1); } }
 
 /* ── SUGAR FREE (LVL 4): bubbles are claims printed on the pack ── */
 .sugar { background: var(--sun); }
@@ -478,7 +541,7 @@ main { overflow-x: clip; }
 .proto { position: fixed; left: 14px; bottom: 14px; z-index: 60; display: none; align-items: center; gap: 6px; background: var(--paper); color: var(--ink); border: 2.5px solid var(--ink); border-radius: 99px; padding: 8px 14px; font-size: .8rem; text-decoration: none; box-shadow: 0 4px 0 var(--ink); transition: transform .2s var(--ease-pop); }
 .proto:hover { transform: translateY(-2px); }
 @media (min-width: 1024px) { .proto { display: inline-flex; } }
-.toast { position: fixed; left: 50%; bottom: 20px; z-index: 130; translate: -50% 150%; max-width: min(92vw, 520px); background: var(--ink); color: var(--paper); border: 2.5px solid var(--paper); border-radius: 20px; padding: 12px 18px; font-weight: 700; display: flex; gap: 10px; align-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.3); transition: translate .45s var(--ease-pop); }
+.toast { position: fixed; left: 50%; bottom: 20px; z-index: 130; translate: -50% 150%; width: max-content; max-width: min(92vw, 520px); background: var(--ink); color: var(--paper); border: 2.5px solid var(--paper); border-radius: 20px; padding: 12px 18px; font-weight: 700; display: flex; gap: 10px; align-items: center; box-shadow: 0 6px 0 rgba(0,0,0,.3); transition: translate .45s var(--ease-pop); }
 .toast .lucide { color: var(--sun); }
 .toast.is-on { translate: -50% 0; }
 .confetti { position: fixed; inset: 0; z-index: 125; pointer-events: none; width: 100vw; height: 100vh; }
@@ -497,6 +560,7 @@ main { overflow-x: clip; }
   .hero-stage { height: clamp(320px, 70vw, 480px); margin-top: -10px; }
   .sun { right: -8%; top: auto; bottom: 22%; }
   .game { grid-template-columns: 1fr; max-width: 640px; margin-inline: auto; }
+  .strip li { flex-basis: 56px; }   /* tablet: the seven fill more of the wider cabinet (phones reset this below) */
   .sugar-in, .gum-in, .faq-in { grid-template-columns: 1fr; }
   .pinfo { grid-template-columns: 1fr; }
   .tiers { grid-template-columns: repeat(2, 1fr); row-gap: 24px; }
@@ -511,23 +575,33 @@ main { overflow-x: clip; }
   .cart-art .mini-pop, .cart-art .mini-gum { transform: scale(.72); }
   .cart.is-on::after { top: auto; bottom: 10px; }
   .steps { grid-template-columns: 1fr; gap: 24px; }
-  .book { gap: 10px; }
+  /* Glow Grid book: one column; a locked card is one compact row (ghost, name, Peek) so the book scrolls less */
+  .book { grid-template-columns: 1fr; gap: 8px; }
   .card { padding: 12px; border-radius: 18px; }
-  .card:not(.is-locked) { grid-column: 1 / -1; }
-  .card-top { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .card:not(.is-locked) .card-top { flex-direction: row; align-items: center; }
   .card h3 { font-size: 1.05rem; }
-  .card.is-locked .card-lock { flex-direction: column; align-items: flex-start; }
-  .card-tok { width: 44px; height: 44px; }
+  .card-tok { width: 46px; height: 46px; }
+  .card.is-locked { display: flex; align-items: center; gap: 10px; min-height: 0; padding: 4px 6px 4px 10px; border-radius: 16px; }
+  .card.is-locked .card-top { flex: 1 1 auto; min-width: 0; gap: 10px; }
+  .card.is-locked .card-tok { width: 34px; height: 34px; }
+  .card.is-locked .card-lock { margin: 0; }
+  .card.is-locked .card-lock > span { display: none; }
   .cloud { display: none; }
   .coin { left: auto; right: 10px; top: 14px; width: 38px; height: 38px; }
   .hero .coin { top: auto; bottom: 22%; }
   .topbar-x { display: none; }
   .hero-stage { height: 320px; }
-  .cab { padding: 10px; border-radius: 24px; }
-  .cab-hud { grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .pips { display: none; }
-  .stat b { font-size: 1.25rem; }
+  /* Glow Grid cabinet: the tray as big as the layout allows */
+  .cab { margin-inline: -10px; padding: 10px 8px; border-width: 3px; border-radius: 24px; }
+  .cab-hud { gap: 8px; margin-bottom: 10px; }
+  .strip { gap: 4px; }
+  .strip li { flex-basis: 36px; }
+  .moves b { margin-top: 3px; font-size: 1.3rem; }
+  .board-wrap { border-width: 2.5px; border-radius: 18px; }
+  .board, .wells { inset: 3px; }
+  .fx { inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); }
+  .tok.is-sel::before { border-width: 3px; }
+  .cab-cap { margin-top: 8px; font-size: .86rem; }
+  .cab-ctrl { margin-top: 4px; }
   .vs th, .vs td { padding: 10px 4px; }
   .vs thead th { font-size: .68rem; letter-spacing: .02em; }
   .vs tbody th { font-size: .86rem; }
@@ -557,6 +631,10 @@ main { overflow-x: clip; }
   .hero-ctas .btn { width: 100%; }
   .bubbles li:nth-child(2) { left: 50%; }
 }
+@media (max-width: 380px) {
+  .strip li { flex-basis: 32px; }
+  .moves-l { font-size: .62rem; letter-spacing: .08em; }
+}
 
 /* ── Reduced motion: everything visible, nothing travels ─── */
 @media (prefers-reduced-motion: reduce) {
@@ -577,8 +655,6 @@ main { overflow-x: clip; }
 .lede, .hero-sub, .fine, .card-body, .card-fact, .streak-quote, .acc-p p { text-wrap: pretty; }
 /* launch label never wraps inside the 40px bar */
 .load-t { white-space: nowrap; font-size: clamp(.7rem, 2.6vw, .8rem); }
-/* start-cover helper line sat on top of tokens: give it its own plate */
-.cover-s { background: rgba(20, 4, 30, .82); padding: 4px 12px; border-radius: 99px; color: #FFE3F0; max-width: 92%; }
 /* launch label: a pill centred on the bar instead of text straddling the stripe edge */
 .load-t { inset: auto; left: 50%; top: 50%; translate: -50% -50%; display: block; background: #F2FCEB; border: 2px solid #062A17; border-radius: 99px; padding: 2px 10px; line-height: 1.3; }
 .load-t .ph { background: transparent; }

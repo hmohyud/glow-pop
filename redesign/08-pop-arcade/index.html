@@ -29,7 +29,7 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <!-- shared SVG defs: the seven original Glow Grid tokens (sh-6, the four-petal flower, is biotin) -->
+  <!-- shared SVG defs: the seven Glow Grid shapes, drawn only if a candy image fails to load (sh-6, the four-petal flower, is biotin) -->
   <svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
     <defs>
       <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
@@ -157,44 +157,40 @@
         <div class="sec-head sec-head--light">
           <p class="lvl rv"><span class="lvl-n">Level 03</span><span class="lvl-t">The seven actives</span></p>
           <h2 class="h2 rv" id="grid-h">Match them to meet them</h2>
-          <p class="lede rv">Seven actives live in every Collagen Boost pop. Swap two neighbouring tokens to line up three of a kind. Each new match unlocks that active’s card.</p>
+          <p class="lede rv">Seven actives live in every Collagen Boost pop. Swap two neighbouring candies to line up three of a kind. Each new match unlocks that active’s card.</p>
         </div>
 
         <div class="game">
           <div class="cab">
             <div class="cab-hud">
-              <p class="stat"><span class="stat-l">Score</span><b id="gScore">0</b></p>
-              <p class="stat"><span class="stat-l">Moves</span><b id="gMoves">0</b></p>
-              <p class="stat stat--wide"><span class="stat-l">Unlocked</span><b><span id="gUnl">0</span>/<span id="gTot">7</span></b>
-                <span class="pips" id="gPips" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></p>
+              <ol class="strip" id="gStrip" aria-hidden="true"></ol>
+              <p class="moves"><span class="moves-l">Moves</span> <b id="gMoves">0</b></p>
+              <p class="sr-only"><span id="gUnl">0</span> of <span id="gTot">7</span> actives unlocked</p>
             </div>
             <div class="board-wrap" style="--n:7">
-              <div class="board" id="board" role="group" aria-label="Glow Grid board, 7 by 7. Arrow keys move, Enter picks a token, then an arrow key swaps it." aria-describedby="gHelp"></div>
+              <div class="wells" aria-hidden="true"></div>
+              <div class="board" id="board" role="group" aria-label="Glow Grid board, 7 by 7. Arrow keys move, Enter picks a candy, then an arrow key swaps it." aria-describedby="gHelp"></div>
               <canvas class="fx" id="fx" aria-hidden="true"></canvas>
-              <div class="combo" id="combo" aria-hidden="true"></div>
               <div class="board-cover" id="cover">
                 <p class="cover-k">Glow Grid</p>
-                <p class="cover-t">Line up 3. Unlock all 7.</p>
+                <p class="cover-t">Line up three. Unlock all seven.</p>
                 <button class="btn btn--sun btn--lg" id="gStart" type="button"><i data-lucide="play"></i> Press start</button>
-                <p class="cover-s">Tap or swipe on touch · arrows + Enter on a keyboard</p>
               </div>
               <div class="board-cover board-cover--win" id="win" hidden>
                 <p class="cover-k">Level clear!</p>
-                <p class="win-stars" id="winStars" aria-hidden="true"></p>
-                <p class="cover-t" id="winTxt">All seven unlocked.</p>
-                <p class="cover-s">Game stars are for play only, not a rating.</p>
+                <p class="cover-t" id="winTxt">All seven found.</p>
                 <div class="win-btns">
                   <button class="btn btn--sun" id="gAgain" type="button"><i data-lucide="rotate-ccw"></i> Play again</button>
                   <a class="btn btn--paper" href="#sugar">Next level <i data-lucide="arrow-down"></i></a>
                 </div>
               </div>
             </div>
+            <p class="cab-cap" id="gCap" aria-hidden="true"><span class="cap-t"><span class="cap-x">Click two neighbours, or use the arrow keys and Enter.</span></span><span class="cap-n">0/7</span></p>
             <div class="cab-ctrl">
               <button class="btn btn--line-l btn--sm" id="gHint" type="button"><i data-lucide="lightbulb"></i> Hint</button>
-              <button class="btn btn--line-l btn--sm" id="gNew" type="button"><i data-lucide="shuffle"></i> New board</button>
-              <button class="btn btn--line-l btn--sm" id="gAll" type="button"><i data-lucide="eye"></i> Skip: show all seven</button>
+              <button class="btn btn--line-l btn--sm" id="gAll" type="button"><i data-lucide="eye"></i> Show all seven</button>
             </div>
-            <p class="sr-only" id="gHelp">Use arrow keys to move between tokens. Press Enter or Space to pick a token, then an arrow key to swap it with its neighbour. Escape cancels. You can also skip the game and read all seven cards.</p>
+            <p class="sr-only" id="gHelp">Use arrow keys to move between candies. Press Enter or Space to pick a candy, then an arrow key to swap it with its neighbour. Escape cancels. The Show all seven button opens every card without playing.</p>
             <p class="sr-only" id="gLive" aria-live="polite"></p>
           </div>
 
