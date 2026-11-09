@@ -666,7 +666,8 @@
 
     function panelHTML(a, i, n) {
       var head = '<article class="ap" role="tabpanel" id="ap-' + i + '" aria-labelledby="dt-' + i + '" tabindex="0"' + (i === sel ? '' : ' hidden') + '>' +
-        '<header class="ap-head"><span class="mono">Active ' + pad2(i + 1) + ' / ' + pad2(n) + '</span><span class="mono ap-code">' + a.code + '</span></header>' +
+        // GP-02's cards are label entries, not actives ("seven actives" is Collagen Boost's count only)
+        '<header class="ap-head"><span class="mono">' + (a.dose ? 'Entry ' : 'Active ') + pad2(i + 1) + ' / ' + pad2(n) + '</span><span class="mono ap-code">' + a.code + '</span></header>' +
         '<h3 class="ap-name">' + a.name + '</h3>';
       // label amounts known, benefit copy not supplied yet (GP-02): show the facts, keep "What it does" a visible placeholder
       if (a.dose) {

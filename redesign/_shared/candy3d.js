@@ -79,13 +79,14 @@
  *   (all 9 CC0 maps, once per page; every candy instance clones what it draws with)
  * LIGHTING
  *   ENVIRONMENTS (beach | golden | studio tuning) · envName(x) · configureRenderer(T, renderer, which, opts)
- *   buildEnvironment(T, renderer, which, onReady, useAssets) -> env {which, texture, sun, hdr, ready, dispose()}
+ *   buildEnvironment(T, renderer, which, onReady, useAssets) -> env {which, texture, sun, hdr, mean, ready, dispose()}
  *     Builds a procedural PMREM in the palette of `which` synchronously (frame 1 is lit), then loads the
  *     HDRI, cuts the sun out of it (its energy becomes the DirectionalLight, so nothing is counted
  *     twice and the env is pure unshadowed sky + sand fill), mirrors / rotates it so the sun sits
  *     front-left, grades it and swaps env.texture in place (onReady(env)). env.ready: Promise<bool>.
  *     The procedural panorama is upsampled to the HDRIs' 1024 x 512, so both PMREMs are the same size
- *     and the upgrade recompiles nothing; the HDRI is parsed + processed in short slices.
+ *     and the upgrade recompiles nothing; the HDRI is parsed + processed in short slices. env.mean =
+ *     the panorama's mean radiance (linear RGB, solid-angle weighted), measured while it is made.
  *   buildLightRig(T, scene, which, sun) -> rig {sun, lights, setSun(info, which), fitShadow(model), dispose()}
  *     One shadow-casting DirectionalLight. fitShadow(model) right before every render: flags the
  *     model's meshes cast + receive, fits a tight ortho shadow camera to the model's world bounding
@@ -96,18 +97,22 @@
  *     candy: MeshPhysicalMaterial (no clearcoat, no bumpMap, emissive = colour at ~0.03) + shader patch:
  *     triplanar CC0 smudge roughness + micro-normal (object space: no UV poles, sticks to the candy;
  *     'gloss' = the pack's smooth candy, only a whisper of either), softer reflections below the
- *     horizon (a 1k HDRI's sand would mirror as grain), light scattering at the terminator, baked AO
- *     (attribute gloAO) on indirect light (ignored on a fresh cut), and the bite attribute gloBite
- *     (fresh glassy fracture, crater occlusion, stress halo).
+ *     horizon (a 1k HDRI's sand would mirror as grain), light scattering at the terminator, a
+ *     translucent body ('gloss': PRESETS.flat of the diffuse light evened out to the mean irradiance
+ *     over the candy, gloMean = environment mean radiance x pi + sun / 4, synced every frame, and the
+ *     diffuse scaled by PRESETS.body, so a sunlit top stays the pack's saturated pink instead of
+ *     blowing out to pastel), baked AO (attribute gloAO) on indirect light (ignored on a fresh cut),
+ *     and the bite attribute gloBite (fresh glassy fracture, crater occlusion, stress halo).
  *     stick: MeshStandardMaterial (emissive exactly 0x000000): plain white satin, the CC0 paper only
  *     whispers (faint fibre, barely-there glued edge) + AO.
  *   applyLollipopAssets(mats, assets)   swaps the real maps in when they arrive (no recompile)
  *   buildLollipop(T, mats, {tilt}) -> Group  userData { kind:'lollipop', size:{w:3.4,h:6}, candy,
  *     stick, collar, tilt, mats, mat, bob(t seconds) }. candy: the pack's head, ONE watertight lathe
- *     (192 columns x ~184 rows): a true sphere (r LOLLY.RB 1.226 at y 1.5 in the tilt group) with a raised
- *     band round its equator (outer r LOLLY.R 1.33 = the old ball's width, 0.36 tall, centred 0.012
- *     above the equator, outer edges rounded 0.04, 0.022 fillets where it meets the ball). Its meridian
- *     is the zero set of headSDF2 (sphere + rounded band, round union). geometry.userData
+ *     (192 columns x ~160 rows): a true sphere (r LOLLY.RB 1.243 at y 1.5 in the tilt group) with a raised
+ *     band round its equator (outer r LOLLY.R 1.33 = the old ball's width, so it stands out 7% of the
+ *     ball's radius, as on the pack art; 0.36 tall, centred on the equator, outer edges rounded 0.04,
+ *     0.022 fillets where it meets the ball). Its meridian is the zero set of headSDF2 (sphere +
+ *     rounded band, round union). geometry.userData
  *     { origPositions, origNormals, radius (the ball), outerRadius (the band), center, head (profile) }.
  *     collar: candy meniscus around the stick (child of candy, same material); stick y -2.8 .. 0.6,
  *     r 0.135 (0.11 x the ball's diameter).
@@ -133,10 +138,10 @@
  *     bite recoil, integrates spin inertia, squashes the candy / jiggles gummies through their own
  *     matrices, and runs the pooled shards + sparkles (added to root after lean, never in shadows).
  *     A bite = one scoop + a crescent of 7 tooth spheres, carved onto smooth-max(own surface,
- *     -smooth-union(cutters)): vertices are Newton-projected along its gradient, except that under a bite
- *     centred on the band the band's vertices slide on their own elevation cones about the centre (so
- *     its ledges never fold over the ball, and its cut ends get vertices); crisp scalloped rims, a deeper
- *     denser interior, a stress-white edge, on the ball and the band alike. The hit test traces the
+ *     -smooth-union(cutters)): the ball's vertices are Newton-projected along its gradient, the band's
+ *     move down their own rays from the centre (so its ledges never fold over the ball and its cut ends
+ *     stay clean walls); crisp scalloped rims, a deeper denser interior, a stress-white edge, on the
+ *     ball and the band alike. The hit test traces the
  *     head's exact profile; a hit on the band bites in from the ball's surface under it (as deep as
  *     anywhere). Hits low on the ball slide up to BITE.minY so the crater never opens the stick
  *     junction. It regrows after a pause. Shards take a free slot first (else the oldest), so three
@@ -409,6 +414,7 @@
     for (var e = 1; e < 256; e++) EXP[e] = Math.pow(2, e - 136);
     var lin = new Float32Array(N * 3), best = -1, bi = 0, yd = 0, yp = 0;
     var Er = 0, Eg = 0, Eb = 0, sx = 0, sy = 0, sz = 0, shift = 0, out = null, sat, tR, tG, tB, toHalf, one;
+    var mR = 0, mG = 0, mB = 0, mW = 0;          // mean radiance of the graded panorama (solid-angle weighted)
     function decode() {                        // 0 · RGBE -> linear, tracking the brightest pixel
       var end = Math.min(H, yd + 64);
       for (var i = yd * W, k = i * 3, n = end * W; i < n; i++, k += 3) {
@@ -454,14 +460,16 @@
     }
     function pack() {                          // 3 · grade + pack
       for (var end = Math.min(H, yp + 16); yp < end; yp++) {
-        var dstRow = (H - 1 - yp) * W;
+        var dstRow = (H - 1 - yp) * W, wr = Math.cos((0.5 - (yp + 0.5) / H) * Math.PI), rR = 0, rG = 0, rB = 0;
         for (var x = 0; x < W; x++) {
           var q = (yp * W + x) * 3;
           var R = lin[q], G = lin[q + 1], B = lin[q + 2], L = 0.2126 * R + 0.7152 * G + 0.0722 * B;
-          R = Math.max(0, L + (R - L) * sat) * tR; G = Math.max(0, L + (G - L) * sat) * tG; B = Math.max(0, L + (B - L) * sat) * tB;
+          R = Math.min(60000, Math.max(0, L + (R - L) * sat) * tR); G = Math.min(60000, Math.max(0, L + (G - L) * sat) * tG); B = Math.min(60000, Math.max(0, L + (B - L) * sat) * tB);
+          rR += R; rG += G; rB += B;
           var xm = cfg.mirror ? W - 1 - x : x, d = (dstRow + (xm + shift) % W) * 4;
-          out[d] = toHalf(Math.min(R, 60000)); out[d + 1] = toHalf(Math.min(G, 60000)); out[d + 2] = toHalf(Math.min(B, 60000)); out[d + 3] = one;
+          out[d] = toHalf(R); out[d + 1] = toHalf(G); out[d + 2] = toHalf(B); out[d + 3] = one;
         }
+        mR += rR * wr; mG += rG * wr; mB += rB * wr; mW += W * wr;
       }
     }
     for (var r = 0; r < H; r += 64) steps.push(decode);
@@ -476,6 +484,7 @@
           elevation: Math.asin(clamp(sy / sl, -1, 1)) / DEG, peak: best, rotation: shift / W
         }
       };
+      st.result.texture.userData.mean = [mR / mW, mG / mW, mB / mW];   // (see the candy's translucent body)
       lin = null;
     });
     return steps;
@@ -549,7 +558,7 @@
     var cfg = ENVIRONMENTS[which], W = 512, H = 256, out = new Uint16Array(W * H * 4);
     var toHalf = T.DataUtils.toHalfFloat, one = toHalf(1), paint = PAINT[cfg.paint] || PAINT.studio;
     var P = { az: cfg.sun.azimuth * DEG, gel: cfg.glowElevation * DEG, glow: sunDirArray(cfg.sun.azimuth, cfg.glowElevation) };
-    var c = [0, 0, 0];
+    var c = [0, 0, 0], m = [0, 0, 0, 0];
     for (var y = 0; y < H; y++) {
       var ph = (0.5 - (y + 0.5) / H) * Math.PI, cp = Math.cos(ph), sp = Math.sin(ph), dstRow = (H - 1 - y) * W;
       for (var x = 0; x < W; x++) {
@@ -557,9 +566,12 @@
         paint(cp * Math.cos(th), sp, cp * Math.sin(th), c, P);
         var d = (dstRow + x) * 4;
         out[d] = toHalf(c[0]); out[d + 1] = toHalf(c[1]); out[d + 2] = toHalf(c[2]); out[d + 3] = one;
+        m[0] += c[0] * cp; m[1] += c[1] * cp; m[2] += c[2] * cp; m[3] += cp;
       }
     }
-    return makeEquirect(T, upsample2(out, W, H), W * 2, H * 2);
+    var tex = makeEquirect(T, upsample2(out, W, H), W * 2, H * 2);
+    tex.userData.mean = [m[0] / m[3], m[1] / m[3], m[2] / m[3]];   // mean radiance (see the candy's translucent body)
+    return tex;
   }
   // 2x upsample of an RGBA half-float image that interpolates the raw bit patterns: for positive
   // halves those are monotonic, so every new texel lies between its neighbours (no float round trip).
@@ -604,8 +616,9 @@
   function buildEnvironment(T, renderer, which, onReady, useAssets) {
     which = envName(which);
     var cfg = ENVIRONMENTS[which], pm = new T.PMREMGenerator(renderer), rt = null, dead = false;
-    var env = { which: which, texture: null, sun: null, hdr: false, ready: null, dispose: dispose };
+    var env = { which: which, texture: null, sun: null, hdr: false, mean: null, ready: null, dispose: dispose };
     function use(src, sun, hdr) {
+      env.mean = (src.userData && src.userData.mean) || null;   // its mean radiance (linear RGB), kept on the CPU
       var next = pm.fromEquirectangular(src);
       src.dispose();                        // frees this renderer's GPU copy; the CPU data stays cached
       if (rt) rt.dispose();
@@ -699,10 +712,10 @@
   // ── lollipop: materials ────────────────────────────────────────────────
   // The pack's lollipop: a true sphere (RB) with a raised moulded band round its equator. The band's
   // outer radius R is the old ball radius, so the head keeps its old width and every layout its framing.
-  // BAND (ball-local, y up): h full height, y centre (a hair above the equator), edge = rounding of its
+  // BAND (ball-local, y up): h full height, y centre (the equator, as on the pack), edge = rounding of its
   // outer edges, fillet = the small concave round where its flat faces meet the ball.
-  var LOLLY = { R: 1.33, RB: 1.226, CY: 1.5, SR: 0.135, TOP: 0.6, BOT: -2.8, SEG: 192,
-    BAND: { h: 0.36, y: 0.012, edge: 0.04, fillet: 0.022 } };
+  var LOLLY = { R: 1.33, RB: 1.243, CY: 1.5, SR: 0.135, TOP: 0.6, BOT: -2.8, SEG: 192,
+    BAND: { h: 0.36, y: 0, edge: 0.04, fillet: 0.022 } };
 
   // Surface tuning per preset. rough/spots/streaks/rmin/rmax: roughness = rough + spots*S + streaks*K
   // (S, K from the CC0 Surface Imperfections maps); nrm: micro-normal strength; sss: wrap light at the
@@ -712,11 +725,14 @@
   // (sss is calibrated against the lighting rig's cut-out sun, ~4.4 at midday)
   // 'gloss' is the pack's candy: smooth, saturated, crisp highlights; the smudge maps only break the
   // gloss up a hair (no visible grain).
+  // flat: how much of the diffuse light the candy body evens out (hard candy is translucent: light that
+  // enters on the sunny side scatters through the sugar and leaves all over, so a sunlit top does not
+  // blow out to pastel and the shade side stays a deep, saturated colour, as on the pack).
   var PRESETS = {
-    gloss:      { rough: 0.045, spots: 0.035, streaks: 0.02, rmin: 0.035, rmax: 0.1, nrm: 0.1, sss: 0.1, alb: 0.035, E: 0.03, env: 1.0, ground: 0.2 },
-    jewel:      { rough: 0.03, spots: 0.05, streaks: 0.03, rmin: 0.02, rmax: 0.14, nrm: 0.25, sss: 0.0, alb: 0.1, E: 0.04, env: 1.15, ground: 0.16 },
-    iridescent: { rough: 0.06, spots: 0.08, streaks: 0.04, rmin: 0.05, rmax: 0.2, nrm: 0.3, sss: 0.08, alb: 0.1, E: 0.03, env: 1.1, ground: 0.2 },
-    satin:      { rough: 0.34, spots: 0.12, streaks: 0.08, rmin: 0.25, rmax: 0.55, nrm: 0.3, sss: 0.09, alb: 0.12, E: 0.03, env: 1.0, ground: 0.34 }
+    gloss:      { rough: 0.045, spots: 0.035, streaks: 0.02, rmin: 0.035, rmax: 0.1, nrm: 0.1, sss: 0.1, alb: 0.035, E: 0.03, env: 1.0, ground: 0.2, flat: 0.6, body: 0.8 },
+    jewel:      { rough: 0.03, spots: 0.05, streaks: 0.03, rmin: 0.02, rmax: 0.14, nrm: 0.25, sss: 0.0, alb: 0.1, E: 0.04, env: 1.15, ground: 0.16, flat: 0 },
+    iridescent: { rough: 0.06, spots: 0.08, streaks: 0.04, rmin: 0.05, rmax: 0.2, nrm: 0.3, sss: 0.08, alb: 0.1, E: 0.03, env: 1.1, ground: 0.2, flat: 0 },
+    satin:      { rough: 0.34, spots: 0.12, streaks: 0.08, rmin: 0.25, rmax: 0.55, nrm: 0.3, sss: 0.09, alb: 0.12, E: 0.03, env: 1.0, ground: 0.34, flat: 0 }
   };
   var TRI = { spots: 0.42, streaks: 0.29 };                 // triplanar tiles per object unit
   // The pack's stick is plain, clean white with a soft satin sheen: the CC0 paper only whispers (a faint
@@ -763,7 +779,7 @@
     // geometry without the attributes (the collar, foreign meshes): unoccluded, unbitten
     mat.defaultAttributeValues = { gloAO: [1], gloBite: [0, 0, 0] };
     mat.userData.gloBite = true;
-    mat.customProgramCacheKey = function () { return 'glo-candy-v4'; };
+    mat.customProgramCacheKey = function () { return 'glo-candy-v5'; };
     mat.onBeforeCompile = function (sh) {
       Object.assign(sh.uniforms, u);
       sh.vertexShader = sh.vertexShader
@@ -780,6 +796,7 @@
           'varying float vGloAO;', 'varying vec3 vGloP;', 'varying vec3 vGloN;', 'varying vec3 vGloBite;',
           'uniform sampler2D gloSpots;', 'uniform sampler2D gloStreaks;', 'uniform sampler2D gloNormal;',
           'uniform vec4 gloTex;', 'uniform vec4 gloRough;', 'uniform float gloAlb;', 'uniform float gloGround;',
+          'uniform vec2 gloBody;', 'uniform vec3 gloMean;',
           '#ifndef USE_NORMALMAP_OBJECTSPACE', 'uniform mat3 normalMatrix;', '#endif',
           'vec4 gloTri( sampler2D s, vec3 p, vec3 w ) {',
           '  return texture2D( s, p.zy ) * w.x + texture2D( s, p.xz ) * w.y + texture2D( s, p.xy ) * w.z;',
@@ -826,6 +843,14 @@
           '  reflectedLight.indirectDiffuse *= gOcc;',
           '  reflectedLight.indirectSpecular *= mix( 1.0, gOcc, 0.7 );',
           '  reflectedLight.directDiffuse *= mix( 1.0, gOcc, 0.5 );',
+          // translucent body: part of the diffuse light is what the sugar scattered inside, which leaves
+          // evenly (the mean irradiance over the candy, sun + environment): no pastel blow-out on top, a
+          // saturated shade side. Creases (baked AO) and craters (gOcc) still darken it.
+          '  if ( gloBody.x > 0.0 ) {',
+          '    vec3 gMean = gloMean * BRDF_Lambert( material.diffuseColor ) * gAoC * gOcc;',
+          '    reflectedLight.directDiffuse *= ( 1.0 - gloBody.x ) * gloBody.y;',
+          '    reflectedLight.indirectDiffuse = mix( reflectedLight.indirectDiffuse, gMean, gloBody.x ) * gloBody.y;',
+          '  }',
           '}',
           '#if NUM_DIR_LIGHTS > 0',
           'if ( gloTex.w > 0.0 ) {',                                  // light scattering through the sugar
@@ -901,7 +926,9 @@
       gloTex: { value: new T.Vector4(TRI.spots, TRI.streaks, P.nrm, P.sss) },
       gloRough: { value: new T.Vector4(P.spots, P.streaks, P.rmin, P.rmax) },
       gloAlb: { value: P.alb },
-      gloGround: { value: P.ground }
+      gloGround: { value: P.ground },
+      gloBody: { value: new T.Vector2(P.flat || 0, P.body || 1) },
+      gloMean: { value: new T.Vector3(0, 0, 0) }   // mean irradiance over the candy (see syncLollipopMean)
     };
     patchCandy(candy, cu);
     candy._glo = cu;
@@ -1065,9 +1092,11 @@
   }
   // The meridian, bottom pole -> top pole, traced along the zero set: steps of at most DS (the sphere
   // gets ~1.3 deg rows, like the old 192 x 144 ball) and at most TURN of normal turn per step, so the
-  // band's small rounded edges and fillets get 8-10 rows each. Rows: [r, y, nr, ny, v] (v = arc length).
+  // band's small rounded edges and fillets get 5 rows each (smooth even at 4x the hero framing; 10 deg
+  // steps doubled the band's rows, and with them the cost of every bite through it). Rows: [r, y, nr,
+  // ny, v] (v = arc length).
   function headProfile(S) {
-    var DS = 0.028, DSMIN = 0.0015, TURN = 10 * DEG, h = 1e-6, pts = [];
+    var DS = 0.028, DSMIN = 0.0015, TURN = 18 * DEG, h = 1e-6, pts = [];
     function nrm(r, y) {
       var gx = headSDF2(S, r + h, y) - headSDF2(S, r - h, y), gy = headSDF2(S, r, y + h) - headSDF2(S, r, y - h), l = Math.hypot(gx, gy) || 1;
       return [gx / l, gy / l];
@@ -1867,7 +1896,7 @@
     regrowAfter: 4500,          // ms after the last bite (fewer than max bites)
     regrowAfterMax: 1500,       // ms after the final bite (shards have landed by then)
     regrowDur: 1.15,            // s
-    scoopR: 0.78, scoopDepth: 0.3,                  // the big scoop cutter (ball radius 1.226)
+    scoopR: 0.78, scoopDepth: 0.3,                  // the big scoop cutter (ball radius 1.243)
     teeth: 7, toothR: 0.19, toothDepth: 0.1,        // the crescent of tooth cutters (they notch the rim)
     arcR: 0.44, arcSpan: 4.0,                       // arc radius / angular span (rad) of the crescent
     halo: 0.03,                                     // width of the stress-whitened rim
@@ -2269,17 +2298,16 @@
       CP[0] = x; CP[1] = y; CP[2] = z;
       return Math.abs(d) <= 1e-3;
     }
-    // Carve every vertex near the new cutters onto the carved SDF. Every point is Newton-projected along
+    // Carve every vertex near the new cutters onto the carved SDF. A ball point is Newton-projected along
     // the SDF gradient (deep inside a cutter exactly v = c + normalize(v - c) * r; at the rim it lands on
-    // the small fillet): crisp scalloped rims. That is fold-free wherever the cutters' centres see the
-    // surface they carve, which holds for the band too when the bite sits above or below it (the scoop
-    // looks down onto the band's top ledge or up at its underside). A bite centred ON the band (cone:
-    // the common case) sees the ledges edge-on, and projecting them would fold the ledge over the ball
-    // beside it, so there a band vertex (it stands out of the ball) slides on its own elevation cone
-    // about the centre instead (coneSlide: in and sideways, so the band's cut ends get their share of
-    // vertices, and its rows can never cross). The ball rows above / below the band then move away from
-    // it (the scoop's centre lies at the band's height); an order-preserving floor (ceiling) keeps a
-    // jittered tooth from pushing one into the band's rows anyway.
+    // the small fillet): crisp scalloped rims. The band's rows sit edge-on to that gradient wherever a
+    // cutter crosses a ledge (above, below or on the band), and projecting them folded the ledges over
+    // the ball and piled vertices up at the band's cut ends (hundreds of folded triangles a bite), so a
+    // band vertex (it stands out of the ball) moves down its own ray from the centre instead: rays never
+    // cross, the band's rows and columns keep their order and its cut ends are clean walls. Under a bite
+    // centred on the band (cone) the ball rows above / below it move away from it (the scoop's centre
+    // lies at the band's height); an order-preserving floor (ceiling, coneSlide) keeps a jittered tooth
+    // from pushing one into the band's rows anyway.
     // Cutters only ever remove material, so the result does not depend on the bite order. The normal is
     // the SDF gradient (analytic, the skin part swapped for the vertex's own normal), so the UV seam and
     // the poles stay consistent by construction and nothing needs computeVertexNormals().
@@ -2303,11 +2331,14 @@
         var r0 = L.rad0[i], d, it, ball = true;
         var ux = (o[i3] - cx) / r0, uy = (o[i3 + 1] - cy) / r0, uz = (o[i3 + 2] - cz) / r0;
         L.Rv = r0;                                 // this vertex's own radius is its skin
-        if (cone && r0 > RB + 1e-5) {              // a band vertex under a bite centred on the band
+        if (H && r0 > RB + 1e-5) {                 // a band vertex (it stands out of the ball)
           ball = false;
-          if (coneSlide(L, x0, y0, z0, uy, 0.05, r0 + 1e-4)) { x = CP[0]; y = CP[1]; z = CP[2]; }
-          else {                                   // (no landing on its cone) down its ray from the centre,
-            var lo = 0.05, hi = r0, t = r0;         // a bracketed 1D Newton: never crosses another ray
+          // down its own ray from the centre (a bracketed 1D Newton): rays never cross, so the band's cut
+          // ends stay clean walls (sliding sideways piled vertices up there and folded the triangles);
+          // one already on the carved surface stays put
+          d = sdf(L, x0, y0, z0);
+          if (Math.abs(d) > 1e-4) {
+            var lo = 0.05, hi = r0, t = r0;
             d = sdf(L, cx + ux * t, cy + uy * t, cz + uz * t);
             for (it = 0; it < 30 && Math.abs(d) > 1e-6; it++) {
               if (d > 0) hi = t; else lo = t;
@@ -3004,6 +3035,16 @@
       geo.dispose();
     }
 
+    // the candy's translucent body needs the mean irradiance over it: the environment's mean radiance
+    // (measured once per panorama on the CPU) x pi x envMapIntensity, plus the sun's irradiance / 4.
+    // A few multiplies per frame, so a relight, an HDRI upgrade or a page's own tweaks are always in.
+    function syncLollipopMean() {
+      var c = mats.lolly && mats.lolly.candy, u = c && c._glo && c._glo.gloMean;
+      if (!u) return;
+      var m = env.mean || [0.5, 0.5, 0.5], k = Math.PI * (c.envMapIntensity == null ? 1 : c.envMapIntensity);
+      var s = rig.sun, si = s.intensity / 4;
+      u.value.set(m[0] * k + s.color.r * si, m[1] * k + s.color.g * si, m[2] * k + s.color.b * si);
+    }
     var frames = 0, raf = 0, last = performance.now(), clock = 0;
     function loop(now) {
       if (!alive) return;
@@ -3026,11 +3067,13 @@
       if (opts.bob !== false && !reduce && model.userData.bob) model.userData.bob(clock);
       ix.update(dt, now);
       rig.fitShadow(model);
+      syncLollipopMean();
       renderer.render(scene, camera);
       frames++;
       if (onRender) onRender(api);               // the frame is still in the canvas: copy it now if needed
     }
     rig.fitShadow(model);
+    syncLollipopMean();
     renderer.render(scene, camera);
     raf = requestAnimationFrame(loop);
     // the gummy cluster (page-wide geometry + bakes) is prepared at idle, so a switch to gummies is cheap

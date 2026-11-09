@@ -218,6 +218,11 @@
       current = id;
       applyTheme(id);
       if (heroCandy) heroCandy.setProduct(PRODUCTS[id].candy);
+      // the 3D's accessible name follows the model it shows (it used to say "strawberry lollipop" over the gummies)
+      var h3d = $('#heroCandy');
+      if (h3d) h3d.setAttribute('aria-label', id === 'green-gummies' ? 'Glossy 3D Super Greens Gummies, a concept render. Drag to spin.'
+        : id === 'next-pop' ? 'A glossy 3D Glo Pop lollipop in a colour still in development. Drag to spin, tap to take a bite.'
+        : 'A glossy 3D strawberry Glo Pop lollipop. Drag to spin, tap to take a bite.');
       // the gummy pile sits higher in the frame than the lollipop's stick: move its contact shadow (and the sand) up
       $('.hero').classList.toggle('is-gum', id === 'green-gummies');
       window.dispatchEvent(new Event('resize'));

@@ -1385,7 +1385,8 @@ html.motion .awning--hero .awning__band { animation: drop 1.2s var(--ease-back) 
   .chips .lucide { width: 12px; height: 12px; }
   .amenity__turn { padding-bottom: 18px; letter-spacing: .1em; }
   .hero__ctas .btn { padding-inline: 18px; }
-  .compare__us { flex-direction: column; gap: 6px; }   /* the parasol mark sits above the name: no "Glo / Pop" break */
+  .compare__us { flex-direction: column; gap: 6px; white-space: normal; text-align: center; }   /* the parasol mark sits above the name; "Collagen Boost" may wrap so the typical column stays in view */
+  .compare__table th, .compare__table td { padding-inline: 10px; }   /* three columns fit the card down to 360px */
   .waitlist__row .btn { flex: 1 1 100%; }
   /* phones: the label print is short, so its "view" chip sits under it as a full-width pill, not over it */
   .labelprint__chip, .labelprint:hover .labelprint__chip { position: static; display: flex; justify-content: center; margin-top: 10px; min-height: 44px; transform: none; }
