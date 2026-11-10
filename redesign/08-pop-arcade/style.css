@@ -24,7 +24,7 @@
   --body: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --wrap: 1240px;
   --gutter: clamp(16px, 4vw, 40px);
-  --hdr-h: 112px;
+  --hdr-h: 92px;       /* the sticky header: 10px + the 66px nav pill + 13px (the progress line sits in the last 4px) + the 3px ink edge */
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: var(--hdr-h); -webkit-text-size-adjust: 100%; }
@@ -65,13 +65,13 @@ ul, ol { padding: 0; list-style: none; }
 /* ── Top bar + header ────────────────────────────────────── */
 .topbar { background: var(--ink); color: var(--paper); text-align: center; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px; }
 .topbar p { display: flex; justify-content: center; align-items: center; gap: .6em; flex-wrap: wrap; }
-.hdr { position: sticky; top: 0; z-index: 50; padding: 10px var(--gutter) 10px; background: var(--paper); border-bottom: var(--line) solid var(--ink); transition: background-color .5s; }
+.hdr { position: sticky; top: 0; z-index: 50; padding: 10px var(--gutter) 13px; background: var(--paper); border-bottom: var(--line) solid var(--ink); transition: background-color .5s; }
 .hdr-in { max-width: var(--wrap); margin: 0 auto; display: flex; align-items: center; gap: 18px; background: var(--paper); border: var(--line) solid var(--ink); border-radius: 999px; padding: 7px 8px 7px 18px; box-shadow: 0 5px 0 var(--ink); }
 .logo { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; font-family: var(--display); font-size: 1.55rem; line-height: 1; letter-spacing: .01em; }
 .logo-a { color: var(--ink); }
 .logo-b { background: var(--c); color: var(--on-c); padding: 2px 8px 4px; border-radius: 10px; border: 2.5px solid var(--ink); transform: rotate(-4deg); margin-left: 4px; transition: background-color .4s; }
 .nav { display: flex; gap: 4px; margin-left: 8px; }
-.nav a { text-decoration: none; font-weight: 700; padding: 8px 12px; border-radius: 999px; font-size: .95rem; transition: background-color .2s; }
+.nav a { white-space: nowrap; text-decoration: none; font-weight: 700; padding: 8px 12px; border-radius: 999px; font-size: .95rem; transition: background-color .2s; }
 .nav a:hover { background: var(--tint); }
 .hdr-act { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .bag { position: relative; display: grid; place-items: center; width: 46px; height: 46px; border: var(--line) solid var(--ink); border-radius: 50%; background: var(--paper); transition: transform .2s var(--ease-pop); }
@@ -82,15 +82,22 @@ ul, ol { padding: 0; list-style: none; }
 .menu-btn { display: none; width: 46px; height: 46px; border-radius: 50%; border: var(--line) solid var(--ink); background: var(--c); color: var(--on-c); place-items: center; }
 .menu-btn .lucide { width: 22px; height: 22px; }
 
-/* Level HUD */
-.hud { max-width: calc(var(--wrap) - 60px); margin: 8px auto 0; display: flex; align-items: center; gap: 12px; background: var(--ink); color: var(--paper); border-radius: 999px; padding: 5px 6px 5px 14px; font-size: .78rem; font-weight: 700; letter-spacing: .04em; box-shadow: 0 4px 0 rgba(0,0,0,.18); }
-.hud-track { flex: 1; height: 10px; border-radius: 99px; background: rgba(255,255,255,.14); overflow: hidden; order: 2; min-width: 40px; }
-.hud-fill { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(.02); border-radius: inherit; background: repeating-linear-gradient(-45deg, var(--c) 0 8px, var(--c2) 8px 16px); transition: transform .5s var(--ease-pop); }
-.hud-lvl { order: 1; white-space: nowrap; text-transform: uppercase; }
-.hud-lvl b { color: var(--sun); margin-right: 4px; }
+/* Level HUD, folded into the header. Three separate things, kept apart so none reads as another's meter:
+   page progress = the striped line just above the header's ink edge, filling as you move through the levels;
+   the level = an ink "LVL n" tag beside the logo (its name is read out; each section's own tag shows it);
+   the sparkle hunt = a coin-yellow counter beside the bag, where found sparkles fly. */
+.hud-track { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; overflow: hidden; pointer-events: none; }
+.hud-fill { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(.02); background: repeating-linear-gradient(-45deg, var(--c) 0 6px, var(--c2) 6px 12px); transition: transform .5s var(--ease-pop); }
+.hud-lvl { display: inline-flex; align-items: center; margin: 0 0 0 -6px; white-space: nowrap; font-size: .74rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.hud-lvl b { min-width: 60px; padding: 4px 9px; border-radius: 99px; background: var(--ink); color: var(--sun); text-align: center; }
+/* read out (aria-live), not shown: the name always; the whole tag where the header has no room for it */
+#hudName { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (min-width: 1024px) and (max-width: 1180px), (max-width: 700px) {
+  .hud-lvl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
 .hud-lvl.is-up b { display: inline-block; animation: lvlup .7s var(--ease-pop); }
-.hud-coins { order: 3; display: flex; align-items: center; gap: 4px; background: rgba(255,255,255,.12); padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
-.hud-coins .lucide { color: var(--sun); }
+.hud-coins { display: inline-flex; align-items: center; gap: 5px; margin: 0; padding: 5px 11px 5px 9px; border-radius: 99px; background: var(--sun); color: var(--ink); font-size: .82rem; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hud-coins .lucide { width: 16px; height: 16px; }
 .hud-coins.is-bump { animation: squash .5s var(--ease-pop); }
 
 /* ── Level tags, headings ────────────────────────────────── */
@@ -119,7 +126,7 @@ main { overflow-x: clip; }
 @keyframes coin { 0%, 100% { translate: 0 0; rotate: -8deg; } 50% { translate: 0 -7px; rotate: 8deg; } }
 
 /* ── HERO ────────────────────────────────────────────────── */
-.hero { min-height: min(calc(100svh - 150px), 900px); padding: clamp(40px, 6vw, 80px) 0 clamp(80px, 9vw, 120px); background: var(--sky); transition: background-color .6s; isolation: isolate; }
+.hero { min-height: min(calc(100svh - 110px), 900px); padding: clamp(40px, 6vw, 80px) 0 clamp(80px, 9vw, 120px); background: var(--sky); transition: background-color .6s; isolation: isolate; }
 .hero-sky { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
 .sun { position: absolute; right: 6%; top: 7%; width: clamp(180px, 24vw, 340px); aspect-ratio: 1; }
 .sun-disc { position: absolute; inset: 18%; border-radius: 50%; background: var(--sun); box-shadow: inset -14px -14px 0 rgba(255,140,0,.25); border: var(--line) solid var(--ink); }
@@ -221,11 +228,11 @@ main { overflow-x: clip; }
 .glowgrid .h2 { color: var(--sun); text-shadow: 3px 3px 0 var(--c), 6px 6px 0 #000; }
 .glowgrid .lede { color: #FFE9F4; }
 /* The cabinet is sized by the viewport height as well as the width: all of it (HUD, tray, caption,
-   buttons) fits under the 132px sticky header and above the fixed proposal pill (bottom left, ~53px)
+   buttons) fits under the 92px sticky header and above the fixed proposal pill (bottom left, ~53px)
    on a 1366x768 laptop and up. Cabinet width = tray + 44px of frame; its height = tray + ~210px.
    It also leaves the sticker book 480px less the gap: two cards side by side need ~430px (a candy and
    the word "Vitamin" can't get narrower), so a narrow, tall screen (1024x1366) keeps the book in the page. */
-.game { display: grid; grid-template-columns: minmax(0, clamp(360px, min(100vh - 380px, 100% - 480px), 560px)) minmax(0, 1fr); grid-template-columns: minmax(0, clamp(360px, min(100svh - 380px, 100% - 480px), 560px)) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
+.game { display: grid; grid-template-columns: minmax(0, clamp(360px, min(100vh - 340px, 100% - 480px), 560px)) minmax(0, 1fr); grid-template-columns: minmax(0, clamp(360px, min(100svh - 340px, 100% - 480px), 560px)) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
 .cab { background: linear-gradient(180deg, #3B1556, #2C0E41); border: 4px solid #000; border-radius: 30px; padding: 16px 18px; box-shadow: 0 8px 0 #000, inset 0 2px 0 rgba(255,255,255,.07); }
 
 /* HUD: one row. The seven actives, unlit until found, then moves */
@@ -567,8 +574,6 @@ main { overflow-x: clip; }
 }
 @media (max-width: 700px) {
   body { font-size: 16px; }
-  .hud-coins-l { display: none; }
-  .hud { padding: 4px 4px 4px 12px; font-size: .72rem; gap: 8px; }
   .carts { grid-template-columns: 1fr; }
   .cart { grid-template-columns: 96px 1fr; column-gap: 14px; align-items: center; }
   .cart-art { grid-row: 1 / span 3; height: 96px; margin: 0; }
@@ -631,7 +636,14 @@ main { overflow-x: clip; }
   .hero-ctas .btn { width: 100%; }
   .bubbles li:nth-child(2) { left: 50%; }
 }
+@media (max-width: 349px) {   /* 320-349px phones: the logo, sparkles, bag and menu still fit the pill */
+  .hdr { padding-inline: 10px; }
+  .logo { font-size: 1.12rem; }
+  .hdr-act { gap: 6px; }
+}
 @media (max-width: 380px) {
+  .hdr-act { gap: 8px; }
+  .hud-coins { padding: 4px 9px 4px 7px; font-size: .78rem; }
   .strip li { flex-basis: 32px; }
   .moves-l { font-size: .62rem; letter-spacing: .08em; }
 }
@@ -676,7 +688,7 @@ main { overflow-x: clip; }
 .hero .sea { bottom: calc(var(--sand-h) - 8px); height: var(--sea-h); }
 .hero-stage .coin { left: auto; top: auto; right: 4%; bottom: 7%; z-index: 3; }
 @media (min-width: 1024px) {
-  .hero { min-height: 0; height: clamp(600px, calc(100svh - 165px), 800px); padding: 0; display: grid; }
+  .hero { min-height: 0; height: clamp(600px, calc(100svh - 125px), 800px); padding: 0; display: grid; }   /* the first screen under the 35px top bar + 92px header */
   .hero-in { height: 100%; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: stretch; gap: 0; }
   .hero-copy { align-self: center; position: relative; z-index: 2; padding: 26px 0 30px; }
   .hero-h { margin-bottom: 18px; }
@@ -696,7 +708,7 @@ main { overflow-x: clip; }
   .hero-h { grid-area: h; margin-bottom: 0; position: relative; z-index: 2; }
   .hero-ctas { grid-area: scene; align-self: end; justify-self: start; flex-direction: column; align-items: stretch; gap: 10px; margin: 0 0 4px; width: min(56%, 300px); position: relative; z-index: 3; }
   .hero-ctas .btn { width: 100%; font-size: 1rem; padding: .78em .9em; }
-  .hero-stage { grid-area: scene; justify-self: end; width: 64%; margin: 0 -2% 0 0; transform: none; height: clamp(290px, calc(100svh - 238px - 44vw), 440px); }
+  .hero-stage { grid-area: scene; justify-self: end; width: 64%; margin: 0 -2% 0 0; transform: none; height: clamp(290px, calc(100svh - 202px - 44vw), 440px); }
   .hero-sub { grid-area: sub; margin-top: 22px; position: relative; z-index: 2; }
   .hero .chips { grid-area: chips; }
   .cloud { display: block; height: 34px; }
@@ -828,7 +840,7 @@ html.lb-open { overflow: hidden; }
 @media (min-width: 1024px) {
   /* the facts panel is the long one: let "From the label" ride alongside it instead of leaving a hole */
   .gum { overflow: hidden; overflow: clip; }
-  .gum-label { position: sticky; top: 150px; }
+  .gum-label { position: sticky; top: calc(var(--hdr-h) + 18px); }
 }
 @media (max-width: 1023px) {
   .gum-in { grid-template-columns: 1fr; }

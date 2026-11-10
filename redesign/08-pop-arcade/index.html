@@ -52,6 +52,9 @@
   <header class="hdr" id="hdr">
     <div class="hdr-in">
       <a class="logo" href="#top" aria-label="Glo Pop Lab, back to top"><span class="logo-a">GLO</span><span class="logo-b">POP<span class="logo-lab">Lab</span></span></a>
+      <!-- level HUD: the level you are on, next to the logo (the name is read out; each section's own tag shows it).
+           Page progress is the line along the header's bottom edge. -->
+      <p class="hud-lvl" aria-live="polite"><b id="hudN">LVL 1</b> <span id="hudName">Press start</span></p>
       <nav class="nav" id="nav" aria-label="Main">
         <a href="#pick">Pick</a>
         <a href="#grid">Glow Grid</a>
@@ -61,17 +64,15 @@
         <a href="#faq">FAQ</a>
       </nav>
       <div class="hdr-act">
+        <!-- the sparkle hunt: hidden sparkles you collect, counted here like the bag -->
+        <p class="hud-coins"><i data-lucide="sparkle"></i> <span><span id="coinN">0</span>/<span id="coinT">8</span></span><span class="sr-only"> sparkles found</span></p>
         <a class="bag" id="bagBtn" href="#shop" aria-label="Your bag, 0 items"><i data-lucide="shopping-bag"></i><span class="bag-n" id="bagN">0</span></a>
         <a class="btn btn--ink btn--sm hdr-cta" href="#shop" data-cta>Build your bag</a>
         <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav"><i data-lucide="menu"></i><span class="sr-only">Menu</span></button>
       </div>
     </div>
-    <!-- level HUD: where you are on the page, plus the sparkle hunt -->
-    <div class="hud" aria-label="Page progress">
-      <div class="hud-track" aria-hidden="true"><span class="hud-fill" id="hudFill"></span></div>
-      <p class="hud-lvl" aria-live="polite"><b id="hudN">LVL 1</b> <span id="hudName">Press start</span></p>
-      <p class="hud-coins"><i data-lucide="sparkle"></i> <span id="coinN">0</span>/<span id="coinT">8</span> <span class="hud-coins-l">sparkles found</span></p>
-    </div>
+    <!-- page progress: fills along the header's bottom edge as you scroll -->
+    <div class="hud-track" aria-hidden="true"><span class="hud-fill" id="hudFill"></span></div>
   </header>
 
   <main id="main">

@@ -180,7 +180,6 @@
           confetti(innerWidth / 2, innerHeight / 3, 140);
           toast('party-popper', 'All ' + all.length + ' sparkles found. Nice eyes! (Just for fun, no prize.)');
         } else toast('sparkle', 'Sparkle ' + got + ' of ' + all.length + ' found.');
-        var next = $('.hud-coins'); if (next) next.setAttribute('aria-label', got + ' of ' + all.length + ' sparkles found');
       });
     });
   }
