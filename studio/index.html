@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model Pops Label Studio</title>
+<meta name="description" content="Make the exact, print-ready Model Pops pack artwork (PDF, SVG, PNG) and see it on a 3D pack.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23b8155a%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Ccircle cx=%2712%27 cy=%278.6%27 r=%275.6%27/%3E%3Cpath d=%27M12 14.2V22%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark"><i data-icon="pop"></i></div>
+      <div>
+        <div class="brand-name">MODEL POPS</div>
+        <div class="brand-sub">Label Studio</div>
+      </div>
+    </div>
+    <div class="divider-v"></div>
+    <label class="sr" for="docname">Design name</label>
+    <input id="docname" class="docname" type="text" spellcheck="false" autocomplete="off" title="Design name (used in the file names)">
+    <div class="spacer"></div>
+    <div class="tb-group">
+      <button class="btn ghost icon" id="btn-undo" title="Undo (Ctrl+Z)" aria-label="Undo"><i data-icon="undo"></i></button>
+      <button class="btn ghost icon" id="btn-redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><i data-icon="redo"></i></button>
+    </div>
+    <div class="divider-v"></div>
+    <div class="tb-group">
+      <span class="btn filepick" title="Open a saved design (.json)"><i data-icon="folder"></i><span class="lbl-long">Open</span>
+        <input type="file" id="open-json" accept=".json,application/json" aria-label="Open design file"></span>
+      <button class="btn" id="btn-save" title="Save the design file (.json) to edit later"><i data-icon="save"></i><span class="lbl-long">Save design</span></button>
+      <button class="btn primary" id="btn-export"><i data-icon="export"></i>Export files</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="panel-left" aria-label="Controls">
+      <section class="sec" id="sec-presets">
+        <div class="sec-h"><h2>Start from</h2></div>
+        <div class="presets" id="presets"></div>
+        <p class="hint">The small pictures are the client's current packs. Click one to compare side by side.</p>
+      </section>
+      <section class="sec" id="sec-format">
+        <div class="sec-h"><h2>Format</h2></div>
+        <div class="fields" id="format-fields"></div>
+      </section>
+      <section class="sec" id="sec-layers">
+        <div class="sec-h"><h2>Layers</h2><span class="hint" style="margin:0">Click to edit &middot; drag on the design</span></div>
+        <div class="layers" id="layers"></div>
+      </section>
+      <section class="sec" id="sec-inspector">
+        <div class="sec-h"><h2 id="insp-title">Edit</h2></div>
+        <div id="inspector"></div>
+      </section>
+    </aside>
+
+    <section class="center" aria-label="Design">
+      <div class="toolbar">
+        <button class="btn sm icon ghost" id="zoom-out" title="Zoom out" aria-label="Zoom out"><i data-icon="minus"></i></button>
+        <span class="zoomval" id="zoom-val">100%</span>
+        <button class="btn sm icon ghost" id="zoom-in" title="Zoom in" aria-label="Zoom in"><i data-icon="plus"></i></button>
+        <button class="btn sm icon ghost" id="zoom-fit" title="Fit to window" aria-label="Fit to window"><i data-icon="fit"></i></button>
+        <div class="divider-v" style="height:20px"></div>
+        <div class="seg view-switch" id="view-switch" role="group" aria-label="Panel">
+          <button type="button" data-v="front" class="on" title="Edit the front panel">Front</button>
+          <button type="button" data-v="back" title="Edit the back panel">Back</button>
+          <button type="button" data-v="layout" title="Print layout: every panel as it prints, with the dieline"><i data-icon="layout"></i>Layout</button>
+        </div>
+        <div class="divider-v" style="height:20px"></div>
+        <button class="toggle" id="tg-bleed" title="Show the bleed (cut off after printing)"><i data-icon="bleed"></i>Bleed</button>
+        <button class="toggle" id="tg-safe" title="Safe area: keep words and logo inside it"><i data-icon="safe"></i>Safe</button>
+        <button class="toggle" id="tg-guides" title="The item's seals, zip, notches and fin seal (from the item specs)"><i data-icon="seal"></i><span id="tg-guides-lbl">Seals</span></button>
+        <div class="spacer"></div>
+        <button class="toggle" id="tg-compare" title="Show the client's current pack beside the design"><i data-icon="compare"></i>Compare</button>
+        <div class="seg sm" id="compare-mode" role="group" aria-label="Compare mode" hidden>
+          <button type="button" data-v="side" title="The client's picture beside the design">Beside</button>
+          <button type="button" data-v="overlay" title="The client's draft, flattened, laid exactly over the design">Overlay</button>
+          <button type="button" data-v="diff" title="Difference: where the design and the draft differ shows bright">Difference</button>
+        </div>
+        <label class="cmp-op" id="compare-op" hidden><span>Draft</span><input type="range" min="0" max="1" step="0.05" value="0.5" aria-label="Draft opacity"></label>
+      </div>
+      <div class="notices" id="notices"></div>
+      <div class="stage-wrap" id="stage-wrap">
+        <div class="stage-inner" id="stage-inner">
+          <div class="artboard" id="artboard">
+            <svg id="stage" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Flat front-panel artwork"></svg>
+          </div>
+          <figure class="compare" id="compare" style="margin:0">
+            <img id="compare-img" alt="The client's current pack">
+            <figcaption class="cap" id="compare-cap">Current pack (reference)</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="statusbar" id="statusbar"></div>
+    </section>
+
+    <aside class="panel-right" aria-label="3D mockup">
+      <div class="mock-head"><h2>3D mockup</h2><span class="s" id="mock-type">Single-pop wrapper</span></div>
+      <div class="mock-view" id="mock-view">
+        <div class="mock-ph" id="mock-ph"><i data-icon="cube"></i><b>3D preview</b><span id="mock-ph-msg">Loading&hellip;</span></div>
+        <div class="mock-busy" id="mock-busy">Updating&hellip;</div>
+      </div>
+      <div class="mock-ctrls" id="mock-ctrls"></div>
+    </aside>
+  </main>
+</div>
+
+<div class="modal-bg" id="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<svg id="measure" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><text id="measure-text" x="0" y="0"> </text></svg>
+<div id="print-sheet" aria-hidden="true"></div>
+
+<script src="items.js"></script>
+<script src="assets/assets-data.js"></script>
+<script src="mockup3d.js"></script>
+<script src="studio.js"></script>
+<script src="gpu.js"></script>
+</body>
+</html>
