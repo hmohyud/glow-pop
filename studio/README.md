@@ -176,43 +176,53 @@ stays; for that, upload a cut-out PNG. Undo brings the original back.
 local studio or the online one. The studio never needs a GPU itself; without a connection the panel only explains
 itself and everything else works as before. The GPU side is the **Model Pops GPU bridge**: the `gpu-bridge` folder
 next to `label-studio` in the model-pops-packaging folder on the GPU PC (it is not part of the online site); its
-`README.md` has the setup, the key and the settings. It runs ComfyUI capped, so the PC stays usable: one picture at
+`README.md` has the setup and the settings. It runs ComfyUI capped, so the PC stays usable: one picture at
 a time, the GPU working about 60 % of the time with 5 GB of its memory kept free, at low priority, the models freed
 when idle, and ComfyUI stopped with the bridge. It also guards memory: the models take about 30 GB of Windows
 memory (RAM + page file), so it loads them only when that fits with room to spare, and stops ComfyUI at once if
 memory still gets close to full. When memory is short, the panel says how much to free before you generate.
 
 **Connect**
-1. On the PC with the GPU, start the bridge (`gpu-bridge\start-gpu-bridge.cmd`). It prints its address and a key.
+1. On the PC with the GPU, start the bridge (`gpu-bridge\start-gpu-bridge.cmd`). It prints its address.
 2. Pick the address:
    - **The same PC:** `http://127.0.0.1:8189`. From the online (https) studio, Chrome first asks for permission to
      reach this device (its local network access prompt): choose **Allow** (if you blocked it, allow it again in
      the site settings, left of the address bar). Until then Chrome blocks the call, and the panel says so.
-   - **Anywhere else** (another computer, a phone, a colleague): start a tunnel on the GPU PC and use the **https**
-     address it prints. Neither tunnel tool is installed here, and neither has been tried with the bridge yet (try
-     one picture first); either should work:
-     `cloudflared tunnel --url http://127.0.0.1:8189` (no account; gives `https://….trycloudflare.com`, a new one
-     each start: paste the new one), or `ngrok http 127.0.0.1:8189` (free account; gives `https://….ngrok-free.app`,
-     the same one each time; the studio sends ngrok's skip-the-warning header).
-3. In the panel, paste the address and the key, then **Connect**. **Remember on this browser** keeps both in this
-   browser only (**Forget** removes them). In a studio opened from disk (`index.html` double-clicked) it reads
-   **Remember until this tab closes**: every file opened from disk shares one browser storage, so the key is never
-   kept there. The key only ever travels in a request header, never in a link.
+   - **Another device** (another computer, a phone, a colleague): start a tunnel on the GPU PC, next to the bridge,
+     and paste the **https** address it prints on that device; the device needs nothing installed. Neither tunnel
+     tool is installed here, and neither has been tried with the bridge yet (try one picture first); either should
+     work: `cloudflared tunnel --url http://127.0.0.1:8189` (no account; the first choice; gives
+     `https://….trycloudflare.com`, a new random one each start: paste the new one), or `ngrok http 127.0.0.1:8189`
+     (free account; gives `https://….ngrok-free.app`, the same one each time; the studio sends ngrok's
+     skip-the-warning header).
+3. In the panel, paste the address, then **Connect**. No key is needed by default. If the bridge asks for one (its
+   `requireKey` is on), the panel shows a **Key** field with the line *This bridge asks for a key: it is shown in
+   the bridge window on the GPU PC*. **Remember on this browser** keeps the address (and the key, if one was used)
+   in this browser only (**Forget the saved address** removes them). In a studio opened from disk (`index.html`
+   double-clicked) it reads **Remember until this tab closes**: every file opened from disk shares one browser
+   storage, so nothing is kept there past the tab. A key only ever travels in a request header, never in a link.
 
-Anyone with the tunnel address **and** the key can use your GPU (within the cap) while the tunnel runs, with any
-picture and style text they like: share neither, and stop the tunnel when you are done. After sharing one, make a
-new key: `start-gpu-bridge.cmd --new-key` (the old key stops working at once). The panel says what went wrong in
-plain words: a wrong key, a bridge that is not running, a tunnel that is down, an http address on the https page
-(it needs the tunnel's https address), a page the bridge does not allow (its `allowedOrigins`), or a PC short of
-memory for the models. While the bridge's ComfyUI is stopped, **Generate** is off and the reason is shown under it.
+Without a key, anyone who has the tunnel address can use the AI while the tunnel runs: pictures only (no files and
+no commands), within the GPU cap and the memory gate, with at most 3 jobs waiting. So use the cloudflared quick
+tunnel (its random address changes at every start, so it works like a one-time password; ngrok's free address stays
+the same between sessions), stop it when you are done, and watch the bridge window: it lists each job and where it
+came from. To turn the key back on: set `"requireKey": true` in `gpu-bridge\config.json` and restart the bridge; the
+key then shows in the bridge window. To try all of this without the GPU, start the bridge with
+`start-gpu-bridge.cmd --fake` (placeholder pictures; the bridge's README has the steps, with a tunnel too).
+
+The panel says what went wrong in plain words: a bridge or a tunnel that is not running on the GPU PC (or a PC that
+is asleep), a key the bridge asks for, an http address on the https page (it needs the tunnel's https address), a
+page the bridge does not allow (its `allowedOrigins`), or a PC short of memory for the models. While the bridge's
+ComfyUI is stopped, **Generate** is off and the reason is shown under it.
 
 **Make**
 - **What.** *Background art* (the default) is for print: no words, no logo, no pop. *Logo ideas* and *Pack ideas* are
   **ideas, not print files**: they are labelled so everywhere and can never be placed in the design.
-- **Start from.** *My current design* (the front panel, drawn by the studio's own renderer at about 1 megapixel with
-  its bleed): for art only its **background** is sent (no words, logo or pop, so nothing of the product can end up
-  in the art); for ideas the front as it is, with its exact words passed on for pack ideas and the real pop as the
-  product lock. Or the client's current **wrapper** or **bag** draft (bases already on the GPU PC).
+- **Start from.** *My current design* (the design open in this browser: its front panel, drawn by the studio's own
+  renderer at about 1 megapixel with its bleed): for art only its **background** is sent (no words, logo or pop, so
+  nothing of the product can end up in the art); for ideas the front as it is, with its exact words passed on for
+  pack ideas and the real pop as the product lock. Or the client's current **wrapper** or **bag** draft (bases
+  already on the GPU PC).
 - **How far from it** (0–1) has four bands, the same as in ComfyUI's Design brief: from *Refine* (0–0.25) through a
   variation (0.25–0.5) and a new style (0.5–0.75) to *All new* (0.75–1). The panel names each band for the chosen
   kind and says what it does; a click on a band sets the slider to its middle.

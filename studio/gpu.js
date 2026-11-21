@@ -2,8 +2,8 @@
  *
  * Optional, and the only part of the studio that uses a GPU: the user's own, through the Model Pops GPU bridge
  * (gpu-bridge/) that runs next to ComfyUI on their PC. The studio reaches the bridge at http://127.0.0.1:8189 on
- * that PC, or from anywhere through a tunnel the user starts (an https ngrok or trycloudflare address). Without a
- * bridge this panel only explains itself, and the studio works exactly as before.
+ * that PC, or from anywhere through a tunnel the user starts on that same PC (an https trycloudflare or ngrok
+ * address). Without a bridge this panel only explains itself, and the studio works exactly as before.
  *
  * What comes back is one of two things, and they never mix:
  *  - Background art: text-free, pop-free art for the print file. "Use as background" sets it as the panel's
@@ -11,7 +11,9 @@
  *    on top as live layers. Made from "My current design", only the design's background is sent.
  *  - Ideas (logo or pack pictures): to choose a direction. Always labelled "ideas, not print files", and never
  *    placed in the design.
- * The key travels only in the X-MP-Key header, never in a URL; this browser keeps it only when asked to.
+ * No key by default: the panel asks only for the address. A bridge that asks for a key (it answers 401: its
+ * requireKey is on) gets it in the X-MP-Key header only, never in a URL. This browser keeps the address (and a key,
+ * if one was used) only when asked to.
  * Results stay in this browser (IndexedDB) for a day. Classic script: works from file://, http and https.
  */
 (function () {
@@ -119,7 +121,7 @@
   /* ------------------------------------------------------------------------------------------ state */
   const st = {
     open: false, restored: false, autoTried: false,
-    conn: { url: '', key: '', state: 'off', health: null, err: '', seen: 0, editing: true },
+    conn: { url: '', key: '', askKey: false, state: 'off', health: null, err: '', seen: 0, editing: true },   // askKey: the bridge asked for a key (401)
     mode: 'art', base: 'mine', distance: 0.4, styleTouched: false,
     seedMode: 'random', seed: 20261120, versions: 2,
     run: null, runMsg: '', results: [], sel: null, mineThumb: '', clearArm: 0,
@@ -127,14 +129,15 @@
   let D = null;                     // the drawer
   let connSeq = 0, runSeq = 0, hTimer = 0, tick = 0, thumbSeq = 0;
 
-  /* ------------------------------------------------------------------------------------------ remembered address + key */
+  /* ------------------------------------------------------------------------------------------ remembered address (+ key) */
   // A studio opened from disk (file://, origin "null") shares ONE browser storage with every other HTML file opened
-  // from disk, so any downloaded page could read a key kept there. On such a page the key is kept only for this tab
-  // (sessionStorage) and never in localStorage; online and on a local server, localStorage (this site only).
+  // from disk, so any downloaded page could read what is kept there. On such a page the address (and a key) is kept
+  // only for this tab (sessionStorage) and never in localStorage; online and on a local server, localStorage (this
+  // site only). A key is kept only if one was used (the bridge asked for it).
   const FILE_PAGE = location.protocol === 'file:' || location.origin === 'null';
   function credStore() { try { return FILE_PAGE ? window.sessionStorage : window.localStorage; } catch (e) { return null; } }
-  function readCreds() { try { const s = credStore().getItem(LS_KEY); const o = s ? JSON.parse(s) : null; return o && typeof o.url === 'string' && typeof o.key === 'string' ? o : null; } catch (e) { return null; } }
-  function saveCreds() { try { credStore().setItem(LS_KEY, JSON.stringify({ url: st.conn.url, key: st.conn.key, savedAt: new Date().toISOString() })); } catch (e) { toast('This browser would not keep the key (storage blocked).', true); } renderForget(); }
+  function readCreds() { try { const s = credStore().getItem(LS_KEY); const o = s ? JSON.parse(s) : null; return o && typeof o.url === 'string' && (o.key == null || typeof o.key === 'string') ? { url: o.url, key: o.key || '' } : null; } catch (e) { return null; } }
+  function saveCreds() { try { const o = { url: st.conn.url, savedAt: new Date().toISOString() }; if (st.conn.key) o.key = st.conn.key; credStore().setItem(LS_KEY, JSON.stringify(o)); } catch (e) { toast('This browser would not keep the address (storage blocked).', true); } renderForget(); }
   function removeCreds() { try { credStore().removeItem(LS_KEY); } catch (e) { /* storage blocked */ } if (FILE_PAGE) { try { localStorage.removeItem(LS_KEY); } catch (e) { /* storage blocked */ } } renderForget(); }
   // a key an earlier version kept in the shared file:// localStorage moves to this tab only
   function moveFileCreds() {
@@ -164,7 +167,8 @@
   }
 
   /* ------------------------------------------------------------------------------------------ talking to the bridge */
-  // every call carries the key in a header (never in the URL) and ngrok's "skip the browser warning" header
+  // every call carries ngrok's "skip the browser warning" header, and a key only when there is one (in a header,
+  // never in the URL): a bridge asks for it with a 401; a keyless bridge ignores it
   async function call(method, path, body, o) {
     o = o || {}; const c = st.conn;
     const ctl = new AbortController(); let timedOut = false;
@@ -172,7 +176,8 @@
     const outer = o.signal;
     const onOuter = () => ctl.abort();
     if (outer) { if (outer.aborted) ctl.abort(); else outer.addEventListener('abort', onOuter, { once: true }); }
-    const headers = { 'X-MP-Key': o.key || c.key, 'ngrok-skip-browser-warning': '1' };
+    const headers = { 'ngrok-skip-browser-warning': '1' };
+    if (o.key || c.key) headers['X-MP-Key'] = o.key || c.key;
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     try {
       let res;
@@ -210,21 +215,21 @@
     const tunnel = !isLoopback(u.hostname);
     const allow = location.protocol === 'https:' && isLoopback(u.hostname)
       ? ' If the browser asks whether this site may use apps and services on this device, choose <b>Allow</b>, or use your tunnel’s https address.' : '';
-    if (e.status === 401) return '<b>Wrong key.</b> Use the key the bridge printed when it started (it is also in <code>gpu-bridge\\config.json</code> on that PC).';
-    if (e.status === 403) return 'The bridge refused this page (' + esc(pageOrigin()) + '). Add it to <code>allowedOrigins</code> in <code>gpu-bridge\\config.json</code>, then restart the bridge.';
+    if (e.status === 401) return st.conn.key ? '<b>Wrong key.</b> Use the key shown in the bridge window on the GPU PC (it is also in <code>gpu-bridge\\config.json</code> there).' : 'This bridge asks for a key: it is shown in the bridge window on the GPU PC.';
+    if (e.status === 403) return 'The bridge refused this page (' + esc(pageOrigin()) + '). Add it to <code>allowedOrigins</code> in <code>gpu-bridge\\config.json</code> on the GPU PC, then restart the bridge.';
     if (e.status === 404) return 'Something answered at ' + host + ', but it is not the Model Pops GPU bridge. Check the address and the port (the bridge uses 8189).';
-    if (e.status >= 500 && tunnel) return 'The tunnel at ' + host + ' is up, but the bridge behind it did not answer (' + e.status + '). Start the bridge on your PC, and check that the tunnel points at port 8189.';
+    if (e.status >= 500 && tunnel) return 'The tunnel at ' + host + ' is up, but the bridge behind it did not answer (' + e.status + '). Start the bridge on the GPU PC, and check that the tunnel points at port 8189.';
     if (e.status) return 'The bridge answered with an error (' + e.status + ')' + (msgOf(e) ? ': ' + esc(msgOf(e)) : '.');
     if (e.kind === 'notbridge') return 'Something answered at ' + host + ', but not like the Model Pops GPU bridge.' + (tunnel ? ' If it is an ngrok page, check that the tunnel points at the bridge (port 8189).' : '');
-    if (e.kind === 'timeout') return 'No answer from ' + host + ' in ' + e.secs + ' seconds. Check that the bridge' + (tunnel ? ' and the tunnel are' : ' is') + ' running.' + allow;
+    if (e.kind === 'timeout') return 'No answer from ' + host + ' in ' + e.secs + ' seconds. ' + (tunnel ? 'The bridge and the tunnel run on the GPU PC: are both still running, and is that PC awake? (A new cloudflared quick tunnel can take up to a minute to answer.)' : 'Check that the bridge is running.') + allow;
     if (await reachable(base)) {
       return tunnel
-        ? 'The address ' + host + ' answers, but the bridge did not. Check that both the tunnel and the bridge are running on your PC, and that the tunnel points at port 8189. (Free tunnel addresses change every time they start: paste the new one.)'
+        ? 'The address ' + host + ' answers, but the bridge behind it did not. The bridge and the tunnel run on the GPU PC: are both running there, is that PC awake, and does the tunnel point at port 8189? Only a cloudflared quick-tunnel address changes at each start (paste the new one; a new one can take up to a minute to answer). ngrok’s free address stays the same.'
         : 'Something on this PC answered at ' + host + ', but the browser blocked its reply (CORS). If it is the bridge, add this page (' + esc(pageOrigin()) + ') to <code>allowedOrigins</code> in <code>gpu-bridge\\config.json</code> and restart it.';
     }
-    if (tunnel) return 'Can’t reach ' + host + '. If it is a tunnel (ngrok or cloudflared), is it still running? Free tunnel addresses change every time they start: paste the new one.';
+    if (tunnel) return 'Can’t reach ' + host + '. The tunnel runs on the GPU PC, next to the bridge: is it still running there, and is that PC awake? Only a cloudflared quick-tunnel address changes at each start: paste the new one (a new one can take up to a minute to answer). ngrok’s free address stays the same.';
     // an https page (the online studio) needs the browser's permission to reach this PC (Local Network Access)
-    if (location.protocol === 'https:') return 'Couldn’t reach the bridge at ' + host + '. Is it running on this PC? This https page also needs the browser’s permission to reach apps on this device: when it asks, choose <b>Allow</b> (if you blocked it once, allow it again in the site settings, left of the address bar). Or use your tunnel’s https address.';
+    if (location.protocol === 'https:') return 'Couldn’t reach the bridge at ' + host + '. Is it running on this PC? That address works only on the GPU PC itself: on another device, paste the <b>https</b> address of the tunnel running on the GPU PC. This https page also needs the browser’s permission to reach apps on this device: when it asks, choose <b>Allow</b> (if you blocked it once, allow it again in the site settings, left of the address bar). Or use your tunnel’s https address.';
     return 'Nothing answered at ' + host + '. Is the bridge running on this PC? Start it, then connect again.';
   }
 
@@ -233,16 +238,16 @@
     const c = st.conn;
     const n = normalizeURL($('#gd-url', D).value);
     if (n.error) return connFail(esc(n.error));
-    const key = $('#gd-key', D).value.trim();
-    if (!key) return connFail('Paste the key the bridge printed when it started.');
+    const key = $('#gd-key', D).value.trim();                // empty unless the bridge asked for one (or one was saved)
     if (location.protocol === 'https:' && n.u.protocol === 'http:' && !isLoopback(n.u.hostname)) {
-      return connFail('This page is on https, so the browser blocks plain <b>http</b> addresses (except this PC’s own 127.0.0.1). Use the <b>https</b> address your tunnel shows (ngrok or cloudflared).');
+      return connFail('This page is on https, so the browser blocks plain <b>http</b> addresses (except this PC’s own 127.0.0.1). Use the <b>https</b> address the tunnel on the GPU PC shows (cloudflared or ngrok).');
     }
     $('#gd-url', D).value = n.url;
     if (st.run && (n.url !== c.url || key !== c.key)) cancelRun(true);       // its job lives on the other bridge
     const seq = ++connSeq;
     c.url = n.url; c.key = key; c.state = 'checking'; c.err = ''; c.health = null;
     renderConn();
+    let askNow = false;
     try {
       const h = await call('GET', '/api/health', undefined, { timeout: 8000 });
       if (seq !== connSeq) return;
@@ -253,10 +258,12 @@
       refreshMineThumb();
     } catch (e) {
       if (seq !== connSeq) return;
+      if (e.status === 401) { c.askKey = true; askNow = true; }             // this bridge asks for a key: show its field
       c.state = 'error'; c.health = null; c.err = await explain(e, n.url);
       if (seq !== connSeq) return;
     }
     renderAll();
+    if (askNow && st.open) $('#gd-key', D).focus();
   }
   function connFail(html) { const c = st.conn; ++connSeq; c.state = 'error'; c.err = html; c.health = null; renderConn(); renderMake(); }
   function disconnect(msg) {
@@ -280,7 +287,7 @@
       if (c.state === 'lost') { c.state = 'on'; c.err = ''; }
     } catch (e) {
       if (seq !== connSeq) return;
-      if (e.status === 401) { c.state = 'error'; c.editing = true; c.err = 'The bridge no longer accepts this key (was it restarted with a new one?). Paste the new key and Connect.'; renderAll(); return; }
+      if (e.status === 401) { c.state = 'error'; c.editing = true; c.askKey = true; c.err = c.key ? 'The bridge no longer accepts this key (was it restarted with a new one?). Paste the new key and Connect.' : 'This bridge now asks for a key: it is shown in the bridge window on the GPU PC.'; renderAll(); return; }
       c.state = 'lost'; c.err = await explain(e, c.url);
       if (seq !== connSeq) return;
     }
@@ -431,19 +438,20 @@
     if (st.run !== r) return;
     st.run = null; stopTicker();
     st.runMsg = e ? noteHTML('warn', runError(e) + ' <button type="button" class="gd-link" data-act="go">Try again</button>') : '';
-    if (e && e.kind === 'network' && st.conn.state === 'on') { st.conn.state = 'lost'; st.conn.err = 'The connection dropped while it was working. The bridge may still finish the image on your PC.'; scheduleHealth(3000); }
+    if (e && e.status === 401) { st.conn.askKey = true; st.conn.editing = true; }      // the bridge asks for a key: show its field now
+    if (e && e.kind === 'network' && st.conn.state === 'on') { st.conn.state = 'lost'; st.conn.err = 'The connection dropped while it was working. The bridge may still finish the image on the GPU PC.'; scheduleHealth(3000); }
     renderAll();
   }
   function runError(e) {
     if (e.user) return esc(e.user);
-    if (e.status === 401) return 'The bridge no longer accepts this key (was it restarted with a new one?). Connect again with the new key.';
+    if (e.status === 401) return st.conn.key ? 'The bridge no longer accepts this key (was it restarted with a new one?). Connect again with the new key.' : 'The bridge now asks for a key: it is shown in the bridge window on the GPU PC. Connect again with it.';
     if (e.status === 429) return 'Your GPU’s queue is full (3 waiting). Try again when one has finished.';
     if (e.status === 413) return 'The design picture is too large for the bridge (12 MB).';
     if (e.status === 503) return 'Your GPU is not available right now' + (msgOf(e) ? ': ' + esc(msgOf(e)) : '.');
     if (e.status === 400) return 'The bridge did not accept it' + (msgOf(e) ? ': ' + esc(msgOf(e)) : '.');
     if (e.status) return 'The bridge answered with an error (' + e.status + ')' + (msgOf(e) ? ': ' + esc(msgOf(e)) : '.');
     if (e.kind === 'timeout') return 'The bridge stopped answering (no reply in ' + e.secs + ' s).';
-    if (e.kind === 'network') return 'Lost the connection to the bridge. The image may still finish on your PC; reconnect and try again.';
+    if (e.kind === 'network') return 'Lost the connection to the bridge. The image may still finish on the GPU PC; reconnect and try again.';
     return 'Something went wrong: ' + esc(e.message || e);
   }
   function cancelRun(quiet) {
@@ -571,16 +579,17 @@
       // 1 · connect
       '<section class="gd-sec" id="gd-conn"><div class="gd-sec-h"><h3>Connect</h3><span class="gd-pill" id="gd-pill"><i></i><span></span></span></div>' +
       '<div class="gd-intro" id="gd-intro"><p>Make <b>background art</b> and <b>logo or pack ideas</b> with ComfyUI on your own PC. The studio itself needs no GPU: everything else works without this.</p>' +
-      '<ol class="gd-steps"><li>On the PC with the GPU, start the <b>Model Pops GPU bridge</b> (the <code>gpu-bridge</code> folder; its README has the steps). It shows an address and a key.</li>' +
-      '<li>On that PC, the address is <b>' + LOCAL_URL + '</b>. From anywhere else, start a tunnel to it (cloudflared or ngrok) and use the <b>https</b> address the tunnel shows.</li>' +
-      '<li>Paste the address and the key here, then Connect.</li></ol></div>' +
+      '<ol class="gd-steps"><li>On the PC with the GPU, start the <b>Model Pops GPU bridge</b> (the <code>gpu-bridge</code> folder; its README has the steps). It shows the address.</li>' +
+      '<li>On that PC, the address is <b>' + LOCAL_URL + '</b>. For another device, start a tunnel on that same PC, next to the bridge (cloudflared or ngrok), then paste the <b>https</b> address it shows on that device. That device needs nothing installed.</li>' +
+      '<li>Paste the address here, then Connect.</li></ol></div>' +
       '<div class="gd-form" id="gd-form">' +
       '<div class="field"><label class="lbl" for="gd-url">Bridge address</label><input class="inp" id="gd-url" type="url" inputmode="url" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="' + LOCAL_URL + '  or  https://….trycloudflare.com">' +
-      '<div class="gd-hint">This PC: <button type="button" class="gd-link" data-act="local">' + LOCAL_URL + '</button> · anywhere: your tunnel’s https address</div></div>' +
-      '<div class="field"><label class="lbl" for="gd-key">Key</label><div class="gd-keyrow"><input class="inp" id="gd-key" type="password" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="The key the bridge printed">' +
+      '<div class="gd-hint">On the GPU PC: <button type="button" class="gd-link" data-act="local">' + LOCAL_URL + '</button> · another device: the https address of the tunnel running on the GPU PC</div></div>' +
+      // the key: shown only when the bridge asks for one (it answered 401: its requireKey is on)
+      '<div class="field" id="gd-keyf" hidden><label class="lbl" for="gd-key">Key</label><div class="gd-keyrow"><input class="inp" id="gd-key" type="password" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="The key in the bridge window">' +
       '<button type="button" class="btn sm" data-act="showkey" aria-pressed="false" aria-label="Show the key">Show</button></div></div>' +
-      '<label class="chk"' + (FILE_PAGE ? ' title="Opened from disk: every file opened from disk shares this browser’s storage, so the key is never kept past this tab."' : '') + '><input type="checkbox" id="gd-remember"> ' + (FILE_PAGE ? 'Remember until this tab closes' : 'Remember on this browser') + '</label>' +
-      '<div class="gd-row"><button type="button" class="btn primary" data-act="connect" id="gd-connect">Connect</button><button type="button" class="btn ghost sm" data-act="forget" id="gd-forget" hidden>' + icon('trash', 'ico-sm') + 'Forget the saved key</button></div></div>' +
+      '<label class="chk"' + (FILE_PAGE ? ' title="Opened from disk: every file opened from disk shares this browser’s storage, so the address (and any key) is never kept past this tab."' : '') + '><input type="checkbox" id="gd-remember"> ' + (FILE_PAGE ? 'Remember until this tab closes' : 'Remember on this browser') + '</label>' +
+      '<div class="gd-row"><button type="button" class="btn primary" data-act="connect" id="gd-connect">Connect</button><button type="button" class="btn ghost sm" data-act="forget" id="gd-forget" hidden>' + icon('trash', 'ico-sm') + 'Forget the saved address</button></div></div>' +
       '<div class="gd-summary" id="gd-summary" hidden></div>' +
       '<div id="gd-msg" role="status" aria-live="polite"></div></section>' +
       // 2 · make
@@ -618,7 +627,7 @@
     $('#gd-style', D).addEventListener('input', () => { st.styleTouched = true; renderStyleCount(); renderChips(); });
     $('#gd-seed', D).addEventListener('change', e => { e.target.value = clampSeed(e.target.value); st.seed = Number(e.target.value); });
     $('#gd-remember', D).addEventListener('change', e => {
-      if (!e.target.checked) { removeCreds(); toast('This browser no longer keeps the bridge address and key.'); }
+      if (!e.target.checked) { removeCreds(); toast('This browser no longer keeps the bridge address' + (st.conn.key ? ' or key.' : '.')); }
       else if (st.conn.state === 'on') saveCreds();
     });
     // the "Use as background" button names the panel it goes on: keep it right when the panel changes
@@ -628,12 +637,12 @@
     const t = e.target.closest && e.target.closest('[data-act]'); if (!t || !D.contains(t) || t.disabled) return;
     const a = t.getAttribute('data-act'), v = t.getAttribute('data-v');
     if (a === 'close') close();
-    else if (a === 'local') { $('#gd-url', D).value = LOCAL_URL; $('#gd-key', D).focus(); }
+    else if (a === 'local') { $('#gd-url', D).value = LOCAL_URL; $(st.conn.askKey ? '#gd-key' : '#gd-connect', D).focus(); }
     else if (a === 'showkey') { const k = $('#gd-key', D); const show = k.type === 'password'; k.type = show ? 'text' : 'password'; t.textContent = show ? 'Hide' : 'Show'; t.setAttribute('aria-pressed', String(show)); t.setAttribute('aria-label', show ? 'Hide the key' : 'Show the key'); }
     else if (a === 'connect' || a === 'reconnect') { if (a === 'reconnect') { $('#gd-url', D).value = st.conn.url; $('#gd-key', D).value = st.conn.key; } connect(); }
     else if (a === 'change') { st.conn.editing = true; renderConn(); $('#gd-url', D).focus(); }
     else if (a === 'disconnect') disconnect();
-    else if (a === 'forget') { removeCreds(); $('#gd-remember', D).checked = false; $('#gd-key', D).value = ''; disconnect('Forgot the saved address and key on this browser.'); }
+    else if (a === 'forget') { const k = (readCreds() || {}).key; removeCreds(); $('#gd-remember', D).checked = false; $('#gd-key', D).value = ''; st.conn.key = ''; st.conn.askKey = false; disconnect('Forgot the saved address' + (k ? ' and key' : '') + ' on this browser.'); }
     else if (a === 'mode') { if (MODES[v] && v !== st.mode) { const was = st.mode; st.mode = v; if (!st.styleTouched || styleIsChipOf(was)) { $('#gd-style', D).value = MODES[v].chips[0][1]; st.styleTouched = false; } renderMake(); refreshMineThumb(); } }
     else if (a === 'base') { if (BASES[v]) { st.base = v; renderMake(); if (v === 'mine') refreshMineThumb(); } }
     else if (a === 'band') { st.distance = BAND_AT[Number(t.getAttribute('data-i'))]; renderDistance(); }
@@ -667,7 +676,7 @@
       connect();
     } else if (st.conn.state === 'on' || st.conn.state === 'lost') pollHealth();
     renderAll(); refreshMineThumb();
-    setTimeout(() => { const f = st.conn.state === 'on' ? $('#gd-go', D) : (!$('#gd-url', D).value ? $('#gd-url', D) : $('#gd-key', D).value ? $('#gd-connect', D) : $('#gd-key', D)); if (f && !f.disabled) f.focus({ preventScroll: true }); }, 220);
+    setTimeout(() => { const f = st.conn.state === 'on' ? $('#gd-go', D) : (!$('#gd-url', D).value ? $('#gd-url', D) : st.conn.askKey && !$('#gd-key', D).value ? $('#gd-key', D) : $('#gd-connect', D)); if (f && !f.disabled) f.focus({ preventScroll: true }); }, 220);
   }
   function close() {
     if (!st.open) return;
@@ -680,7 +689,7 @@
   /* ---- rendering */
   function renderAll() { renderConn(); renderMake(); renderRun(); renderResults(); }
   function healthText(h) {
-    const comfy = { up: 'ComfyUI ready', starting: 'ComfyUI starting (the first load takes about a minute)', down: 'ComfyUI not running yet', error: 'ComfyUI hit an error (see the bridge window)' }[h.comfy] || 'ComfyUI: ' + esc(h.comfy);
+    const comfy = { up: 'ComfyUI ready', starting: 'ComfyUI starting (the first load takes about a minute)', down: 'ComfyUI not running yet', error: 'ComfyUI hit an error (see the bridge window on the GPU PC)' }[h.comfy] || 'ComfyUI: ' + esc(h.comfy);
     const q = Number(h.queued) || 0;
     const work = h.busy ? 'making an image' + (q ? ', ' + q + ' waiting' : '') : q ? q + ' waiting' : '';
     const g = h.gpu && typeof h.gpu === 'object' ? 'GPU ' + Math.round(Number(h.gpu.util) || 0) + ' %' + (h.gpu.memTotalMB ? ' · ' + gb(Number(h.gpu.memUsedMB) || 0) + ' of ' + gb(Number(h.gpu.memTotalMB)) + ' GB' : '') : 'GPU use not reported';
@@ -692,7 +701,7 @@
     const parts = [];
     if (Number.isFinite(d) && d > 0) parts.push('the GPU works at most about ' + Math.round(d) + ' % of the time');
     if (Number(c.reserveVramGB) > 0) parts.push(Number(c.reserveVramGB) + ' GB of its memory stay free');
-    return parts.length ? 'Capped: ' + parts.join(' and ') + ', so your PC stays usable.' : '';
+    return parts.length ? 'Capped: ' + parts.join(' and ') + ', so the GPU PC stays usable.' : '';
   }
   function pillState() {
     const c = st.conn, h = c.health;
@@ -714,6 +723,7 @@
     $('#btn-gpu').title = 'AI on your GPU · ' + txt;
     $('#gd-intro', D).hidden = live;
     $('#gd-form', D).hidden = live && !c.editing;
+    $('#gd-keyf', D).hidden = !c.askKey;                     // the key field: only once the bridge asked for one
     $('#gd-connect', D).disabled = c.state === 'checking';
     $('#gd-connect', D).textContent = c.state === 'checking' ? 'Connecting…' : 'Connect';
     renderForget();
@@ -742,8 +752,8 @@
     $$('#gd-bases .gd-base', D).forEach(b => { const k = b.getAttribute('data-v'); const on = k === st.base, ok = baseAvailable(k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = !ok; b.title = ok ? '' : 'Not among the bases the bridge has on that PC'; });
     const im = $('#gd-thumb-mine', D); if (im && st.mineThumb && im.getAttribute('src') !== st.mineThumb) im.src = st.mineThumb;
     $('#gd-basenote', D).textContent = st.base === 'mine'
-      ? (st.mode === 'art' ? 'Sent as its background only: no words, no logo, no pop.' : 'Sent as it is now: the logo, the words and the real pop' + (st.mode === 'pack' ? ', with its words passed on to be spelled exactly.' : '.'))
-      : 'The client’s current ' + (st.base === 'bag' ? 'bag' : 'wrapper') + ' draft (a base already on your PC, with its words).';
+      ? 'Uses the design open in this browser. ' + (st.mode === 'art' ? 'Sent as its background only: no words, no logo, no pop.' : 'Sent as it is now: the logo, the words and the real pop' + (st.mode === 'pack' ? ', with its words passed on to be spelled exactly.' : '.'))
+      : 'The client’s current ' + (st.base === 'bag' ? 'bag' : 'wrapper') + ' draft (a base already on the GPU PC, with its words).';
     if (!$('#gd-style', D).value.trim() && !st.styleTouched) $('#gd-style', D).value = M.chips[0][1];
     renderDistance(); renderStyleCount(); renderChips(); renderSeed(); renderGo();
   }
@@ -770,7 +780,7 @@
     if (!m || typeof m !== 'object' || m.enoughToLoad !== false || h.modelsLoaded) return '';
     const need = Number(m.modelsNeedGB) || 0, free = Number(m.commitFreeGB) || 0, lim = Number(m.commitLimitGB) || 0, below = Number(m.loadBelowPct) || 85;
     const more = Math.max(1, Math.ceil(need - (free - lim * (1 - below / 100))));
-    return 'Your PC is short of memory for the AI models right now: they take about <b>' + Math.round(need) + ' GB</b> of Windows memory (RAM + page file), and ' + Math.round(free) + ' GB is free. Close apps to free about <b>' + more + ' GB</b> more (games, browser tabs, other AI tools) before you generate. Until then the bridge won’t load them, so your PC never runs out of memory.';
+    return 'The GPU PC is short of memory for the AI models right now: they take about <b>' + Math.round(need) + ' GB</b> of Windows memory (RAM + page file), and ' + Math.round(free) + ' GB is free. Close apps there to free about <b>' + more + ' GB</b> more (games, browser tabs, other AI tools) before you generate. Until then the bridge won’t load them, so that PC never runs out of memory.';
   }
   function renderGo() {
     const g = $('#gd-go', D);
@@ -810,9 +820,9 @@
     const t = $('#gd-time', D); if (t) t.textContent = r.tSent ? clock(runMs(r)) : '';
     const hint = $('#gd-run-hint', D); if (!hint) return;
     const h = st.conn.health; const ms = runMs(r);
-    hint.textContent = r.phase === 'queued' && h && h.comfy !== 'up' ? 'ComfyUI is starting on your PC; the first image takes longer.'
+    hint.textContent = h && (h.comfy === 'starting' || (r.phase === 'queued' && h.comfy !== 'up')) ? 'ComfyUI is starting on the GPU PC; the first image takes longer.'
       : r.phase === 'running' && ms > 90000 ? 'Taking longer than usual (the first run loads the models). It keeps going.'
-        : r.phase === 'running' ? 'Usually 15–40 s, at a capped pace so your PC stays usable.' : '';
+        : r.phase === 'running' ? 'Usually 15–40 s, at a capped pace so the GPU PC stays usable.' : '';
   }
   function renderResults() {
     if (!D) return;
