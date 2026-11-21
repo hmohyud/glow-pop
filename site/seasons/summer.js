@@ -83,6 +83,7 @@
       cabanasLede: 'Three cabanas on the sand: choose one and its curtains open. Collagen Boost and <span data-name="green-pop">Green Veggies</span> are open now; Liposomal Vitamin C opens soon.',
       // the Sun Index
       sunLede: 'Your first month, told as one summer day.',
+      dayTitle: 'A summer day with <em>Model Pops.</em>',
       // the menu and the waitlist
       menuLede: 'Collagen Boost, ten strawberry pops to a bag; <span data-name="green-pop">Green Veggies</span>, sixty. Choose your pop and a signature, then how you’d like it served.',
       serveOnce: 'Just this once, poolside.',

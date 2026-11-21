@@ -23,3 +23,14 @@ including commercial use, with no attribution required. Credits are listed here 
 
 Assets load over http(s). Opened straight from disk (`file://`), browsers block them in WebGL,
 so the 3D library falls back to its procedural environment and textures.
+
+## Photographs on the day postcards (site/assets/day)
+
+Found through Openverse (api.openverse.org), filtered to CC0 and public-domain-mark works, on 2026-11-21. CC0 needs no credit; the sources are listed so the choice can be checked. Each page was read on 2026-11-21 and states "free for both personal and commercial use. CC0 license. No attribution required." If a picture is kept, a larger original can be downloaded from its page.
+
+| File | Picture | Source | Licence | Page | What was done |
+|---|---|---|---|---|---|
+| `site/assets/day/morning.webp` | Woman Paddleboard, by YesManPro | StockSnap | CC0 1.0 (public domain dedication) | https://stocksnap.io/photo/woman-paddleboard-LD6NNOJJKT | 960 px wide preview from the StockSnap CDN, cropped and re-encoded as WebP |
+| `site/assets/day/midday.webp` | Woman Girl, by Jens Kreuter | StockSnap | CC0 1.0 (public domain dedication) | https://stocksnap.io/photo/woman-girl-AWETGB1PS6 | 960 px wide preview from the StockSnap CDN, cropped and re-encoded as WebP |
+| `site/assets/day/golden.webp` | Tropical Beach, by Joe deSousa | StockSnap | CC0 1.0 (public domain dedication) | https://stocksnap.io/photo/tropical-beach-807SY1FTFT | 960 px wide preview from the StockSnap CDN, cropped and re-encoded as WebP |
+| `site/assets/day/night.webp` | Moon Ocean, by JJ Skys the Limit | StockSnap | CC0 1.0 (public domain dedication) | https://stocksnap.io/photo/moon-ocean-JLUHRYXJE1 | 960 px wide preview from the StockSnap CDN, cropped and re-encoded as WebP |

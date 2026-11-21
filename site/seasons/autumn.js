@@ -25,6 +25,7 @@
       postmark: 'MODEL POPS BEACH CLUB · CABANA NO. 1 · GOLDEN HOUR ·',
       cabanasLede: 'Three cabanas on the sand, in the last of the sun: choose one and its curtains open. Collagen Boost and <span data-name="green-pop">Green Veggies</span> are open now; Liposomal Vitamin C opens soon.',
       sunLede: 'Your first month, told as one autumn day.',
+      dayTitle: 'An autumn day with <em>Model Pops.</em>',
       serveOnce: 'Just this once, at golden hour.',
       waitlistTitle: 'Save a table on the terrace at the <em>third cabana.</em>',
       waitlistEmpty: 'Please add your email address so we can save your table.',

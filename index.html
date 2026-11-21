@@ -46,6 +46,7 @@
 <link rel="stylesheet" href="site/style.css">
 <link rel="stylesheet" href="site/swiss.css">
 <link rel="stylesheet" href="site/rider.css">
+<link rel="stylesheet" href="site/day.css">
 <!-- the four seasons, each scoped to html[data-season="…"] (only the current one applies) -->
 <link rel="stylesheet" href="site/seasons/summer.css">
 <link rel="stylesheet" href="site/seasons/autumn.css">
@@ -121,7 +122,7 @@
       <ul>
         <li><a href="#cabanas">Lineup</a></li>
         <li><a href="#amenities">Ingredients</a></li>
-        <li><a href="#sun-index">Ritual</a></li>
+        <li><a href="#day">Ritual</a></li>
         <li><a href="#sugar">Sugar Free</a></li>
         <li><a href="#capsules">Vitamin C</a></li>
         <li><a href="#faq">FAQ</a></li>
@@ -144,7 +145,7 @@
     <ol class="menu-panel__list">
       <li><a href="#cabanas"><span aria-hidden="true">N<span class="ord">o</span> 1</span>Lineup</a></li>
       <li><a href="#amenities"><span aria-hidden="true">N<span class="ord">o</span> 2</span>Ingredients</a></li>
-      <li><a href="#sun-index"><span aria-hidden="true">N<span class="ord">o</span> 3</span>Ritual</a></li>
+      <li><a href="#day"><span aria-hidden="true">N<span class="ord">o</span> 3</span>Ritual</a></li>
       <li><a href="#sugar"><span aria-hidden="true">N<span class="ord">o</span> 4</span>Sugar Free</a></li>
       <li><a href="#capsules"><span aria-hidden="true">N<span class="ord">o</span> 5</span>Vitamin C</a></li>
       <li><a href="#menu"><span aria-hidden="true">N<span class="ord">o</span> 6</span>Shop</a></li>
@@ -375,63 +376,96 @@
        one card, the dots. The card's pouches carry the count: a pop leaves the bag each day, a bag empties in
        ten, three bags make the month. Static by default (every stop listed with its own pouches); app.js pins
        it when the screen fits.  -->
-  <section class="sunindex theme-pin" id="sun-index" aria-labelledby="sun-title">
-    <div class="sunindex__stage is-window" data-water="sea" data-sun="arc" data-stop="0">
-      <header class="sunindex__head" data-haze>
-        <p class="eyebrow">The ritual</p>
-        <h2 class="display" id="sun-title">The Sun <em>Index.</em></h2>
-        <p class="lede sunindex__lede" data-season-copy="sunLede">Your first month, told as one summer day.</p>
-        <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind-html="ritualNote">Shown for Collagen Boost strawberry pops.</span></p>
-      </header>
-
-      <!-- the day (drawn by app.js): the sun's arc with the third bag's band, its two feet labelled -->
-      <svg class="sunindex__arc" id="sunArc" aria-hidden="true" focusable="false"></svg>
-      <div class="sun" id="sun" aria-hidden="true">
-        <svg class="sun__rays" viewBox="0 0 200 200"><g id="sunRays"></g></svg>
-        <span class="sun__disc"></span>
-      </div>
-      <svg class="sunindex__marks" id="sunMarks" aria-hidden="true" focusable="false"></svg>
-
-      <!-- the dots come before the card, so Tab meets them first (pinned they sit under it; static they're hidden) -->
-      <div class="sunindex__dial" role="group" aria-label="Jump to a stop">
-        <button type="button" data-goto="0" aria-controls="sun-stop-0" aria-current="step"><span class="sr-only">Day 1</span></button>
-        <button type="button" data-goto="1" aria-controls="sun-stop-1"><span class="sr-only">Every day</span></button>
-        <button type="button" data-goto="2" aria-controls="sun-stop-2"><span class="sr-only">Bag by bag</span></button>
-        <button type="button" data-goto="3" aria-controls="sun-stop-3"><span class="sr-only">Days 21 to 30</span></button>
+  <section class="day theme-pin" id="day" aria-labelledby="day-title">
+    <div class="day__pin">
+      <div class="day__sky" aria-hidden="true">
+        <span class="day__layer day__layer--dawn"></span><span class="day__layer day__layer--noon"></span><span class="day__layer day__layer--gold"></span><span class="day__layer day__layer--haze"></span><span class="day__layer day__layer--night"></span><span class="day__layer day__layer--dusk"></span>
+        <span class="day__stars"></span><span class="day__sun"></span><span class="day__moon"></span><span class="day__sea"></span>
       </div>
 
-      <div class="sunindex__sheet" id="sunSheet">
-        <!-- three pouches, ten pops in each, emptying one pop a day as the sun travels (visual only: the list says it) -->
-        <svg class="pouches" id="sunPouches" aria-hidden="true" focusable="false"></svg>
-        <ol class="sunindex__stops" id="sunStops" aria-label="Your first month, one pop a day">
-          <li class="stop is-active" id="sun-stop-0" data-stop="0" data-day="1">
-            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
-            <p class="stop__when">Day 1</p>
-            <h3>Unwrap &amp; enjoy</h3>
-            <p class="stop__text">Strawberry and sugar free, sweetened with isomalt and stevia leaf, with four actives in every pop.</p>
-          </li>
-          <li class="stop" id="sun-stop-1" data-stop="1" data-day="5">
-            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
-            <p class="stop__when">Every day</p>
-            <h3>One a day</h3>
-            <p class="stop__text">One pop a day: 16 calories and 0&nbsp;g sugar each.</p>
-          </li>
-          <li class="stop" id="sun-stop-2" data-stop="2" data-day="10">
-            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
-            <p class="stop__when">Bag by bag</p>
-            <h3>A bag lasts ten days</h3>
-            <p class="stop__text">Ten pops to a bag, so three bags make about a month.</p>
-          </li>
-          <li class="stop" id="sun-stop-3" data-stop="3" data-day="30">
-            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
-            <p class="stop__when"><span class="stop__key" aria-hidden="true"></span>Days <span class="nw">21–30</span></p>
-            <h3>The month, complete</h3>
-            <p class="stop__text">The third bag sees the month out: thirty pops, one a day.</p>
-            <a class="btn btn--sm stop__cta" href="#menu" data-shop="strawberry-pop" data-pick-bundle="month"><span>Choose The Month</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </li>
-        </ol>
+      <div class="day__track" id="dayTrack">
+        <header class="day__intro">
+          <p class="eyebrow">The ritual · 08:00 to 22:00</p>
+          <h2 class="display" id="day-title" data-season-copy="dayTitle">A summer day with <em>Model Pops.</em></h2>
+          <p class="lede">Four postcards. One pop a day.</p>
+          <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span>Shown for Collagen Boost strawberry pops.</span></p>
+          <p class="day__cue" aria-hidden="true"><span>Scroll the day</span><i data-lucide="arrow-right"></i></p>
+        </header>
+
+        <article class="pc pc--morning" aria-labelledby="pc1-t">
+          <div class="pc__front">
+            <img class="pc__img" src="site/assets/day/morning.webp" width="576" height="640" loading="lazy" decoding="async" alt="A paddleboarder crossing a calm, sunlit sea early in the morning.">
+            <p class="pc__time"><b>08:00</b> Morning</p>
+          </div>
+          <div class="pc__back">
+            <div class="pc__top">
+              <p class="pc__step">Step 01</p>
+              <div class="pc__post" aria-hidden="true"><svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g></svg><span class="pc__stamp"><svg viewBox="0 0 48 48" focusable="false"><use href="#o-sun"/></svg><b>08</b></span></div>
+            </div>
+            <h3 class="pc__title" id="pc1-t">Unwrap &amp; enjoy</h3>
+            <p class="pc__note">One a day is the whole ritual. Have it with your morning coffee, on the way out, or wherever the morning takes you.</p>
+            <ul class="pc__facts" aria-label="Morning facts"><li><i data-lucide="sun" aria-hidden="true"></i>One a day</li><li><i data-lucide="lollipop" aria-hidden="true"></i>Strawberry</li><li><i data-lucide="package" aria-hidden="true"></i>10 pops per bag</li></ul>
+            <div class="pc__foot"><p class="pc__sign">x, Model Pops</p><p class="pc__to" aria-hidden="true">To: you, wherever the sun is</p></div>
+          </div>
+        </article>
+
+        <article class="pc pc--midday" aria-labelledby="pc2-t">
+          <div class="pc__front">
+            <img class="pc__img" src="site/assets/day/midday.webp" width="576" height="640" loading="lazy" decoding="async" alt="A woman in a straw hat looking out over a bright blue sea, seen from behind.">
+            <p class="pc__time"><b>13:00</b> Midday</p>
+          </div>
+          <div class="pc__back">
+            <div class="pc__top">
+              <p class="pc__step">Step 02</p>
+              <div class="pc__post" aria-hidden="true"><svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g></svg><span class="pc__stamp"><svg viewBox="0 0 48 48" focusable="false"><use href="#o-sun"/></svg><b>13</b></span></div>
+            </div>
+            <h3 class="pc__title" id="pc2-t">Four actives in every pop</h3>
+            <p class="pc__note">While you get on with the afternoon, here is what each strawberry pop carries, straight from the label.</p>
+            <ul class="pc__actives"><li><b>Collagen peptides</b><span>500&nbsp;mg · types I &amp; III</span></li><li><b>Hyaluronic acid</b><span>10&nbsp;mg</span></li><li><b>Vitamin C</b><span>60&nbsp;mg</span></li><li><b>Biotin</b><span>5,000&nbsp;mcg · vitamin B7</span></li></ul>
+            <div class="pc__foot"><p class="pc__sign">wish you were here</p><p class="pc__to" aria-hidden="true">To: you, on the sun lounger</p></div>
+          </div>
+        </article>
+
+        <article class="pc pc--golden" aria-labelledby="pc3-t">
+          <div class="pc__front">
+            <img class="pc__img" src="site/assets/day/golden.webp" width="880" height="978" loading="lazy" decoding="async" alt="A palm tree leaning over the sea as the sun sets behind it.">
+            <p class="pc__time"><b>19:00</b> Golden hour</p>
+          </div>
+          <div class="pc__back">
+            <div class="pc__top">
+              <p class="pc__step">Step 03</p>
+              <div class="pc__post" aria-hidden="true"><svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g></svg><span class="pc__stamp"><svg viewBox="0 0 48 48" focusable="false"><use href="#o-sun"/></svg><b>19</b></span></div>
+            </div>
+            <h3 class="pc__title" id="pc3-t">Make it a month</h3>
+            <p class="pc__note">Ten pops to a bag, so three bags make about a month: thirty pops, one a day.</p>
+            <ul class="pc__facts" aria-label="Golden hour facts"><li><i data-lucide="package" aria-hidden="true"></i>10 pops per bag</li><li><i data-lucide="calendar-days" aria-hidden="true"></i>Three bags, about a month</li><li><i data-lucide="repeat" aria-hidden="true"></i>Every day</li></ul>
+            <a class="btn btn--sm pc__cta" href="#menu" data-shop="strawberry-pop"><span>Choose your bags</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+            <div class="pc__foot"><p class="pc__sign">golden, obviously</p><p class="pc__to" aria-hidden="true">To: you, at golden hour</p></div>
+          </div>
+        </article>
+
+        <article class="pc pc--night" aria-labelledby="pc4-t">
+          <div class="pc__front">
+            <img class="pc__img" src="site/assets/day/night.webp" width="576" height="640" loading="lazy" decoding="async" alt="The moon over a calm sea at night, its light on the water.">
+            <p class="pc__time"><b>22:00</b> Night</p>
+          </div>
+          <div class="pc__back">
+            <div class="pc__top">
+              <p class="pc__step">Same time tomorrow?</p>
+              <div class="pc__post" aria-hidden="true"><svg class="pc__pm" viewBox="0 0 150 90" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="44" cy="44" r="37"/><circle cx="44" cy="44" r="30"/><path d="M88 28q7-6 14 0t14 0 14 0 14 0M88 40q7-6 14 0t14 0 14 0 14 0M88 52q7-6 14 0t14 0 14 0 14 0M88 64q7-6 14 0t14 0 14 0 14 0"/></g></svg><span class="pc__stamp"><svg viewBox="0 0 48 48" focusable="false"><path d="M31.5 7.5a17 17 0 1 0 9 30.2A19.5 19.5 0 0 1 31.5 7.5z" fill="currentColor" fill-opacity=".28" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><b>22</b></span></div>
+            </div>
+            <h3 class="pc__title" id="pc4-t">Sugar free. Sweet dreams.</h3>
+            <p class="pc__note">Still sweet, still strawberry: 0&nbsp;g sugar and 16 calories a pop, sweetened with isomalt and stevia leaf.</p>
+            <ul class="pc__facts" aria-label="Night facts"><li><i data-lucide="badge-check" aria-hidden="true"></i>Sugar free</li><li><i data-lucide="flame" aria-hidden="true"></i>16 calories</li><li><i data-lucide="lollipop" aria-hidden="true"></i>15&nbsp;g pop</li></ul>
+            <div class="pc__foot"><p class="pc__sign">sweet dreams</p><p class="pc__to" aria-hidden="true">To: you, under the moon</p></div>
+          </div>
+        </article>
       </div>
-      <p class="sr-only" id="sunStatus" aria-live="polite"></p>
+
+      <div class="day__hud" aria-hidden="true">
+        <span class="day__clock" id="dayClock">08:00</span>
+        <div class="day__rail"><span class="day__dot"></span><ol class="day__ticks"><li>Morning</li><li>Midday</li><li>Golden hour</li><li>Night</li></ol></div>
+      </div>
     </div>
   </section>
 
@@ -749,6 +783,7 @@
 <script src="site/candy3d.js" defer></script>
 <script src="site/app.js" defer></script>
 <script src="site/rider.js" defer></script>
+<script src="site/day.js" defer></script>
 <script id="lucide-js" src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" defer></script>
 </body>
 </html>

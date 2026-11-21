@@ -1,0 +1,133 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Model Pops — a day with Model Pops (day.css, with site/day.js)
+
+   The ritual, told as four postcards from one day: 08:00, 13:00, 19:00 and 22:00. Each postcard has a picture
+   side (a photograph, tagged with the time) and a written side (the step, a stamp and a
+   postmark, a few words, a sign-off). Brought over from the archived Golden Hour proposal, in this site's type
+   and colours and with the current label's facts.
+   · PINNED (.is-pinned, set by day.js on a screen 900 px wide or more and tall enough for a postcard, with motion allowed):
+     the section holds still while you scroll and the postcards slide past sideways; behind them the sky goes
+     from dawn to night, the sun crosses and sets, the moon comes up, and a small clock keeps the time.
+     day.js sets --p (0 to 1, how far through the day) and --travel (how far the row slides, px).
+   · STATIC (everything else: phones, tablets held upright, reduced motion, print): the postcards are a column
+     on one wash of sky from dawn at the top to night at the foot.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.day { position: relative; background: #FFE9D8; }
+.day__pin { position: relative; padding: var(--section-y, clamp(72px, 9vw, 140px)) var(--gutter); overflow: clip; }
+
+/* ── the sky ── */
+.day__sky { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, #FFE3D0 0%, #FFEBDD 14%, #CFECF6 34%, #BFE5F3 46%, #F8D3A2 64%, #F3B98A 76%, #5B3F7C 92%, #2A2358 100%); }
+.day__layer, .day__stars, .day__sun, .day__moon, .day__sea { display: none; position: absolute; }
+.day__layer, .day__stars { inset: 0; }
+.day__layer--dawn  { background: linear-gradient(to bottom, #FBCBD3 0%, #FFDCCF 46%, #FFF0E0 100%); }
+.day__layer--noon  { background: linear-gradient(to bottom, #8FD2EE 0%, #C4E8F5 52%, #EAF7F8 100%); }
+.day__layer--gold  { background: linear-gradient(to bottom, #F3A56B 0%, #F8C78D 46%, #FCE5C2 100%); }
+.day__layer--night { background: linear-gradient(to bottom, #171A46 0%, #2F2867 48%, #6E4686 100%); }
+/* two passing lights keep the in-between hours clean (a straight blend of blue into gold, or gold into night, goes grey):
+   the pale haze of mid-afternoon, and the rose of dusk */
+.day__layer--haze  { background: linear-gradient(to bottom, #CDE9F2 0%, #FBEBCB 55%, #FFF4DC 100%); }
+.day__layer--dusk  { background: linear-gradient(to bottom, #4B3A86 0%, #B0609B 46%, #F59C8E 78%, #FFC89B 100%); }
+.day__stars {
+  background:
+    radial-gradient(circle, #fff 0 1.1px, transparent 1.7px) 0 0 / 190px 170px,
+    radial-gradient(circle, rgba(255, 255, 255, .85) 0 .9px, transparent 1.5px) 70px 90px / 240px 210px,
+    radial-gradient(circle, rgba(255, 255, 255, .7) 0 1.4px, transparent 2px) 130px 40px / 330px 290px;
+}
+.day__sun { width: clamp(90px, 9vw, 150px); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; background: radial-gradient(circle, #FFFDF2 0 34%, #FFE9A8 35% 52%, rgba(255, 222, 150, .45) 53% 74%, rgba(255, 222, 150, 0) 75%); }
+.day__moon { right: 9%; top: 15%; width: clamp(56px, 5.4vw, 86px); aspect-ratio: 1; border-radius: 50%; box-shadow: inset -0.34em .08em 0 0 #FFF6DD; font-size: clamp(56px, 5.4vw, 86px); filter: drop-shadow(0 0 18px rgba(255, 240, 200, .5)); }
+.day__sea { left: 0; right: 0; bottom: 0; height: 15%; background: linear-gradient(to bottom, #5CC1DE 0%, #2E97C7 100%); box-shadow: 0 -1px 0 rgba(255, 255, 255, .55); }
+.day__sea::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, #2A2D6A, #151A44); opacity: clamp(0, calc(var(--p, 0) * 3 - 2), 1); }
+.day__sea::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255, 196, 120, .55), rgba(255, 170, 110, 0) 70%); opacity: clamp(0, calc(1 - max(var(--p, 0) * 3 - 2, 2 - var(--p, 0) * 3)), 1); }
+
+/* ── the row ── */
+.day__track { position: relative; z-index: 1; display: grid; gap: clamp(28px, 6vw, 44px); justify-items: center; max-width: var(--maxw); margin-inline: auto; }
+.day__intro { display: grid; gap: 14px; justify-items: start; width: 100%; max-width: 560px; }
+.day__intro .display { font-size: clamp(2.2rem, 1.3rem + 3.4vw, 4.2rem); }
+.day__intro .lede { color: var(--ink); }
+.day__cue { display: none; align-items: center; gap: 10px; margin-top: 6px; font: 500 var(--fs-cap)/1 var(--sans); letter-spacing: var(--track-cap); text-transform: uppercase; color: var(--accent-text); }
+.day__cue .lucide { width: 16px; height: 16px; }
+
+/* ── a postcard ── */
+.pc {
+  position: relative; display: grid; width: 100%; max-width: 560px; padding: 10px; border-radius: var(--r-xs);
+  background: var(--paper); box-shadow: 0 0 0 1px rgba(255, 255, 255, .7) inset, 0 26px 40px -22px rgba(74, 13, 46, .38), 0 2px 3px rgba(74, 13, 46, .08);
+}
+.pc__front { position: relative; min-height: 220px; border-radius: 2px; overflow: hidden; background: var(--sand); }
+.pc__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.04) contrast(1.03) sepia(.07) brightness(1.02); }   /* the site's one warm grade for photographs */
+.pc__time { position: absolute; left: 12px; bottom: 12px; margin: 0; padding: 8px 13px 7px; border-radius: var(--r-pill); background: rgba(255, 253, 248, .93); color: var(--ink); font: 500 .68rem/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 6px 14px -8px rgba(74, 13, 46, .5); }
+.pc__time b { margin-right: .5em; font-weight: 600; letter-spacing: .08em; color: var(--accent-deep); }
+
+.pc__back { display: flex; flex-direction: column; gap: 10px; padding: 16px 12px 8px; }
+.pc__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 60px; }
+.pc__step { margin: 4px 0 0; font: 500 var(--fs-cap)/1.2 var(--sans); letter-spacing: var(--track-cap); text-transform: uppercase; color: var(--accent-text); }
+.pc__post { position: relative; display: flex; align-items: flex-start; flex: none; }
+.pc__pm { width: 86px; height: 52px; margin: 6px -14px 0 0; color: var(--ink-2); opacity: .55; rotate: -7deg; }
+/* the stamp: a tinted square with a perforated edge (a dotted border in the card's own paper) */
+.pc__stamp { position: relative; display: grid; justify-items: center; align-content: center; gap: 1px; width: 50px; height: 60px; border: 3px dotted var(--paper); background: color-mix(in srgb, var(--accent) 16%, var(--paper)); background-clip: border-box; color: var(--accent-deep); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent); rotate: 3deg; }
+.pc__stamp svg { width: 20px; height: 20px; }
+.pc__stamp b { font: 600 .9rem/1 var(--serif); }
+.pc__title { margin: 6px 0 0; font: 600 clamp(1.5rem, 1.1rem + 1.6vw, 2.05rem)/1.08 var(--serif); letter-spacing: -.012em; color: var(--ink); text-wrap: balance; }
+.pc__note { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1rem; line-height: 1.55; text-wrap: pretty; }
+.pc__facts { display: flex; flex-wrap: wrap; gap: 7px; margin: 2px 0 0; padding: 0; list-style: none; }
+.pc__facts li { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: var(--r-pill); background: var(--white); color: var(--accent-deep); font: 500 .82rem/1 var(--sans); letter-spacing: .02em; box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent); }
+.pc__facts .lucide { width: 14px; height: 14px; color: var(--accent-text); }
+.pc__actives { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin: 2px 0 0; padding: 0; list-style: none; }
+.pc__actives li { display: grid; gap: 2px; padding-top: 8px; border-top: 1px solid var(--line-2); }
+.pc__actives b { font: 600 1.02rem/1.15 var(--serif); color: var(--ink); }
+.pc__actives span { font: 500 .7rem/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-text); }
+.pc__cta { align-self: flex-start; margin-top: 4px; }
+.pc__foot { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 6px 14px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-2); }   /* (at the foot of the card, however much is written) */
+.pc__sign { margin: 0; font: italic 400 1.3rem/1.1 var(--serif); color: var(--accent-display); white-space: nowrap; }
+.pc__to { margin: 0; font: 500 .68rem/1.3 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); text-align: right; }
+
+.day__hud { display: none; }
+
+@media (min-width: 700px) {
+  .pc { max-width: 820px; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); padding: 12px; }
+  .pc__front { min-height: 320px; }
+  .pc__time { left: 14px; bottom: 14px; }
+  .pc__back { padding: 12px 14px 8px 26px; }
+}
+
+/* ── pinned: the postcards slide past, the sky keeps the time ── */
+.day.is-pinned { height: calc(100vh + var(--travel, 0px)); background: #FFD6C2; }
+.is-pinned .day__pin { position: sticky; top: 0; height: 100vh; height: 100svh; padding: 0; overflow: hidden; overflow: clip; }   /* (clip: nothing can scroll the frame itself) */
+.is-pinned .day__sky { background: none; }
+.is-pinned .day__layer, .is-pinned .day__stars, .is-pinned .day__sun, .is-pinned .day__moon, .is-pinned .day__sea { display: block; }
+/* each hour's sky fades in over the one before it */
+.is-pinned .day__layer--noon  { opacity: clamp(0, calc(var(--p, 0) * 3), 1); }
+.is-pinned .day__layer--gold  { opacity: clamp(0, calc(var(--p, 0) * 3 - 1), 1); }
+.is-pinned .day__layer--night, .is-pinned .day__stars { opacity: clamp(0, calc(var(--p, 0) * 3 - 2), 1); }
+.is-pinned .day__layer--haze  { opacity: calc(.7 * clamp(0, 1 - max((var(--p, 0) - .5) / .17, (.5 - var(--p, 0)) / .17), 1)); }
+.is-pinned .day__layer--dusk  { opacity: calc(.92 * clamp(0, 1 - max((var(--p, 0) - .835) / .17, (.835 - var(--p, 0)) / .17), 1)); }
+/* the sun crosses on an arc and is gone by night; the moon comes up as it goes */
+.is-pinned .day__sun { left: calc(10% + var(--p, 0) * 86%); top: 26%; top: calc(74% - sin(var(--p, 0) * 150deg + 12deg) * 56%); opacity: clamp(0, calc((.8 - var(--p, 0)) * 7), 1); }
+.is-pinned .day__moon { opacity: clamp(0, calc((var(--p, 0) - .78) * 6), 1); translate: 0 calc((1 - clamp(0, (var(--p, 0) - .78) * 6, 1)) * 40px); }
+
+.is-pinned .day__track {
+  position: absolute; left: 0; top: var(--nav-h); bottom: 74px; display: flex; align-items: center; gap: clamp(36px, 5vw, 84px);
+  width: max-content; max-width: none; margin: 0; padding: 0 16vw 0 max(var(--gutter), calc((100vw - var(--maxw)) / 2)); will-change: transform;
+}
+.is-pinned .day__intro { flex: none; width: min(36vw, 480px); }
+.is-pinned .day__cue { display: inline-flex; }
+.is-pinned .pc { flex: none; width: min(840px, 62vw); max-width: none; }
+.is-pinned .pc:nth-of-type(1) { rotate: -1.3deg; }
+.is-pinned .pc:nth-of-type(2) { rotate: .9deg; translate: 0 10px; }
+.is-pinned .pc:nth-of-type(3) { rotate: -.7deg; translate: 0 -8px; }
+.is-pinned .pc:nth-of-type(4) { rotate: 1.1deg; }
+.is-pinned .pc__front { min-height: min(46vh, 380px); }
+
+.is-pinned .day__hud {
+  position: absolute; z-index: 2; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 18px; width: min(680px, calc(100% - 2 * var(--gutter))); padding: 10px 22px 10px 20px;
+  translate: -50% 0; border-radius: var(--r-pill); background: rgba(255, 253, 248, .86); -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .7) inset, 0 12px 26px -16px rgba(74, 13, 46, .5); color: var(--ink);
+}
+.day__clock { flex: none; min-width: 5ch; font: 600 1rem/1 var(--sans); letter-spacing: .12em; font-variant-numeric: tabular-nums; color: var(--accent-deep); }
+.day__rail { position: relative; flex: 1; }
+.day__rail::before { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 1px; background: var(--line-2); }
+.day__dot { position: absolute; left: calc(var(--p, 0) * 100%); top: 0; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; background: var(--accent-btn); box-shadow: 0 0 0 3px rgba(255, 253, 248, .9); }
+.day__ticks { display: flex; justify-content: space-between; margin: 0; padding: 14px 0 0; list-style: none; font: 500 .66rem/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
+
+@media (forced-colors: active) { .pc { border: 1px solid CanvasText; } .pc__time { border: 1px solid CanvasText; } }
+@media print { .day__sky, .day__hud, .day__cue { display: none !important; } }

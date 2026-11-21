@@ -21,6 +21,7 @@
       postmark: 'MODEL POPS BEACH CLUB · CABANA NO. 1 · IN BLOOM ·',
       cabanasLede: 'Three cabanas on the sand, petals on the breeze: choose one and its curtains open. Collagen Boost and <span data-name="green-pop">Green Veggies</span> are open now; Liposomal Vitamin C opens soon.',
       sunLede: 'Your first month, told as one spring day.',
+      dayTitle: 'A spring day with <em>Model Pops.</em>',
       serveOnce: 'Just this once, fresh for spring.',
       waitlistTitle: 'Save a lounger in the spring sun at the <em>third cabana.</em>',
       waitlistEmpty: 'Please add your email address so we can save your lounger.',

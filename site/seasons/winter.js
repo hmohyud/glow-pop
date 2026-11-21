@@ -23,6 +23,7 @@
       postmark: 'MODEL POPS SNOW CLUB · CABANA NO. 1 · APRÈS-SKI ·',
       cabanasLede: 'Three cabanas in the snow: choose one and its curtains open. Collagen Boost and <span data-name="green-pop">Green Veggies</span> are open now; Liposomal Vitamin C opens soon.',
       sunLede: 'Your first month, told as one bright winter day.',
+      dayTitle: 'A winter day with <em>Model Pops.</em>',
       serveOnce: 'Just this once, après-ski.',
       waitlistTitle: 'Save a spot by the heated pool at the <em>third cabana.</em>',
       waitlistEmpty: 'Please add your email address so we can save your spot by the pool.',
