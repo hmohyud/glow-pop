@@ -1135,8 +1135,8 @@
   var hero = $('.hero'), heroMount = $('#heroCandy'), heroFloat = $('#heroFloat'), heroFig = $('.hero__candy'), heroCaption = $('#heroCaption');
   var heroCopy = $('.hero__copy'), heroFallback = $('#heroFallback');
   var heroState = { visible: true, rect: null, fig: null, drop0: 0, dropDone: false, capW: 0, capH: 0, ty: 0, sc: 1, head: null, clip: 1e5, flW: 0, flH: 0, away: false, sil: false };
-  // (away, sil: site/rider.js. away: the pop is out riding the page, its mount in the rider; sil: it floats over another
-  // pool, so its silhouette is still copied for the water to cast)
+  // (away, sil: site/rider.js. away: the pop is out riding the page, its mount in the rider; sil: it is still over the hero's
+  // own pool on its way out, so its silhouette is still copied for the water to cast)
   // Ripples are debounced: a moving pointer leaves at most one ring per 130 ms AND per 48 px of travel
   // (so a sweep draws a trail of separate rings, not a smear); a tap always splashes, at most every 80 ms.
   var RIP_MOVE_MS = 130, RIP_MOVE_PX = 48, RIP_TAP_MS = 80;
@@ -2947,9 +2947,9 @@
       setProduct: setProduct, products: PRODUCTS, water: Water, kick: kick, sun: Sun, decor: Decor, archive: Archive, get loopRunning() { return running; },
       // site/rider.js, the pop that rides the page: it plugs into the frame loop and borrows the hero's candy. hero.state.away:
       // its mount is out riding (the hero casts no shadow, its caption stays put); hero.state.sil: keep copying its silhouette (it
-      // floats over another pool); hero.dropIn(): drop into the pool again (when it comes home)
+      // is still over the hero's own pool on its way out, and the water casts its shadow)
       plugRider: function (r) { Rider = r; kick(); },
-      hero: { state: heroState, cast: cast, silWake: silWake, dropIn: function () { heroState.drop0 = performance.now(); heroState.dropDone = false; kick(); } },
+      hero: { state: heroState, cast: cast, silWake: silWake },
       season: { name: SEASON_NAME, config: SEASON, water: WFX, environment: seasonEnv() }, canDraw: canDraw,
       get heroCandy() { return heroApi; }, get cabanaCandy() { return cab.api; },
       menu: { get product() { return shop.product && shop.product.id; }, setProduct: setMenuProduct },   // the menu card's product

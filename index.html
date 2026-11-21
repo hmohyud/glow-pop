@@ -199,7 +199,7 @@
     <div class="club__grid">
       <figure class="postcard postcard--club" data-reveal>
         <div class="postcard__card">
-          <div class="postcard__photo"><img class="parallax" src="images/model_pink.webp" width="1023" height="1537" loading="lazy" decoding="async" alt="A sun-kissed woman in a pink bikini, eyes closed in the sun, holds a pink lollipop beside a pink pool float on the beach."><div class="postcard__art" role="img" aria-label="The Model Pops club emblem: a striped ring around the season’s club name."><div class="emblem"><span class="emblem__ring"></span><span class="emblem__disc"><svg class="emblem__orn eyebrow__sun" aria-hidden="true"><use href="#o-sun"/></svg><span class="emblem__brand">Model Pops</span><span class="emblem__club" data-season-copy="club">Beach Club</span><span class="emblem__rule"></span><span class="emblem__line">Cabana <span class="no">N<span class="ord">o</span> 1</span></span></span></div></div></div>
+          <div class="postcard__photo"><img class="parallax" src="images/model_pink.webp" width="1023" height="1537" loading="lazy" decoding="async" alt="A sun-kissed woman in a pink bikini, eyes closed in the sun, holds a pink lollipop beside a pink pool float on the beach."><div class="postcard__art" role="img" aria-label="The Model Pops club emblem: a striped ring around the season’s club name."><div class="emblem"><span class="emblem__ring"></span><span class="emblem__disc"><span class="emblem__words"><svg class="emblem__orn eyebrow__sun" aria-hidden="true"><use href="#o-sun"/></svg><span class="emblem__brand">Model Pops</span><span class="emblem__club" data-season-copy="club">Beach Club</span><span class="emblem__rule"></span><span class="emblem__line">Cabana <span class="no">N<span class="ord">o</span> 1</span></span></span></span><svg class="emblem__round" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><path id="emblem-arc" d="M100 100m-75 0a75 75 0 1 1 150 0a75 75 0 1 1-150 0" fill="none"/><text textLength="462" lengthAdjust="spacing"><textPath href="#emblem-arc" textLength="462" lengthAdjust="spacing" data-season-copy="postmark">MODEL POPS BEACH CLUB · CABANA NO. 1 · RIVIERA ·</textPath></text></svg><div class="rider-dock rider-dock--emblem" data-dock="emblem" data-for="strawberry-pop" aria-hidden="true"></div></div></div></div>
           <figcaption class="postcard__caption"><em data-season-copy="clubCaption">Strawberry, by the water</em><span>Model Pops <span data-season-copy="club">Beach Club</span></span></figcaption>
         </div>
         <svg class="postmark" aria-hidden="true" focusable="false"><use href="#o-postmark"/></svg>
@@ -483,8 +483,6 @@
         <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="leaf"></i></span><h3>Natural strawberry</h3><p>Natural strawberry flavor, and its pink comes from beet root powder.</p></li>
         <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="wheat-off"></i></span><h3>Gluten free</h3><p>GMO free and gluten free, as the label says.</p></li>
       </ul>
-      <!-- a dock: an empty box kept for the pop that rides the page (site/rider.js, placed by site/rider.css) -->
-      <div class="rider-dock rider-dock--sugar" data-dock="sugar" data-for="strawberry-pop" aria-hidden="true"></div>
     </div>
   </section>
 
@@ -495,7 +493,6 @@
         <p class="eyebrow" data-reveal>Why Model Pops</p>
         <h2 class="display" id="compare-title" data-reveal>Not just candy. <em>A beauty routine.</em></h2>
         <p class="lede" data-reveal>Most supplements are a chore. We took a sweeter approach: four actives in a strawberry lollipop you’ll look forward&nbsp;to.</p>
-        <div class="rider-dock rider-dock--compare" data-dock="compare" data-for="strawberry-pop" data-hop="interlude" aria-hidden="true"></div>
       </header>
       <div class="compare__card" data-reveal>
         <table class="compare__table">
@@ -520,14 +517,6 @@
       </div>
     </div>
   </section>
-
-  <!-- ═══════════ 8½ · INTERLUDE: a lap of water, a parasol's shade, one line ═══════════ -->
-  <div class="interlude is-window" data-water="pool" data-warm=".3">
-    <div class="coping coping--top" aria-hidden="true"></div>
-    <p class="interlude__line" data-shade><span>Beauty has never</span> <em>tasted this good.</em></p>
-    <div class="rider-dock rider-dock--lap" data-dock="interlude" data-for="strawberry-pop" data-pool data-hop="compare" aria-hidden="true"></div>
-    <div class="coping coping--bottom" aria-hidden="true"></div>
-  </div>
 
   <!-- ═══════════ 9 · THE CAPSULES: Liposomal Vitamin C, made in Switzerland (Cabana Nº 3, coming soon) ═══════════
        Swiss all year round, set in the International Typographic Style; its look, its tokens and the poster's motion
@@ -622,8 +611,6 @@
           <p class="formmsg" role="status" aria-live="polite"></p>
         </div>
       </form>
-      <div class="rider-dock rider-dock--menu" data-dock="menu" data-for="strawberry-pop green-pop" data-wear="menu" aria-hidden="true"></div>
-      <div class="rider-dock rider-dock--wait" data-dock="waitlist" data-for="vitamin-c" aria-hidden="true"></div>
     </div>
 
     <!-- the cabana still to open, Liposomal Vitamin C (app.js renders it from PRODUCTS: every product still to open) -->
@@ -702,7 +689,6 @@
         </div>
         <p class="glow__note" data-reveal>10 lollipops per bag <span aria-hidden="true">·</span> 15&nbsp;g each <span aria-hidden="true">·</span> Sugar free</p>
       </div>
-      <div class="rider-dock rider-dock--glow" data-dock="glow" data-for="strawberry-pop" data-pool aria-hidden="true"></div>
       <figure class="postcard postcard--glow" data-reveal>
         <div class="postcard__card">
           <div class="postcard__photo"><img class="parallax" src="images/cta_model.webp" width="832" height="1248" loading="lazy" decoding="async" alt="A smiling woman in a pink bikini holds a pink lollipop in front of a pink-and-white striped backdrop."></div>

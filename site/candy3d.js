@@ -3535,7 +3535,7 @@
     if (ro) ro.observe(mount); else window.addEventListener('resize', onWinResize);
 
     var onScreen = true, paused = false;
-    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (e) { onScreen = e[0].isIntersecting; }, { threshold: 0 }) : null;
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (e) { onScreen = e[e.length - 1].isIntersecting; }, { threshold: 0 }) : null;
     if (io) io.observe(mount);
 
     // subtle lean toward the mouse (fine pointers only)
