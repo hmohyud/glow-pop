@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODEL POPS · SWISS: Liposomal Vitamin C, made in Switzerland (Cabana Nº 3)
+   ───────────────────────────────────────────────────────────────────────────
+   Loaded after style.css (and before the season files).
+   1 · The product's theme tokens. app.js applies every product colour as
+       var(--<id>-<token>, <hex>), so these win whenever its cabana is chosen:
+       the sand-and-cream canvas the client chose (every awning, band and its
+       cabana), deep navy, navy buttons, glacier-blue accents, alpine red for
+       the small accents and the flag.
+   2 · #capsules (.alps): the capsules' own section, Swiss all year round,
+       whatever cabana is chosen. Set in the International Typographic Style:
+       one grotesk (Inter Tight, requested with the other fonts by the font link
+       in index.html's <head>), flush left, a two-column grid, hairline rules.
+       The copy (Liposomal Vitamin C · Made in Switzerland · coming soon), the
+       facts as a numbered table under the Swiss flag (the unknowns marked TBD),
+       the waitlist call, and a postcard from the Alps holding the poster. The
+       section opens in the beach club's warm white and cools into alpine air.
+   3 · The poster (.alps-scene): a moving travel poster in the manner of the
+       Swiss railway and tourism posters of the 1930s to 50s, drawn as hand-made
+       SVG (site/assets/swiss/, one set per season). A crooked, snow-streaked
+       peak under a deep blue sky and a ringed sun (up-left: lit faces left and
+       top, cast shadows right and back); a stone viaduct over the lake with a
+       red train crossing it (its reflection with it), a cable car riding its
+       rope from the peak's shoulder, a village by the water, drifting clouds,
+       glints of sun on the lake; and on the granite parapet in front, a wedge
+       of holey Swiss cheese and three ivory two-piece capsules (two crossed,
+       one apart, as in the product photo), with the Swiss flag rippling on its
+       pole. Everything that moves is its own box, moved by transform or opacity
+       only (the compositor plays it); nothing runs while .is-offscreen is on
+       (app.js) and with reduced motion it is a complete still. The seasons
+       swap the art: blossom in spring, golden larches and chimney smoke in
+       autumn, deep snow, a frozen lake and warm windows in winter.
+   The Swiss flag appears only on the "Made in Switzerland" badge and in the
+   scene, and always as the square flag, never the shield.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ───────────── 1 · Tokens ───────────── */
+:root {
+  --vitamin-c-accent: #D52B1E;   /* alpine red: the selection rule and the small accents */
+  --vitamin-c-deep: #15294A;     /* deep navy */
+  --vitamin-c-btn: #1B3A63;      /* navy buttons: white text on it is AA (11.5 : 1) */
+  --vitamin-c-text: #24507E;     /* small accents on white (AA) */
+  --vitamin-c-display: #2A6597;  /* glacier blue: the big italic accents */
+  --vitamin-c-tint: #EAF2F8;     /* glacier mist */
+  --vitamin-c-soft: #BCD6EA;
+  --vitamin-c-stripe: #E2D2B6;   /* the sand-and-cream canvas the client chose: every awning, band and its cabana */
+  --vitamin-c-trim: #A38A62;     /* the canvas's deeper sand: its cabana's piping, ridge and flag pole */
+
+  /* the alpine palette (the #capsules section) */
+  --alp-snow: #FBFDFF;
+  --alp-ice: #EAF3F9;
+  --alp-sky: #CFE5F4;
+  --alp-glacier: #2A6597;
+  --alp-navy: #15294A;
+  --alp-pine: #1F4A3D;
+  --alp-red: #D52B1E;
+  --alp-red-text: #C42719;       /* red for small words: AA on the snow and the ice */
+  --alp-ink: #15294A;
+  --alp-ink-2: #43597A;
+  --alp-line: rgba(21, 41, 74, .14);
+  --grotesk: 'Inter Tight', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
+}
+/* the capsules' cabana chosen: text selections turn alpine too (the focus rings follow --accent-btn) */
+html[data-product="vitamin-c"] ::selection { background: var(--vitamin-c-tint); color: var(--vitamin-c-deep); }
+
+/* ───────────── 2 · #capsules: the Swiss section ───────────── */
+.alps {
+  /* the section's own accents, whatever cabana is chosen */
+  --accent: var(--alp-red); --accent-deep: var(--alp-navy); --accent-btn: var(--vitamin-c-btn); --accent-text: var(--vitamin-c-text);
+  --accent-display: var(--alp-glacier); --accent-tint: var(--vitamin-c-tint); --accent-soft: var(--vitamin-c-soft); --em: var(--alp-red);
+  --ink: var(--alp-ink); --ink-2: var(--alp-ink-2); --line: var(--alp-line); --line-2: rgba(21, 41, 74, .26);
+  --sans: var(--grotesk);   /* every label, button and placeholder tag in here turns grotesk */
+  position: relative; isolation: isolate; overflow: clip;
+  padding-block: clamp(60px, 5.6vw, 96px) clamp(84px, 9vw, 144px);
+  /* the hand-off: the beach club's own white under the pool's coping (each season's), cooling into clear alpine air */
+  background: linear-gradient(to bottom, var(--white), #F1F6FA clamp(220px, 26vw, 380px), #F7FAFC 70%, #FBFCFD);
+  color: var(--ink);
+  font-family: var(--grotesk); font-size: var(--fs-body); line-height: 1.55; letter-spacing: -.004em;
+}
+/* one column on phones: the headline, the postcard, then the copy, the facts and the calls (tablets and desktops below) */
+.alps__grid { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.alps__grid > * { margin: 0; min-width: 0; }
+
+/* the eyebrow hangs from a navy rule, the column's top line (from 1024px level with the postcard's top edge) */
+.alps .eyebrow { justify-self: stretch; max-width: 36rem; gap: 10px; padding-top: 14px; border-top: 2px solid var(--ink); font: 600 var(--fs-cap)/1.2 var(--grotesk); letter-spacing: .16em; color: var(--ink); }
+.alps .eyebrow .lucide { width: 16px; height: 16px; color: var(--alp-red); }
+.alps__title {
+  margin-top: 16px;
+  font: 700 clamp(3rem, 1.55rem + 4.6vw, 5rem)/1 var(--grotesk); letter-spacing: -.042em; color: var(--ink);   /* 1, not tighter: the p of "Liposomal" clears the dot of the i below it */
+  font-variant-numeric: lining-nums;
+}
+.alps__title em { display: block; font-style: normal; font-weight: 700; color: var(--alp-red); }
+.alps .lede { margin-top: 26px; max-width: 36ch; font-size: clamp(1.06rem, 1rem + .3vw, 1.22rem); line-height: 1.55; letter-spacing: -.006em; color: var(--ink-2); }
+.alps .ph { border-bottom-color: var(--alp-glacier); }
+.alps .ph::after { font-weight: 700; color: var(--vitamin-c-text); }
+
+/* the facts, set like a Swiss data plate: the flag and its words on top, a navy rule, then one numbered row a fact,
+   the label in tracked capitals, the value beside it on one line */
+.swiss-badge {
+  justify-self: start; margin-top: 30px;
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 700 var(--fs-cap)/1 var(--grotesk); letter-spacing: .16em; text-transform: uppercase; color: var(--alp-navy);
+}
+.swiss-badge__flag { width: 22px; height: 22px; flex: none; border-radius: 2px; box-shadow: 0 4px 10px -6px rgba(213, 43, 30, .7); }
+.alps__facts { margin-top: 14px; width: 100%; max-width: 36rem; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line-2); counter-reset: fact; }
+.alps__facts > div { display: grid; grid-template-columns: 9.25rem minmax(0, 1fr); align-items: baseline; column-gap: 14px; padding: 10px 0 9px; border-top: 1px solid var(--line); counter-increment: fact; }
+.alps__facts > div:first-child { border-top: 0; }
+.alps__facts dt { display: flex; align-items: baseline; gap: .75em; font: 600 var(--fs-cap)/1.2 var(--grotesk); letter-spacing: .13em; text-transform: uppercase; color: var(--ink-2); }
+.alps__facts dt::before { content: counter(fact, decimal-leading-zero); min-width: 1.7em; letter-spacing: .03em; color: var(--alp-red-text); font-variant-numeric: tabular-nums; }
+.alps__facts dd { margin: 0; font: 500 1.06rem/1.3 var(--grotesk); letter-spacing: -.01em; color: var(--ink); }
+.alps__facts .ph { white-space: normal; }
+
+.alps__ctas { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 12px; }
+.alps__ctas .btn { font-family: var(--grotesk); font-weight: 600; letter-spacing: .12em; }
+.alps__ctas .btn--ghost { background: rgba(255, 255, 255, .8); }
+
+/* the postcard from the Alps: the beach club's deckle-edged print, set straight on the grid, a portrait now (the
+   poster's 4 : 5). Its shadow is a plain layer behind it: no filter over the moving poster, so its layers move
+   without anything being redrawn. */
+.postcard--alps { justify-self: stretch; width: 100%; margin-top: 30px; filter: none; isolation: isolate; }
+.postcard--alps::before {
+  content: ''; position: absolute; inset: 8px 6px 2px; z-index: -1; pointer-events: none;
+  box-shadow: 0 34px 50px -24px rgba(21, 41, 74, .45), 0 2px 3px rgba(21, 41, 74, .08);
+}
+.postcard--alps .postcard__caption { padding: 13px 2px 16px; }
+.postcard--alps .postcard__caption em { font: 600 1.02rem/1.25 var(--grotesk); font-style: normal; letter-spacing: -.012em; color: var(--ink); }
+.postcard--alps .postcard__caption > span { font: 600 var(--fs-cap)/1.2 var(--grotesk); letter-spacing: .14em; color: var(--ink-2); }
+
+@media (min-width: 600px) and (max-width: 699px) {
+  /* a wide phone's single column: the postcard keeps a portrait's size */
+  .postcard--alps { justify-self: start; width: min(520px, 100%); }
+}
+@media (min-width: 700px) and (max-width: 1023px) {
+  /* a tablet: the headline and its lede beside the postcard, then the data plate and the calls under both */
+  .alps__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); column-gap: clamp(28px, 4vw, 44px); grid-template-rows: auto auto 1fr; }
+  .alps__grid > .eyebrow { grid-area: 1 / 1; }
+  .alps__title { grid-area: 2 / 1; font-size: clamp(2.75rem, 1rem + 4.6vw, 3.6rem); }
+  .alps .lede { grid-area: 3 / 1; margin-top: 22px; }
+  .postcard--alps { grid-area: 1 / 2 / 4 / 3; margin-top: 0; }
+  .alps__grid > .swiss-badge { grid-area: 4 / 1 / 5 / -1; margin-top: 44px; }
+  .alps__facts { grid-area: 5 / 1 / 6 / -1; }
+  .alps__ctas { grid-area: 6 / 1 / 7 / -1; }
+}
+@media (min-width: 1024px) {
+  /* two columns: the copy on the left, top to bottom; the postcard on the right, beside all of it */
+  .alps__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-rows: repeat(6, auto) 1fr; column-gap: clamp(56px, 6.5vw, 120px); }
+  .alps__grid > :not(.alps__visual) { grid-column: 1; }
+  .alps .lede { margin-top: 20px; max-width: 48ch; }
+  .alps__facts > div { padding: 9px 0 8px; }
+  .alps__grid > .swiss-badge { margin-top: 28px; }
+  .postcard--alps { grid-column: 2; grid-row: 1 / -1; align-self: start; justify-self: end; width: min(560px, 100%); margin-top: 0; }
+}
+@media (max-width: 559px) {
+  .alps__ctas .btn { flex: 1 1 auto; }
+  .alps__facts > div { grid-template-columns: 8.5rem minmax(0, 1fr); column-gap: 10px; }
+}
+
+/* ───────────── 3 · The poster (.alps-scene) ─────────────
+   A 4 : 5 window, decorative (aria-hidden), drawn on one 800 × 1000 board: every part is placed in percentages of
+   it. Back to front:
+     .as-back            the sky, the sun in its rings, the far range, the peak, the cable car's top station
+     .as-cloud--a/b/c    two clouds drifting slowly to and fro, and the banner cloud the wind draws off the summit
+     .as-cab             the cable car's cabin, riding its rope down from the station and back, swaying a little
+     .as-mid             the forest, the tunnel mouth, the stone viaduct, the meadow and its village, the lake and
+                         its reflections, the cable car's ropes
+     .as-rail            the red train: out of the tunnel, over the viaduct, out of the picture; its reflection,
+                         upside down in the lake, keeps step with it
+     .as-glints          glints of sun on the lake, under the sun (not on winter's ice)
+     .as-smoke           smoke from a chalet's chimney (autumn and winter)
+     .as-front           the granite parapet, the flagpole, the cheese and the three capsules with their shadows
+     .as-flag            the Swiss flag, cut into strips that ripple (see below)
+   The art is site/assets/swiss/<layer>-<season>.svg (the moving parts are season-free). Everything that moves is
+   its own box, moved by transform or opacity only, so the compositor plays it: no style, layout or paint on the main
+   thread from one frame to the next. Until the art arrives the window shows its colours (sky, lake, stone). */
+.alps-scene {
+  position: relative; aspect-ratio: 4 / 5; overflow: hidden; isolation: isolate; contain: layout paint;
+  background: linear-gradient(to bottom, #3573BC, #8DBDE6 47%, #DCEBF6 60%, #4D93C9 67%, #2F72AE 83.6%, #DCDFDF 83.8%, #ECEDEA);
+}
+.alps-scene i, .alps-scene b { position: absolute; display: block; pointer-events: none; }
+.alps-scene .as-cloud { background: 0 0 / 100% 100% no-repeat; }
+.alps-scene .as-cloud--c { transform-origin: 0 50%; }   /* the banner cloud stretches away from the summit */
+.alps-scene .as-glints, .alps-scene .as-smoke { inset: 0; }
+.alps-scene .as-glints > i { border-radius: 2px; background: #fff; opacity: .6; }
+.alps-scene .as-smoke > i { border-radius: 50%; background: #fff; }
+.alps-scene .as-smoke { display: none; }
+/* the flag: square, red, the white cross's arms a sixth longer than they are wide. Twelve strips of the same cloth,
+   each clipped to its slice; at rest (and with reduced motion) they hold a gentle wave, set in the markup */
+.alps-scene .as-fl {
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' preserveAspectRatio='none'%3E%3Crect width='32' height='32' fill='%23D52B1E'/%3E%3Cpath d='M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z' fill='%23fff'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+}
+.alps-scene .as-fl__sh { top: 0; bottom: 0; }
+.alps-scene .as-fl__sh > b { inset: 0; background: #3B0F0C; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .alps-scene .as-cloud, .alps-scene .as-cab, .alps-scene .as-cab > i, .alps-scene .as-train { will-change: transform; }
+  .alps-scene .as-cloud--a { animation: as-drift-a 84s ease-in-out -30s infinite alternate; }
+  .alps-scene .as-cloud--b { animation: as-drift-b 66s ease-in-out -14s infinite alternate; }
+  .alps-scene .as-cloud--c { animation: as-drift-c 58s ease-in-out -41s infinite alternate; }
+  .alps-scene .as-cab { animation: as-cab 64s ease-in-out -2s infinite; }
+  .alps-scene .as-cab > i { animation: as-sway 4.6s ease-in-out infinite alternate; }
+  .alps-scene .as-train { animation: as-train 26s linear -7s infinite; }
+  .alps-scene .as-glints > i { animation: as-glint 3.6s ease-in-out infinite; }
+  .alps-scene .as-smoke > i { animation: as-puff 7.8s linear infinite; }
+  .alps-scene .as-fl, .alps-scene .as-fl__sh > b { animation-duration: 3.2s; animation-timing-function: linear; animation-iteration-count: infinite; }
+}
+/* out of view (app.js), nothing runs: the animations are taken off, not just paused, so none is kept alive and the
+   poster holds its still frame. The loops start again, unseen, 120px before it scrolls back into view. */
+.alps-scene.is-offscreen, .alps-scene.is-offscreen * { animation: none !important; }
+
+@keyframes as-drift-a { from { transform: translateX(-7%); } to { transform: translateX(6%); } }
+@keyframes as-drift-b { from { transform: translateX(-10%); } to { transform: translateX(10%); } }
+@keyframes as-drift-c { from { transform: scaleX(.9); opacity: .85; } to { transform: scaleX(1.08); opacity: 1; } }
+@keyframes as-sway { from { transform: rotate(-1.4deg); } to { transform: rotate(1.4deg); } }
+@keyframes as-glint { 0%, 100% { opacity: .1; } 50% { opacity: .95; } }
+/* a puff rises about three of its widths and drifts two to the right as it grows and fades */
+@keyframes as-puff { 0% { transform: translate(0, 0) scale(.5); opacity: 0; } 14% { opacity: .85; } 100% { transform: translate(170%, -330%) scale(1.9); opacity: 0; } }
+/* the parts' places on the board, the cable car's run along its rope and the train's crossing, measured from the art
+   (written with it by a local script, not part of the site) */
+.alps-scene .as-l { inset: 0; background: 0 0 / 100% 100% no-repeat; }
+.alps-scene .as-back { background-image: url("assets/swiss/back-summer.svg"); }
+html[data-season="spring"] .alps-scene .as-back { background-image: url("assets/swiss/back-spring.svg"); }
+html[data-season="autumn"] .alps-scene .as-back { background-image: url("assets/swiss/back-autumn.svg"); }
+html[data-season="winter"] .alps-scene .as-back { background-image: url("assets/swiss/back-winter.svg"); }
+.alps-scene .as-mid { background-image: url("assets/swiss/mid-summer.svg"); }
+html[data-season="spring"] .alps-scene .as-mid { background-image: url("assets/swiss/mid-spring.svg"); }
+html[data-season="autumn"] .alps-scene .as-mid { background-image: url("assets/swiss/mid-autumn.svg"); }
+html[data-season="winter"] .alps-scene .as-mid { background-image: url("assets/swiss/mid-winter.svg"); }
+.alps-scene .as-front { background-image: url("assets/swiss/front-summer.svg"); }
+html[data-season="spring"] .alps-scene .as-front { background-image: url("assets/swiss/front-spring.svg"); }
+html[data-season="autumn"] .alps-scene .as-front { background-image: url("assets/swiss/front-autumn.svg"); }
+html[data-season="winter"] .alps-scene .as-front { background-image: url("assets/swiss/front-winter.svg"); }
+.alps-scene .as-cloud--a { left: 72.5%; top: 7.2%; width: 28.75%; height: 7.4%; background-image: url("assets/swiss/cloud-a.svg"); }
+.alps-scene .as-cloud--b { left: 30.75%; top: 29.6%; width: 18.75%; height: 5%; background-image: url("assets/swiss/cloud-b.svg"); }
+.alps-scene .as-cloud--c { left: 67%; top: 16%; width: 21.5%; height: 4.4%; background-image: url("assets/swiss/cloud-c.svg"); }
+.alps-scene .as-cab { left: 76.625%; top: 32.459%; width: 3.75%; height: 4%; transform: translate(249.2%, 247.516%); }
+.alps-scene .as-cab > i { position: absolute; inset: 0; background: url("assets/swiss/cabin.svg") 0 0 / 100% 100% no-repeat; transform-origin: 50% 2.5%; }
+@keyframes as-cab { 0%, 7% { transform: translate(0%, 0%); } 47%, 55% { transform: translate(593.333%, 589.324%); } 95%, 100% { transform: translate(0%, 0%); } }
+.alps-scene .as-rail { left: 38.25%; top: 57.31%; width: 61.75%; height: 2.59%; overflow: hidden; }
+.alps-scene .as-rail--refl { top: 73.7%; transform: scaleY(-1); opacity: .22; }
+.alps-scene .as-train { position: absolute; left: 0; top: 0; width: 29.96%; height: 100%; background: url("assets/swiss/train.svg") 0 0 / 100% 100% no-repeat; transform: translateX(77.027%); }
+@keyframes as-train { 0% { transform: translateX(-100%); } 74%, 100% { transform: translateX(333.784%); } }
+.alps-scene .as-flag { left: 11.188%; top: 31.6%; width: 10%; height: 8%; }
+/* The flag's ripple: a travelling wave that grows from the pole to the free end. Strip i rides the wave with its left
+   edge and leans (skewY about that edge) so its right edge lands where strip i + 1 starts; its shade deepens as it
+   tips away from the sun. Baked from the wave by a local script (site/_qa/swiss/gen.mjs, not part of the site): 12 samples a period of 3.2 s. */
+/* ⟨flag keyframes⟩ */
+@media (prefers-reduced-motion: no-preference) {
+  .alps-scene .as-fl:nth-child(1) { animation-name: as-fl0; } .alps-scene .as-fl:nth-child(1) > b > b { animation-name: as-fs0; }
+  .alps-scene .as-fl:nth-child(2) { animation-name: as-fl1; } .alps-scene .as-fl:nth-child(2) > b > b { animation-name: as-fs1; }
+  .alps-scene .as-fl:nth-child(3) { animation-name: as-fl2; } .alps-scene .as-fl:nth-child(3) > b > b { animation-name: as-fs2; }
+  .alps-scene .as-fl:nth-child(4) { animation-name: as-fl3; } .alps-scene .as-fl:nth-child(4) > b > b { animation-name: as-fs3; }
+  .alps-scene .as-fl:nth-child(5) { animation-name: as-fl4; } .alps-scene .as-fl:nth-child(5) > b > b { animation-name: as-fs4; }
+  .alps-scene .as-fl:nth-child(6) { animation-name: as-fl5; } .alps-scene .as-fl:nth-child(6) > b > b { animation-name: as-fs5; }
+  .alps-scene .as-fl:nth-child(7) { animation-name: as-fl6; } .alps-scene .as-fl:nth-child(7) > b > b { animation-name: as-fs6; }
+  .alps-scene .as-fl:nth-child(8) { animation-name: as-fl7; } .alps-scene .as-fl:nth-child(8) > b > b { animation-name: as-fs7; }
+  .alps-scene .as-fl:nth-child(9) { animation-name: as-fl8; } .alps-scene .as-fl:nth-child(9) > b > b { animation-name: as-fs8; }
+  .alps-scene .as-fl:nth-child(10) { animation-name: as-fl9; } .alps-scene .as-fl:nth-child(10) > b > b { animation-name: as-fs9; }
+  .alps-scene .as-fl:nth-child(11) { animation-name: as-fl10; } .alps-scene .as-fl:nth-child(11) > b > b { animation-name: as-fs10; }
+  .alps-scene .as-fl:nth-child(12) { animation-name: as-fl11; } .alps-scene .as-fl:nth-child(12) > b > b { animation-name: as-fs11; }
+}
+@keyframes as-fl0{0%{transform:translateY(0.00%) skewY(-2.51deg)}8.33%{transform:translateY(0.26%) skewY(-1.30deg)}16.67%{transform:translateY(0.44%) skewY(0.26deg)}25%{transform:translateY(0.51%) skewY(1.75deg)}33.33%{transform:translateY(0.44%) skewY(2.77deg)}41.67%{transform:translateY(0.26%) skewY(3.05deg)}50%{transform:translateY(0.00%) skewY(2.51deg)}58.33%{transform:translateY(-0.26%) skewY(1.30deg)}66.67%{transform:translateY(-0.44%) skewY(-0.26deg)}75%{transform:translateY(-0.51%) skewY(-1.75deg)}83.33%{transform:translateY(-0.44%) skewY(-2.77deg)}91.67%{transform:translateY(-0.26%) skewY(-3.05deg)}100%{transform:translateY(-0.00%) skewY(-2.51deg)}}
+@keyframes as-fs0{0%{opacity:0.221}8.33%{opacity:0.356}16.67%{opacity:0.529}25%{opacity:0.695}33.33%{opacity:0.808}41.67%{opacity:0.839}50%{opacity:0.779}58.33%{opacity:0.644}66.67%{opacity:0.471}75%{opacity:0.305}83.33%{opacity:0.192}91.67%{opacity:0.161}100%{opacity:0.221}}
+@keyframes as-fl1{0%{transform:translateY(-0.37%) skewY(-4.21deg)}8.33%{transform:translateY(0.07%) skewY(-3.56deg)}16.67%{transform:translateY(0.48%) skewY(-1.95deg)}25%{transform:translateY(0.77%) skewY(0.19deg)}33.33%{transform:translateY(0.85%) skewY(2.27deg)}41.67%{transform:translateY(0.70%) skewY(3.74deg)}50%{transform:translateY(0.37%) skewY(4.21deg)}58.33%{transform:translateY(-0.07%) skewY(3.56deg)}66.67%{transform:translateY(-0.48%) skewY(1.95deg)}75%{transform:translateY(-0.77%) skewY(-0.19deg)}83.33%{transform:translateY(-0.85%) skewY(-2.27deg)}91.67%{transform:translateY(-0.70%) skewY(-3.74deg)}100%{transform:translateY(-0.37%) skewY(-4.21deg)}}
+@keyframes as-fs1{0%{opacity:0.032}8.33%{opacity:0.105}16.67%{opacity:0.283}25%{opacity:0.521}33.33%{opacity:0.752}41.67%{opacity:0.916}50%{opacity:0.968}58.33%{opacity:0.895}66.67%{opacity:0.717}75%{opacity:0.479}83.33%{opacity:0.248}91.67%{opacity:0.084}100%{opacity:0.032}}
+@keyframes as-fl2{0%{transform:translateY(-0.98%) skewY(-4.65deg)}8.33%{transform:translateY(-0.45%) skewY(-5.38deg)}16.67%{transform:translateY(0.20%) skewY(-4.67deg)}25%{transform:translateY(0.79%) skewY(-2.71deg)}33.33%{transform:translateY(1.18%) skewY(-0.02deg)}41.67%{transform:translateY(1.24%) skewY(2.68deg)}50%{transform:translateY(0.98%) skewY(4.65deg)}58.33%{transform:translateY(0.45%) skewY(5.38deg)}66.67%{transform:translateY(-0.20%) skewY(4.67deg)}75%{transform:translateY(-0.79%) skewY(2.71deg)}83.33%{transform:translateY(-1.18%) skewY(0.02deg)}91.67%{transform:translateY(-1.24%) skewY(-2.68deg)}100%{transform:translateY(-0.98%) skewY(-4.65deg)}}
+@keyframes as-fs2{0%{opacity:0.000}8.33%{opacity:0.000}16.67%{opacity:0.000}25%{opacity:0.199}33.33%{opacity:0.498}41.67%{opacity:0.798}50%{opacity:1.000}58.33%{opacity:1.000}66.67%{opacity:1.000}75%{opacity:0.801}83.33%{opacity:0.502}91.67%{opacity:0.202}100%{opacity:0.000}}
+@keyframes as-fl3{0%{transform:translateY(-1.66%) skewY(-3.21deg)}8.33%{transform:translateY(-1.24%) skewY(-5.69deg)}16.67%{transform:translateY(-0.48%) skewY(-6.64deg)}25%{transform:translateY(0.40%) skewY(-5.82deg)}33.33%{transform:translateY(1.17%) skewY(-3.45deg)}41.67%{transform:translateY(1.63%) skewY(-0.14deg)}50%{transform:translateY(1.66%) skewY(3.21deg)}58.33%{transform:translateY(1.24%) skewY(5.69deg)}66.67%{transform:translateY(0.48%) skewY(6.64deg)}75%{transform:translateY(-0.40%) skewY(5.82deg)}83.33%{transform:translateY(-1.17%) skewY(3.45deg)}91.67%{transform:translateY(-1.63%) skewY(0.14deg)}100%{transform:translateY(-1.66%) skewY(-3.21deg)}}
+@keyframes as-fs3{0%{opacity:0.143}8.33%{opacity:0.000}16.67%{opacity:0.000}25%{opacity:0.000}33.33%{opacity:0.117}41.67%{opacity:0.485}50%{opacity:0.857}58.33%{opacity:1.000}66.67%{opacity:1.000}75%{opacity:1.000}83.33%{opacity:0.883}91.67%{opacity:0.515}100%{opacity:0.143}}
+@keyframes as-fl4{0%{transform:translateY(-2.13%) skewY(0.11deg)}8.33%{transform:translateY(-2.07%) skewY(-3.91deg)}16.67%{transform:translateY(-1.45%) skewY(-6.86deg)}25%{transform:translateY(-0.45%) skewY(-7.97deg)}33.33%{transform:translateY(0.67%) skewY(-6.97deg)}41.67%{transform:translateY(1.61%) skewY(-4.10deg)}50%{transform:translateY(2.13%) skewY(-0.11deg)}58.33%{transform:translateY(2.07%) skewY(3.91deg)}66.67%{transform:translateY(1.45%) skewY(6.86deg)}75%{transform:translateY(0.45%) skewY(7.97deg)}83.33%{transform:translateY(-0.67%) skewY(6.97deg)}91.67%{transform:translateY(-1.61%) skewY(4.10deg)}100%{transform:translateY(-2.13%) skewY(0.11deg)}}
+@keyframes as-fs4{0%{opacity:0.512}8.33%{opacity:0.065}16.67%{opacity:0.000}25%{opacity:0.000}33.33%{opacity:0.000}41.67%{opacity:0.045}50%{opacity:0.488}58.33%{opacity:0.935}66.67%{opacity:1.000}75%{opacity:1.000}83.33%{opacity:1.000}91.67%{opacity:0.955}100%{opacity:0.512}}
+@keyframes as-fl5{0%{transform:translateY(-2.11%) skewY(4.63deg)}8.33%{transform:translateY(-2.64%) skewY(-0.10deg)}16.67%{transform:translateY(-2.46%) skewY(-4.80deg)}25%{transform:translateY(-1.62%) skewY(-8.17deg)}33.33%{transform:translateY(-0.35%) skewY(-9.36deg)}41.67%{transform:translateY(1.02%) skewY(-8.08deg)}50%{transform:translateY(2.11%) skewY(-4.63deg)}58.33%{transform:translateY(2.64%) skewY(0.10deg)}66.67%{transform:translateY(2.46%) skewY(4.80deg)}75%{transform:translateY(1.62%) skewY(8.17deg)}83.33%{transform:translateY(0.35%) skewY(9.36deg)}91.67%{transform:translateY(-1.02%) skewY(8.08deg)}100%{transform:translateY(-2.11%) skewY(4.63deg)}}
+@keyframes as-fs5{0%{opacity:1.000}8.33%{opacity:0.489}16.67%{opacity:0.000}25%{opacity:0.000}33.33%{opacity:0.000}41.67%{opacity:0.000}50%{opacity:0.000}58.33%{opacity:0.511}66.67%{opacity:1.000}75%{opacity:1.000}83.33%{opacity:1.000}91.67%{opacity:1.000}100%{opacity:1.000}}
+@keyframes as-fl6{0%{transform:translateY(-1.43%) skewY(9.12deg)}8.33%{transform:translateY(-2.65%) skewY(5.01deg)}16.67%{transform:translateY(-3.16%) skewY(-0.50deg)}25%{transform:translateY(-2.82%) skewY(-5.87deg)}33.33%{transform:translateY(-1.72%) skewY(-9.61deg)}41.67%{transform:translateY(-0.17%) skewY(-10.79deg)}50%{transform:translateY(1.43%) skewY(-9.12deg)}58.33%{transform:translateY(2.65%) skewY(-5.01deg)}66.67%{transform:translateY(3.16%) skewY(0.50deg)}75%{transform:translateY(2.82%) skewY(5.87deg)}83.33%{transform:translateY(1.72%) skewY(9.61deg)}91.67%{transform:translateY(0.17%) skewY(10.79deg)}100%{transform:translateY(-1.43%) skewY(9.12deg)}}
+@keyframes as-fs6{0%{opacity:1.000}8.33%{opacity:1.000}16.67%{opacity:0.444}25%{opacity:0.000}33.33%{opacity:0.000}41.67%{opacity:0.000}50%{opacity:0.000}58.33%{opacity:0.000}66.67%{opacity:0.556}75%{opacity:1.000}83.33%{opacity:1.000}91.67%{opacity:1.000}100%{opacity:1.000}}
+@keyframes as-fl7{0%{transform:translateY(-0.10%) skewY(12.21deg)}8.33%{transform:translateY(-1.92%) skewY(10.07deg)}16.67%{transform:translateY(-3.23%) skewY(5.21deg)}25%{transform:translateY(-3.67%) skewY(-1.12deg)}33.33%{transform:translateY(-3.13%) skewY(-7.14deg)}41.67%{transform:translateY(-1.75%) skewY(-11.16deg)}50%{transform:translateY(0.10%) skewY(-12.21deg)}58.33%{transform:translateY(1.92%) skewY(-10.07deg)}66.67%{transform:translateY(3.23%) skewY(-5.21deg)}75%{transform:translateY(3.67%) skewY(1.12deg)}83.33%{transform:translateY(3.13%) skewY(7.14deg)}91.67%{transform:translateY(1.75%) skewY(11.16deg)}100%{transform:translateY(-0.10%) skewY(12.21deg)}}
+@keyframes as-fs7{0%{opacity:1.000}8.33%{opacity:1.000}16.67%{opacity:1.000}25%{opacity:0.375}33.33%{opacity:0.000}41.67%{opacity:0.000}50%{opacity:0.000}58.33%{opacity:0.000}66.67%{opacity:0.000}75%{opacity:0.625}83.33%{opacity:1.000}91.67%{opacity:1.000}100%{opacity:1.000}}
+@keyframes as-fl8{0%{transform:translateY(1.71%) skewY(12.79deg)}8.33%{transform:translateY(-0.44%) skewY(13.62deg)}16.67%{transform:translateY(-2.47%) skewY(10.90deg)}25%{transform:translateY(-3.84%) skewY(5.22deg)}33.33%{transform:translateY(-4.18%) skewY(-1.97deg)}41.67%{transform:translateY(-3.40%) skewY(-8.58deg)}50%{transform:translateY(-1.71%) skewY(-12.79deg)}58.33%{transform:translateY(0.44%) skewY(-13.62deg)}66.67%{transform:translateY(2.47%) skewY(-10.90deg)}75%{transform:translateY(3.84%) skewY(-5.22deg)}83.33%{transform:translateY(4.18%) skewY(1.97deg)}91.67%{transform:translateY(3.40%) skewY(8.58deg)}100%{transform:translateY(1.71%) skewY(12.79deg)}}
+@keyframes as-fs8{0%{opacity:1.000}8.33%{opacity:1.000}16.67%{opacity:1.000}25%{opacity:1.000}33.33%{opacity:0.281}41.67%{opacity:0.000}50%{opacity:0.000}58.33%{opacity:0.000}66.67%{opacity:0.000}75%{opacity:0.000}83.33%{opacity:0.719}91.67%{opacity:1.000}100%{opacity:1.000}}
+@keyframes as-fl9{0%{transform:translateY(3.60%) skewY(10.19deg)}8.33%{transform:translateY(1.58%) skewY(14.48deg)}16.67%{transform:translateY(-0.86%) skewY(14.97deg)}25%{transform:translateY(-3.07%) skewY(11.58deg)}33.33%{transform:translateY(-4.46%) skewY(5.01deg)}41.67%{transform:translateY(-4.65%) skewY(-3.05deg)}50%{transform:translateY(-3.60%) skewY(-10.19deg)}58.33%{transform:translateY(-1.58%) skewY(-14.48deg)}66.67%{transform:translateY(0.86%) skewY(-14.97deg)}75%{transform:translateY(3.07%) skewY(-11.58deg)}83.33%{transform:translateY(4.46%) skewY(-5.01deg)}91.67%{transform:translateY(4.65%) skewY(3.05deg)}100%{transform:translateY(3.60%) skewY(10.19deg)}}
+@keyframes as-fs9{0%{opacity:1.000}8.33%{opacity:1.000}16.67%{opacity:1.000}25%{opacity:1.000}33.33%{opacity:1.000}41.67%{opacity:0.162}50%{opacity:0.000}58.33%{opacity:0.000}66.67%{opacity:0.000}75%{opacity:0.000}83.33%{opacity:0.000}91.67%{opacity:0.838}100%{opacity:1.000}}
+@keyframes as-fl10{0%{transform:translateY(5.10%) skewY(4.35deg)}8.33%{transform:translateY(3.73%) skewY(11.95deg)}16.67%{transform:translateY(1.37%) skewY(16.19deg)}25%{transform:translateY(-1.37%) skewY(16.24deg)}33.33%{transform:translateY(-3.73%) skewY(12.09deg)}41.67%{transform:translateY(-5.10%) skewY(4.56deg)}50%{transform:translateY(-5.10%) skewY(-4.35deg)}58.33%{transform:translateY(-3.73%) skewY(-11.95deg)}66.67%{transform:translateY(-1.37%) skewY(-16.19deg)}75%{transform:translateY(1.37%) skewY(-16.24deg)}83.33%{transform:translateY(3.73%) skewY(-12.09deg)}91.67%{transform:translateY(5.10%) skewY(-4.56deg)}100%{transform:translateY(5.10%) skewY(4.35deg)}}
+@keyframes as-fs10{0%{opacity:0.984}8.33%{opacity:1.000}16.67%{opacity:1.000}25%{opacity:1.000}33.33%{opacity:1.000}41.67%{opacity:1.000}50%{opacity:0.016}58.33%{opacity:0.000}66.67%{opacity:0.000}75%{opacity:0.000}83.33%{opacity:0.000}91.67%{opacity:0.000}100%{opacity:0.984}}
+@keyframes as-fl11{0%{transform:translateY(5.73%) skewY(-3.86deg)}8.33%{transform:translateY(5.49%) skewY(5.89deg)}16.67%{transform:translateY(3.79%) skewY(13.83deg)}25%{transform:translateY(1.06%) skewY(17.91deg)}33.33%{transform:translateY(-1.95%) skewY(17.41deg)}41.67%{transform:translateY(-4.43%) skewY(12.41deg)}50%{transform:translateY(-5.73%) skewY(3.86deg)}58.33%{transform:translateY(-5.49%) skewY(-5.89deg)}66.67%{transform:translateY(-3.79%) skewY(-13.83deg)}75%{transform:translateY(-1.06%) skewY(-17.91deg)}83.33%{transform:translateY(1.95%) skewY(-17.41deg)}91.67%{transform:translateY(4.43%) skewY(-12.41deg)}100%{transform:translateY(5.73%) skewY(-3.86deg)}}
+@keyframes as-fs11{0%{opacity:0.071}8.33%{opacity:1.000}16.67%{opacity:1.000}25%{opacity:1.000}33.33%{opacity:1.000}41.67%{opacity:1.000}50%{opacity:0.929}58.33%{opacity:0.000}66.67%{opacity:0.000}75%{opacity:0.000}83.33%{opacity:0.000}91.67%{opacity:0.000}100%{opacity:0.071}}
+/* ⟨/flag keyframes⟩ */
+
+/* the seasons: the art swaps (above); the moving parts follow. Smoke from the chimney in the cold months; winter's
+   lake is frozen, so no glints and no reflection of the train */
+html[data-season="autumn"] .alps-scene .as-smoke, html[data-season="winter"] .alps-scene .as-smoke { display: block; }
+html[data-season="winter"] .alps-scene .as-glints, html[data-season="winter"] .alps-scene .as-rail--refl { display: none; }
+html[data-season="winter"] .alps-scene { background: linear-gradient(to bottom, #3070BA, #8FBEE8 47%, #E6F0F8 60%, #D9E9F5 67%, #B2CCE2 83.6%, #DCDFDF 83.8%, #ECEDEA); }

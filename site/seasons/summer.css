@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODEL POPS · SUMMER: the Riviera
+   ───────────────────────────────────────────────────────────────────────────
+   site/style.css IS the summer design, so this file only restates its tokens, as the reference every other
+   season starts from. Everything here is scoped to html[data-season="summer"]; a season file may set any of
+   these tokens, any product's (--<id>-<token>: strawberry-pop, green-pop, vitamin-c; tokens accent, deep, btn,
+   text, display, tint, soft, stripe, trim), and restyle any element under its own scope.
+
+   SURFACES     --white (the page) · --paper (cards) · --card-paper (postcard prints) · --sand (the sugar and
+                menu sections) · --section-tint (the amenities band) · --sand-hi / --sand-lo (the beach under the
+                cabanas) · --coping-hi / --coping-lo (the pool's stone edge) · --announce-bg / --announce-ink
+                (the top bar) · --foot-bg (the footer)
+   STRIPES      --stripe-2 (the white stripe of every awning and cabana)
+   SUN          --sun · --amber (the engraved suns and the Sun Index)
+   INK          --ink · --ink-2 · --ink-3 · --line · --line-2 (keep AA contrast on the surfaces above)
+   HOOKS        .cab-snow (a snow cap on every cabana roof, hidden: show it with display: inline) · .decor (the
+                particle canvas) · .coping (the pool edges) · .beach__sand · .beach__foam · .shore · .alps (the
+                Swiss section: see site/swiss.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-season="summer"] {
+  --white: #FFFDF8;
+  --paper: #FFFEFB;
+  --card-paper: #FFFEFA;
+  --sand: #F5E6D0;
+  --section-tint: #FBF4EA;
+  --sand-hi: #F3DFC2;
+  --sand-lo: #F7EAD8;
+  --coping-hi: #FFFFFF;
+  --coping-lo: #EFE4D5;
+  --stripe-2: #FFFDF8;
+  --sun: #FFC93C;
+  --amber: #C8870C;
+}

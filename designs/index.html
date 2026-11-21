@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model Pops · Design archive</title>
+<meta name="description" content="Model Pops: the seasonal versions of the site and the archived design proposals.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Model Pops · Design archive">
+<meta property="og:url" content="https://hmohyud.github.io/glow-pop/designs/">
+<meta property="og:image" content="https://hmohyud.github.io/glow-pop/site/assets/seasons/og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14.6' fill='%23FFFDF8'/%3E%3Cpath fill='%23FF1493' d='M16 16L18.77 2.07A14.2 14.2 0 0 1 23.89 4.19ZM16 16L27.81 8.11A14.2 14.2 0 0 1 29.93 13.23ZM16 16L29.93 18.77A14.2 14.2 0 0 1 27.81 23.89ZM16 16L23.89 27.81A14.2 14.2 0 0 1 18.77 29.93ZM16 16L13.23 29.93A14.2 14.2 0 0 1 8.11 27.81ZM16 16L4.19 23.89A14.2 14.2 0 0 1 2.07 18.77ZM16 16L2.07 13.23A14.2 14.2 0 0 1 4.19 8.11ZM16 16L8.11 4.19A14.2 14.2 0 0 1 13.23 2.07Z'/%3E%3Ccircle cx='16' cy='16' r='14.6' fill='none' stroke='%234A0D2E' stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%234A0D2E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Jost:ital,wght@0,300..700;1,400..500&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#FFFDF8; --serif:'Bodoni Moda','Bodoni 72',Didot,'Times New Roman',serif; --sans:'Jost','Futura','Century Gothic','Avenir Next',system-ui,sans-serif; --card:#fff; --ink:#3A0A24; --muted:#8E5076; --line:rgba(122,27,77,.14); --pink:#FF1493; --pink-text:#C2006B; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+  img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+  .wrap{width:min(1320px,100% - 32px);margin:0 auto;padding:clamp(28px,5vw,56px) 0 64px}
+  h1{margin:0 0 clamp(20px,3vw,32px);font-size:15px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h2{margin:0 0 6px;font:500 clamp(24px,2.6vw,32px)/1.1 var(--serif);letter-spacing:-.01em}
+  /* the Bodoni set small: its sturdiest optical size, so its hairlines hold (as on the site) */
+  .name{font-optical-sizing:none;font-variation-settings:'opsz' 6}
+  section + section{margin-top:clamp(44px,6vw,72px)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,560px),1fr));gap:clamp(16px,2.4vw,28px)}
+  .card{position:relative;display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;
+        box-shadow:0 1px 2px rgba(58,10,36,.05),0 12px 36px -20px rgba(58,10,36,.3);transition:transform .25s ease,box-shadow .25s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(58,10,36,.06),0 22px 44px -22px rgba(58,10,36,.45)}
+  .card:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+  .shots{display:grid;grid-template-columns:1fr .289fr;gap:10px;align-items:start}   /* a 1440×900 and a 390×844 shot, the same height */
+  .shots > span{position:relative;display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#f4eef0}
+  .d{aspect-ratio:1440/900}
+  .m{aspect-ratio:390/844}
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 4px 2px}
+  .name{font:600 20px/1.15 var(--serif)}
+  .name b{color:var(--pink-text);font-weight:600;margin-right:4px;font-variant-numeric:lining-nums}
+  .name small{display:block;margin-top:4px;font:500 13px/1.3 var(--sans);color:var(--muted)}
+  .sw{display:flex;gap:5px;flex:none}
+  .sw i{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
+  .back{margin:0 0 8px;font-size:15px}
+  .back a{display:inline-block;padding:11px 0;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-decoration-thickness:1px;text-underline-offset:4px}   /* 44px to tap */
+  .back a:hover{text-decoration-color:var(--pink)}
+  .note{margin:0 0 clamp(20px,3vw,28px);color:var(--muted);font-size:15px;max-width:70ch}
+  /* the seasons: a placeholder in the season's own colours until its thumbnails exist (designs/thumbs/<season>/) */
+  .ph{position:absolute;inset:0;display:grid;place-items:center;padding:10px;text-align:center;
+      background:radial-gradient(120% 90% at 20% 15%,var(--a),transparent 60%),linear-gradient(160deg,var(--b),var(--c));
+      color:var(--ink);font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  .ph em{display:block;margin-top:4px;font-style:normal;font-weight:500;letter-spacing:.04em;text-transform:none;color:rgba(58,10,36,.7)}
+  .m .ph{font-size:11px}
+  .m .ph em{display:none}
+  .shots img{position:relative}
+  .live{position:absolute;left:24px;top:24px;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;
+        background:#fff;color:var(--pink-text);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 1px var(--line),0 6px 16px -8px rgba(58,10,36,.4)}
+  .live::before{content:'';width:8px;height:8px;border-radius:50%;background:#22A35A;box-shadow:0 0 0 3px rgba(34,163,90,.2)}
+  .card.is-live{border-color:rgba(255,20,147,.45)}
+  @media (prefers-reduced-motion: reduce){ .card{transition:none} .card:hover{transform:none} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="back"><a href="../index.html">&larr; Back to the Model Pops site</a></p>
+  <h1>Model Pops · Design archive</h1>
+
+  <section aria-labelledby="seasons-title">
+    <h2 id="seasons-title">The Model Pops site, by season</h2>
+    <p class="note">One version of the site for each season, so it never looks out of date. The site picks the season from each visitor’s own date; open any season here.</p>
+    <div class="grid" id="seasons">
+      <!-- rendered below; without JS these plain links still work -->
+      <a class="card" href="../index.html?season=spring"><div class="meta"><span class="name">Spring</span></div></a>
+      <a class="card" href="../index.html?season=summer"><div class="meta"><span class="name">Summer</span></div></a>
+      <a class="card" href="../index.html?season=autumn"><div class="meta"><span class="name">Autumn</span></div></a>
+      <a class="card" href="../index.html?season=winter"><div class="meta"><span class="name">Winter</span></div></a>
+    </div>
+  </section>
+
+  <section aria-labelledby="archive-title">
+    <h2 id="archive-title">Archived proposals</h2>
+    <p class="note">Earlier design proposals, kept as they were. They were made when the brand was called Glo Pop.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+<script>
+  // The seasons, in the year's order. The live one is today's, by the same rule as the site (northern hemisphere,
+  // meteorological: Mar–May spring, Jun–Aug summer, Sep–Nov autumn, Dec–Feb winter).
+  // [id, name, months, palette (also the placeholder's colours: glow, top, bottom)]
+  var SEASONS = [
+    ['spring', 'Spring', 'March to May · in bloom', ['#FFFDFB', '#F7E9E1', '#EEF7F0', '#FFDF5E', '#FF1493']],
+    ['summer', 'Summer', 'June to August · the Riviera', ['#FFFDF8', '#5DD6E8', '#1D9BD1', '#F5E6D0', '#FF1493']],
+    ['autumn', 'Autumn', 'September to November · golden hour', ['#FFFBF4', '#F2DEC6', '#D9822B', '#5B2342', '#FF1493']],
+    ['winter', 'Winter', 'December to February · après-ski', ['#FBFDFF', '#EBF2F8', '#8EC5E6', '#FFE08A', '#FF1493']]
+  ];
+  var MONTHS = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+  var live = MONTHS[new Date().getMonth()];
+  // the seasons whose thumbnails are in designs/thumbs/<season>/ (desktop-00.webp, mobile-00.webp): add each one here
+  // once it is made; until then its placeholder shows and nothing is requested
+  var THUMBS = ['spring', 'summer', 'autumn', 'winter'];
+  // a thumbnail that isn't there yet leaves its placeholder showing (both decorative: the card's own words name it)
+  function thumb(cls, src, w, h, label) {
+    return '<span class="' + cls + '"><span class="ph" aria-hidden="true"><span>' + label + '</span></span>' +
+      (src ? '<img src="' + src + '" alt="" width="' + w + '" height="' + h + '" loading="lazy" onerror="this.remove()">' : '') + '</span>';
+  }
+  document.getElementById('seasons').innerHTML = SEASONS.map(function (s) {
+    var t = THUMBS.indexOf(s[0]) >= 0 ? 'thumbs/' + s[0] + '/' : null, p = s[3], on = s[0] === live;
+    return '<a class="card' + (on ? ' is-live' : '') + '" href="../index.html?season=' + s[0] + '" style="--a:' + p[3] + '66;--b:' + p[1] + ';--c:' + p[2] + '">' +
+      (on ? '<span class="live">Live now</span>' : '') +
+      '<div class="shots">' +
+        thumb('d', t && t + 'desktop-00.webp', 1440, 900, s[1] + '<em>preview to come</em>') +
+        thumb('m', t && t + 'mobile-00.webp', 390, 844, s[1]) +
+      '</div>' +
+      '<div class="meta"><span class="name">' + s[1] + '<small>' + s[2] + '</small></span>' +
+        '<span class="sw" aria-hidden="true">' + p.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span></div>' +
+    '</a>';
+  }).join('');
+
+  // [number, thumbs folder, name, palette, link (defaults to the proposal folder)]
+  var PROPOSALS = [
+    ['', '00-first-draft', 'First draft', ['#FFF0F5', '#7A1B4D', '#FF1493', '#F26A1B', '#0E9CAD'], '../first-draft/index.html'],
+    ['01', '01-editorial', 'The Glo Issue', ['#FBF0EC', '#4A0D2E', '#FF1493', '#EEF3EC', '#1FA453']],
+    ['02', '02-candy', 'Sweet Riot', ['#FF1493', '#FF8AC6', '#E8174B', '#FFF4E8', '#22C55E']],
+    ['03', '03-lab', 'Glow Lab', ['#FAF8F7', '#1B0B14', '#FF1493', '#E9E2E5', '#1FA453']],
+    ['04', '04-prism', 'Prism', ['#FFF8FC', '#EBDDFF', '#FFD9C7', '#D6ECFF', '#FF1493']],
+    ['05', '05-golden', 'Golden Hour', ['#FFB38A', '#FF6F61', '#FF1493', '#4E0E36', '#FFC94A']],
+    ['06', '06-riviera', 'Riviera', ['#FFFDF8', '#5DD6E8', '#1D9BD1', '#FF1493', '#F5E6D0']],
+    ['07', '07-paper-sun', 'Paper Sun', ['#FF1493', '#FFC83D', '#0E9CAD', '#FFF6EE', '#2B0718']],
+    ['08', '08-pop-arcade', 'Pop Arcade', ['#FF2E93', '#FFD23F', '#2CC6F2', '#2A0B3D', '#FFF6EC']]
+  ];
+  document.getElementById('grid').innerHTML = PROPOSALS.map(function (p) {
+    var t = '../redesign/_qa/thumbs/' + p[1] + '/';
+    return '<a class="card" href="' + (p[4] || '../redesign/' + p[1] + '/index.html') + '">' +
+      '<div class="shots">' +
+        '<span class="d"><img src="' + t + 'desktop-00.webp" alt="" width="1440" height="900" loading="lazy"></span>' +
+        '<span class="m"><img src="' + t + 'mobile-00.webp" alt="" width="390" height="844" loading="lazy"></span>' +
+      '</div>' +
+      '<div class="meta"><span class="name">' + (p[0] ? '<b>' + p[0] + '</b> ' : '') + p[2] + '</span>' +
+        '<span class="sw" aria-hidden="true">' + p[3].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span></div>' +
+    '</a>';
+  }).join('');
+</script>
+</body>
+</html>

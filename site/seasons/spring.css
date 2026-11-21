@@ -1,0 +1,41 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODEL POPS · SPRING: the Riviera in bloom, on a bright spring morning
+   ───────────────────────────────────────────────────────────────────────────
+   The same club, freshened: crisp white, petal blush where the summer has sand, a mint band, a mint
+   announcement bar and a mint foot, and the engraved suns in mimosa gold (the Riviera's first flower of the
+   year) around a lemon sun. The awnings keep each product's stripe (the white one a touch crisper), the pink
+   stays the product's own, and every product keeps its colours. The petals on the pool are the particle layer
+   (site/seasons/spring.js). Tokens: see summer.css. Everything here is scoped to html[data-season="spring"].
+   CONTRAST (WCAG AA): ink #4A0D2E ≥ 11:1 and ink-2 #74435C ≥ 5.7:1 on every surface below; small accents
+   (--accent-text #BF0068) ≥ 4.5:1 on blush, mint and white; big italic accents (--accent-display) ≥ 3:1.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-season="spring"] {
+  --white: #FFFDFB;
+  --paper: #FFFFFE;
+  --card-paper: #FFFFFD;
+  --sand: #FAEAE6;          /* petal blush: the label print and the menu card lie on it */
+  --sand-2: #F0D3CC;
+  --sand-3: #DFB3A9;
+  --section-tint: #E9F6EE;  /* mint, behind the amenities */
+  --sand-hi: #F0D8CC;       /* the beach in the morning: damp sand by the water … */
+  --sand-lo: #FBF3EE;       /* … pale dry sand in front */
+  --coping-hi: #FFFFFF;
+  --coping-lo: #EDE6E1;
+  --stripe-2: #FFFEFC;      /* the awnings' white stripe: crisp */
+  --sun: #FFE15A;           /* lemon */
+  --amber: #C39A0C;         /* mimosa gold: the engraved suns */
+  --announce-bg: #DFF2E6;   /* mint */
+  --announce-ink: #4A0D2E;
+  --foot-bg: #EAF5EE;       /* mint again at the foot of the page */
+}
+
+/* the Sun Index: a lemon sun on a mimosa-gold ring, its path gilded in the same gold */
+html[data-season="spring"] .sun__disc { background: var(--sun); }
+html[data-season="spring"] .sunindex__arc .done { stroke: #E2AA14; }
+
+/* reduced motion (the particle canvas never starts): the same petals, as one still picture resting on the pool by
+   the top-right corner, clear of the headline. Only once the page is up, and only while there is no canvas */
+html[data-season="spring"].app-ready .hero:not(:has(> .decor))::before {
+  content: ''; position: absolute; z-index: 1; right: 0; top: 44px; width: 240px; height: 230px; pointer-events: none;
+  background: url("../assets/seasons/spring/petals-still.svg") 0 0 / 100% 100% no-repeat;
+}

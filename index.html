@@ -1,73 +1,768 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-product="strawberry-pop" data-kind="lollipop" data-season="summer">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glo Pop · Design proposals</title>
-<meta name="description" content="Glo Pop website design proposals.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  /* Before first paint. THE SEASON: one version of the site per season. ?season=spring|summer|autumn|winter
+     (or fall) previews one (anything else is ignored); otherwise the visitor's own date picks it (northern
+     hemisphere, meteorological: Mar–May spring, Jun–Aug summer, Sep–Nov autumn, Dec–Feb winter). This page's own
+     words are summer's: in another season, its words (data-season-copy) wait unseen until app.js has set them
+     (the first thing it does), or 8 s if it never does. Progressive enhancement: the reveals run only once JS
+     does, and if app.js never boots everything is simply shown after 2.5 s. */
+  (function (h) {
+    var M = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+    var q = /[?&]season=([^&#]*)/.exec(location.search), s = q ? String(q[1]).toLowerCase() : '';
+    if (s === 'fall') s = 'autumn';
+    if (M.indexOf(s) < 0) s = M[new Date().getMonth()];
+    h.setAttribute('data-season', s);
+    window.MP_SEASON_NAME = s;
+    h.classList.add('js');
+    if (s !== 'summer') h.classList.add('season-pending');
+    if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('motion');
+    setTimeout(function () { if (!h.classList.contains('app-ready')) h.classList.remove('motion'); }, 2500);
+    setTimeout(function () { h.classList.remove('season-pending'); }, 8000);
+  })(document.documentElement);
+</script>
+<title data-season-copy="metaTitle">Model Pops · Your summer glow, served poolside</title>
+<meta name="description" content="Model Pops, your supermodel routine. Collagen Boost is a sugar free, allulose free strawberry lollipop, sweetened with isomalt and stevia leaf, with collagen peptides, hyaluronic acid, vitamin C and biotin: 16 calories and 0 g sugar in every 15 g pop." data-season-copy="metaDescription">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Glo Pop · Design proposals">
+<meta property="og:site_name" content="Model Pops">
+<meta property="og:title" content="Model Pops · Your supermodel routine">
+<meta property="og:description" content="Collagen Boost: a sugar free, allulose free strawberry lollipop with collagen peptides, hyaluronic acid, vitamin C and biotin, sweetened with isomalt and stevia leaf. 16 calories, 0 g sugar.">
 <meta property="og:url" content="https://hmohyud.github.io/glow-pop/">
-<meta property="og:image" content="https://hmohyud.github.io/glow-pop/images/og-card.png">
+<meta property="og:image" content="https://hmohyud.github.io/glow-pop/site/assets/seasons/og-card.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Model Pops, your supermodel routine. Sugar free. Still strawberry. Collagen Boost: allulose free, 16 calories. Beside it, a postcard of a smiling woman in a pink bikini holding a pink lollipop.">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 18v12' stroke='%23e8dde2' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='11' r='9' fill='%23FF1493'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#FFFDF8" data-season-copy="themeColor">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14.6' fill='%23FFFDF8'/%3E%3Cpath fill='%23FF1493' d='M16 16L18.77 2.07A14.2 14.2 0 0 1 23.89 4.19ZM16 16L27.81 8.11A14.2 14.2 0 0 1 29.93 13.23ZM16 16L29.93 18.77A14.2 14.2 0 0 1 27.81 23.89ZM16 16L23.89 27.81A14.2 14.2 0 0 1 18.77 29.93ZM16 16L13.23 29.93A14.2 14.2 0 0 1 8.11 27.81ZM16 16L4.19 23.89A14.2 14.2 0 0 1 2.07 18.77ZM16 16L2.07 13.23A14.2 14.2 0 0 1 4.19 8.11ZM16 16L8.11 4.19A14.2 14.2 0 0 1 13.23 2.07Z'/%3E%3Ccircle cx='16' cy='16' r='14.6' fill='none' stroke='%234A0D2E' stroke-width='1.4'/%3E%3Ccircle cx='16' cy='16' r='2.6' fill='%234A0D2E'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root{ --bg:#FFF8F5; --card:#fff; --ink:#3A0A24; --muted:#8E5076; --line:rgba(122,27,77,.14); --pink:#FF1493; }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.4 'Poppins',system-ui,sans-serif}
-  img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
-  .wrap{width:min(1320px,100% - 32px);margin:0 auto;padding:clamp(28px,5vw,56px) 0 64px}
-  h1{margin:0 0 clamp(20px,3vw,32px);font-size:15px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,560px),1fr));gap:clamp(16px,2.4vw,28px)}
-  .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;
-        box-shadow:0 1px 2px rgba(58,10,36,.05),0 12px 36px -20px rgba(58,10,36,.3);transition:transform .25s ease,box-shadow .25s ease}
-  .card:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(58,10,36,.06),0 22px 44px -22px rgba(58,10,36,.45)}
-  .card:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
-  .shots{display:grid;grid-template-columns:1fr .3fr;gap:10px;align-items:start}
-  .shots span{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#f4eef0}
-  .d{aspect-ratio:1440/900}
-  .m{aspect-ratio:390/844}
-  .meta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 4px 2px}
-  .name{font-size:18px;font-weight:600}
-  .name b{color:var(--pink);font-weight:600;margin-right:8px}
-  .sw{display:flex;gap:5px;flex:none}
-  .sw i{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
-  @media (prefers-reduced-motion: reduce){ .card{transition:none} .card:hover{transform:none} }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Jost:ital,wght@0,300..700;1,400..500&family=Inter+Tight:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/style.css">
+<link rel="stylesheet" href="site/swiss.css">
+<link rel="stylesheet" href="site/rider.css">
+<!-- the four seasons, each scoped to html[data-season="…"] (only the current one applies) -->
+<link rel="stylesheet" href="site/seasons/summer.css">
+<link rel="stylesheet" href="site/seasons/autumn.css">
+<link rel="stylesheet" href="site/seasons/winter.css">
+<link rel="stylesheet" href="site/seasons/spring.css">
 </head>
 <body>
-<main class="wrap">
-  <h1>Glo Pop · Design proposals</h1>
-  <div class="grid" id="grid"></div>
+
+<!-- ═══════════ SVG sprite: drawn ornaments (one line weight, never emoji) ═══════════ -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- engraved sun: a filled disc, one ring, fine alternating rays -->
+    <symbol id="o-sun" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="6.6" fill="currentColor" fill-opacity=".28" stroke="currentColor" stroke-width="1.7"/>
+      <g stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+        <path d="M24 4.2v7.2M24 36.6v7.2M4.2 24h7.2M36.6 24h7.2M10 10l5.1 5.1M32.9 32.9L38 38M10 38l5.1-5.1M32.9 15.1L38 10"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7">
+        <path d="M16.3 5.5l1.5 3.5M30.2 39l1.5 3.5M5.5 31.7L9 30.2M39 17.8l3.5-1.5M5.5 16.3L9 17.8M39 30.2l3.5 1.5M16.3 42.5l1.5-3.5M30.2 9l1.5-3.5"/>
+      </g>
+    </symbol>
+    <symbol id="o-wave" viewBox="0 0 120 12">
+      <path d="M0 6c10 0 10-4.5 20-4.5S30 6 40 6s10-4.5 20-4.5S70 6 80 6s10-4.5 20-4.5S110 6 120 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </symbol>
+    <!-- postmark: a cancelled stamp for the postcards (its words follow the season) -->
+    <path id="pm-ring" d="M180 80m-52 0a52 52 0 1 1 104 0a52 52 0 1 1-104 0"/>
+    <symbol id="o-postmark" viewBox="0 0 260 160">
+      <circle cx="180" cy="80" r="66" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="180" cy="80" r="40" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <text fill="currentColor" font-family="Jost, Futura, sans-serif" font-size="11" font-weight="500" letter-spacing="2"><textPath href="#pm-ring" textLength="324" lengthAdjust="spacing" data-season-copy="postmark">MODEL POPS BEACH CLUB · CABANA NO. 1 · RIVIERA ·</textPath></text>
+      <use href="#o-sun" x="160" y="60" width="40" height="40"/>
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <path d="M4 58c10-7 20-7 30 0s20 7 30 0 20-7 30 0 20 7 30 0"/>
+        <path d="M4 74c10-7 20-7 30 0s20 7 30 0 20-7 30 0 20 7 30 0"/>
+        <path d="M4 90c10-7 20-7 30 0s20 7 30 0 20-7 30 0 20 7 30 0"/>
+        <path d="M4 106c10-7 20-7 30 0s20 7 30 0 20-7 30 0 20 7 30 0"/>
+      </g>
+    </symbol>
+    <!-- the Alpine postmark (the capsules' postcard): a range of peaks in place of the waves -->
+    <path id="pm-ring-alps" d="M180 80m-52 0a52 52 0 1 1 104 0a52 52 0 1 1-104 0"/>
+    <symbol id="o-postmark-alps" viewBox="0 0 260 160">
+      <circle cx="180" cy="80" r="66" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="180" cy="80" r="40" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <text fill="currentColor" font-family="Jost, Futura, sans-serif" font-size="11" font-weight="500" letter-spacing="2"><textPath href="#pm-ring-alps" textLength="324" lengthAdjust="spacing">MODEL POPS · CABANA NO. 3 · MADE IN SWITZERLAND ·</textPath></text>
+      <path d="M161 92l11-17 7 9 6-8 14 16z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 104l22-30 14 16 18-26 22 30 16-18 22 28"/>
+        <path d="M4 118h114"/>
+      </g>
+    </symbol>
+    <!-- the Swiss flag (square; the cross's arms a sixth longer than they are wide): only on the capsules' badge and in their scene -->
+    <symbol id="o-swiss" viewBox="0 0 32 32">
+      <rect width="32" height="32" rx="2.5" fill="#D52B1E"/>
+      <path d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z" fill="#fff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ═══════════ 1 · Announcement + header ═══════════ -->
+<div class="announce" role="note">
+  <p><span>Free shipping on every order</span><svg class="announce__sun" aria-hidden="true"><use href="#o-sun"/></svg><span>Now serving Collagen Boost &amp; <span data-name="green-pop">Green Veggies</span></span></p>
+</div>
+
+<header class="nav" id="nav">
+  <div class="nav__bar wrap">
+    <a class="brand" href="#top" aria-label="Model Pops, back to the top">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__lockup" aria-hidden="true"><span class="brand__word">Model Pops</span></span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <ul>
+        <li><a href="#cabanas">Lineup</a></li>
+        <li><a href="#amenities">Ingredients</a></li>
+        <li><a href="#sun-index">Ritual</a></li>
+        <li><a href="#sugar">Sugar Free</a></li>
+        <li><a href="#capsules">Vitamin C</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+    <div class="nav__end">
+      <a class="nav__cabana" href="#cabanas"><span class="brand__mark" aria-hidden="true"></span><span class="nav__cabana-k">Your cabana</span><b data-bind="short">Collagen Boost</b><span class="sr-only">. Change product</span></a>
+      <a class="btn btn--sm" href="#menu"><i data-lucide="shopping-bag" aria-hidden="true"></i><span>Shop</span></a>
+      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="menu-panel">
+        <span class="nav__toggle-lines" aria-hidden="true"><span></span><span></span></span>
+        <span class="sr-only">Open menu</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile menu: rolls down like an awning -->
+<div class="menu-panel" id="menu-panel" hidden>
+  <nav aria-label="Mobile">
+    <ol class="menu-panel__list">
+      <li><a href="#cabanas"><span aria-hidden="true">N<span class="ord">o</span> 1</span>Lineup</a></li>
+      <li><a href="#amenities"><span aria-hidden="true">N<span class="ord">o</span> 2</span>Ingredients</a></li>
+      <li><a href="#sun-index"><span aria-hidden="true">N<span class="ord">o</span> 3</span>Ritual</a></li>
+      <li><a href="#sugar"><span aria-hidden="true">N<span class="ord">o</span> 4</span>Sugar Free</a></li>
+      <li><a href="#capsules"><span aria-hidden="true">N<span class="ord">o</span> 5</span>Vitamin C</a></li>
+      <li><a href="#menu"><span aria-hidden="true">N<span class="ord">o</span> 6</span>Shop</a></li>
+      <li><a href="#faq"><span aria-hidden="true">N<span class="ord">o</span> 7</span>FAQ</a></li>
+    </ol>
+  </nav>
+  <a class="btn btn--block" href="#menu" data-bind-href="heroHref"><i data-lucide="shopping-bag" aria-hidden="true"></i><span data-bind="heroCta">Shop Collagen Boost</span></a>
+  <p class="menu-panel__note">Free shipping on every order</p>
+</div>
+
+<!-- The one WebGL canvas: sunlit water, seen through every "window" section -->
+<div class="water" aria-hidden="true"><canvas id="water"></canvas></div>
+
+<main id="main">
+
+  <!-- ═══════════ 2 · HERO: the copy lies on open water, over the pool's sunlit shallows (its two lines follow the season) ═══════════ -->
+  <section class="hero is-window" id="top" data-water="pool" data-warm="0" aria-labelledby="hero-title">
+    <div class="awning awning--hero" aria-hidden="true"><span class="awning__band"></span></div>
+
+    <div class="hero__inner">
+      <div class="hero__copy" data-shelf>
+        <p class="eyebrow"><svg class="eyebrow__sun" aria-hidden="true"><use href="#o-sun"/></svg><span data-bind="heroEyebrow">Collagen Boost · Strawberry</span></p>
+        <h1 class="hero__title" id="hero-title"><span class="hero__l1" data-season-copy="heroL1">Your summer glow,</span> <em class="hero__l2" data-season-copy="heroL2">served poolside.</em></h1>
+        <p class="hero__lede" data-bind-html="heroLede">Collagen peptides, hyaluronic acid, vitamin C and biotin, in a really, really good strawberry lollipop, sweetened with isomalt and a touch of&nbsp;stevia.</p>
+        <div class="hero__ctas">
+          <a class="btn" href="#menu" data-bind-href="heroHref"><span data-bind="heroCta">Shop Collagen Boost</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          <a class="btn btn--ghost" href="#cabanas">Choose your cabana</a>
+        </div>
+        <ul class="proofs" aria-label="At a glance" data-bind-html="heroProofs">
+          <li><i data-lucide="lollipop" aria-hidden="true"></i><span><b>Sugar &amp; allulose free</b></span></li>
+          <li><i data-lucide="sparkles" aria-hidden="true"></i><span><b>4</b> beauty actives</span></li>
+          <li><i data-lucide="flame" aria-hidden="true"></i><span><b>16</b> calories</span></li>
+        </ul>
+      </div>
+
+      <figure class="hero__candy">
+        <div class="hero__float" id="heroFloat" role="img" aria-label="A glossy pink Model Pops Collagen Boost strawberry lollipop floating above the pool." data-bind-label="heroLabel">
+          <div class="candy-mount" id="heroCandy"></div>
+          <div class="lolly-fallback" id="heroFallback" hidden aria-hidden="true"><span class="lolly-fallback__stick"></span><span class="lolly-fallback__head"></span><span class="lolly-fallback__cap"></span><span class="lolly-fallback__cap"></span><span class="lolly-fallback__cap"></span></div>
+        </div>
+        <span class="hero__loading" aria-hidden="true"><i></i><i></i><i></i></span>
+        <figcaption class="caption caption--hero" id="heroCaption" data-bind-html="heroCaption"><span class="no" aria-hidden="true">N<span class="ord">o</span> 1</span> Strawberry</figcaption>
+      </figure>
+    </div>
+
+    <p class="hero__hint"><i data-lucide="hand" aria-hidden="true"></i><span data-bind="heroHint">Touch the water · tap the pop for a bite</span></p>
+    <div class="coping" aria-hidden="true"></div>
+  </section>
+
+  <!-- ═══════════ 3 · WELCOME: the club's postcard ═══════════ -->
+  <section class="club theme-pin" id="club" aria-labelledby="club-title">
+    <div class="club__grid">
+      <figure class="postcard postcard--club" data-reveal>
+        <div class="postcard__card">
+          <div class="postcard__photo"><img class="parallax" src="images/model_pink.webp" width="1023" height="1537" loading="lazy" decoding="async" alt="A sun-kissed woman in a pink bikini, eyes closed in the sun, holds a pink lollipop beside a pink pool float on the beach."><div class="postcard__art" role="img" aria-label="The Model Pops club emblem: a striped ring around the season’s club name."><div class="emblem"><span class="emblem__ring"></span><span class="emblem__disc"><svg class="emblem__orn eyebrow__sun" aria-hidden="true"><use href="#o-sun"/></svg><span class="emblem__brand">Model Pops</span><span class="emblem__club" data-season-copy="club">Beach Club</span><span class="emblem__rule"></span><span class="emblem__line">Cabana <span class="no">N<span class="ord">o</span> 1</span></span></span></div></div></div>
+          <figcaption class="postcard__caption"><em data-season-copy="clubCaption">Strawberry, by the water</em><span>Model Pops <span data-season-copy="club">Beach Club</span></span></figcaption>
+        </div>
+        <svg class="postmark" aria-hidden="true" focusable="false"><use href="#o-postmark"/></svg>
+      </figure>
+
+      <div class="club__copy">
+        <p class="eyebrow" data-reveal>Welcome to the club</p>
+        <h2 class="display" id="club-title" data-reveal>Your supermodel <em>routine.</em></h2>
+        <p class="lede" data-reveal>Four actives in every Collagen Boost pop, and not a powder or a shaker in sight: just a really, really good strawberry lollipop.</p>
+        <ol class="perks">
+          <li data-reveal>
+            <span class="perks__n" aria-hidden="true">i</span>
+            <div><h3>Collagen &amp; hyaluronic acid</h3><p>500&nbsp;mg of collagen peptides (types I and III) and 10&nbsp;mg of hyaluronic acid in every&nbsp;pop.</p></div>
+          </li>
+          <li data-reveal>
+            <span class="perks__n" aria-hidden="true">ii</span>
+            <div><h3>Sugar free</h3><p>It says so right on the label: 0&nbsp;g sugar and 16 calories a pop. Still sweet, still strawberry: sweetened with isomalt, a sugar alcohol, and stevia leaf.</p></div>
+          </li>
+          <li data-reveal>
+            <span class="perks__n" aria-hidden="true">iii</span>
+            <div><h3>Vitamin C &amp; biotin</h3><p>Vitamin C and biotin (vitamin B7), to support healthy-looking skin, hair and nails.<a class="fn" href="#fda" aria-label="See the FDA statement">*</a></p></div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 4 · THE CABANAS (the line-up: one cabana per product) ═══════════ -->
+  <section class="cabanas" id="cabanas" aria-labelledby="cabanas-title">
+    <div class="beach is-window" data-water="sea" data-sun="noon">
+      <header class="section-head beach__head" data-haze>
+        <p class="eyebrow">The lineup</p>
+        <h2 class="display" id="cabanas-title">Choose your <em>cabana.</em></h2>
+        <p class="lede" data-season-copy="cabanasLede">Three cabanas on the sand: choose one and its curtains open. Collagen Boost and <span data-name="green-pop">Green Veggies</span> are open now; Liposomal Vitamin C opens soon.</p>
+      </header>
+      <div class="beach__sand" aria-hidden="true"><span class="beach__foam"></span></div>
+      <div class="cabana-scroller" role="group" aria-label="Choose a product">
+        <ul class="cabana-row" id="cabanaRow">
+          <!-- Rendered from PRODUCTS by app.js; this static copy is the no-JS fallback -->
+          <li class="cabana is-selected is-open" data-id="strawberry-pop">
+            <div class="cabana__art cabana__art--static" aria-hidden="true"></div>
+            <button class="cabana__btn" type="button" aria-pressed="true" data-product="strawberry-pop"><span class="cabana__no" aria-hidden="true">Cabana N<span class="ord">o</span> 1</span><span class="sr-only">Cabana 1: </span><span class="cabana__name">Collagen Boost</span><span class="cabana__status" data-status="available">Available now</span></button>
+          </li>
+          <li class="cabana" data-id="green-pop" style="--stripe: var(--green-pop-stripe, #4FC24A)">
+            <div class="cabana__art cabana__art--static" aria-hidden="true"></div>
+            <button class="cabana__btn" type="button" aria-pressed="false" data-product="green-pop"><span class="cabana__no" aria-hidden="true">Cabana N<span class="ord">o</span> 2</span><span class="sr-only">Cabana 2: </span><span class="cabana__name" data-name="green-pop">Green Veggies</span><span class="cabana__status" data-status="available">Available now</span></button>
+          </li>
+          <li class="cabana" data-id="vitamin-c" style="--stripe: #E2D2B6">
+            <div class="cabana__art cabana__art--static" aria-hidden="true"></div>
+            <button class="cabana__btn" type="button" aria-pressed="false" data-product="vitamin-c"><span class="cabana__no" aria-hidden="true">Cabana N<span class="ord">o</span> 3</span><span class="sr-only">Cabana 3: </span><span class="cabana__name">Liposomal Vitamin C</span><span class="cabana__status" data-status="coming-soon">Coming soon</span></button>
+          </li>
+        </ul>
+      </div>
+      <p class="cabana-swipe" aria-hidden="true"><i data-lucide="move-horizontal"></i>Swipe to visit every cabana</p>
+      <div class="candy-mount candy-mount--cabana" id="cabanaCandy" aria-hidden="true"></div>
+    </div>
+
+    <div class="cabana-card" id="cabanaCard">
+      <div class="cabana-card__inner wrap">
+        <div class="cabana-card__main" data-swap>
+          <p class="eyebrow"><span data-bind="cabanaNo" aria-hidden="true">Cabana N<span class="ord">o</span> 1</span><span class="dot" aria-hidden="true"></span><span data-bind="statusLabel">Available now</span></p>
+          <h3 class="cabana-card__title" data-bind-html="title">Collagen Boost, <em>Strawberry</em></h3>
+          <p class="cabana-card__text" data-bind-html="blurb">A sugar free strawberry beauty lollipop, sweetened with isomalt and stevia leaf, with 500&nbsp;mg of collagen peptides, hyaluronic acid, vitamin C and biotin in every pop.</p>
+        </div>
+        <dl class="cabana-card__facts" data-bind-html="facts" data-swap>
+          <div><dt>Free from</dt><dd>Sugar &amp; allulose</dd></div>
+          <div><dt>Each pop</dt><dd>15 g · 16 calories</dd></div>
+          <div><dt>Actives</dt><dd>4 in every pop</dd></div>
+          <div><dt>In the bag</dt><dd>10 lollipops</dd></div>
+        </dl>
+        <div class="cabana-card__cta" data-swap>
+          <a class="btn" href="#menu" data-bind-href="cardHref"><span data-bind="cardCta">Shop Collagen Boost</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          <p class="cabana-card__note" data-bind-html="note">Free shipping on every order</p>
+        </div>
+        <span class="cabana-card__stamp" aria-hidden="true"><span>Model Pops</span><b data-bind="stampNo">N<span class="ord">o</span> 1</b><span data-season-copy="club">Beach Club</span></span>
+        <!-- The facts drawer: the chosen product's label, set by app.js from PRODUCTS[].label -->
+        <div class="cabana-card__label" id="cabanaLabel" data-swap hidden>
+          <button class="label-toggle" id="labelToggle" type="button" aria-expanded="false" aria-controls="labelPanel">
+            <span class="label-toggle__text"><span class="label-toggle__k"><i data-lucide="clipboard-list" aria-hidden="true"></i>Label facts</span><span class="label-toggle__meta"></span></span>
+            <span class="label-toggle__icon" aria-hidden="true"></span>
+          </button>
+          <div class="label-panel" id="labelPanel" role="region" hidden></div>
+        </div>
+      </div>
+      <p class="sr-only" id="themeStatus" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ═══════════ 5 · AMENITIES: the four actives, with their amounts per pop (from the label) ═══════════ -->
+  <section class="amenities section theme-pin" id="amenities" aria-labelledby="amenities-title">
+    <header class="section-head">
+      <p class="eyebrow" data-reveal>What's inside</p>
+      <h2 class="display" id="amenities-title" data-reveal>Four amenities, <em>all inclusive.</em></h2>
+      <p class="lede" data-reveal>Four actives in every pop, each with its amount from the label. Turn a&nbsp;card for the details.</p>
+      <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind-html="pinNote">Shown for Collagen Boost strawberry pops.</span></p>
+    </header>
+
+    <ul class="amenity-grid wrap" id="amenityGrid">
+      <li class="amenity" data-reveal>
+        <article class="amenity__card" aria-labelledby="amn-1">
+          <div class="amenity__face amenity__front">
+            <span class="amenity__no" aria-hidden="true">N<span class="ord">o</span> 01</span>
+            <span class="amenity__icon" aria-hidden="true"><i data-lucide="gem"></i></span>
+            <h3 class="amenity__name" id="amn-1">Collagen peptides</h3>
+            <p class="amenity__dose"><b>500</b> mg <span class="amenity__per">a pop</span></p>
+            <span class="amenity__for">Types I &amp; III</span>
+          </div>
+          <div class="amenity__face amenity__back" id="am-1">
+            <span class="amenity__back-name" aria-hidden="true">Collagen peptides</span>
+            <p>Hydrolyzed collagen peptides, types I and III: collagen, broken down into small peptides.</p>
+            <ul class="chips" aria-label="At a glance"><li><i data-lucide="waves" aria-hidden="true"></i>Hydrolyzed</li><li><i data-lucide="sparkles" aria-hidden="true"></i>Types I &amp; III</li></ul>
+          </div>
+          <button class="amenity__turn" type="button" aria-expanded="false" aria-controls="am-1"><span class="sr-only">Collagen peptides: </span><span class="amenity__turn-label">See details</span><i data-lucide="rotate-cw" aria-hidden="true"></i></button>
+        </article>
+      </li>
+      <li class="amenity" data-reveal>
+        <article class="amenity__card" aria-labelledby="amn-2">
+          <div class="amenity__face amenity__front">
+            <span class="amenity__no" aria-hidden="true">N<span class="ord">o</span> 02</span>
+            <span class="amenity__icon" aria-hidden="true"><i data-lucide="droplets"></i></span>
+            <h3 class="amenity__name" id="amn-2">Hyaluronic acid</h3>
+            <p class="amenity__dose"><b>10</b> mg <span class="amenity__per">a pop</span></p>
+            <span class="amenity__for">Moisture-holding</span>
+          </div>
+          <div class="amenity__face amenity__back" id="am-2">
+            <span class="amenity__back-name" aria-hidden="true">Hyaluronic acid</span>
+            <p>Hyaluronic acid, a moisture-holding molecule your skin makes too.</p>
+            <ul class="chips" aria-label="At a glance"><li><i data-lucide="droplet" aria-hidden="true"></i>Found in skin</li></ul>
+          </div>
+          <button class="amenity__turn" type="button" aria-expanded="false" aria-controls="am-2"><span class="sr-only">Hyaluronic acid: </span><span class="amenity__turn-label">See details</span><i data-lucide="rotate-cw" aria-hidden="true"></i></button>
+        </article>
+      </li>
+      <li class="amenity" data-reveal>
+        <article class="amenity__card" aria-labelledby="amn-3">
+          <div class="amenity__face amenity__front">
+            <span class="amenity__no" aria-hidden="true">N<span class="ord">o</span> 03</span>
+            <span class="amenity__icon" aria-hidden="true"><i data-lucide="citrus"></i></span>
+            <h3 class="amenity__name" id="amn-3">Vitamin C</h3>
+            <p class="amenity__dose"><b>60</b> mg <span class="amenity__per">67% DV</span></p>
+            <span class="amenity__for">As ascorbic acid</span>
+          </div>
+          <div class="amenity__face amenity__back" id="am-3">
+            <span class="amenity__back-name" aria-hidden="true">Vitamin C</span>
+            <p>An antioxidant vitamin, and one your body can’t make on its own.</p>
+            <ul class="chips" aria-label="At a glance"><li><i data-lucide="shield-check" aria-hidden="true"></i>Antioxidant</li><li><i data-lucide="sun-medium" aria-hidden="true"></i>Essential vitamin</li></ul>
+          </div>
+          <button class="amenity__turn" type="button" aria-expanded="false" aria-controls="am-3"><span class="sr-only">Vitamin C: </span><span class="amenity__turn-label">See details</span><i data-lucide="rotate-cw" aria-hidden="true"></i></button>
+        </article>
+      </li>
+      <li class="amenity" data-reveal>
+        <article class="amenity__card" aria-labelledby="amn-4">
+          <div class="amenity__face amenity__front">
+            <span class="amenity__no" aria-hidden="true">N<span class="ord">o</span> 04</span>
+            <span class="amenity__icon" aria-hidden="true"><i data-lucide="feather"></i></span>
+            <h3 class="amenity__name" id="amn-4">Biotin <span class="amenity__aka">(vitamin B7)</span></h3>
+            <p class="amenity__dose"><b>5,000</b> mcg <span class="amenity__per">16,667% DV</span></p>
+            <span class="amenity__for">A B vitamin</span>
+          </div>
+          <div class="amenity__face amenity__back" id="am-4">
+            <span class="amenity__back-name" aria-hidden="true">Biotin (B7)</span>
+            <p>One of the B vitamins. It can affect some lab test results, which is why the label carries a warning.</p>
+            <ul class="chips" aria-label="At a glance"><li><i data-lucide="feather" aria-hidden="true"></i>Vitamin B7</li></ul>
+          </div>
+          <button class="amenity__turn" type="button" aria-expanded="false" aria-controls="am-4"><span class="sr-only">Biotin (vitamin B7): </span><span class="amenity__turn-label">See details</span><i data-lucide="rotate-cw" aria-hidden="true"></i></button>
+        </article>
+      </li>
+    </ul>
+    <p class="amenities__foot caption"><svg aria-hidden="true"><use href="#o-wave"/></svg><span>One pop a day · <span class="nw">amounts per pop, from the label</span></span></p>
+  </section>
+
+  <!-- ═══════════ 6 · THE SUN INDEX (ritual): your first month, told as one day ═══════════
+       One centred axis: the title, the day (the sun's arc: Day 1 to Day 30, the third bag's days a warm band),
+       one card, the dots. The card's pouches carry the count: a pop leaves the bag each day, a bag empties in
+       ten, three bags make the month. Static by default (every stop listed with its own pouches); app.js pins
+       it when the screen fits.  -->
+  <section class="sunindex theme-pin" id="sun-index" aria-labelledby="sun-title">
+    <div class="sunindex__stage is-window" data-water="sea" data-sun="arc" data-stop="0">
+      <header class="sunindex__head" data-haze>
+        <p class="eyebrow">The ritual</p>
+        <h2 class="display" id="sun-title">The Sun <em>Index.</em></h2>
+        <p class="lede sunindex__lede" data-season-copy="sunLede">Your first month, told as one summer day.</p>
+        <p class="pin-note when-other"><i data-lucide="info" aria-hidden="true"></i><span data-bind-html="ritualNote">Shown for Collagen Boost strawberry pops.</span></p>
+      </header>
+
+      <!-- the day (drawn by app.js): the sun's arc with the third bag's band, its two feet labelled -->
+      <svg class="sunindex__arc" id="sunArc" aria-hidden="true" focusable="false"></svg>
+      <div class="sun" id="sun" aria-hidden="true">
+        <svg class="sun__rays" viewBox="0 0 200 200"><g id="sunRays"></g></svg>
+        <span class="sun__disc"></span>
+      </div>
+      <svg class="sunindex__marks" id="sunMarks" aria-hidden="true" focusable="false"></svg>
+
+      <!-- the dots come before the card, so Tab meets them first (pinned they sit under it; static they're hidden) -->
+      <div class="sunindex__dial" role="group" aria-label="Jump to a stop">
+        <button type="button" data-goto="0" aria-controls="sun-stop-0" aria-current="step"><span class="sr-only">Day 1</span></button>
+        <button type="button" data-goto="1" aria-controls="sun-stop-1"><span class="sr-only">Every day</span></button>
+        <button type="button" data-goto="2" aria-controls="sun-stop-2"><span class="sr-only">Bag by bag</span></button>
+        <button type="button" data-goto="3" aria-controls="sun-stop-3"><span class="sr-only">Days 21 to 30</span></button>
+      </div>
+
+      <div class="sunindex__sheet" id="sunSheet">
+        <!-- three pouches, ten pops in each, emptying one pop a day as the sun travels (visual only: the list says it) -->
+        <svg class="pouches" id="sunPouches" aria-hidden="true" focusable="false"></svg>
+        <ol class="sunindex__stops" id="sunStops" aria-label="Your first month, one pop a day">
+          <li class="stop is-active" id="sun-stop-0" data-stop="0" data-day="1">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Day 1</p>
+            <h3>Unwrap &amp; enjoy</h3>
+            <p class="stop__text">Strawberry and sugar free, sweetened with isomalt and stevia leaf, with four actives in every pop.</p>
+          </li>
+          <li class="stop" id="sun-stop-1" data-stop="1" data-day="5">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Every day</p>
+            <h3>One a day</h3>
+            <p class="stop__text">One pop a day: 16 calories and 0&nbsp;g sugar each.</p>
+          </li>
+          <li class="stop" id="sun-stop-2" data-stop="2" data-day="10">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when">Bag by bag</p>
+            <h3>A bag lasts ten days</h3>
+            <p class="stop__text">Ten pops to a bag, so three bags make about a month.</p>
+          </li>
+          <li class="stop" id="sun-stop-3" data-stop="3" data-day="30">
+            <svg class="pouches stop__pouches" aria-hidden="true" focusable="false"></svg>
+            <p class="stop__when"><span class="stop__key" aria-hidden="true"></span>Days <span class="nw">21–30</span></p>
+            <h3>The month, complete</h3>
+            <p class="stop__text">The third bag sees the month out: thirty pops, one a day.</p>
+            <a class="btn btn--sm stop__cta" href="#menu" data-shop="strawberry-pop" data-pick-bundle="month"><span>Choose The Month</span><i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </li>
+        </ol>
+      </div>
+      <p class="sr-only" id="sunStatus" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ═══════════ 7 · SUGAR FREE: the label, as a print on the sand ═══════════
+       The new back label, set in HTML (the pack photos carry an old logo, so they are never shown): the facts
+       panel, the ingredients, the label's claims and its warning, word for word. app.js holds the same label
+       for the cabana card's facts drawer; site/_qa/check-facts.mjs keeps the two in step.                    -->
+  <section class="sugar section theme-pin" id="sugar" aria-labelledby="sugar-title">
+    <div class="shore" aria-hidden="true"></div>
+    <div class="wrap sugar__grid">
+      <div class="sugar__intro">
+        <p class="eyebrow" data-reveal>Sugar free · Allulose free</p>
+        <h2 class="display" id="sugar-title" data-reveal>Sugar free. <em>Still strawberry.</em></h2>
+        <p class="lede" data-reveal>We took the long way round on the recipe: no sugar, no allulose. Collagen Boost is sweetened with isomalt, a sugar alcohol, and a touch of stevia leaf, for 0&nbsp;g sugar and 16 calories a&nbsp;pop.</p>
+      </div>
+      <figure class="labelcard" data-reveal>
+        <div class="labelcard__card">
+          <p class="labelcard__brand">Model Pops</p>
+          <p class="labelcard__tag">Your supermodel routine</p>
+          <div class="labelcard__box">
+            <table class="sfacts sfacts--dv">
+              <caption><span class="sfacts__title">Collagen Boost</span><span class="sfacts__serving">Servings per container 1</span></caption>
+              <thead><tr><th scope="col">Amount per serving</th><th scope="col"><span class="sr-only">Amount</span></th><th scope="col">% DV</th></tr></thead>
+              <tbody>
+                <tr class="sf-top"><th scope="row">Calories</th><td>16</td><td></td></tr>
+                <tr><th scope="row">Total Carbohydrate</th><td>8 g</td><td>3%</td></tr>
+                <tr class="sf-in"><th scope="row">Total Sugars</th><td>0 g</td><td>†</td></tr>
+                <tr class="sf-in2"><th scope="row">Includes 0 g Added Sugars</th><td></td><td>0%</td></tr>
+                <tr class="sf-in"><th scope="row">Sugar Alcohol (Isomalt)</th><td>8 g</td><td>†</td></tr>
+                <tr><th scope="row">Protein</th><td>0.5 g</td><td>1%</td></tr>
+                <tr class="sf-bar"><th scope="row">Vitamin C (as Ascorbic Acid)</th><td>60 mg</td><td>67%</td></tr>
+                <tr><th scope="row">Biotin (Vitamin B7)</th><td>5,000 mcg</td><td>16,667%</td></tr>
+                <tr><th scope="row">Hydrolyzed Collagen Peptides (Types I and III)</th><td>500 mg</td><td>†</td></tr>
+                <tr><th scope="row">Hyaluronic Acid</th><td>10 mg</td><td>†</td></tr>
+              </tbody>
+              <tfoot><tr><td colspan="3"><p>† Daily Value not established.</p></td></tr></tfoot>
+            </table>
+          </div>
+          <p class="labelcard__h">Ingredients</p>
+          <p class="labelcard__ing">Isomalt, Hydrolyzed Collagen Peptides (Type I &amp; III), Ascorbic Acid, Hyaluronic Acid, Citric Acid, DL-Malic Acid, Natural Strawberry Flavor, Natural Color (Beet Root Powder), Stevia Leaf Extract, Lecithin.</p>
+          <p class="labelcard__claims"><b>GMO Free</b><span>Sugar Free <span aria-hidden="true">·</span> Gluten Free</span></p>
+          <p class="labelcard__warn">WARNING: Biotin may interfere with certain laboratory test results. If you are pregnant, nursing, taking medication, have a medical condition, or are scheduled for lab tests, consult your healthcare practitioner before use. CHOKING HAZARD: Small parts. Not for children under 3 years of age. KEEP OUT OF REACH OF CHILDREN.</p>
+        </div>
+        <figcaption class="postcard__caption"><em>Collagen Boost, the label</em><span>Each pop 15&nbsp;g</span></figcaption>
+      </figure>
+      <ul class="sugar__notes" aria-label="What else the label tells you">
+        <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="lollipop"></i></span><h3>0&nbsp;g sugar</h3><p>No sugar and no added sugars. The sweetness comes from isomalt, a sugar alcohol (8&nbsp;g a pop), and stevia leaf extract.<!-- PENDING the user's decision: the narrow teeth line (in its 21 CFR 101.80 wording) would go here, after the isomalt sentence. Do not add it until it is approved. --></p></li>
+        <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="flame"></i></span><h3>16 calories</h3><p>In a 15&nbsp;g pop: 8&nbsp;g of carbohydrate and 0.5&nbsp;g of protein. Ten pops to a bag.</p></li>
+        <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="leaf"></i></span><h3>Natural strawberry</h3><p>Natural strawberry flavor, and its pink comes from beet root powder.</p></li>
+        <li class="note" data-reveal><span class="note__icon" aria-hidden="true"><i data-lucide="wheat-off"></i></span><h3>Gluten free</h3><p>GMO free and gluten free, as the label says.</p></li>
+      </ul>
+      <!-- a dock: an empty box kept for the pop that rides the page (site/rider.js, placed by site/rider.css) -->
+      <div class="rider-dock rider-dock--sugar" data-dock="sugar" data-for="strawberry-pop" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 8 · COMPARISON ═══════════ -->
+  <section class="compare section theme-pin" id="compare" aria-labelledby="compare-title">
+    <div class="wrap compare__grid">
+      <header class="compare__head">
+        <p class="eyebrow" data-reveal>Why Model Pops</p>
+        <h2 class="display" id="compare-title" data-reveal>Not just candy. <em>A beauty routine.</em></h2>
+        <p class="lede" data-reveal>Most supplements are a chore. We took a sweeter approach: four actives in a strawberry lollipop you’ll look forward&nbsp;to.</p>
+        <div class="rider-dock rider-dock--compare" data-dock="compare" data-for="strawberry-pop" data-hop="interlude" aria-hidden="true"></div>
+      </header>
+      <div class="compare__card" data-reveal>
+        <table class="compare__table">
+          <caption class="sr-only">Model Pops Collagen Boost compared with a typical supplement</caption>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only">Feature</span></th>
+              <th scope="col" class="is-us"><span class="compare__us"><span class="brand__mark" aria-hidden="true"></span>Collagen Boost</span></th>
+              <th scope="col">Typical supplement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Tastes amazing</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--no"><i data-lucide="x" aria-hidden="true"></i><span class="sr-only">No</span></span></td></tr>
+            <tr><th scope="row">Collagen peptides</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--na"><i data-lucide="minus" aria-hidden="true"></i><span class="sr-only">Varies</span></span></td></tr>
+            <tr><th scope="row">Hyaluronic acid</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--na"><i data-lucide="minus" aria-hidden="true"></i><span class="sr-only">Varies</span></span></td></tr>
+            <tr><th scope="row">Vitamin C</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--na"><i data-lucide="minus" aria-hidden="true"></i><span class="sr-only">Varies</span></span></td></tr>
+            <tr><th scope="row">Biotin (vitamin B7)</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--na"><i data-lucide="minus" aria-hidden="true"></i><span class="sr-only">Varies</span></span></td></tr>
+            <tr><th scope="row">Sugar free</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--na"><i data-lucide="minus" aria-hidden="true"></i><span class="sr-only">Varies</span></span></td></tr>
+            <tr><th scope="row">Fun to use</th><td class="is-us"><span class="mark mark--yes"><i data-lucide="check" aria-hidden="true"></i><span class="sr-only">Yes</span></span></td><td><span class="mark mark--no"><i data-lucide="x" aria-hidden="true"></i><span class="sr-only">No</span></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 8½ · INTERLUDE: a lap of water, a parasol's shade, one line ═══════════ -->
+  <div class="interlude is-window" data-water="pool" data-warm=".3">
+    <div class="coping coping--top" aria-hidden="true"></div>
+    <p class="interlude__line" data-shade><span>Beauty has never</span> <em>tasted this good.</em></p>
+    <div class="rider-dock rider-dock--lap" data-dock="interlude" data-for="strawberry-pop" data-pool data-hop="compare" aria-hidden="true"></div>
+    <div class="coping coping--bottom" aria-hidden="true"></div>
+  </div>
+
+  <!-- ═══════════ 9 · THE CAPSULES: Liposomal Vitamin C, made in Switzerland (Cabana Nº 3, coming soon) ═══════════
+       Swiss all year round, set in the International Typographic Style; its look, its tokens and the poster's motion
+       live in site/swiss.css. On phones the postcard comes right after the headline; from 1024px it stands beside the
+       copy. The facts are a numbered table under the Swiss flag. The poster (.alps-scene) is a moving Swiss travel
+       poster in layers of hand-made SVG (site/assets/swiss/, one set per season); what moves is its own box, moved by
+       transform and opacity only; it rests off screen (.is-offscreen) and stands still with reduced motion. -->
+  <section class="alps" id="capsules" aria-labelledby="alps-title">
+    <div class="wrap alps__grid">
+      <p class="eyebrow" data-reveal><i data-lucide="mountain-snow" aria-hidden="true"></i><span>Cabana N<span class="ord">o</span> 3 · Coming soon</span></p>
+      <h2 class="alps__title" id="alps-title" data-reveal>Liposomal <em>Vitamin C.</em></h2>
+      <figure class="postcard postcard--alps alps__visual" id="capsulesVisual" data-reveal>
+        <div class="postcard__card">
+          <div class="alps-scene" data-scene="alps" aria-hidden="true">
+            <!-- the poster, back to front: the sky, the sun, the far range and the peak · three clouds · the cable car · the hills,
+                 the viaduct, the village and the lake · the train (and its reflection) · glints, smoke · the parapet and its still
+                 life · the flag. The art is in site/assets/swiss/ (one set per season); everything here moves by transform or opacity -->
+            <i class="as-l as-back"></i>
+            <i class="as-cloud as-cloud--a"></i><i class="as-cloud as-cloud--b"></i><i class="as-cloud as-cloud--c"></i>
+            <i class="as-cab"><i></i></i>
+            <i class="as-l as-mid"></i>
+            <i class="as-rail"><i class="as-train"></i></i><i class="as-rail as-rail--refl"><i class="as-train"></i></i>
+            <i class="as-glints"><i style="left:16.5%;top:70.4%;width:1.25%;height:0.24%;animation-delay:0s"></i><i style="left:22%;top:72.6%;width:1.75%;height:0.24%;animation-delay:-0.9s"></i><i style="left:14.75%;top:75.2%;width:1.5%;height:0.24%;animation-delay:-1.7s"></i><i style="left:20%;top:78%;width:2.25%;height:0.24%;animation-delay:-2.4s"></i><i style="left:24.5%;top:80.6%;width:1.75%;height:0.24%;animation-delay:-0.4s"></i><i style="left:17.25%;top:82.2%;width:2.5%;height:0.24%;animation-delay:-3.1s"></i></i>
+            <i class="as-smoke"><i style="left:84.688%;top:60.5%;width:1.125%;height:0.9%;transform:translate(0.0%,0.0%) scale(0.6);opacity:0.7;animation-delay:0s"></i><i style="left:84.688%;top:60.5%;width:1.125%;height:0.9%;transform:translate(44.4%,-122.2%) scale(0.9);opacity:0.5;animation-delay:-2.6s"></i><i style="left:84.688%;top:60.5%;width:1.125%;height:0.9%;transform:translate(100.0%,-255.6%) scale(1.25);opacity:0.3;animation-delay:-5.2s"></i></i>
+            <i class="as-l as-front"></i>
+            <i class="as-flag"><i class="as-fl" style="transform-origin:0% 50%;clip-path:inset(-30% calc(91.66666666666667% - .5px) -30% 0);transform:translateY(0.48%) skewY(2.55deg)"><b class="as-fl__sh" style="left:0;width:calc(8.3333% + 0.5px);opacity:0.040"><b style="opacity:0.783"></b></b></i><i class="as-fl" style="transform-origin:8.3333% 50%;clip-path:inset(-30% calc(83.33333333333333% - .5px) -30% calc(8.333333333333334% - .5px));transform:translateY(0.85%) skewY(1.73deg)"><b class="as-fl__sh" style="left:calc(8.3333% - .5px);width:calc(8.3333% + 1px);opacity:0.048"><b style="opacity:0.692"></b></b></i><i class="as-fl" style="transform-origin:16.6667% 50%;clip-path:inset(-30% calc(75% - .5px) -30% calc(16.666666666666668% - .5px));transform:translateY(1.10%) skewY(-0.81deg)"><b class="as-fl__sh" style="left:calc(16.6667% - .5px);width:calc(8.3333% + 1px);opacity:0.056"><b style="opacity:0.410"></b></b></i><i class="as-fl" style="transform-origin:25% 50%;clip-path:inset(-30% calc(66.66666666666666% - .5px) -30% calc(25% - .5px));transform:translateY(0.98%) skewY(-4.24deg)"><b class="as-fl__sh" style="left:calc(25% - .5px);width:calc(8.3333% + 1px);opacity:0.065"><b style="opacity:0.029"></b></b></i><i class="as-fl" style="transform-origin:33.3333% 50%;clip-path:inset(-30% calc(58.333333333333336% - .5px) -30% calc(33.333333333333336% - .5px));transform:translateY(0.36%) skewY(-7.46deg)"><b class="as-fl__sh" style="left:calc(33.3333% - .5px);width:calc(8.3333% + 1px);opacity:0.073"><b style="opacity:0.000"></b></b></i><i class="as-fl" style="transform-origin:41.6667% 50%;clip-path:inset(-30% calc(50% - .5px) -30% calc(41.666666666666664% - .5px));transform:translateY(-0.73%) skewY(-9.28deg)"><b class="as-fl__sh" style="left:calc(41.6667% - .5px);width:calc(8.3333% + 1px);opacity:0.081"><b style="opacity:0.000"></b></b></i><i class="as-fl" style="transform-origin:50% 50%;clip-path:inset(-30% calc(41.666666666666664% - .5px) -30% calc(50% - .5px));transform:translateY(-2.09%) skewY(-8.80deg)"><b class="as-fl__sh" style="left:calc(50% - .5px);width:calc(8.3333% + 1px);opacity:0.089"><b style="opacity:0.000"></b></b></i><i class="as-fl" style="transform-origin:58.3333% 50%;clip-path:inset(-30% calc(33.33333333333333% - .5px) -30% calc(58.333333333333336% - .5px));transform:translateY(-3.38%) skewY(-5.59deg)"><b class="as-fl__sh" style="left:calc(58.3333% - .5px);width:calc(8.3333% + 1px);opacity:0.097"><b style="opacity:0.000"></b></b></i><i class="as-fl" style="transform-origin:66.6667% 50%;clip-path:inset(-30% calc(25% - .5px) -30% calc(66.66666666666667% - .5px));transform:translateY(-4.19%) skewY(0.08deg)"><b class="as-fl__sh" style="left:calc(66.6667% - .5px);width:calc(8.3333% + 1px);opacity:0.105"><b style="opacity:0.509"></b></b></i><i class="as-fl" style="transform-origin:75% 50%;clip-path:inset(-30% calc(16.66666666666667% - .5px) -30% calc(75% - .5px));transform:translateY(-4.18%) skewY(7.09deg)"><b class="as-fl__sh" style="left:calc(75% - .5px);width:calc(8.3333% + 1px);opacity:0.114"><b style="opacity:1.000"></b></b></i><i class="as-fl" style="transform-origin:83.3333% 50%;clip-path:inset(-30% calc(8.333333333333329% - .5px) -30% calc(83.33333333333333% - .5px));transform:translateY(-3.15%) skewY(13.65deg)"><b class="as-fl__sh" style="left:calc(83.3333% - .5px);width:calc(8.3333% + 1px);opacity:0.122"><b style="opacity:1.000"></b></b></i><i class="as-fl" style="transform-origin:91.6667% 50%;clip-path:inset(-30% -10% -30% calc(91.66666666666667% - .5px));transform:translateY(-1.12%) skewY(18.02deg)"><b class="as-fl__sh" style="left:calc(91.6667% - .5px);width:calc(8.3333% + 1px);opacity:0.130"><b style="opacity:1.000"></b></b></i></i>
+          </div>
+          <figcaption class="postcard__caption"><em>Greetings from the Alps</em><span>Cabana N<span class="ord">o</span> 3 · concept</span></figcaption>
+        </div>
+      </figure>
+      <p class="lede" data-reveal>Liposomal vitamin C in simple ivory capsules, made in Switzerland. The third cabana opens soon.</p>
+      <p class="swiss-badge" data-reveal><svg class="swiss-badge__flag" aria-hidden="true" focusable="false"><use href="#o-swiss"/></svg><span>Made in Switzerland</span></p>
+      <dl class="alps__facts" data-reveal>
+        <div><dt>Form</dt><dd>Liposomal vitamin C</dd></div>
+        <div><dt>Capsules</dt><dd>Ivory, <span class="nw">two-piece</span></dd></div>
+        <div><dt>Vitamin C</dt><dd><span class="ph">XX</span> mg a&nbsp;capsule</dd></div>
+        <div><dt>Per pack</dt><dd><span class="ph">XX</span> capsules</dd></div>
+        <div><dt>Price</dt><dd>$<span class="ph">XX</span></dd></div>
+        <div><dt>Launch</dt><dd><span class="ph">date</span></dd></div>
+      </dl>
+      <div class="alps__ctas" data-reveal>
+        <a class="btn" href="#waitlist" data-waitlist="vitamin-c"><i data-lucide="bell" aria-hidden="true"></i><span>Join the list</span></a>
+        <a class="btn btn--ghost" href="#cabanas" data-pick="vitamin-c">Visit its cabana</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 10 · THE CLUB MENU (shop + waitlist): pinned to Collagen Boost without JS; app.js dresses it in the
+       colours of the product on the menu card (its switch picks one), the waitlist card stays pinned ═══════════ -->
+  <section class="menu section theme-pin" id="menu" aria-labelledby="menu-title">
+    <header class="section-head">
+      <p class="eyebrow" data-reveal><span>The <span data-season-copy="club">Beach Club</span> Menu</span></p>
+      <h2 class="display" id="menu-title" data-reveal>Served by <em>the bag.</em></h2>
+      <p class="lede" data-reveal data-season-copy="menuLede">Collagen Boost, ten strawberry pops to a bag; <span data-name="green-pop">Green Veggies</span>, sixty. Choose your pop and a signature, then how you’d like it served.</p>
+    </header>
+
+    <div class="wrap menu__layout">
+      <form class="menucard" id="orderForm" novalidate data-reveal>
+        <div class="awning awning--menu" aria-hidden="true"><span class="awning__band"></span></div>
+        <div class="menucard__body">
+          <div class="menucard__head">
+            <p class="caption"><span>Model Pops <span data-season-copy="club">Beach Club</span></span></p>
+            <h3>Signatures</h3>
+            <!-- the product switch: app.js fills it from PRODUCTS (a radio per product on the menu) and shows it -->
+            <fieldset class="menucard__pick" id="menuPick" hidden></fieldset>
+            <p class="menucard__sub" id="menuSub">Collagen Boost · Strawberry · <span class="nw">10 pops per bag</span></p>
+          </div>
+
+          <fieldset class="menucard__list" id="bundleList">
+            <legend class="sr-only">Choose a bundle</legend>
+            <!-- rendered by app.js from BUNDLES (the signatures of the product on the card); the static fallback is Collagen Boost's -->
+            <label class="item"><input type="radio" name="bundle" value="single" checked><span class="item__row"><span class="item__name">The Single</span><span class="item__dots" aria-hidden="true"></span><span class="item__price">$<span class="ph">XX</span></span></span><span class="item__desc">One bag, ten pops. A taste of the club.</span></label>
+            <label class="item"><input type="radio" name="bundle" value="duo"><span class="item__row"><span class="item__name">The Duo</span><span class="item__dots" aria-hidden="true"></span><span class="item__price">$<span class="ph">XX</span></span></span><span class="item__desc">Two bags, twenty pops. Save <span class="ph">XX%</span>.</span></label>
+            <label class="item"><input type="radio" name="bundle" value="month"><span class="item__row"><span class="item__name">The Month</span><span class="item__dots" aria-hidden="true"></span><span class="item__price">$<span class="ph">XX</span></span></span><span class="item__desc">Three bags, thirty pops: one a day for a month. Save <span class="ph">XX%</span>.</span></label>
+          </fieldset>
+
+          <fieldset class="menucard__service">
+            <legend class="caption">Service</legend>
+            <label class="opt"><input type="radio" name="plan" value="once" checked><span class="opt__box"><span class="opt__name">One-time order</span><span class="opt__desc" data-season-copy="serveOnce">Just this once, poolside.</span></span></label>
+            <label class="opt"><input type="radio" name="plan" value="sub"><span class="opt__box"><span class="opt__name">Subscribe &amp; save <span class="ph">XX%</span></span><span class="opt__desc">Delivered every <span class="ph">XX</span> days · terms <span class="ph">to come</span></span></span></label>
+          </fieldset>
+
+          <div class="menucard__total">
+            <div>
+              <p class="caption">Your order</p>
+              <p class="menucard__summary" id="orderSummary">Collagen Boost · The Single, one<span class="hy">-</span>time order</p>
+            </div>
+            <p class="menucard__price">$<span class="ph">XX</span></p>
+          </div>
+          <button class="btn btn--block" type="submit"><i data-lucide="shopping-bag" aria-hidden="true"></i>Add to bag</button>
+          <p class="menucard__note"><i data-lucide="truck" aria-hidden="true"></i>Free shipping on every order</p>
+          <p class="formmsg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+      <div class="rider-dock rider-dock--menu" data-dock="menu" data-for="strawberry-pop green-pop" data-wear="menu" aria-hidden="true"></div>
+      <div class="rider-dock rider-dock--wait" data-dock="waitlist" data-for="vitamin-c" aria-hidden="true"></div>
+    </div>
+
+    <!-- the cabana still to open, Liposomal Vitamin C (app.js renders it from PRODUCTS: every product still to open) -->
+    <form class="waitlist wrap theme-pin" id="waitlist" novalidate data-reveal>
+      <div class="band band--soon" aria-hidden="true"></div>
+      <div class="waitlist__head">
+        <p class="eyebrow"><i data-lucide="bell" aria-hidden="true"></i>Opening soon</p>
+        <h3 data-season-copy="waitlistTitle">Save a sun lounger at the <em>third cabana.</em></h3>
+        <p data-season-copy="waitlistLede">Liposomal Vitamin C, capsules made in Switzerland, is on its way. Its launch date is <span class="ph">to come</span>: leave your email and you’ll hear first.</p>
+      </div>
+      <div class="waitlist__form">
+        <div class="waitlist__row">
+          <label class="waitlist__label" for="wl-email">Email address</label>
+          <input id="wl-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="wl-msg">
+          <button class="btn" type="submit">Join the list</button>
+        </div>
+        <fieldset class="waitlist__opts" id="waitlistOpts">
+          <legend class="sr-only">Tell me about</legend>
+          <p class="wl-opt" data-id="vitamin-c"><span class="wl-opt__thumb" aria-hidden="true"></span><span class="wl-opt__text"><b>Liposomal Vitamin C</b> capsules · made in Switzerland</span></p>
+        </fieldset>
+        <p class="formmsg" id="wl-msg" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+  </section>
+
+  <!-- ═══════════ 11 · FAQ ═══════════ -->
+  <section class="faq section theme-pin" id="faq" aria-labelledby="faq-title">
+    <div class="wrap faq__grid">
+      <header class="faq__head">
+        <p class="eyebrow" data-reveal><i data-lucide="concierge-bell" aria-hidden="true"></i>Ask the concierge</p>
+        <h2 class="display" id="faq-title" data-reveal data-season-copy="faqTitle">Questions from the <em>deck chairs.</em></h2>
+        <p class="lede" data-reveal data-season-copy="faqLede">Everything guests ask us between swims.</p>
+      </header>
+      <div class="faq__list" id="faqList">
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq1" aria-expanded="false" aria-controls="fa1"><span class="faq__n" aria-hidden="true">i.</span><span class="faq__text">What is Model Pops Collagen Boost?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa1" role="region" aria-labelledby="fq1"><p>Collagen Boost is Model Pops’ strawberry beauty lollipop. It’s sugar free, sweetened with isomalt and stevia leaf extract, with four actives in every 15&nbsp;g pop: 500&nbsp;mg of hydrolyzed collagen peptides (types I and III), 10&nbsp;mg of hyaluronic acid, 60&nbsp;mg of vitamin C and 5,000&nbsp;mcg of biotin (vitamin B7). Ten pops come in a bag.</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq2" aria-expanded="false" aria-controls="fa2"><span class="faq__n" aria-hidden="true">ii.</span><span class="faq__text">How many should I have per day?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa2" role="region" aria-labelledby="fq2"><p>We recommend <span class="ph">one pop a day</span>, as part of your beauty routine. Each pop carries 5,000&nbsp;mcg of biotin, so please read the label’s warning before your first one (it’s just below).</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq3" aria-expanded="false" aria-controls="fa3"><span class="faq__n" aria-hidden="true">iii.</span><span class="faq__text">Is there anything I should know first?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa3" role="region" aria-labelledby="fq3"><p>Yes. The label says: <span class="faq__quote">WARNING: Biotin may interfere with certain laboratory test results. If you are pregnant, nursing, taking medication, have a medical condition, or are scheduled for lab tests, consult your healthcare practitioner before use. CHOKING HAZARD: Small parts. Not for children under 3 years of age. KEEP OUT OF REACH OF CHILDREN.</span></p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq4" aria-expanded="false" aria-controls="fa4"><span class="faq__n" aria-hidden="true">iv.</span><span class="faq__text">Is Collagen Boost sugar free?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa4" role="region" aria-labelledby="fq4"><p>Yes: 0&nbsp;g of sugar and 0&nbsp;g of added sugars in every pop, as the label says, and no allulose either. It’s sweetened with isomalt, a sugar alcohol (8&nbsp;g a pop), and a touch of stevia leaf extract, so each pop has just 16 calories.</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq5" aria-expanded="false" aria-controls="fa5"><span class="faq__n" aria-hidden="true">v.</span><span class="faq__text">What does Collagen Boost taste like, and what’s in it?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa5" role="region" aria-labelledby="fq5"><p>Like a really, really good strawberry lollipop. The full list: Isomalt, Hydrolyzed Collagen Peptides (Type I &amp; III), Ascorbic Acid, Hyaluronic Acid, Citric Acid, DL-Malic Acid, Natural Strawberry Flavor, Natural Color (Beet Root Powder), Stevia Leaf Extract, Lecithin. The label also says GMO free and gluten free.</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq6" aria-expanded="false" aria-controls="fa6"><span class="faq__n" aria-hidden="true">vi.</span><span class="faq__text">What’s in the <span data-name="green-pop">Green Veggies</span> pop?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa6" role="region" aria-labelledby="fq6"><p>It’s a green veggie lollipop, with electrolytes (details <span class="ph">to come</span>). Its label proof (subject to change) gives a serving of 2 lollipops (15&nbsp;g) with 30 calories, 0&nbsp;g of sugars, 8&nbsp;g of dietary fiber, 5&nbsp;g of sugar alcohol and a 2010&nbsp;mg whole veggies blend: spirulina, broccoli, spinach, green cabbage, wheatgrass, kale, cauliflower, celery, white onion, zucchini, garlic, red cabbage, red onion, carrot, cayenne pepper, shiitake mushroom, sweet potato and green onion. A large bag holds 60 lollipops (30 servings). Its flavor and price are <span class="ph">to come</span>. <a href="#cabanaLabel" data-show-label="green-pop">See its label facts</a> or <a href="#menu" data-shop="green-pop">shop it by the bag</a>.</p></div>
+        </div>
+        <div class="faq__item" data-reveal>
+          <h3><button class="faq__q" type="button" id="fq7" aria-expanded="false" aria-controls="fa7"><span class="faq__n" aria-hidden="true">vii.</span><span class="faq__text">And the Liposomal Vitamin C?</span><span class="faq__icon" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="fa7" role="region" aria-labelledby="fq7"><p>Liposomal vitamin C capsules, made in Switzerland: regular two-piece capsules in ivory. The amount of vitamin C per capsule, the count, the price and the launch date are <span class="ph">to come</span>. <a href="#capsules">Visit the Alps</a> or <a href="#waitlist" data-waitlist="vitamin-c">join the list</a>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ 12 · FINAL CTA: the same pool, now at golden hour ═══════════ -->
+  <section class="glow is-window theme-pin" id="glow" data-water="pool" data-warm="1" aria-labelledby="glow-title">
+    <div class="glow__inner">
+      <div class="glow__copy" data-shelf>
+        <p class="eyebrow" data-reveal><svg class="eyebrow__sun" aria-hidden="true"><use href="#o-sun"/></svg><span data-season-copy="glowKicker">See you poolside</span></p>
+        <h2 class="display display--xl" id="glow-title" data-reveal data-season-copy="glowTitle">Get your <em>summer</em> glow.</h2>
+        <p class="lede" data-reveal>Make Model Pops part of your beauty routine, one pop at a&nbsp;time.</p>
+        <div class="glow__ctas" data-reveal>
+          <a class="btn btn--lg" href="#menu" data-shop="strawberry-pop">Shop Collagen Boost<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <p class="glow__note" data-reveal>10 lollipops per bag <span aria-hidden="true">·</span> 15&nbsp;g each <span aria-hidden="true">·</span> Sugar free</p>
+      </div>
+      <div class="rider-dock rider-dock--glow" data-dock="glow" data-for="strawberry-pop" data-pool aria-hidden="true"></div>
+      <figure class="postcard postcard--glow" data-reveal>
+        <div class="postcard__card">
+          <div class="postcard__photo"><img class="parallax" src="images/cta_model.webp" width="832" height="1248" loading="lazy" decoding="async" alt="A smiling woman in a pink bikini holds a pink lollipop in front of a pink-and-white striped backdrop."></div>
+          <figcaption class="postcard__caption"><em data-season-copy="glowCaption">Cabana <span class="no">N<span class="ord">o</span> 1</span>, late afternoon</em></figcaption>
+        </div>
+      </figure>
+    </div>
+    <div class="coping coping--glow" aria-hidden="true"></div>
+  </section>
+
 </main>
-<script>
-  // [number, thumbs folder, name, palette, link (defaults to the proposal folder)]
-  var PROPOSALS = [
-    ['', '00-first-draft', 'First draft', ['#FFF0F5', '#7A1B4D', '#FF1493', '#F26A1B', '#0E9CAD'], 'first-draft/index.html'],
-    ['01', '01-editorial', 'The Glo Issue', ['#FBF0EC', '#4A0D2E', '#FF1493', '#EEF3EC', '#1FA453']],
-    ['02', '02-candy', 'Sweet Riot', ['#FF1493', '#FF8AC6', '#E8174B', '#FFF4E8', '#22C55E']],
-    ['03', '03-lab', 'Glow Lab', ['#FAF8F7', '#1B0B14', '#FF1493', '#E9E2E5', '#1FA453']],
-    ['04', '04-prism', 'Prism', ['#FFF8FC', '#EBDDFF', '#FFD9C7', '#D6ECFF', '#FF1493']],
-    ['05', '05-golden', 'Golden Hour', ['#FFB38A', '#FF6F61', '#FF1493', '#4E0E36', '#FFC94A']],
-    ['06', '06-riviera', 'Riviera', ['#FFFDF8', '#5DD6E8', '#1D9BD1', '#FF1493', '#F5E6D0']],
-    ['07', '07-paper-sun', 'Paper Sun', ['#FF1493', '#FFC83D', '#0E9CAD', '#FFF6EE', '#2B0718']],
-    ['08', '08-pop-arcade', 'Pop Arcade', ['#FF2E93', '#FFD23F', '#2CC6F2', '#2A0B3D', '#FFF6EC']]
-  ];
-  document.getElementById('grid').innerHTML = PROPOSALS.map(function (p) {
-    var t = 'redesign/_qa/thumbs/' + p[1] + '/';
-    return '<a class="card" href="' + (p[4] || 'redesign/' + p[1] + '/index.html') + '">' +
-      '<div class="shots">' +
-        '<span class="d"><img src="' + t + 'desktop-00.webp" alt="' + p[2] + ', desktop" width="1440" height="900" loading="lazy"></span>' +
-        '<span class="m"><img src="' + t + 'mobile-00.webp" alt="' + p[2] + ', phone" width="390" height="844" loading="lazy"></span>' +
-      '</div>' +
-      '<div class="meta"><span class="name">' + (p[0] ? '<b>' + p[0] + '</b>' : '') + p[2] + '</span>' +
-        '<span class="sw" aria-hidden="true">' + p[3].map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span></div>' +
-    '</a>';
-  }).join('');
-</script>
+
+<!-- ═══════════ 13 · FOOTER ═══════════ -->
+<footer class="foot">
+  <div class="band" aria-hidden="true"></div>
+  <div class="wrap foot__grid">
+    <div class="foot__brand">
+      <a class="brand" href="#top" aria-label="Model Pops, your supermodel routine. Back to the top"><span class="brand__mark" aria-hidden="true"></span><span class="brand__lockup" aria-hidden="true"><span class="brand__word">Model Pops</span><span class="brand__tag">Your supermodel routine</span></span></a>
+      <p>Collagen Boost: sugar free strawberry lollipops with collagen peptides, hyaluronic acid, vitamin C and biotin, sweetened with isomalt and stevia leaf. Beauty has never tasted this good.</p>
+      <p class="foot__social">Social <span class="ph">handles</span></p>
+    </div>
+    <nav class="foot__col" aria-label="Shop">
+      <h2 class="foot__h">Shop</h2>
+      <ul><li><a href="#menu" data-shop="strawberry-pop">Collagen Boost</a></li><li><a href="#menu" data-shop="green-pop" data-name="green-pop">Green Veggies</a></li><li><a href="#menu">Bundles</a></li><li><a href="#menu">Subscribe &amp; save</a></li><li><a href="#waitlist">Join the list</a></li></ul>
+    </nav>
+    <nav class="foot__col" aria-label="Learn">
+      <h2 class="foot__h">Learn</h2>
+      <ul><li><a href="#club">The club</a></li><li><a href="#amenities">Ingredients</a></li><li><a href="#capsules">Vitamin C</a></li><li><a href="#faq">FAQ</a></li></ul>
+    </nav>
+    <nav class="foot__col" aria-label="Support">
+      <h2 class="foot__h">Support</h2>
+      <ul><li><span class="foot__soon">Contact <small>soon</small></span></li><li><span class="foot__soon">Shipping <small>soon</small></span></li><li><span class="foot__soon">Returns <small>soon</small></span></li><li><span class="foot__soon">Privacy <small>soon</small></span></li></ul>
+    </nav>
+  </div>
+  <div class="wrap foot__legal">
+    <p class="foot__fda" id="fda">*These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p>
+    <div class="foot__base">
+      <p>© 2026 Model Pops. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Sticky mobile shop bar -->
+<div class="shopbar" id="shopbar">
+  <div class="shopbar__info"><span class="brand__mark" aria-hidden="true"></span><span><b data-bind="barName">Collagen Boost</b><small data-bind="barNote">Sugar free · 10 per bag</small></span></div>
+  <a class="btn btn--sm" href="#menu" data-bind-href="barHref" tabindex="-1"><span data-bind="barCta">Shop</span></a>
+</div>
+
+<!-- The design archive: a small pill, bottom left, that steps aside whenever anything lies under it (app.js).
+     Without JS it is a plain link at the very end of the page. -->
+<a class="archive-btn" href="designs/index.html"><i data-lucide="archive" aria-hidden="true"></i><span>Design archive</span></a>
+
+<!-- each season registers window.MP_SEASONS.<season> before app.js runs (all four are tiny) -->
+<script src="site/seasons/summer.js" defer></script>
+<script src="site/seasons/autumn.js" defer></script>
+<script src="site/seasons/winter.js" defer></script>
+<script src="site/seasons/spring.js" defer></script>
+<script src="site/candy3d.js" defer></script>
+<script src="site/app.js" defer></script>
+<script src="site/rider.js" defer></script>
+<script id="lucide-js" src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" defer></script>
 </body>
 </html>

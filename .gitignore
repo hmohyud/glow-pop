@@ -24,3 +24,8 @@ npm-debug.log*
 yarn-error.log*
 .cache/
 dist/
+
+# ── Local QA output for the main site (screenshots, scratch tooling) ──
+/site/_qa/
+/designs/_qa/
+/_qa/

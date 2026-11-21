@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Model Pops — the pop that rides the page (rider.css, with site/rider.js)
+
+   One pop, the hero's own 3D candy, leaves the pool as you scroll and turns up in a few docks where it means
+   something: beside its label (#sugar), under "Not just candy" (#compare), afloat in the interlude's lap of water,
+   by the menu card (#menu: the card's own pop) and back in the water at golden hour (#glow). Phones keep three of
+   them (sugar, menu, glow). Liposomal Vitamin C's capsules wait by the waitlist.
+   Each dock is an empty box reserved in the layout ([data-dock] in index.html), so the pop never covers copy,
+   a control or the fixed UI. A dock takes room only when the pop can use it: with JS and 3D, and when it takes
+   the chosen product (data-for, against html[data-product]). The pop itself rides in .rider, an absolute sheet
+   at the top of the document (it scrolls with the page), above the sections and below the fixed UI (the archive
+   pill 44, the shop bar 45, the menu 49, the nav 50).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rider {
+  position: absolute; left: 0; top: 0; z-index: 40; width: 100%; height: 0;
+  overflow: clip visible;   /* never wider than the page, whatever its scale */
+  pointer-events: none;
+}
+.rider__box { position: absolute; left: 0; top: 0; display: none; transform-origin: 0 0; will-change: transform, opacity; }
+.rider__box.is-on { display: block; }
+.rider__box > .candy-mount { transition: none; }
+
+/* ── the docks ── */
+.rider-dock { display: none; pointer-events: none; }
+.rider-dock.is-held { pointer-events: auto; }   /* (hit-testable while the pop rests in it: the archive pill steps aside) */
+html.js:not(.no-3d) .rider-dock { display: block; }
+html[data-product="strawberry-pop"] .rider-dock:not([data-for~="strawberry-pop"]),
+html[data-product="green-pop"] .rider-dock:not([data-for~="green-pop"]),
+html[data-product="vitamin-c"] .rider-dock:not([data-for~="vitamin-c"]) { display: none; }
+
+/* phones and tablets: fewer, smaller docks, each a short pause in the column */
+
+/* Sugar free: between the intro and the label print, on the sand */
+html.js:not(.no-3d)[data-product="strawberry-pop"] .sugar__grid { grid-template-areas: "intro" "dock" "pack" "notes"; }
+.rider-dock--sugar { grid-area: dock; justify-self: end; width: 104px; height: 174px; margin: -18px 9% -24px 0; }
+
+/* Not just candy, and a lap of water: desktop only */
+@media (max-width: 1023.98px) { .rider-dock--compare, .rider-dock--lap { display: none !important; } }
+
+/* the menu: above the card (its pop), and the capsules under it, by the waitlist */
+.rider-dock--menu { order: -1; width: 98px; height: 164px; margin: -22px 0 12px; }
+.rider-dock--wait { order: 1; width: 172px; height: 116px; margin: 14px 0 -22px; }
+
+/* golden hour: in the water between the copy and the postcard */
+.rider-dock--glow { justify-self: end; width: 100px; height: 168px; margin: -14px 12% -30px 0; }
+
+@media (min-width: 1024px) {
+  /* beside the label print, under the notes (the intro and the notes move up to meet the print's top) */
+  html.js:not(.no-3d)[data-product="strawberry-pop"] .sugar__grid { grid-template-areas: ". pack" "intro pack" "notes pack" "dock pack"; }
+  /* (it reaches down into the section's padding, so the column hardly grows) */
+  .rider-dock--sugar { --dw: clamp(132px, 10.5vw, 176px); justify-self: end; align-self: start; width: var(--dw); height: calc(var(--dw) * 5 / 3); margin: -6px 3% calc(24px - var(--section-y)) 0; }
+
+  /* under "…a strawberry lollipop you'll look forward to" */
+  .rider-dock--compare { width: clamp(112px, 9vw, 144px); aspect-ratio: 3 / 5; margin: 4px 0 -12px 2px; }
+
+  /* the interlude's lap of water: floating in the sun to the left of the line, clear of the parasol's shade */
+  .rider-dock--lap { position: absolute; left: clamp(40px, 8.4vw, 170px); top: 50%; width: clamp(104px, 9vw, 150px); aspect-ratio: 3 / 5; transform: translateY(-50%); }
+
+  /* golden hour: in the water above the postcard, lifted into the section's top padding */
+  .glow__inner > .glow__copy { grid-column: 1; grid-row: 1; }
+  .glow__inner > .postcard--glow { grid-column: 2; grid-row: 1; }
+  .rider-dock--glow { grid-column: 2; grid-row: 1; align-self: start; justify-self: center; width: clamp(108px, 9.6vw, 160px); height: auto; aspect-ratio: 3 / 5; margin: calc(64px - clamp(84px, 9vw, 150px)) 0 0; }
+}
+
+@media (min-width: 1180px) {
+  /* the pop rests on the sand beside the menu card, by its title; the capsules lower down, by the waitlist */
+  .menu__layout { grid-template-columns: minmax(0, 1fr) minmax(0, 720px) minmax(0, 1fr); column-gap: clamp(20px, 2.6vw, 44px); }
+  .menu__layout > .menucard { grid-column: 2; grid-row: 1; }
+  .rider-dock--menu, .rider-dock--wait { order: 0; grid-column: 3; grid-row: 1; justify-self: start; height: auto; }
+  .rider-dock--menu { align-self: start; width: min(100%, clamp(120px, 11.5vw, 178px)); aspect-ratio: 3 / 5; margin: clamp(96px, 9vw, 150px) 0 0 6%; }
+  .rider-dock--wait { align-self: end; width: min(100%, clamp(170px, 16vw, 250px)); aspect-ratio: 3 / 2; margin: 0 0 56px 0; }
+}
+
+@media print { .rider, .rider-dock { display: none !important; } }

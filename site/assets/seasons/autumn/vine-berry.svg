@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+<defs>
+<radialGradient id="l37w" gradientUnits="userSpaceOnUse" cx="48.1" cy="59.4" r="56.8">
+<stop offset="0" stop-color="#D9573E"/><stop offset=".42" stop-color="#C0303F"/><stop offset=".8" stop-color="#A0213F"/><stop offset="1" stop-color="#6E1F3F"/>
+</radialGradient>
+<radialGradient id="l37b0" gradientUnits="userSpaceOnUse" cx="22.6" cy="48.3" r="11.3"><stop offset="0" stop-color="#E07A3E" stop-opacity=".55"/><stop offset="1" stop-color="#E07A3E" stop-opacity="0"/></radialGradient>
+<radialGradient id="l37b1" gradientUnits="userSpaceOnUse" cx="76.7" cy="64.9" r="14"><stop offset="0" stop-color="#8E1E3E" stop-opacity=".55"/><stop offset="1" stop-color="#8E1E3E" stop-opacity="0"/></radialGradient>
+<radialGradient id="l37b2" gradientUnits="userSpaceOnUse" cx="60.4" cy="28.9" r="11.7"><stop offset="0" stop-color="#C9443C" stop-opacity=".55"/><stop offset="1" stop-color="#C9443C" stop-opacity="0"/></radialGradient>
+<radialGradient id="l37g" gradientUnits="userSpaceOnUse" cx="48" cy="48" r="44"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<path id="l37p" d="M48.1 77.3L47.7 77.4L46.9 78L42.2 84.2L39 87.4L37.3 88.8L35.5 89.8L33.8 90.6L32.1 90.8L30.7 90.6L27.5 88.7L13.5 78.2L13.4 77.7L11.7 76.2L10.5 75L10.2 74L10.5 70L10.2 69.6L11.1 63.3L11.3 60.4L11.2 57.9L10.8 56L10.1 53.9L9.5 52.8L9.6 52.3L9.4 51.7L5.3 46.1L7.6 46.2L4.5 42L3.6 40.2L3 38.6L5.7 39.2L4.4 36.4L3.9 34.6L3.7 32.9L3.8 32.2L4.1 31.6L5.4 30.8L7 30.3L8.9 30.1L12.1 30.2L10.2 27.8L12 27.7L14 27.8L18.2 28.7L17.1 26.7L22.5 27.7L24.6 27.9L25 27.5L26.2 27.5L27.8 27.2L29.2 26.6L30 26L31.1 24.9L31.8 23.8L32.7 20.8L33.6 21.4L34.8 16.4L35.8 13.4L37.1 15.9L38.1 12.3L39 10.1L40 8.1L41.2 6.5L42.2 9.5L44 6.5L45.3 4.9L46.7 3.7L48.1 3.1L49.6 3.7L51 4.9L52.3 6.5L54 9.5L55.1 6.5L56.3 8.1L57.3 10.1L58.2 12.3L59.2 15.9L60.5 13.4L61.5 16.4L62.7 21.5L63.5 20.8L64.5 23.9L65.5 25.4L66.5 26.5L67.4 27.1L68.7 27.7L70.3 28L71.6 28L72 28.3L74.1 28.2L79.6 27.1L78.5 29L82.8 28.1L84.9 28L86.7 28.2L84.9 30.4L89.1 30.5L90.8 30.9L92.1 31.6L92.4 32.2L92.5 33L92.2 34.7L91.6 36.5L90.1 39.4L93 38.7L92.3 40.4L91.2 42.2L88.5 45.7L90.8 45.5L87 50.6L86.7 51.2L86.8 51.7L86.1 52.9L85.2 55.5L84.9 57.9L85 60.8L86.2 67L87.1 69.8L86.3 70.2L87.1 72.6L87.4 74.5L87.3 75L86.7 76L83.4 78L83.8 78.8L81.1 80.2L77.1 82.8L67.2 89.7L65.6 90.6L64.1 90.8L62.5 90.5L60.8 89.8L59 88.8L57.2 87.4L54.1 84.2L49.6 78.3L48.4 77.3Z"/>
+<clipPath id="l37c"><use href="#l37p"/></clipPath>
+</defs>
+<path d="M48.1 57.2Q44.9 77.8 41.6 92.9" fill="none" stroke="#6B2A2A" stroke-width="2.1" stroke-linecap="round"/>
+<use href="#l37p" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.3" stroke-linejoin="round"/>
+<use href="#l37p" fill="url(#l37w)"/>
+<g clip-path="url(#l37c)">
+<circle cx="22.6" cy="48.3" r="11.3" fill="url(#l37b0)"/><circle cx="76.7" cy="64.9" r="14" fill="url(#l37b1)"/><circle cx="60.4" cy="28.9" r="11.7" fill="url(#l37b2)"/>
+<circle cx="80" cy="40" r="1.3" fill="#5C1834" fill-opacity="0.31"/><circle cx="23" cy="47.9" r="1.2" fill="#5C1834" fill-opacity="0.18"/><circle cx="46.6" cy="45.1" r="1.1" fill="#5C1834" fill-opacity="0.21"/><circle cx="64.8" cy="50.1" r="1.1" fill="#5C1834" fill-opacity="0.24"/><circle cx="60.7" cy="22.9" r="0.8" fill="#5C1834" fill-opacity="0.22"/><circle cx="49.5" cy="45.9" r="1.3" fill="#5C1834" fill-opacity="0.31"/>
+<path d="M38.7 63.2L36.1 71.2M38.7 63.2L31.3 59.3M31.3 66.2L29.1 72.9M31.3 66.2L25.1 62.9M23.9 69.2L22.1 74.6M23.9 69.2L18.9 66.5M38.3 53.3L27.3 56.8M38.3 53.3L36.7 41.8M31.1 48.7L21.4 51.8M31.1 48.7L29.6 38.7M23.8 44.2L15.5 46.9M23.8 44.2L22.6 35.6M16.5 39.6L9.6 41.9M16.5 39.6L15.5 32.5M48.1 46.8L38.5 38.7M48.1 46.8L57.8 38.7M48.1 37.5L39.7 30.5M48.1 37.5L56.6 30.5M48.1 28.2L40.9 22.2M48.1 28.2L55.4 22.2M48.1 18.9L42.1 13.9M48.1 18.9L54.1 13.9M57.9 53.3L59.5 41.8M57.9 53.3L69 56.8M65.2 48.7L66.6 38.7M65.2 48.7L74.8 51.9M72.5 44.2L73.7 35.6M72.5 44.2L80.7 46.9M79.7 39.7L80.7 32.5M79.7 39.7L86.6 41.9M58.1 63.4L65.8 59.3M58.1 63.4L60.8 71.8M65.8 66.5L72.3 63.1M65.8 66.5L68.1 73.5M73.6 69.7L78.8 66.9M73.6 69.7L75.4 75.3" fill="none" stroke="#F1B36A" stroke-opacity=".32" stroke-width=".55" stroke-linecap="round"/>
+<path d="M48.1 59.4Q32 64.1 17.2 71.9M48.1 59.4Q30 46.1 10.1 35.6M48.1 59.4Q49.8 35 48.1 10.7M48.1 59.4Q68 48.9 86.1 35.6M48.1 59.4Q63.8 67.5 80.7 72.5" fill="none" stroke="#5A1230" stroke-opacity=".22" stroke-width="1.6" stroke-linecap="round" transform="translate(.35 .45)"/>
+<path d="M48.1 59.4Q32 64.1 17.2 71.9M48.1 59.4Q30 46.1 10.1 35.6M48.1 59.4Q49.8 35 48.1 10.7M48.1 59.4Q68 48.9 86.1 35.6M48.1 59.4Q63.8 67.5 80.7 72.5" fill="none" stroke="#F1B36A" stroke-opacity=".62" stroke-width=".95" stroke-linecap="round"/>
+<use href="#l37p" fill="none" stroke="#5C1834" stroke-opacity=".55" stroke-width="2.4"/>
+<use href="#l37p" fill="url(#l37g)"/>
+</g>
+<use href="#l37p" fill="none" stroke="#5C1834" stroke-opacity=".35" stroke-width=".5"/>
+</svg>

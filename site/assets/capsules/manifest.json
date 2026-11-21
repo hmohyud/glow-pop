@@ -1,0 +1,61 @@
+{
+  "note": "Transparent WebP stills rendered by site/candy3d.js (2x). Sun from the upper left (az -40, el 50): shadows fall right / back. The pops: the approved pop in beach light (the green in its pack art green). Concept renders.",
+  "files": [
+    {
+      "file": "capsules-cluster.webp",
+      "w": 1200,
+      "h": 800,
+      "alt": "Three ivory two-piece capsules: two crossed, one apart",
+      "use": "Hero / section art: the full cluster with soft contact shadows (sun from the upper left)"
+    },
+    {
+      "file": "capsules-cluster-flat.webp",
+      "w": 1200,
+      "h": 800,
+      "alt": "Three ivory two-piece capsules: two crossed, one apart",
+      "use": "Hero / section art: the full cluster with soft contact shadows (sun from the upper left). Flat-lit variant: soft, low contrast, little specular, for a flat vector scene"
+    },
+    {
+      "file": "capsule-single.webp",
+      "w": 800,
+      "h": 560,
+      "alt": "One ivory two-piece capsule, seen at three-quarters",
+      "use": "A single capsule (icons, cards, illustration props)"
+    },
+    {
+      "file": "capsule-single-flat.webp",
+      "w": 800,
+      "h": 560,
+      "alt": "One ivory two-piece capsule, seen at three-quarters",
+      "use": "A single capsule (icons, cards, illustration props). Flat-lit variant: soft, low contrast, little specular, for a flat vector scene"
+    },
+    {
+      "file": "capsules-crossed.webp",
+      "w": 840,
+      "h": 680,
+      "alt": "Two ivory two-piece capsules, one leaning across the other",
+      "use": "Two capsules crossed (secondary art, illustration props)"
+    },
+    {
+      "file": "capsules-crossed-flat.webp",
+      "w": 840,
+      "h": 680,
+      "alt": "Two ivory two-piece capsules, one leaning across the other",
+      "use": "Two capsules crossed (secondary art, illustration props). Flat-lit variant: soft, low contrast, little specular, for a flat vector scene"
+    },
+    {
+      "file": "../pops/pop-collagen-boost.webp",
+      "w": 600,
+      "h": 900,
+      "alt": "Collagen Boost lollipop: a glossy pink pop with a raised band, on a white stick",
+      "use": "Collagen Boost (No 1) product still"
+    },
+    {
+      "file": "../pops/pop-green-veggies.webp",
+      "w": 600,
+      "h": 900,
+      "alt": "Green Veggies lollipop: a glossy green pop with a raised band, on a white stick",
+      "use": "Green Veggies (No 2) product still (coming soon)"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+<defs>
+<radialGradient id="l23w" gradientUnits="userSpaceOnUse" cx="47" cy="52.4" r="49.5">
+<stop offset="0" stop-color="#F2B54A"/><stop offset=".42" stop-color="#E0862F"/><stop offset=".8" stop-color="#C95F28"/><stop offset="1" stop-color="#9E4220"/>
+</radialGradient>
+<radialGradient id="l23b0" gradientUnits="userSpaceOnUse" cx="36.8" cy="39.7" r="12.4"><stop offset="0" stop-color="#E9A23C" stop-opacity=".55"/><stop offset="1" stop-color="#E9A23C" stop-opacity="0"/></radialGradient>
+<radialGradient id="l23b1" gradientUnits="userSpaceOnUse" cx="75.9" cy="57.4" r="8.6"><stop offset="0" stop-color="#B44A22" stop-opacity=".55"/><stop offset="1" stop-color="#B44A22" stop-opacity="0"/></radialGradient>
+<radialGradient id="l23b2" gradientUnits="userSpaceOnUse" cx="58.7" cy="41.2" r="9.1"><stop offset="0" stop-color="#D9772C" stop-opacity=".55"/><stop offset="1" stop-color="#D9772C" stop-opacity="0"/></radialGradient>
+<radialGradient id="l23g" gradientUnits="userSpaceOnUse" cx="48" cy="48" r="44"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<path id="l23p" d="M47 74.6L45 74.9L40.3 76.2L37.7 76.8L35 76.9L32.7 76.6L30.6 75.7L28.2 73.9L25.2 71.1L21.7 67.5L21.1 66.1L19.6 60.6L17.7 49.7L16.2 44.6L15.3 42.6L12.5 37.6L11.6 35.5L11.1 33.5L11.4 33.1L12.1 32.9L14.2 32.3L17.1 31.9L21.3 31.6L23.4 31.2L28 29.5L30.9 27.6L32.6 25.8L33.9 24L35.4 19.6L36.4 21L39.3 13.7L41 10.5L42.4 8.1L44.6 5.3L45.8 4L47 3L48.3 4L49.5 5.3L51.7 8.1L53.1 10.5L54.8 13.7L57.7 21L58.7 19.6L60.2 23.9L61.5 25.8L63 27.2L65.7 28.8L69.9 30.2L72.1 30.5L77 30.7L80.1 31L83.9 31.8L84.5 32.1L84.9 32.5L84.4 34.6L83.1 37.5L79.3 43.8L78.3 45.8L76.5 51.3L74.9 59.1L73.7 63.9L72.6 67.2L71.8 68.1L68.6 71.4L65.9 73.9L63.5 75.7L61.4 76.6L59.1 76.9L56.4 76.8L53.8 76.2L49.1 74.9L47.3 74.6Z"/>
+<clipPath id="l23c"><use href="#l23p"/></clipPath>
+</defs>
+<path d="M47 50.6Q50.8 74.7 54.6 93" fill="none" stroke="#7E4424" stroke-width="2.1" stroke-linecap="round"/>
+<use href="#l23p" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.3" stroke-linejoin="round"/>
+<use href="#l23p" fill="url(#l23w)"/>
+<g clip-path="url(#l23c)">
+<circle cx="36.8" cy="39.7" r="12.4" fill="url(#l23b0)"/><circle cx="75.9" cy="57.4" r="8.6" fill="url(#l23b1)"/><circle cx="58.7" cy="41.2" r="9.1" fill="url(#l23b2)"/>
+<circle cx="74.1" cy="65.9" r="0.9" fill="#82351A" fill-opacity="0.28"/><circle cx="27.7" cy="58.3" r="1.1" fill="#82351A" fill-opacity="0.32"/><circle cx="18.7" cy="41.5" r="0.7" fill="#82351A" fill-opacity="0.19"/><circle cx="58.7" cy="47.7" r="1.1" fill="#82351A" fill-opacity="0.22"/><circle cx="48.2" cy="19.4" r="1.2" fill="#82351A" fill-opacity="0.30"/><circle cx="72" cy="56.4" r="1.2" fill="#82351A" fill-opacity="0.27"/>
+<path d="M40.7 56.1L40 60.8M40.7 56.1L36.3 54.3M35.5 59.1L34.9 62.8M35.5 59.1L32 57.8M37.8 47.5L29.4 51.2M37.8 47.5L36.2 38.5M30.5 43.6L23.5 46.7M30.5 43.6L29.2 36.1M23.2 39.8L17.6 42.3M23.2 39.8L22.2 33.7M47 41.5L37.9 34.3M47 41.5L56.2 34.3M47 33.4L39 27.1M47 33.4L55.1 27.1M47 25.3L40.2 19.9M47 25.3L53.9 19.9M47 17.2L41.3 12.7M47 17.2L52.7 12.7M56.9 47.2L58.6 37.7M56.9 47.2L65.7 51.1M64.6 43.1L66 35.1M64.6 43.1L72 46.4M72.3 39L73.4 32.6M72.3 39L78.3 41.7M53.3 56L57.6 54.3M53.3 56L53.9 60.7M58.4 59L61.8 57.7M58.4 59L58.9 62.6" fill="none" stroke="#F7D58C" stroke-opacity=".32" stroke-width=".55" stroke-linecap="round"/>
+<path d="M47 52.4Q38.1 56 30.6 61.9M47 52.4Q32.5 43.1 16.7 36.3M47 52.4Q48.5 31.2 47 10M47 52.4Q63.8 45.1 79.3 35.3M47 52.4Q54.4 58.3 63.2 61.8" fill="none" stroke="#7A3416" stroke-opacity=".22" stroke-width="1.6" stroke-linecap="round" transform="translate(.35 .45)"/>
+<path d="M47 52.4Q38.1 56 30.6 61.9M47 52.4Q32.5 43.1 16.7 36.3M47 52.4Q48.5 31.2 47 10M47 52.4Q63.8 45.1 79.3 35.3M47 52.4Q54.4 58.3 63.2 61.8" fill="none" stroke="#F7D58C" stroke-opacity=".62" stroke-width=".95" stroke-linecap="round"/>
+<use href="#l23p" fill="none" stroke="#82351A" stroke-opacity=".55" stroke-width="2.4"/>
+<use href="#l23p" fill="url(#l23g)"/>
+</g>
+<use href="#l23p" fill="none" stroke="#82351A" stroke-opacity=".35" stroke-width=".5"/>
+</svg>

@@ -1,0 +1,57 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODEL POPS · AUTUMN: the club late in the season, at golden hour
+   ───────────────────────────────────────────────────────────────────────────
+   The same Riviera, a few weeks on: the sun lower and warmer, cream travertine, toasted sand, a plum bar over
+   the page; terracotta, berry, plum and gold, and a cosy terrace mood. The pink stays the product's own (the
+   pop, the stripes, the buttons). Tokens: see summer.css. Every rule is scoped to html[data-season="autumn"].
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[data-season="autumn"] {
+  --white: #FFFAF3;          /* warm cream */
+  --paper: #FFFCF8;
+  --card-paper: #FFFBF4;
+  --sand: #F3DBC1;           /* toasted sand (the sugar and menu sections) */
+  --sand-2: #E7C4A0;
+  --sand-3: #D2A274;
+  --section-tint: #FBEADA;   /* an apricot band behind the amenities */
+  --sand-hi: #EDCBA6;        /* the beach in the low sun: wet sand at the waterline … */
+  --sand-lo: #F6E3CC;        /* … dry sand at the front */
+  --coping-hi: #FFF8EE;      /* travertine in the late light … */
+  --coping-lo: #EBD3B6;      /* … and in its shade */
+  --stripe-2: #FFF8EE;       /* the cream stripe of every awning and cabana */
+  --sun: #FFB547;            /* a deeper, golden sun */
+  --amber: #B8601A;          /* burnt amber for the engraved suns */
+  --announce-bg: #561F3E;    /* plum, cream words on it */
+  --announce-ink: #FFF1E3;
+  --foot-bg: #F4DEC6;        /* (light enough for the pink link text: AA) */
+  /* the big italic accents take a deeper berry pink in the late light (buttons and stripes keep the brand pink) */
+  --strawberry-pop-display: #D0006C;
+  /* and the small accent words too, so they stay AA on toasted sand in the vine's shade (4.85:1 at its darkest) */
+  --strawberry-pop-text: #A8005C;
+  /* Green Veggies' small accent words a shade deeper too: AA on toasted sand (5.0:1, the menu's eyebrow when the
+     menu serves Green Veggies; the vine's shade lies at the section's far end, never under it) */
+  --green-pop-text: #116A36;
+}
+html[data-season="autumn"] .announce__sun { color: #FFBE6B; }
+
+/* the photographs: the same warm grade, with a little more of the low sun from the upper left */
+html[data-season="autumn"] .postcard__photo::after {
+  background: linear-gradient(155deg, rgba(255, 186, 104, .42), rgba(255, 150, 120, .1) 52%, rgba(74, 20, 50, .16));
+}
+
+/* the low sun casts the hero awning's shade further across the pool (still down and to the right) */
+html[data-season="autumn"] .awning--hero { filter: drop-shadow(0 0 .55px rgba(74, 13, 46, .55)) drop-shadow(5px 24px 14px rgba(3, 44, 74, .26)); }
+/* (a leaf that drifts under the awning slips into its shade: style.css's .decor mask, every season) */
+
+/* the beach in the last of the sun: warmer, longer shadows (the same sun, upper left: they still fall right and back) */
+html[data-season="autumn"] .cab-shadow { fill: rgba(128, 66, 34, .32); transform-box: view-box; transform-origin: 120px 291px; transform: skewX(-24deg) scaleY(1.28); }
+html[data-season="autumn"] .cab-contact { fill: rgba(110, 56, 28, .3); }
+html[data-season="autumn"] .beach__foam::after { background: linear-gradient(to bottom, rgba(130, 76, 40, .16), transparent); }
+
+/* the terrace: the sand lies in a vine canopy's dappled shade (it drifts like the parasol's shade in summer) */
+html[data-season="autumn"] .sugar::after, html[data-season="autumn"] .menu::after {
+  background: url("../assets/seasons/autumn/pergola-shade.svg") 50% 50% / 100% 100% no-repeat;
+}
+/* phones: the shade lies close behind the headline there, so it is lighter (calm, like summer's parasol) */
+@media (max-width: 767px) {
+  html[data-season="autumn"] .sugar::after, html[data-season="autumn"] .menu::after { opacity: .5; }
+}
