@@ -115,6 +115,10 @@
     stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>',
     // elements (pictures of your own)
     copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="1.5"/><path d="M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
+    // Save a kit (every layer on its own)
+    kit: '<path d="M12 3.5 20.5 8 12 12.5 3.5 8z"/><path d="m3.5 12 8.5 4.5 8.5-4.5"/><path d="m3.5 16 8.5 4.5 8.5-4.5"/>',
+    // the "?" help button (helpHTML): a question mark in a circle
+    help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.3 2.2c-.6.3-1 .8-1 1.5v.5"/><path d="M12 16.6h.01"/>',
   };
   function icon(name, cls) { return '<svg class="ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>'; }
 
@@ -193,7 +197,7 @@
 
   const SWATCHES = [
     ['#de0a66', 'Hot pink'], ['#f25c9b', 'Bag pink'], ['#f9b1d3', 'Blush'], ['#fbc2dc', 'Petal'], ['#b0105a', 'Raspberry'], ['#8a0b45', 'Deep raspberry'],
-    ['#ffffff', 'White'], ['#f7efdd', 'Cream'], ['#f2d98a', 'Pale gold'], ['#f4b622', 'Gold'],
+    ['#ffffff', 'White'], ['#f7efdd', 'Cream'], ['#f2d98a', 'Pale gold'], ['#f4b622', 'Gold'], ['#ffd700', 'Bright gold'],
     ['#13843f', 'Emerald'], ['#0f5a2c', 'Deep green'], ['#2fa84f', 'Leaf'], ['#c8f07a', 'Lime'], ['#e6f7c6', 'Pale lime'], ['#2a2125', 'Ink'],
   ];
   // The client's pictures. `flat`: the same draft unwarped onto the flat panel (its filled-pack bulge taken out,
@@ -568,11 +572,11 @@
   }
   function presetSub(fmt, lead) { const s = specDefaults(fmt); return lead + ' · ' + n(s.flat.w, 1) + ' × ' + n(s.flat.h, 1) + ' mm'; }
   const PRESETS = [
-    { id: 'wrapper', name: 'Current wrapper', fmt: 'wrapper', lead: 'Single pop', ref: 'wrapper', sw: [PINK.hot, PINK.blush], build: () => presetWrapper(false) },
-    { id: 'bag', name: 'Current bag', fmt: 'bag', lead: '100 g bag', ref: 'bag', sw: [PINK.bag, PINK.bag], build: () => presetBag(false) },
-    { id: 'green-wrapper', name: 'Green wrapper', fmt: 'wrapper', lead: 'Green pop', ref: null, sw: [GREEN.emerald, GREEN.paleLime], build: () => presetWrapper(true) },
-    { id: 'green-bag', name: 'Green bag', fmt: 'bag', lead: 'Green pop', ref: 'greenbag', sw: [GREEN.bag, GREEN.bag], build: () => presetBag(true) },
-    { id: 'sleeve3', name: '3-pack sleeve', fmt: 'sleeve3', lead: 'Wrapper look', ref: null, sw: [PINK.hot, PINK.blush], land: true, build: presetSleeve },
+    { id: 'wrapper', name: 'Current wrapper', short: 'Wrapper', fmt: 'wrapper', lead: 'Single pop', ref: 'wrapper', sw: [PINK.hot, PINK.blush], build: () => presetWrapper(false) },
+    { id: 'bag', name: 'Current bag', short: 'Bag', fmt: 'bag', lead: '100 g bag', ref: 'bag', sw: [PINK.bag, PINK.bag], build: () => presetBag(false) },
+    { id: 'green-wrapper', name: 'Green wrapper', short: 'Green wrapper', fmt: 'wrapper', lead: 'Green pop', ref: null, sw: [GREEN.emerald, GREEN.paleLime], build: () => presetWrapper(true) },
+    { id: 'green-bag', name: 'Green bag', short: 'Green bag', fmt: 'bag', lead: 'Green pop', ref: 'greenbag', sw: [GREEN.bag, GREEN.bag], build: () => presetBag(true) },
+    { id: 'sleeve3', name: '3-pack sleeve', short: '3-pack', fmt: 'sleeve3', lead: 'Wrapper look', ref: null, sw: [PINK.hot, PINK.blush], land: true, build: presetSleeve },
   ];
 
   /* =========================================================================================
@@ -586,7 +590,10 @@
   const hist = { stack: [], i: -1 };
   const AUTOSAVE_KEY = 'model-pops-label-studio:autosave:v1';
 
+  // aiHold: inside MPStudio.aiStep the changes add up to ONE step, committed once at its end
+  const aiHold = { n: 0, tok: null, i: -1 };
   function commit() {
+    if (aiHold.n) return;
     const s = JSON.stringify(state.model);
     if (hist.stack[hist.i] === s) return;
     hist.stack = hist.stack.slice(0, hist.i + 1); hist.stack.push(s);
@@ -598,6 +605,31 @@
   function undo() { if (hist.i > 0) { hist.i--; state.model = JSON.parse(hist.stack[hist.i]); afterModelReplaced(); } }
   function redo() { if (hist.i < hist.stack.length - 1) { hist.i++; state.model = JSON.parse(hist.stack[hist.i]); afterModelReplaced(); } }
   function updateUndoButtons() { $('#btn-undo').disabled = hist.i <= 0; $('#btn-redo').disabled = hist.i >= hist.stack.length - 1; }
+  // The AI panel's "same step" (gpu.js): fn changes the design through the usual calls, and everything it changes is
+  // ONE undo step. Called again with the same token while that step is still the latest one in the history (nothing
+  // else changed since), the step is replaced instead: the design goes back to how it was before it, then fn runs.
+  // So switching between versions never piles up history, and Ctrl+Z returns to the design before the first one.
+  function aiStep(tok, fn) {
+    let replaced = false;
+    if (tok && aiHold.tok === tok && aiHold.i === hist.i && hist.i > 0 && hist.stack[hist.i] === JSON.stringify(state.model)) {
+      hist.stack.length = hist.i; hist.i--; state.model = JSON.parse(hist.stack[hist.i]); replaced = true;
+    }
+    const before = hist.stack[hist.i];
+    aiHold.n++;
+    let out;
+    try { out = fn ? fn(replaced) : undefined; } finally { aiHold.n--; }
+    commit();
+    aiHold.tok = tok || null; aiHold.i = hist.stack[hist.i] !== before ? hist.i : -1;     // (no change: no step to replace later)
+    afterModelReplaced(); notifySel();
+    return out;
+  }
+  // who wants to know when the selection or the panel being edited changes (gpu.js: the AI panel's target line)
+  const selWatch = []; let selQueued = false;
+  function notifySel() {
+    if (selQueued || !selWatch.length) return;
+    selQueued = true;
+    Promise.resolve().then(() => { selQueued = false; selWatch.slice().forEach(f => { try { f({ sel: state.sel, side: state.side, view: ui.view }); } catch (e) { console.warn('[label-studio] selection watcher failed', e); } }); });
+  }
 
   function usedAssetIds(m, includeBundled) {
     const ids = new Set();
@@ -990,6 +1022,10 @@
     });
     return s;
   }
+  // the logo's "Gold foil" fill: one flat bright gold, with no shading and no outline (the client, 2026-11-22: "flat
+  // shiny gold no outline"). The shine is a material, not a drawing: the 3D pack shades these pixels as metal foil
+  // (renderFoilCanvas), and on the real pack it is the printer's hot-foil.
+  const GOLD = '#ffd700';
   function renderLogo(el, m, env, defs) {
     if (el.style === 'upload') {
       const a = ASSETS[el.upload.src];
@@ -1003,14 +1039,7 @@
     let fill = '#ffffff';
     if (el.fill === 'cream') fill = '#f7efdd';
     else if (el.fill === 'custom') fill = el.fillColor || '#ffffff';
-    else if (el.fill === 'gold') {
-      const xs1 = Math.min.apply(null, g.lines.map(l => l.x1)), xs2 = Math.max.apply(null, g.lines.map(l => l.x2));
-      const y1 = g.lines[0].base - g.cap, y2 = g.lines[g.lines.length - 1].base;
-      const gid = env.idp + 'logo-gold';
-      defs.push('<linearGradient id="' + gid + '" gradientUnits="userSpaceOnUse" x1="' + n(xs1) + '" y1="' + n(y1) + '" x2="' + n(xs2) + '" y2="' + n(y2) + '">' +
-        '<stop offset="0" stop-color="#a8792a"/><stop offset="0.22" stop-color="#e3bd62"/><stop offset="0.42" stop-color="#fbeab0"/><stop offset="0.58" stop-color="#d7a945"/><stop offset="0.8" stop-color="#a6741f"/><stop offset="1" stop-color="#e2bd5f"/></linearGradient>');
-      fill = 'url(#' + gid + ')';
-    }
+    else if (el.fill === 'gold') fill = GOLD;
     let sp = '';
     const S = el.sparkles || {};
     if (S.on && g.lines[0] && g.lines[0].t) {
@@ -1467,14 +1496,15 @@
   // env: { idp: id prefix, editor: bool, href(assetId) }
   // over (mm, at most 0.6): the artwork runs this far past the bleed, for renders whose edge sits exactly on
   // the bleed line (so the edge pixels are solid). The background art keeps the same fit in every file.
-  function buildDesign(m, env, over, side) {
+  // only (optional): draw just that one layer ('background' = the background with the seal ribs), for the kit's pieces
+  function buildDesign(m, env, over, side, only) {
     const v = panelView(m, side || 'front');
     const W = v.trim.w, H = v.trim.h, b = v.bleed + (over || 0);
     const defs = [];
     defs.push('<clipPath id="' + env.idp + 'clip-bleed"><rect x="' + n(-b) + '" y="' + n(-b) + '" width="' + n(W + 2 * b) + '" height="' + n(H + 2 * b) + '"/></clipPath>');
-    let body = renderBackground(v, env, defs) + renderSeals(v, env);
+    let body = !only || only === 'background' ? renderBackground(v, env, defs) + renderSeals(v, env) : '';
     for (const key of v.order) {
-      const el = v.els[key]; if (!el || !el.visible) continue;
+      const el = v.els[key]; if (!el || !el.visible || (only && key !== only)) continue;
       body += renderEl(key, el, v, env, defs);
     }
     return { defs: defs.join(''), body: '<g id="' + env.idp + 'artwork" clip-path="url(#' + env.idp + 'clip-bleed)">' + body + '</g>' };
@@ -1628,7 +1658,7 @@
     const side = sideOf(opts.side);
     await ensureFonts(m, 4000);
     const env = { idp: opts.idp || 'mp-', editor: false, href: id => assetHref(id, 'data') };
-    const d = buildDesign(m, env, opts.pxW ? 0.5 : 0, side);   // pixel renders: solid edge pixels at the bleed line
+    const d = buildDesign(m, env, opts.pxW ? 0.5 : 0, side, opts.only);   // pixel renders: solid edge pixels at the bleed line
     let fontCSS = '', families = [], fontsOK = true, fontErr = '';
     if (opts.embedFonts !== false) {
       try { const r = await embeddedFontCSS(m, [side]); fontCSS = r.css; families = r.families; }
@@ -2309,20 +2339,168 @@
     if (html !== undefined) e.innerHTML = html;
     return e;
   }
+
+  /* ---- "?" help: the one way explanations are shown, in the studio and in the AI panel (gpu.js calls
+   * MPStudio.helpHTML). A small button at the end of the title or label it explains; its words wait in a hidden
+   * span next to it (the button's description for screen readers). One floating panel (#help-pop) shows them: on
+   * mouse hover after a short delay, on keyboard focus, and on click or tap, which pins it until the next click,
+   * Escape or a click elsewhere. Only one is open at a time, and it floats over the page, so nothing moves. ---- */
+  let helpN = 0;
+  // html: the explanation (the studio's own words; anything typed by the user must already be escaped).
+  // topic: what it explains ("Help: <topic>"). txtId: an id of your own for the text, to update it later.
+  function helpHTML(html, topic, txtId) {
+    const id = txtId || 'hlp-' + (++helpN);
+    return '<button type="button" class="help-q" aria-label="Help: ' + esc(topic || 'more') + '" aria-expanded="false" aria-controls="help-pop" aria-describedby="' + id + '" data-help="' + id + '">' + icon('help') + '</button>' +
+      '<span class="help-txt" id="' + id + '" hidden>' + html + '</span>';
+  }
+  // a host that holds one "?" whose words change (redrawn only when they do); no html: no button
+  function setHelp(host, html, topic) {
+    if (!host) return;
+    const sig = html ? topic + '\n' + html : '';
+    if (host.dataset.help === sig) return;
+    host.dataset.help = sig; host.innerHTML = html ? helpHTML(html, topic) : '';
+  }
+  // a long message: its first sentence (and a short second one) stays in view, the rest goes behind a "?"
+  function splitHelp(html) {
+    const s = String(html || ''); const cuts = []; let depth = 0, tag = false;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (c === '<') tag = true; else if (c === '>') tag = false;
+      else if (!tag && c === '(') depth++; else if (!tag && c === ')') depth = Math.max(0, depth - 1);
+      else if (!tag && !depth && /[.?!]/.test(c) && /^\s+(<[a-z]+[^>]*>)?[A-Z(“"]/.test(s.slice(i + 1, i + 40))) cuts.push(i + 1);
+    }
+    if (!cuts.length) return [s, ''];
+    const plain = t => t.replace(/<[^>]*>/g, '').length;
+    let at = cuts[0];
+    if (plain(s.slice(0, at)) < 70 && cuts.length >= 1) { const nx = cuts[1] || s.length; if (plain(s.slice(0, nx)) <= 150) at = nx; }
+    return [s.slice(0, at).trim(), s.slice(at).trim()];
+  }
+  const help = { btn: null, label: '', pin: false, tOpen: 0, tClose: 0, tick: 0, pop: null };
+  function helpPop() {
+    if (!help.pop) {
+      help.pop = h('div', { id: 'help-pop', class: 'help-pop', role: 'tooltip', hidden: true });
+      help.pop.addEventListener('pointerenter', () => clearTimeout(help.tClose));
+      help.pop.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse' && !help.pin) closeHelpSoon(); });
+      document.body.appendChild(help.pop);
+    }
+    return help.pop;
+  }
+  function openHelp(b, pin) {
+    clearTimeout(help.tOpen); clearTimeout(help.tClose);
+    const txt = document.getElementById(b.getAttribute('data-help')); if (!txt) return;
+    if (help.btn && help.btn !== b) closeHelp();
+    const p = helpPop();
+    help.btn = b; help.label = b.getAttribute('aria-label'); help.pin = !!pin;
+    p.innerHTML = txt.innerHTML; p.hidden = false;
+    b.setAttribute('aria-expanded', 'true'); b.classList.toggle('pinned', help.pin);
+    placeHelp();
+    if (!help.tick) help.tick = setInterval(followHelp, 400);
+  }
+  // under its button (above it when there is no room below), always inside the window
+  function placeHelp() {
+    const b = help.btn, p = help.pop; if (!b || !p || p.hidden) return;
+    const r = b.getBoundingClientRect(), vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, M = 8;
+    p.style.maxWidth = Math.max(160, Math.min(300, vw - 2 * M)) + 'px'; p.style.left = '0px'; p.style.top = '0px';
+    const w = p.offsetWidth, hh = p.offsetHeight;
+    const x = Math.max(M, Math.min(r.left + r.width / 2 - 22, vw - M - w));
+    let y = r.bottom + 6;
+    if (y + hh > vh - M && r.top - 6 - hh >= M) y = r.top - 6 - hh;
+    y = Math.max(M, Math.min(y, vh - M - hh));
+    p.style.left = Math.round(x) + 'px'; p.style.top = Math.round(y) + 'px';
+  }
+  // the panels are redrawn often: an open help follows its button to the new one (same topic), or closes
+  // (on screen: not removed, not in a closed section, not in the AI panel while it is closed)
+  const helpShown = b => b.isConnected && (typeof b.checkVisibility === 'function' ? b.checkVisibility({ visibilityProperty: true, contentVisibilityAuto: true }) : b.getClientRects().length > 0);
+  function followHelp() {
+    if (!help.btn) { clearInterval(help.tick); help.tick = 0; return; }
+    if (!help.btn.isConnected) {
+      const nb = $$('.help-q').find(b => b.getAttribute('aria-label') === help.label && helpShown(b));
+      if (!nb) { closeHelp(); return; }
+      help.btn = nb; nb.setAttribute('aria-expanded', 'true'); nb.classList.toggle('pinned', help.pin);
+    }
+    if (!helpShown(help.btn)) { closeHelp(); return; }
+    const txt = document.getElementById(help.btn.getAttribute('data-help'));
+    if (txt && help.pop.innerHTML !== txt.innerHTML) help.pop.innerHTML = txt.innerHTML;
+    placeHelp();
+  }
+  function closeHelp() {
+    clearTimeout(help.tOpen); clearTimeout(help.tClose);
+    if (help.btn) { help.btn.setAttribute('aria-expanded', 'false'); help.btn.classList.remove('pinned'); }
+    help.btn = null; help.pin = false;
+    if (help.pop) { help.pop.hidden = true; help.pop.innerHTML = ''; }
+    if (help.tick) { clearInterval(help.tick); help.tick = 0; }
+  }
+  function closeHelpSoon() { clearTimeout(help.tClose); help.tClose = setTimeout(() => { if (!help.pin) closeHelp(); }, 200); }
+  // one delegated handler for every "?" on the page (the studio's and the AI panel's)
+  function wireHelp() {
+    const qOf = e => (e.target && e.target.closest ? e.target.closest('.help-q') : null);
+    document.addEventListener('pointerover', e => {
+      if (e.pointerType !== 'mouse') return;
+      const b = qOf(e); if (!b) return;
+      if (help.btn === b) { clearTimeout(help.tClose); return; }
+      if (help.pin) return;                                                  // a pinned one stays until it is closed
+      clearTimeout(help.tOpen); help.tOpen = setTimeout(() => { if (b.isConnected && b.matches(':hover')) openHelp(b, false); }, 320);
+    });
+    document.addEventListener('pointerout', e => {
+      if (e.pointerType !== 'mouse') return;
+      const b = qOf(e); if (!b || (e.relatedTarget && b.contains(e.relatedTarget))) return;
+      clearTimeout(help.tOpen);
+      if (help.btn === b && !help.pin && document.activeElement !== b) closeHelpSoon();
+    });
+    document.addEventListener('focusin', e => { const b = qOf(e); if (b && help.btn !== b && b.matches(':focus-visible')) openHelp(b, false); });
+    document.addEventListener('focusout', e => { const b = qOf(e); if (b && help.btn === b && !help.pin && !b.matches(':hover')) closeHelpSoon(); });
+    // (capture: a "?" inside a summary or a label must not toggle it, and a click elsewhere closes the panel)
+    document.addEventListener('click', e => {
+      const b = qOf(e);
+      if (b) { e.preventDefault(); e.stopPropagation(); if (help.btn === b && help.pin) closeHelp(); else openHelp(b, true); return; }
+      if (help.btn && !(help.pop && help.pop.contains(e.target))) closeHelp();
+    }, true);
+    // Escape closes the help first (and nothing else: the dialog or the AI panel stay open)
+    window.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' || !help.btn) return;
+      e.preventDefault(); e.stopPropagation(); closeHelp();
+    }, true);
+    window.addEventListener('scroll', e => { if (help.btn && !(help.pop && help.pop.contains(e.target))) { if (help.pin) placeHelp(); else closeHelp(); } }, true);
+    window.addEventListener('resize', () => placeHelp());
+  }
+  // Start from: a small picture of each starting design's own front panel with a short name under it; its full name
+  // and size are in the tooltip and the accessible name. The pictures are drawn by the studio's own renderer as
+  // inline SVG (sharp at any size), once, after the studio is ready, and kept for the session (tiles).
+  const tiles = { svg: {}, busy: false };
+  const tileKey = p => p.id + '|' + (/^green/.test(p.id) ? state.greenPop || '' : '');
+  function tilePic(p) {
+    const svg = tiles.svg[tileKey(p)];
+    return svg || '<span class="pt-sw" style="background:linear-gradient(180deg,' + p.sw[0] + ' 0 50%,' + p.sw[1] + ' 50% 100%)"></span>';
+  }
   function renderPresets() {
     const host = $('#presets'); host.innerHTML = '';
     PRESETS.forEach(p => {
-      const row = h('div', { class: 'preset' });
-      const btn = h('button', { class: 'preset-btn' + (state.model && state.model.preset === p.id ? ' on' : ''), type: 'button', title: 'Start from ' + p.name, onclick: () => applyPreset(p.id) },
-        '<span class="swatch2' + (p.land ? ' land' : '') + '" style="background:linear-gradient(180deg,' + p.sw[0] + ' 0 50%,' + p.sw[1] + ' 50% 100%)"></span><span style="min-width:0"><span class="t">' + esc(p.name) + '</span><br><span class="s">' + esc(presetSub(p.fmt, p.lead)) + '</span></span>');
-      row.appendChild(btn);
-      const ref = p.ref && REFS[p.ref];
-      const th = h('button', { class: 'ref-thumb' + (ref ? '' : ' empty'), type: 'button', title: ref ? 'Compare with: ' + ref.label : '', 'aria-label': ref ? 'Compare with ' + ref.label : null, tabindex: ref ? null : '-1',
-        onclick: () => { if (!ref) return; if (state.model.ref !== p.ref) { state.model.ref = p.ref; } if (ui.view !== 'front') setView('front'); ui.compare = true; syncToggles(); layoutAndRender(); } },
-      ref ? '<img src="' + ref.src + '" alt="">' : '');
-      row.appendChild(th);
-      host.appendChild(row);
+      const on = !!state.model && state.model.preset === p.id;
+      const full = p.name + ' · ' + presetSub(p.fmt, p.lead);
+      host.appendChild(h('button', { class: 'pt' + (on ? ' on' : '') + (p.land ? ' land' : ''), type: 'button', 'data-preset': p.id, title: 'Start from ' + full, 'aria-label': 'Start from ' + full, 'aria-pressed': on ? 'true' : 'false', onclick: () => applyPreset(p.id) },
+        '<span class="pt-pic" aria-hidden="true">' + tilePic(p) + '</span><span class="pt-n">' + esc(p.short) + '</span>'));
     });
+    if (window.MPStudio && window.MPStudio.ready && PRESETS.some(p => !(tileKey(p) in tiles.svg))) drawTiles();
+  }
+  // one picture at a time, in idle time, so the studio's start and typing are never held up
+  async function drawTiles() {
+    if (tiles.busy) return; tiles.busy = true;
+    const idle = () => new Promise(r => (window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 600 }) : setTimeout(r, 30)));
+    try {
+      for (const p of PRESETS) {
+        const k = tileKey(p); if (k in tiles.svg) continue;
+        await idle();
+        let svg = '';
+        try {
+          const m = p.build();
+          await ensureFonts(m, 4000);
+          const d = buildDesign(m, { idp: 'pt' + p.id.replace(/[^a-z0-9]/gi, '') + '-', editor: false, href: id => assetHref(id, 'blob') }, 0, 'front');
+          svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + n(m.trim.w) + ' ' + n(m.trim.h) + '" focusable="false"><defs>' + d.defs + '</defs>' + d.body + '</svg>';
+        } catch (e) { console.warn('[label-studio] start-from picture not drawn:', e); }
+        tiles.svg[k] = svg;
+        const pic = svg && $('#presets [data-preset="' + p.id + '"] .pt-pic'); if (pic) pic.innerHTML = svg;
+      }
+    } finally { tiles.busy = false; }
   }
 
   // ---- control builders bound to model paths ----
@@ -2332,10 +2510,24 @@
   function rootOf(path) { const k = path.split('.')[0]; return k === 'els' || k === 'bg' || k === 'order' ? curPanel() : state.model; }
   function getP(path) { return path.split('.').reduce((o, k) => (o == null ? o : o[k]), rootOf(path)); }
   function setP(path, v) { const ks = path.split('.'); let o = rootOf(path); for (let i = 0; i < ks.length - 1; i++) o = o[ks[i]]; o[ks[ks.length - 1]] = v; }
-  function fieldWrap(label, ctl, valSpan) {
-    const f = h('label', { class: 'field' });
-    const l = h('span', { class: 'lbl' }); l.appendChild(document.createTextNode(label)); if (valSpan) l.appendChild(valSpan);
+  // help: words for a "?" after the label. (Then the field is not a <label>, which would take the "?" as its
+  // control: the label's text names the control instead.)
+  function fieldWrap(label, ctl, valSpan, help) {
+    const f = h(help ? 'div' : 'label', { class: 'field' });
+    const l = h('span', { class: 'lbl' });
+    if (help) {
+      const id = 'flbl-' + (++helpN);
+      const t = h('span', { class: 'lbl-t' }); t.appendChild(h('span', { id, text: label })); t.insertAdjacentHTML('beforeend', helpHTML(help, label));
+      l.appendChild(t);
+      const c = ctl.matches && ctl.matches('input, select, textarea') ? ctl : ctl.querySelector && ctl.querySelector('input, select, textarea');
+      if (c && !c.hasAttribute('aria-label')) c.setAttribute('aria-labelledby', id);
+    } else l.appendChild(document.createTextNode(label));
+    if (valSpan) l.appendChild(valSpan);
     f.appendChild(l); f.appendChild(ctl); return f;
+  }
+  // a row: a control (a checkbox label, a button) with a "?" after it
+  function withHelp(ctl, help, topic) {
+    const r = h('div', { class: 'help-row' }); r.appendChild(ctl); r.insertAdjacentHTML('beforeend', helpHTML(help, topic)); return r;
   }
   function cNumber(label, path, o) {
     o = Object.assign({ step: 0.5, min: -9999, max: 9999, unit: '', digits: 2 }, o || {});
@@ -2361,7 +2553,7 @@
     inp.addEventListener('input', () => { setP(path, parseFloat(inp.value)); val.textContent = o.fmt(parseFloat(inp.value)); invalidate(o.after); });
     inp.addEventListener('change', () => { commit(); invalidate({ three: true }); });
     bindings.push({ el: inp, sync: show });
-    return fieldWrap(label, inp, val);
+    return fieldWrap(label, inp, val, o.help);
   }
   // a slider and a number field for the same value (an added picture's width and rotation). o.smax: the slider's
   // own upper end, when the number field allows more; o.note(v): a short text beside the label
@@ -2375,6 +2567,7 @@
       const v = Number(getP(path)) || 0; rng.value = v;
       if (force || document.activeElement !== inp) inp.value = n(v, o.digits);
       val.textContent = o.note ? o.note(v) : '';
+      if (o.tip) { const tp = o.tip(v); f.title = tp; inp.title = tp; }     // (a value that is not a unit: in the tooltip)
     };
     show(true);
     rng.addEventListener('input', () => { setP(path, parseFloat(rng.value)); show(true); invalidate(o.after); });
@@ -2393,9 +2586,7 @@
     ta.addEventListener('input', () => { setP(path, ta.value); invalidate(o.after || { layers: true }); });
     ta.addEventListener('change', () => { commit(); invalidate({ three: true }); });
     bindings.push({ el: ta, sync: show });
-    const f = fieldWrap(label, ta);
-    if (o.hint) f.appendChild(h('span', { class: 'hint', style: 'margin:0' }, o.hint));
-    return f;
+    return fieldWrap(label, ta, null, o.hint);
   }
   function cSelect(label, path, options, o) {
     o = o || {};
@@ -2426,7 +2617,7 @@
     });
     show();
     bindings.push({ el: seg, sync: show });
-    return label ? fieldWrap(label, seg) : seg;
+    return label ? fieldWrap(label, seg, null, o.help) : seg;
   }
   function cCheck(label, path, o) {
     o = o || {};
@@ -2436,7 +2627,7 @@
     inp.addEventListener('change', () => { setP(path, inp.checked); if (o.onChange) o.onChange(inp.checked); commit(); invalidate(Object.assign({ three: true, layers: true }, o.after || {})); if (o.rebuild) buildInspector(); });
     bindings.push({ el: inp, sync: show });
     lab.appendChild(inp); lab.appendChild(document.createTextNode(label));
-    return lab;
+    return o.help ? withHelp(lab, o.help, label) : lab;
   }
   function cColor(label, path, o) {
     o = o || {};
@@ -2482,36 +2673,39 @@
     el.weight = nearestWeight(f, Number(el.weight) || 400, !!el.italic);
     ensureFonts(state.model).then(() => { clearMeasureCache(); invalidate({ three: true }); });
   }
-  function textControls(host, key, o) {
-    o = o || {};
+  // a text line: the words, the size and the colour in view (host); the font, weight, spacing and alignment in More
+  function textControls(host, key, o, more) {
+    o = o || {}; more = more || host;
     const base = 'els.' + key;
     const el = getP(base);
     if (key === 'netWeight') {
-      host.appendChild(cCheck('Auto from grams (oz = g ÷ 28.3495)', base + '.auto', { rebuild: true, onChange: on => { if (!on) el.text = netWeightText(Object.assign({}, el, { auto: true })); } }));
+      host.appendChild(cCheck('Auto from grams', base + '.auto', { rebuild: true, help: 'oz = g ÷ 28.3495', onChange: on => { if (!on) el.text = netWeightText(Object.assign({}, el, { auto: true })); } }));
       if (el.auto) host.appendChild(cNumber('Net weight in grams', base + '.grams', { unit: 'g', step: 1, min: 0, max: 100000, digits: 2, allowEmpty: true, after: { layers: true } }));
       else host.appendChild(cText('Text (override)', base + '.text'));
-      host.appendChild(h('div', { class: 'note' }, icon('info') + '<span>Prints: <b id="nw-preview">' + esc(netWeightText(el)) + '</b></span>'));
-      host.appendChild(h('div', { class: 'note', id: 'nw-size' }));
+      more.appendChild(h('div', { class: 'note' }, icon('info') + '<span>Prints: <b id="nw-preview">' + esc(netWeightText(el)) + '</b></span>'));
+      more.appendChild(h('div', { class: 'note', id: 'nw-size' }));
       updateNetQtyNote();
     } else {
       host.appendChild(cText('Text', base + '.text', { multi: true, rows: o.rows || 2, hint: 'Press Enter for a new line. What you type is exactly what prints.' }));
     }
-    host.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
-    const f = fontOf(el.font);
     const r = h('div', { class: 'row2' });
-    r.appendChild(weightSelect(base + '.weight', base + '.font', base + '.italic'));
     r.appendChild(cNumber('Size', base + '.size', { unit: 'pt', step: 0.5, min: 2, max: 400, digits: 2 }));
     host.appendChild(r);
-    if (f.italic) host.appendChild(cCheck('Italic', base + '.italic', { rebuild: true, onChange: () => onFontChanged(base) }));
     host.appendChild(cColor('Colour', base + '.color'));
-    if (!o.noAlign) host.appendChild(cSeg('Alignment', base + '.align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']], { after: { layers: true } }));
+    more.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
+    const f = fontOf(el.font);
+    const rw = h('div', { class: 'row2' });
+    rw.appendChild(weightSelect(base + '.weight', base + '.font', base + '.italic'));
+    more.appendChild(rw);
+    if (f.italic) more.appendChild(cCheck('Italic', base + '.italic', { rebuild: true, onChange: () => onFontChanged(base) }));
+    if (!o.noAlign) more.appendChild(cSeg('Alignment', base + '.align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']], { after: { layers: true } }));
     const multi = String(el.text || '').includes('\n') || (el.tracking2 !== null && el.tracking2 !== undefined && el.tracking2 !== '');
     const r2 = h('div', { class: multi ? 'row3' : 'row2' });
     r2.appendChild(cNumber('Letter spacing', base + '.tracking', { unit: '‰', step: 5, min: -200, max: 800, digits: 0 }));
     if (multi) r2.appendChild(cNumber('2nd line', base + '.tracking2', { unit: '‰', step: 5, min: -200, max: 800, digits: 1, allowEmpty: true }));
     r2.appendChild(cNumber('Line spacing', base + '.leading', { unit: '×', step: 0.02, min: 0.5, max: 3, digits: 2 }));
-    host.appendChild(r2);
-    if (multi && el.align === 'left') host.appendChild(cNumber('Second line offset', base + '.indent', { unit: 'mm', step: 0.2, min: -100, max: 100, digits: 2 }));
+    more.appendChild(r2);
+    if (multi && el.align === 'left') more.appendChild(cNumber('Second line offset', base + '.indent', { unit: 'mm', step: 0.2, min: -100, max: 100, digits: 2 }));
   }
   // US net-quantity type size (21 CFR 101.105(i)): the lowercase "o" must reach a minimum height that
   // depends on the front panel area. Shown as a quiet check, never enforced.
@@ -2535,7 +2729,8 @@
     const ok = r.oh + 0.05 >= r.min;
     const frac = { 0.0625: '1/16', 0.125: '1/8', 0.1875: '3/16', 0.25: '1/4', 0.5: '1/2' }[r.minIn] || n(r.minIn, 3);
     box.className = 'note' + (ok ? '' : ' warn');
-    box.innerHTML = icon(ok ? 'check' : 'alert') + '<span>Lowercase “o” is <b>' + n(r.oh, 1) + ' mm</b> tall. US rule (21 CFR 101.105): a ' + n(r.area, 1) + ' in² front panel needs at least ' + frac + ' in (' + n(r.min, 1) + ' mm). Check with your label advisor.</span>';
+    const html = '<span>Lowercase “o” is <b>' + n(r.oh, 1) + ' mm</b> tall (US minimum ' + n(r.min, 1) + ' mm).' + helpHTML('Lowercase “o” is ' + n(r.oh, 1) + ' mm tall. US rule (21 CFR 101.105): a ' + n(r.area, 1) + ' in² front panel needs at least ' + frac + ' in (' + n(r.min, 1) + ' mm). Check with your label advisor.', 'US net weight type size') + '</span>';
+    if (box.dataset.html !== html) { box.dataset.html = html; box.innerHTML = icon(ok ? 'check' : 'alert') + html; }
   }
   function positionControls(host, base, o) {
     o = o || {};
@@ -2560,7 +2755,7 @@
     r.appendChild(h('button', { class: 'btn sm', type: 'button', onclick: () => mv(-1) }, icon('down', 'ico-sm') + 'Send backward'));
     host.appendChild(r);
   }
-  function sub(host, t) { host.appendChild(h('div', { class: 'subhead', text: t })); }
+  function sub(host, t, help) { const d = h('div', { class: 'subhead', text: t }); if (help) d.insertAdjacentHTML('beforeend', helpHTML(help, t)); host.appendChild(d); }
 
   function buildInspector() {
     bindings = [];
@@ -2568,32 +2763,47 @@
     if (state.sel && state.sel !== 'background' && (isLayoutView() || !curPanel().els[state.sel])) state.sel = null;   // (an element of the other panel)
     const key = state.sel; const m = state.model;
     const title = $('#insp-title');
-    if (!key) { title.textContent = 'Edit'; host.innerHTML = '<p class="inspector-empty">Select a layer above, or click something on the design. Drag to move it; arrow keys nudge 0.5 mm (Shift: 5 mm).</p>'; return; }
+    if (!key) { title.textContent = 'Edit'; host.innerHTML = '<p class="inspector-empty">Select a layer to edit.' + helpHTML('Select a layer above, or click something on the design. Drag to move it; arrow keys nudge 0.5 mm (Shift: 5 mm).', 'Edit') + '</p>'; return; }
     const box = h('div', { class: 'fields' }); host.appendChild(box);
-    if (key === 'background') { title.innerHTML = '<span class="sec-title">Background</span>'; return bgInspector(box); }
+    // what people change most stays in view; the rest waits in one folded "More" at the bottom
+    if (key === 'background') { title.innerHTML = '<span class="sec-title">Background</span>'; const f = moreFold('background'); bgInspector(box, f.body); return f.place(box); }
     const el = curPanel().els[key];
     title.innerHTML = '<span class="sec-title">' + esc(infoOf(key, el).label) + '</span>' + (isPic(el) && el.ai ? AI_TAG : '');
-    box.appendChild(cCheck('Show on the pack', 'els.' + key + '.visible', { after: { layers: true } }));
-    if (isPic(el)) pictureInspector(box, key);
-    else if (key === 'logo') logoInspector(box);
-    else if (key === 'badge') badgeInspector(box);
-    else if (key === 'pop') popInspector(box);
-    else if (key === 'facts') factsInspector(box);
-    else if (key === 'ingredients') ingredientsInspector(box);
-    else if (key === 'claims') claimsInspector(box);
-    else if (key === 'warning') warningInspector(box);
+    const kind = isPic(el) ? 'picture' : ['logo', 'badge', 'pop', 'facts', 'ingredients', 'claims', 'warning'].includes(key) ? key : 'text';
+    const f = moreFold(kind), more = f.body;
+    more.appendChild(cCheck('Show on the pack', 'els.' + key + '.visible', { after: { layers: true } }));
+    if (isPic(el)) pictureInspector(box, key, more);
+    else if (key === 'logo') logoInspector(box, more);
+    else if (key === 'badge') badgeInspector(box, more);
+    else if (key === 'pop') popInspector(box, more);
+    else if (key === 'facts') factsInspector(box, more);
+    else if (key === 'ingredients') ingredientsInspector(box, more);
+    else if (key === 'claims') claimsInspector(box, more);
+    else if (key === 'warning') warningInspector(box, more);
     else {
-      textControls(box, key, { rows: key === 'productLine' ? 2 : 1 });
-      sub(box, 'Position');
-      positionControls(box, 'els.' + key, { yLabel: 'Y (baseline)' });
-      box.appendChild(cCheck('Pill behind the text', 'els.' + key + '.pill', { rebuild: true }));
-      if (el.pill) box.appendChild(cColor('Pill colour', 'els.' + key + '.pillColor'));
+      textControls(box, key, { rows: key === 'productLine' ? 2 : 1 }, more);
+      sub(more, 'Position');
+      positionControls(more, 'els.' + key, { yLabel: 'Y (baseline)' });
+      more.appendChild(cCheck('Pill behind the text', 'els.' + key + '.pill', { rebuild: true }));
+      if (el.pill) more.appendChild(cColor('Pill colour', 'els.' + key + '.pillColor'));
     }
-    sub(box, 'Arrange');
-    arrangeControls(box, key);
+    sub(more, 'Arrange');
+    arrangeControls(more, key);
+    f.place(box);
   }
-  function logoInspector(box) {
-    const m = state.model; const el = curPanel().els.logo; const base = 'els.logo';
+  // "More": one fold at the bottom of an inspector. Closed at first; each kind of inspector (a picture, the pop, a
+  // text line…) remembers for this session whether it was opened. A native <details>: the keyboard and screen
+  // readers open it like any other, and its controls are reached by Tab once it is open.
+  const moreOpen = {};
+  function moreFold(kind) {
+    const d = h('details', { class: 'more-fold', 'data-kind': kind }); if (moreOpen[kind]) d.open = true;
+    d.addEventListener('toggle', () => { moreOpen[kind] = d.open; });
+    d.appendChild(h('summary', { class: 'more-sum' }, '<span>More</span>'));
+    const body = h('div', { class: 'fields more-b' }); d.appendChild(body);
+    return { body, place: box => { if (body.children.length) box.appendChild(d); } };
+  }
+  function logoInspector(box, more) {
+    const m = state.model; const el = curPanel().els.logo; const base = 'els.logo'; more = more || box;
     box.appendChild(cSeg('Style', base + '.style', [['wrapper', 'Wrapper', 'Upright high-contrast serif, like the single wrapper'], ['bag', 'Bag', 'Italic serif, like the 100 g bag'], ['custom', 'Custom', 'Pick any font from the list'], ['upload', 'Upload', 'Your exact logo file (PNG or SVG)']], {
       rebuild: true, onSet: v => {
         el.style = v;
@@ -2613,50 +2823,53 @@
         try { const id = await addUpload(file, 'logo'); el.upload.src = id; commit(); invalidate({ three: true }); buildInspector(); toast('Logo placed exactly as supplied'); }
         catch (e) { toast('Could not read that file: ' + e.message, true); }
       });
-      pick.appendChild(inp); row.appendChild(pick); box.appendChild(row);
-      if (!el.upload.src) box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>Upload the final logo artwork. It is placed as is: never redrawn or recoloured. An SVG logo stays vector in the PDF.</span>'));
+      pick.appendChild(inp); row.appendChild(pick);
+      row.insertAdjacentHTML('beforeend', helpHTML('Upload the final logo artwork. It is placed as is: never redrawn or recoloured. An SVG logo stays vector in the PDF.', 'Logo file'));
+      box.appendChild(row);
       box.appendChild(cNumber('Logo width', base + '.upload.w', { unit: 'mm', step: 0.5, min: 2, max: 400 }));
-      box.appendChild(h('div', { class: 'note', 'data-ppi': 'logo', style: 'display:none' }));
-      sub(box, 'Position');
-      positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (top)' });
+      box.appendChild(h('div', { class: 'note', 'data-ppi': 'logo', 'data-ppi-when': 'low', style: 'display:none' }));
+      more.appendChild(h('div', { class: 'note', 'data-ppi': 'logo', 'data-ppi-when': 'fine', style: 'display:none' }));
+      sub(more, 'Position');
+      positionControls(more, base, { xLabel: 'X (centre)', yLabel: 'Y (top)' });
       updatePPINotes();
       return;
     }
     box.appendChild(cText('Words', base + '.text', { multi: true, rows: 2 }));
-    if (el.style === 'bag' || el.style === 'wrapper') box.appendChild(cSeg(el.style === 'bag' ? 'Italic serif' : 'Upright serif', base + '.font', [['bodoni', 'Bodoni Moda'], ['playfair', 'Playfair Display']], { onSet: v => { el.font = v; el.weight = nearestWeight(FONT[v], el.weight, el.style === 'bag'); ensureFonts(m).then(() => { clearMeasureCache(); invalidate({ three: true }); }); }, rebuild: true }));
-    if (el.style === 'custom') box.appendChild(fontPicker(base));
-    const lf = logoFont(el);
     const r = h('div', { class: 'row2' });
-    r.appendChild(cSelect('Weight', base + '.weight', weightsOf(fontOf(lf.font), lf.italic).map(w => [String(w), w + ' ' + (WEIGHT_NAMES[w] || '')]), { num: true }));
     r.appendChild(cNumber('Size', base + '.size', { unit: 'pt', step: 0.5, min: 6, max: 400 }));
     box.appendChild(r);
+    box.appendChild(cSeg('Fill', base + '.fill', [['white', 'White'], ['cream', 'Cream'], ['gold', 'Gold foil'], ['custom', 'Colour']], { rebuild: true, help: el.fill === 'gold' ? 'The print files carry a flat bright gold, and the 3D pack shows it as shiny foil (the sparkles too, when their colour is Bright gold). For real hot-foil, tell the printer the logo is a foil layer.' : null }));
+    if (el.fill === 'custom') box.appendChild(cColor('Logo colour', base + '.fillColor'));
+    if (el.style === 'bag' || el.style === 'wrapper') more.appendChild(cSeg(el.style === 'bag' ? 'Italic serif' : 'Upright serif', base + '.font', [['bodoni', 'Bodoni Moda'], ['playfair', 'Playfair Display']], { onSet: v => { el.font = v; el.weight = nearestWeight(FONT[v], el.weight, el.style === 'bag'); ensureFonts(m).then(() => { clearMeasureCache(); invalidate({ three: true }); }); }, rebuild: true }));
+    if (el.style === 'custom') more.appendChild(fontPicker(base));
+    const lf = logoFont(el);
+    const rw = h('div', { class: 'row2' });
+    rw.appendChild(cSelect('Weight', base + '.weight', weightsOf(fontOf(lf.font), lf.italic).map(w => [String(w), w + ' ' + (WEIGHT_NAMES[w] || '')]), { num: true }));
+    more.appendChild(rw);
     if (el.style === 'custom') {
-      if (fontOf(el.font).italic) box.appendChild(cCheck('Italic', base + '.italic', { rebuild: true, onChange: () => onFontChanged(base) }));
-      box.appendChild(cSeg('Alignment', base + '.align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]));
+      if (fontOf(el.font).italic) more.appendChild(cCheck('Italic', base + '.italic', { rebuild: true, onChange: () => onFontChanged(base) }));
+      more.appendChild(cSeg('Alignment', base + '.align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]));
     }
-    if (fontOf(lf.font).opsz) box.appendChild(cRange('Contrast (optical size)', base + '.opsz', { min: 6, max: 96, step: 1, fmt: v => v <= 14 ? v + ' · sturdy' : v <= 36 ? v + ' · balanced' : v + ' · hairline' }));
+    if (fontOf(lf.font).opsz) more.appendChild(cRange('Contrast (optical size)', base + '.opsz', { min: 6, max: 96, step: 1, fmt: v => String(v), help: 'The size the type is drawn for: up to 14 sturdy, 15 to 36 balanced, above 36 hairline strokes.' }));
     const r2 = h('div', { class: 'row3' });
     r2.appendChild(cNumber('Letter spacing', base + '.tracking', { unit: '‰', step: 5, min: -200, max: 800, digits: 0 }));
     r2.appendChild(cNumber('2nd line', base + '.tracking2', { unit: '‰', step: 5, min: -200, max: 800, digits: 1, allowEmpty: true }));
     r2.appendChild(cNumber('Line spacing', base + '.leading', { unit: '×', step: 0.02, min: 0.4, max: 3 }));
-    box.appendChild(r2);
-    if (el.style === 'bag' || (el.style === 'custom' && el.align === 'left')) box.appendChild(cNumber('Second line offset', base + '.indent', { unit: 'mm', step: 0.2, min: -100, max: 100 }));
-    box.appendChild(cSeg('Fill', base + '.fill', [['white', 'White'], ['cream', 'Cream'], ['gold', 'Gold foil'], ['custom', 'Colour']], { rebuild: true }));
-    if (el.fill === 'gold') box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>Gold foil is shown as a gradient. For real hot-foil, tell the printer the logo is a foil layer.</span>'));
-    if (el.fill === 'custom') box.appendChild(cColor('Logo colour', base + '.fillColor'));
-    sub(box, 'Sparkles');
-    box.appendChild(cCheck('Four-point sparkles', base + '.sparkles.on', { rebuild: true }));
+    more.appendChild(r2);
+    if (el.style === 'bag' || (el.style === 'custom' && el.align === 'left')) more.appendChild(cNumber('Second line offset', base + '.indent', { unit: 'mm', step: 0.2, min: -100, max: 100 }));
+    sub(more, 'Sparkles');
+    more.appendChild(cCheck('Four-point sparkles', base + '.sparkles.on', { rebuild: true }));
     if (el.sparkles.on) {
-      box.appendChild(cSeg('Placement', base + '.sparkles.layout', [['mirror', 'Mirrored'], ['diagonal', 'Diagonal']].concat(el.sparkles.points && el.sparkles.points.length ? [['draft', 'As drawn', 'Exactly where the client’s draft has them']] : [])));
-      box.appendChild(cSeg('Star', base + '.sparkles.shape', [['slim', 'Slim'], ['plump', 'Plump', 'Fuller arms, as on the wrapper draft']]));
-      box.appendChild(cColor('Sparkle colour', base + '.sparkles.color', { swatches: [['#f7e5a2', 'Cream gold (wrapper draft)'], ['#f2d98a', 'Pale gold'], ['#f4b622', 'Gold'], ['#e9c46a', 'Soft gold'], ['#ffffff', 'White'], ['#fbc2dc', 'Petal'], ['#c8f07a', 'Lime']] }));
+      more.appendChild(cSeg('Placement', base + '.sparkles.layout', [['mirror', 'Mirrored'], ['diagonal', 'Diagonal']].concat(el.sparkles.points && el.sparkles.points.length ? [['draft', 'As drawn', 'Exactly where the client’s draft has them']] : [])));
+      more.appendChild(cSeg('Star', base + '.sparkles.shape', [['slim', 'Slim'], ['plump', 'Plump', 'Fuller arms, as on the wrapper draft']]));
+      more.appendChild(cColor('Sparkle colour', base + '.sparkles.color', { swatches: [['#f7e5a2', 'Cream gold (wrapper draft)'], ['#f2d98a', 'Pale gold'], ['#f4b622', 'Gold'], ['#ffd700', 'Bright gold'], ['#e9c46a', 'Soft gold'], ['#ffffff', 'White'], ['#fbc2dc', 'Petal'], ['#c8f07a', 'Lime']] }));
       const r3 = h('div', { class: 'row2' });
       r3.appendChild(cRange('Size', base + '.sparkles.scale', { min: 0.4, max: 2.2, step: 0.05, fmt: v => Math.round(v * 100) + '%' }));
       r3.appendChild(cRange('Spread', base + '.sparkles.spread', { min: 0.4, max: 2.4, step: 0.05, fmt: v => Math.round(v * 100) + '%' }));
-      box.appendChild(r3);
+      more.appendChild(r3);
     }
-    sub(box, 'Position');
-    positionControls(box, base, { yLabel: 'Y (first baseline)' });
+    sub(more, 'Position');
+    positionControls(more, base, { yLabel: 'Y (first baseline)' });
   }
   function fontPicker(base) {
     const wrap = h('div', { class: 'field' });
@@ -2672,34 +2885,34 @@
     wrap.appendChild(list);
     return wrap;
   }
-  function badgeInspector(box) {
-    const base = 'els.badge';
+  function badgeInspector(box, more) {
+    const base = 'els.badge'; more = more || box;
     box.appendChild(cText('Words in the heart', base + '.text', { multi: true, rows: 2 }));
-    box.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
     const r = h('div', { class: 'row2' });
-    r.appendChild(weightSelect(base + '.weight', base + '.font', base + '.italic'));
     r.appendChild(cNumber('Text size', base + '.size', { unit: 'pt', step: 0.25, min: 2, max: 60 }));
+    r.appendChild(cNumber('Heart width', base + '.w', { unit: 'mm', step: 0.5, min: 4, max: 300 }));
     box.appendChild(r);
+    box.appendChild(cColor('Heart colour', base + '.heartColor'));
+    box.appendChild(h('div', { class: 'note warn', id: 'badge-fit', style: 'display:none' }, icon('alert') + '<span>The words do not fit inside the heart: make the heart wider or the text smaller.</span>'));
+    updateBadgeFit();
+    more.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
+    const rw = h('div', { class: 'row2' });
+    rw.appendChild(weightSelect(base + '.weight', base + '.font', base + '.italic'));
+    rw.appendChild(cNumber('Tilt', base + '.rotate', { unit: '°', step: 1, min: -45, max: 45, digits: 1 }));
+    more.appendChild(rw);
     const r2 = h('div', { class: 'row3' });
     r2.appendChild(cNumber('Letter spacing', base + '.tracking', { unit: '‰', step: 5, min: -200, max: 800, digits: 0 }));
     r2.appendChild(cNumber('2nd line', base + '.tracking2', { unit: '‰', step: 5, min: -200, max: 800, digits: 1, allowEmpty: true }));
     r2.appendChild(cNumber('Line spacing', base + '.leading', { unit: '×', step: 0.02, min: 0.6, max: 2.5 }));
-    box.appendChild(r2);
-    box.appendChild(cNumber('Words up / down in the heart', base + '.ty', { unit: 'mm', step: 0.1, min: -20, max: 20 }));
-    box.appendChild(cColor('Text colour', base + '.color'));
-    box.appendChild(cColor('Heart colour', base + '.heartColor'));
-    const r3 = h('div', { class: 'row2' });
-    r3.appendChild(cNumber('Heart width', base + '.w', { unit: 'mm', step: 0.5, min: 4, max: 300 }));
-    r3.appendChild(cNumber('Tilt', base + '.rotate', { unit: '°', step: 1, min: -45, max: 45, digits: 1 }));
-    box.appendChild(r3);
-    box.appendChild(h('div', { class: 'note warn', id: 'badge-fit', style: 'display:none' }, icon('alert') + '<span>The words do not fit inside the heart: make the heart wider or the text smaller.</span>'));
-    updateBadgeFit();
-    box.appendChild(cCheck('Soft shadow under the heart', base + '.shadow'));
-    sub(box, 'Position');
-    positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (centre)' });
+    more.appendChild(r2);
+    more.appendChild(cNumber('Words up / down in the heart', base + '.ty', { unit: 'mm', step: 0.1, min: -20, max: 20 }));
+    more.appendChild(cColor('Text colour', base + '.color'));
+    more.appendChild(cCheck('Soft shadow under the heart', base + '.shadow'));
+    sub(more, 'Position');
+    positionControls(more, base, { xLabel: 'X (centre)', yLabel: 'Y (centre)' });
   }
-  function popInspector(box) {
-    const m = state.model; const el = curPanel().els.pop; const base = 'els.pop';
+  function popInspector(box, more) {
+    const m = state.model; const el = curPanel().els.pop; const base = 'els.pop'; more = more || box;
     const grid = h('div', { class: 'popchoices' });
     const ids = Object.keys(ASSETS).filter(id => ASSETS[id].kind === 'pop');
     ids.forEach(id => {
@@ -2709,7 +2922,7 @@
       b.addEventListener('click', () => { el.src = id; if (m.theme === 'green' && !BUNDLED.has(id)) state.greenPop = id; commit(); invalidate({ three: true }); buildInspector(); });
       grid.appendChild(b);
     });
-    box.appendChild(fieldWrap('Picture of the real pop', grid));
+    box.appendChild(fieldWrap('Picture of the real pop', grid, null, 'The pop is always the real product picture, placed exactly: never redrawn, recoloured or stretched. Only its size and position change.'));
     const row = h('div', { class: 'uploadrow' });
     const pick = h('span', { class: 'btn sm filepick' }, icon('upload', 'ico-sm') + 'Upload real photo');
     const inp = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp', 'aria-label': 'Upload a photo of the real pop' });
@@ -2734,28 +2947,30 @@
     }
     box.appendChild(row);
     const a = ASSETS[el.src];
-    if (!a) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>No picture yet. Upload a photo of the real ' + (m.theme === 'green' ? 'green ' : '') + 'pop (a cut-out PNG is best). Until then the pop is left out of the files; the dashed outline only shows where it goes.</span>'));
+    if (!a) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>No picture yet. Upload a photo of the real ' + (m.theme === 'green' ? 'green ' : '') + 'pop (a cut-out PNG is best).' + helpHTML('Until then the pop is left out of the files; the dashed outline only shows where it goes.', 'No pop picture') + '</span>'));
     else if (m.theme === 'green' && isPinkBundled(el.src)) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>Stand-in: this green design is showing the pink pop. Upload a photo of the real green pop.</span>'));
     else if (a.opaque) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>This photo still has its background, so a box would print around the pop. Use “Remove plain background”, or upload a cut-out PNG (transparent background).</span>'));
-    box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>The pop is always the real product picture, placed exactly: never redrawn, recoloured or stretched. Only its size and position change.</span>'));
     const r = h('div', { class: 'row2' });
     r.appendChild(cNumber('Height', base + '.h', { unit: 'mm', step: 0.5, min: 2, max: 400 }));
-    r.appendChild(h('div', { class: 'field' }, '<span class="lbl">Width (from the picture)</span><div class="unit" data-unit="mm"><input class="inp" type="text" readonly tabindex="-1" id="pop-w"></div>'));
     box.appendChild(r);
-    box.appendChild(h('div', { class: 'note', 'data-ppi': 'pop', style: 'display:none' }));
+    box.appendChild(h('div', { class: 'note', 'data-ppi': 'pop', 'data-ppi-when': 'low', style: 'display:none' }));
+    const rw = h('div', { class: 'row2' });
+    rw.appendChild(h('div', { class: 'field' }, '<span class="lbl">Width (from the picture)</span><div class="unit" data-unit="mm"><input class="inp" type="text" readonly tabindex="-1" id="pop-w" aria-label="Width (from the picture)"></div>'));
+    more.appendChild(rw);
+    more.appendChild(h('div', { class: 'note', 'data-ppi': 'pop', 'data-ppi-when': 'fine', style: 'display:none' }));
     const r2 = h('div', { class: 'row2' });
     r2.appendChild(cNumber('How many', base + '.repeat', { step: 1, min: 1, max: 6, digits: 0, after: { layers: true } }));
     r2.appendChild(cNumber('Gap', base + '.gap', { unit: 'mm', step: 0.5, min: -60, max: 100 }));
-    box.appendChild(r2);
-    box.appendChild(cCheck('Soft shadow', base + '.shadow.on', { rebuild: true }));
+    more.appendChild(r2);
+    more.appendChild(cCheck('Soft shadow', base + '.shadow.on', { rebuild: true }));
     if (el.shadow.on) {
       const r3 = h('div', { class: 'row2' });
       r3.appendChild(cRange('Strength', base + '.shadow.opacity', { min: 0.05, max: 0.6, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
       r3.appendChild(cRange('Softness', base + '.shadow.blur', { min: 0.2, max: 4, step: 0.1, fmt: v => n(v, 1) + ' mm' }));
-      box.appendChild(r3);
+      more.appendChild(r3);
     }
-    sub(box, 'Position');
-    positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (top)' });
+    sub(more, 'Position');
+    positionControls(more, base, { xLabel: 'X (centre)', yLabel: 'Y (top)' });
     updatePopWidth(); updatePPINotes();
   }
   function updatePopWidth() {
@@ -2765,41 +2980,39 @@
   }
   // An added picture (an upload, the pop photo again, or an AI drawing): its name, the picture itself, its size,
   // rotation and position. Arrange follows it, as for every layer.
-  function pictureInspector(box, key) {
-    const m = state.model; const side = state.side; const el = curPanel().els[key]; const base = 'els.' + key; const a = ASSETS[el.src];
-    if (el.ai) {
+  function pictureInspector(box, key, more) {
+    const m = state.model; const side = state.side; const el = curPanel().els[key]; const base = 'els.' + key; const a = ASSETS[el.src]; more = more || box;
+    if (el.ai) {                                                          // (the "AI" tag in the title; what it was made from behind its "?")
       const p = String(el.ai.prompt || '').trim();
-      box.appendChild(h('div', { class: 'note', title: p || null }, icon('info') + '<span><b>AI drawing.</b> ' + (p ? (el.ai.op === 'rework' ? 'Reworked with: ' : 'Made from: ') + '“' + esc(p.length > 160 ? p.slice(0, 159) + '…' : p) + '”. ' : '') + 'A drawing, not a photo of your product.</span>'));
+      $('#insp-title').insertAdjacentHTML('beforeend', helpHTML('<b>AI drawing.</b> ' + (p ? (el.ai.op === 'rework' ? 'Reworked with: ' : 'Made from: ') + '“' + esc(p.length > 160 ? p.slice(0, 159) + '…' : p) + '”. ' : '') + 'A drawing, not a photo of your product.', 'AI drawing'));
     }
-    const nameF = cText('Name', base + '.name'); const nameI = $('input', nameF);
-    nameI.setAttribute('maxlength', 80);
-    nameI.addEventListener('input', () => { const t = $('#insp-title .sec-title'); if (t) t.textContent = infoOf(key, el).label; });
-    box.appendChild(nameF);
     const r0 = h('div', { class: 'btn-pair' });
     r0.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'A copy, 4 mm to the right and down (Ctrl+D)', onclick: () => duplicatePicture(key, side) }, icon('copy', 'ico-sm') + 'Duplicate'));
     r0.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'Take this element out of the design (Delete key)', onclick: () => removePicture(key, side) }, icon('trash', 'ico-sm') + 'Delete'));
     box.appendChild(r0);
-    sub(box, 'Picture');
-    const r1 = h('div', { class: 'btn-pair' });
-    r1.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'Put another picture (PNG, JPG or WebP) in its place: the same spot, the same size', onclick: () => pickPictureFile(id => {
+    // (Name, Replace picture, the position numbers and Arrange wait in More)
+    const nameF = cText('Name', base + '.name'); const nameI = $('input', nameF);
+    nameI.setAttribute('maxlength', 80);
+    nameI.addEventListener('input', () => { const t = $('#insp-title .sec-title'); if (t) t.textContent = infoOf(key, el).label; });
+    more.appendChild(nameF);
+    more.appendChild(h('button', { class: 'btn sm block', type: 'button', title: 'Put another picture (PNG, JPG or WebP) in its place: the same spot, the same size', onclick: () => pickPictureFile(id => {
       if (!replacePicture(key, id, { ai: null }, side)) { toast('That element is no longer in the design.', true); return; }
       toast('Picture replaced' + (ASSETS[id].opaque ? '. If it has a plain background, use “Remove plain background”.' : ' · Ctrl+Z to go back'));
     }) }, icon('upload', 'ico-sm') + 'Replace picture…'));
-    r1.appendChild(h('button', { class: 'btn sm', type: 'button', disabled: !a, title: a ? 'Describe a change and let AI redraw this picture (AI on your GPU)' : 'This element has no picture to rework', onclick: () => askAI('rework', key) }, icon('chip', 'ico-sm') + 'Rework with AI…'));
-    box.appendChild(r1);
     if (a && a.opaque) {                                                  // (only a picture that still has a solid backdrop)
       const rb = h('button', { class: 'btn sm block', type: 'button', title: 'Clears a plain backdrop from the edges inwards. The subject itself is not touched.' }, icon('wand', 'ico-sm') + 'Remove plain background');
       rb.addEventListener('click', async () => { rb.disabled = true; try { await cutOutElement(key, side); } catch (e) { toast(e.message || String(e), true); } rb.disabled = false; });
-      box.appendChild(rb);
+      box.appendChild(withHelp(rb, 'This picture has a solid background, so it prints as a rectangle. If that background is one plain colour, “Remove plain background” cuts the subject out.', 'Solid background'));
     }
-    if (!a) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>' + (state.lost.elements ? 'This picture could not be restored (it was too large to keep in this browser). ' : 'This element has no picture. ') + 'Use “Replace picture…”, or delete the element. Until then it is left out of the files; the dashed outline only shows where it goes.</span>'));
-    else if (a.opaque) box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>This picture has a solid background, so it prints as a rectangle. If that background is one plain colour, “Remove plain background” cuts the subject out.</span>'));
-    sub(box, 'Size and rotation');
-    box.appendChild(cSlideNumber('Width', base + '.w', { unit: 'mm', step: 0.5, min: PIC_MIN, max: PIC_MAX, smax: Math.max(40, Math.ceil(Math.max(m.trim.w, m.trim.h) * 1.2)), after: { layers: true }, note: v => (a ? 'height ' + n(v * a.h / a.w, 1) + ' mm' : '') }));
-    box.appendChild(h('div', { class: 'note', 'data-ppi': key, style: 'display:none' }));
+    if (!a) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>' + (state.lost.elements ? 'This picture could not be restored. ' : 'This element has no picture. ') + 'Use “Replace picture…”, or delete the element.' +
+      helpHTML((state.lost.elements ? 'It was too large to keep in this browser. ' : '') + 'Until then it is left out of the files; the dashed outline only shows where it goes.', 'Missing picture') + '</span>'));
+    box.appendChild(cSlideNumber('Width', base + '.w', { unit: 'mm', step: 0.5, min: PIC_MIN, max: PIC_MAX, smax: Math.max(40, Math.ceil(Math.max(m.trim.w, m.trim.h) * 1.2)), after: { layers: true }, tip: v => (a ? 'Height ' + n(v * a.h / a.w, 1) + ' mm' : '') }));
+    box.appendChild(h('div', { class: 'note', 'data-ppi': key, 'data-ppi-when': 'low', style: 'display:none' }));
     box.appendChild(cSlideNumber('Rotation', base + '.rotate', { unit: '°', step: 1, min: -180, max: 180, digits: 1 }));
-    sub(box, 'Position');
-    positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (centre)' });
+    box.appendChild(h('button', { class: 'btn sm block', type: 'button', disabled: !a, title: a ? 'Describe a change and let AI redraw this picture (AI on your GPU)' : 'This element has no picture to rework', onclick: () => askAI('rework', key) }, icon('chip', 'ico-sm') + 'Rework with AI…'));
+    more.appendChild(h('div', { class: 'note', 'data-ppi': key, 'data-ppi-when': 'fine', style: 'display:none' }));
+    sub(more, 'Position');
+    positionControls(more, base, { xLabel: 'X (centre)', yLabel: 'Y (centre)' });
     updatePPINotes();
   }
   // effective resolution of each raster picture at its printed size (an SVG is vector: no limit)
@@ -2843,8 +3056,15 @@
       const r = rasterInfo(state.model).find(x => x.key === k && ((k !== 'background' && !PIC_KEY.test(k)) || x.side === state.side));
       if (!r) { box.style.display = 'none'; return; }
       const ok = r.ppi >= PPI_IDEAL, low = r.ppi < (r.min || PPI_MIN);
+      // (data-ppi-when: 'low' = the box in view, only for a resolution too low to print well; 'fine' = the box in
+      // More, for every other case. Without it: always.)
+      const when = box.getAttribute('data-ppi-when');
+      if ((when === 'low' && !low) || (when === 'fine' && low)) { box.style.display = 'none'; return; }
       box.style.display = ''; box.className = 'note' + (low ? ' warn' : '');
-      box.innerHTML = icon(ok ? 'check' : low ? 'alert' : 'info') + '<span>Print resolution: <b>' + Math.round(r.ppi) + ' ppi</b> at this size' + (ok ? ' (300 is ideal).' : low ? '. Aim for 300. ' + esc(r.tip) : ', under the 300 ppi ideal. ' + esc(r.tip)) + '</span>';
+      // (redrawn every frame: only when the words change, so its "?" stays the same button)
+      const html = icon(ok ? 'check' : low ? 'alert' : 'info') + '<span>Print resolution: <b>' + Math.round(r.ppi) + ' ppi</b> at this size' + (ok ? ' (300 is ideal).' : low ? '. Aim for 300.' + helpHTML(esc(r.tip), 'Print resolution') : ', under the 300 ppi ideal.' + helpHTML(esc(r.tip), 'Print resolution')) + '</span>';
+      const sig = Math.round(r.ppi) + (ok ? 'ok' : low ? 'low' : 'mid') + r.tip;
+      if (box.dataset.sig !== sig) { box.dataset.sig = sig; box.innerHTML = html; }
     });
   }
   function updateBadgeFit() {
@@ -2852,8 +3072,8 @@
     const el = state.model.panels.front.els.badge;
     box.style.display = el.visible && badgeOverflow(el) ? '' : 'none';
   }
-  function bgInspector(box) {
-    const m = state.model; const bg = curPanel().bg;
+  function bgInspector(box, more) {
+    const m = state.model; const bg = curPanel().bg; more = more || box;
     box.appendChild(cSeg('Background', 'bg.mode', [['solid', 'Solid'], ['two-tone', 'Two-tone'], ['image', 'Image']], { rebuild: true, after: { layers: true } }));
     if (bg.mode === 'image') {
       const row = h('div', { class: 'uploadrow' });
@@ -2864,54 +3084,55 @@
         try { const id = await addUpload(file, 'background'); bg.image.src = id; bg.image.zoom = 1; bg.image.ox = 0; bg.image.oy = 0; commit(); invalidate({ three: true }); buildInspector(); }
         catch (e) { toast('Could not read that picture: ' + e.message, true); }
       });
-      pick.appendChild(inp); row.appendChild(pick); box.appendChild(row);
-      box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>Import ComfyUI art <b>without words</b>. It fills the panel and bleed (cover fit); every word and the logo stay live type on top, so nothing warps. Drag it on the design to reposition.</span>'));
+      pick.appendChild(inp); row.appendChild(pick);
+      row.insertAdjacentHTML('beforeend', helpHTML('Import ComfyUI art <b>without words</b>. It fills the panel and bleed (cover fit); every word and the logo stay live type on top, so nothing warps. Drag it on the design to reposition.', 'Background art'));
+      box.appendChild(row);
       if (bg.image.src) {
         box.appendChild(cRange('Zoom', 'bg.image.zoom', { min: 1, max: 4, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
         const r = h('div', { class: 'row2' });
         r.appendChild(cNumber('Offset X', 'bg.image.ox', { unit: 'mm', step: 0.5 }));
         r.appendChild(cNumber('Offset Y', 'bg.image.oy', { unit: 'mm', step: 0.5 }));
-        box.appendChild(r);
-        box.appendChild(h('div', { class: 'note', 'data-ppi': 'background', style: 'display:none' }));
+        more.appendChild(r);
+        box.appendChild(h('div', { class: 'note', 'data-ppi': 'background', 'data-ppi-when': 'low', style: 'display:none' }));
+        more.appendChild(h('div', { class: 'note', 'data-ppi': 'background', 'data-ppi-when': 'fine', style: 'display:none' }));
       }
-      box.appendChild(cColor('Colour under the art', 'bg.c1'));
+      more.appendChild(cColor('Colour under the art', 'bg.c1'));
     } else {
       box.appendChild(cColor(bg.mode === 'two-tone' ? 'Top colour' : 'Colour', 'bg.c1'));
       if (bg.mode === 'two-tone') {
         box.appendChild(cColor('Bottom colour', 'bg.c2'));
-        sub(box, 'Wave divider');
-        box.appendChild(cRange('Wave height (from the top)', 'bg.wave.y', { min: 0, max: m.trim.h, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
-        box.appendChild(cRange('Wave depth', 'bg.wave.depth', { min: -40, max: 40, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
+        sub(more, 'Wave divider');
+        more.appendChild(cRange('Wave height (from the top)', 'bg.wave.y', { min: 0, max: m.trim.h, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
+        more.appendChild(cRange('Wave depth', 'bg.wave.depth', { min: -40, max: 40, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
         const r = h('div', { class: 'row2' });
         r.appendChild(cRange('Dip position', 'bg.wave.center', { min: 0.05, max: 0.95, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
         r.appendChild(cRange('Tilt', 'bg.wave.tilt', { min: -30, max: 30, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
-        box.appendChild(r);
+        more.appendChild(r);
       }
     }
     if (m.format === 'wrapper') {
-      sub(box, 'End seals');
-      box.appendChild(cCheck('Rib texture on the end seals (as on the draft)', 'bg.ribs', { rebuild: true }));
-      if (bg.ribs !== false) box.appendChild(cRange('Rib strength', 'bg.ribStrength', { min: 0.2, max: 2, step: 0.05, fmt: v => Math.round(v * 100) + '%' }));
-      box.appendChild(h('p', { class: 'hint', style: 'margin:-2px 0 0' }, 'Printed in the panel’s own colours, straight cut edges. The sealing jaws emboss the real ribs: ask your printer whether to keep the printed texture.'));
+      sub(more, 'End seals', 'Printed in the panel’s own colours, straight cut edges. The sealing jaws emboss the real ribs: ask your printer whether to keep the printed texture.');
+      more.appendChild(cCheck('Rib texture on the end seals (as on the draft)', 'bg.ribs', { rebuild: true }));
+      if (bg.ribs !== false) more.appendChild(cRange('Rib strength', 'bg.ribStrength', { min: 0.2, max: 2, step: 0.05, fmt: v => Math.round(v * 100) + '%' }));
     }
-    sub(box, 'Pattern overlay');
-    box.appendChild(cSeg(null, 'bg.pattern.kind', [['none', 'None'], ['hearts', 'Hearts', '', 'heart'], ['sparkles', 'Sparkles', '', 'sparkle'], ['dots', 'Dots']], { rebuild: true }));
+    sub(more, 'Pattern overlay');
+    more.appendChild(cSeg(null, 'bg.pattern.kind', [['none', 'None'], ['hearts', 'Hearts', '', 'heart'], ['sparkles', 'Sparkles', '', 'sparkle'], ['dots', 'Dots']], { rebuild: true }));
     const drawn = Array.isArray(bg.pattern.points) && bg.pattern.points.length > 0;
     if (bg.pattern.kind !== 'none' && drawn) {
       const nt = h('div', { class: 'note' }, icon('info') + '<span>' + bg.pattern.points.length + ' shapes placed exactly as on the client’s draft.</span>');
-      box.appendChild(nt);
+      more.appendChild(nt);
       const sb = h('button', { class: 'btn sm', type: 'button', title: 'Replace the draft’s placement with an even scatter' }, icon('shuffle', 'ico-sm') + 'Scatter evenly instead');
       sb.addEventListener('click', () => { bg.pattern.points = []; commit(); invalidate({ three: true }); buildInspector(); });
-      box.appendChild(sb);
+      more.appendChild(sb);
     }
     if (bg.pattern.kind !== 'none') {
-      box.appendChild(cCheck('Keep clear of the logo and words', 'bg.pattern.clear'));
-      box.appendChild(cColor('Pattern colour', 'bg.pattern.color'));
-      box.appendChild(cRange('Opacity', 'bg.pattern.opacity', { min: 0.03, max: 1, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
+      more.appendChild(cCheck('Keep clear of the logo and words', 'bg.pattern.clear'));
+      more.appendChild(cColor('Pattern colour', 'bg.pattern.color'));
+      more.appendChild(cRange('Opacity', 'bg.pattern.opacity', { min: 0.03, max: 1, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
       const r = h('div', { class: 'row2' });
       r.appendChild(cRange('Size', 'bg.pattern.size', { min: 1, max: 30, step: 0.2, fmt: v => n(v, 1) + ' mm' }));
       if (!drawn) r.appendChild(cRange('Spacing', 'bg.pattern.spacing', { min: 5, max: 60, step: 0.5, fmt: v => n(v, 1) + ' mm' }));
-      box.appendChild(r);
+      more.appendChild(r);
     }
     if (bg.pattern.kind !== 'none' && !drawn) {
       const r2 = h('div', { class: 'row2' });
@@ -2920,14 +3141,14 @@
       const b = h('button', { class: 'btn sm', type: 'button' }, icon('shuffle', 'ico-sm') + 'Shuffle');
       b.addEventListener('click', () => { bg.pattern.seed = (Number(bg.pattern.seed) || 1) + 1; commit(); invalidate({ three: true }); });
       sh.appendChild(b); r2.appendChild(sh);
-      box.appendChild(r2);
+      more.appendChild(r2);
     }
     updatePPINotes();
   }
 
   function renderLayers() {
     const host = $('#layers'); host.innerHTML = '';
-    if (isLayoutView()) { ui.addMenu = false; host.innerHTML = '<p class="inspector-empty">The print layout shows every panel as it prints. Click a panel (or Front / Back above the design) to edit it.</p>'; return; }
+    if (isLayoutView()) { ui.addMenu = false; host.innerHTML = '<p class="inspector-empty">Click a panel to edit it.' + helpHTML('The print layout shows every panel as it prints. Click a panel (or Front / Back above the design) to edit it.', 'Print layout') + '</p>'; return; }
     const P = curPanel();
     host.appendChild(addElementControl());
     const rows = P.order.slice().reverse().concat(['background']);
@@ -2956,10 +3177,10 @@
       }
       // an added picture shows itself in small, and an AI drawing says so
       const mark = isBg ? '' : pic && ASSETS[el.src] ? '<img class="pic-th" src="' + esc(assetHref(el.src, 'blob')) + '" alt="">' : icon(info.icon, 'ico-sm');
-      const nm = h('button', { class: 'name', type: 'button' }, mark + '<span>' + esc(label) + '</span>' + (pic && el.ai ? AI_TAG : ''));
+      // (one short name per row: what it holds is in the row's tooltip, not on screen)
+      const nm = h('button', { class: 'name', type: 'button', title: meta ? label + ': ' + meta : label }, mark + '<span>' + esc(label) + '</span>' + (pic && el.ai ? AI_TAG : ''));
       nm.addEventListener('click', () => select(key));
       row.appendChild(nm);
-      row.appendChild(h('span', { class: 'meta', title: meta, text: meta }));
       host.appendChild(row);
     });
   }
@@ -3042,7 +3263,7 @@
     if (key && (isLayoutView() || side !== state.side)) setView(side);
     if (key) state.sel = key;
     ui.hover = null;
-    buildInspector(); renderLayers(); invalidate({ three: true });
+    buildInspector(); renderLayers(); invalidate({ three: true }); notifySel();
   }
   // o: { name, ai, side, w }. In the middle of the panel, about 40 % of its width (a tall picture: at most 60 %
   // of its height), on top of the other layers
@@ -3159,12 +3380,21 @@
     });
     host.appendChild(seg);
     const it = window.MPItems[m.format] || {}; const sp = specOf(m);
-    // the spec values fold into one summary line, so the layers stay close at hand; open to edit them
+    // the sizes and spec values fold into one closed row, "Size and specs" (what the item is, its sizes, the trim and
+    // bleed, and every spec number to edit); open to see and edit them
     const det = h('details', { class: 'spec-box' }); if (ui.specOpen) det.open = true;
     det.addEventListener('toggle', () => { ui.specOpen = det.open; });
     const sum = m.format === 'wrapper' ? 'end seals ' + n(sp.endSeal.top, 1) + ' / ' + n(sp.endSeal.bottom, 1) + ' · fin ' + n(sp.finSeal.width, 1) + ' mm' + (finFold(sp.finSeal) === 'either' ? '' : ', laid ' + finFold(sp.finSeal))
       : m.format === 'bag' ? 'zip ' + n(sp.zip.top, 1) + '–' + n(sp.zip.bottom, 1) + ' · gusset ' + n(sp.gusset.depth, 1) + ' mm' : 'depth ' + n(sp.depth, 1) + ' mm';
-    det.appendChild(h('summary', { class: 'spec-head' }, '<span class="sh-t">Item specs: from your drafts (interim)' + (specEdited(m) ? ' · <b class="sh-ed">edited</b>' : '') + '</span><span class="sh-s">' + esc(it.label || FORMATS[m.format].label) + ': ' + n(sp.flat.w, 1) + ' × ' + n(sp.flat.h, 1) + ' mm · ' + esc(sum) + '</span>'));
+    det.appendChild(h('summary', { class: 'spec-head' }, '<span class="sh-t">Size and specs' + (specEdited(m) ? ' <b class="sh-ed">edited</b>' : '') + '</span>'));
+    const L = layoutGeometry(m);
+    det.appendChild(h('div', { class: 'kv spec-kv', id: 'spec-kv' },
+      '<span>Item</span><span>' + esc(it.label || FORMATS[m.format].label) + '</span>' +
+      '<span>Size</span><span>' + n(sp.flat.w, 1) + ' × ' + n(sp.flat.h, 1) + ' mm · ' + esc(sum) + '</span>' +
+      '<span>Trim</span><span>' + n(m.trim.w, 2) + ' × ' + n(m.trim.h, 2) + ' mm</span>' +
+      '<span>Bleed</span><span>' + n(m.bleed, 2) + ' mm</span>' +
+      '<span>Print layout</span><span>' + n(L.w, 1) + ' × ' + n(L.h, 1) + ' mm + ' + n(m.bleed, 1) + ' mm bleed</span>' +
+      '<span>Specs</span><span>From your drafts (interim)' + (specEdited(m) ? ', edited' : '') + '</span>'));
     host.appendChild(det);
     const grid = h('div', { class: 'spec-grid' });
     (SPEC_FIELDS[m.format] || []).forEach(f => {
@@ -3190,8 +3420,7 @@
       [['either', 'Either side (not known yet)'], ['left', 'To the left (seen from the back)'], ['right', 'To the right (seen from the back)']].forEach(o => sel.appendChild(h('option', { value: o[0] }, esc(o[1]))));
       sel.value = fold;
       sel.addEventListener('change', () => { setSpecValue('finSeal.fold', sel.value); commit(); layoutAndRender({ three: true, layers: true, spec: true }); renderFormat(); buildInspector(); });
-      det.appendChild(fieldWrap('Fin seal is laid', sel));
-      det.appendChild(h('p', { class: 'hint', style: 'margin:-4px 0 0' }, 'Its seam runs down the middle of the back. Until the converter says which way the fin is laid, type keeps clear of both sides.'));
+      det.appendChild(fieldWrap('Fin seal is laid', sel, null, 'Its seam runs down the middle of the back. Until the converter says which way the fin is laid, type keeps clear of both sides.'));
     }
     const row = h('div', { class: 'spec-actions' });
     const rb = h('button', { class: 'btn sm', type: 'button', disabled: !specEdited(m), title: 'Put every number back to the value measured from the client’s draft (items.js)' }, icon('reset', 'ico-sm') + 'Reset to draft values');
@@ -3202,7 +3431,7 @@
     sc.appendChild(si); sc.appendChild(document.createTextNode('Move the layout with the size'));
     row.appendChild(sc);
     det.appendChild(row);
-    det.appendChild(h('p', { class: 'hint box' }, icon('info', 'ico-sm') + ' The proportions are measured from the client’s drafts; the absolute size is an assumption. Every number is <b>' + esc(INTERIM_NOTE) + '</b>. Guides, the print layout and the 3D pack all follow these numbers.'));
+    $('.sh-t', det.firstChild).insertAdjacentHTML('beforeend', helpHTML('The item specs: the proportions are measured from the client’s drafts; the absolute size is an assumption. Every number is <b>' + esc(INTERIM_NOTE) + '</b>. Guides, the print layout and the 3D pack all follow these numbers.', 'Size and specs'));
     dielineControls(host);
   }
   // How large a panel's type and pictures are at W x H, relative to the draft size of its format (items.js). Only
@@ -3325,9 +3554,9 @@
     toast('Dieline loaded: ' + n(wmm, 1) + ' × ' + n(hmm, 1) + ' mm, centred on the ' + (isLayoutView() ? 'print layout' : SIDES[state.side].toLowerCase() + ' panel'));
   }
   function dielineControls(host) {
-    host.appendChild(h('div', { class: 'subhead', text: 'Printer’s dieline' }));
+    // (one button; what it is for is behind its "?")
     const row = h('div', { class: 'uploadrow' });
-    const pick = h('span', { class: 'btn sm filepick' }, icon('dieline', 'ico-sm') + (ui.dieline ? 'Load another dieline' : 'Load printer’s dieline (SVG or PDF)'));
+    const pick = h('span', { class: 'btn sm filepick', title: 'An SVG or a PDF from your printer' }, icon('dieline', 'ico-sm') + (ui.dieline ? 'Load another dieline' : 'Load printer’s dieline'));
     const inp = h('input', { type: 'file', id: 'dieline-file', accept: '.svg,.pdf,image/svg+xml,application/pdf', 'aria-label': 'Load the printer’s dieline' });
     inp.addEventListener('change', async () => {
       const f = inp.files && inp.files[0]; inp.value = ''; if (!f) return;
@@ -3340,8 +3569,9 @@
       rm.addEventListener('click', () => { ui.dieline = null; renderFormat(); invalidate(); });
       row.appendChild(rm);
     }
+    row.insertAdjacentHTML('beforeend', helpHTML('<b>Printer’s dieline</b> (SVG or PDF): shown over the design to check alignment (scaled to mm, its page centred on the trim; type exact offsets for an off-centre file). It is never part of the exports.', 'Printer’s dieline'));
     host.appendChild(row);
-    if (!D) { host.appendChild(h('p', { class: 'hint', style: 'margin:0' }, 'Shown over the design to check alignment (scaled to mm, its page centred on the trim; type exact offsets for an off-centre file). It is never part of the exports.')); return; }
+    if (!D) return;
     host.appendChild(h('div', { class: 'note' }, icon('info') + '<span><b>' + esc(D.name) + '</b>: ' + n(D.wmm, 1) + ' × ' + n(D.hmm, 1) + ' mm. ' + esc(D.note || '') + ' Never exported.</span>'));
     const upd = (from) => {
       invalidate(); const o = $('#dl-out'); if (o) o.textContent = 'Offset ' + n(D.dx, 2) + ', ' + n(D.dy, 2) + ' mm · scale ' + n(D.scale * 100, 2) + '%';
@@ -3393,8 +3623,7 @@
   /* ---- back-panel inspectors ---- */
   function finClearCheck(box, base) {
     if (state.model.format === 'wrapper' && state.side === 'back') {
-      box.appendChild(cCheck('Keep clear of the fin seal', base + '.finClear', { rebuild: true }));
-      box.appendChild(h('p', { class: 'hint', style: 'margin:-4px 0 0' }, 'The fin seal’s seam runs down the middle of the back and the fin is laid flat to one side. On: the words keep clear of every place the fin can lie (two columns). Off: one column like the client’s label, and the fin covers part of it.'));
+      box.appendChild(cCheck('Keep clear of the fin seal', base + '.finClear', { rebuild: true, help: 'The fin seal’s seam runs down the middle of the back and the fin is laid flat to one side. On: the words keep clear of every place the fin can lie (two columns). Off: one column like the client’s label, and the fin covers part of it.' }));
     }
   }
   function blockPosition(box, base) {
@@ -3407,17 +3636,15 @@
     b.addEventListener('click', () => { const el = getP(base); el.x = n((state.model.trim.w - el.w) / 2, 3); commit(); invalidate({ three: true }); syncInspector(); });
     box.appendChild(b);
   }
-  function factsInspector(box) {
-    const base = 'els.facts'; const el = getP(base);
-    box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>The client’s own label, word for word. Every cell is editable; nothing is added. The title and column headings are the standard FDA panel headings.</span>'));
-    const sv = h('div', { class: 'row2' });
-    sv.appendChild(cText('Servings Per Container', base + '.servings', { after: { layers: true } }));
-    sv.appendChild(cCheck('Show the title', base + '.showTitle'));
-    box.appendChild(sv);
-    if (!String(el.servings || '').trim()) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>Blank on purpose: the per-' + (state.model.format === 'bag' ? 'bag' : 'pack') + ' count is not confirmed. The files say DRAFT until it is filled in.</span>'));
-    box.appendChild(cCheck('Column headings (Amount Per Serving / % Daily Value)', base + '.showHead'));
-    box.appendChild(cCheck('Serving Size line', base + '.servingSizeOn', { rebuild: true }));
-    if (el.servingSizeOn) box.appendChild(cText('Serving Size', base + '.servingSize', { hint: 'The client’s label does not show a serving size: fill it in only with the client’s words.' }));
+  function factsInspector(box, more) {
+    const base = 'els.facts'; const el = getP(base); more = more || box;
+    $('#insp-title').insertAdjacentHTML('beforeend', helpHTML('The client’s own label, word for word. Every cell is editable; nothing is added. The title and column headings are the standard FDA panel headings.', 'Supplement Facts'));
+    box.appendChild(cText('Servings Per Container', base + '.servings', { after: { layers: true } }));
+    if (!String(el.servings || '').trim()) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>Blank on purpose: the per-' + (state.model.format === 'bag' ? 'bag' : 'pack') + ' count is not confirmed.' + helpHTML('The files say DRAFT until it is filled in.', 'Servings Per Container') + '</span>'));
+    more.appendChild(cCheck('Show the title', base + '.showTitle'));
+    more.appendChild(cCheck('Column headings (Amount Per Serving / % Daily Value)', base + '.showHead'));
+    more.appendChild(cCheck('Serving Size line', base + '.servingSizeOn', { rebuild: true }));
+    if (el.servingSizeOn) more.appendChild(cText('Serving Size', base + '.servingSize', { hint: 'The client’s label does not show a serving size: fill it in only with the client’s words.' }));
     sub(box, 'Rows');
     const tbl = h('div', { class: 'facts-rows' });
     tbl.appendChild(h('div', { class: 'fr-h' }, '<span>Name</span><span>Amount</span><span>% DV</span><span title="Indent">In</span><span title="Line under the row">Line</span>'));
@@ -3437,21 +3664,21 @@
       tbl.appendChild(row);
     });
     box.appendChild(tbl);
-    box.appendChild(cText('Footnote', base + '.footnote'));
-    finClearCheck(box, base);
-    sub(box, 'Type');
+    more.appendChild(cText('Footnote', base + '.footnote'));
+    finClearCheck(more, base);
+    sub(more, 'Type');
     const r = h('div', { class: 'row3' });
     r.appendChild(cNumber('Rows', base + '.size', { unit: 'pt', step: 0.1, min: 2, max: 40 }));
     r.appendChild(cNumber('Title', base + '.titleSize', { unit: 'pt', step: 0.1, min: 2, max: 60 }));
     r.appendChild(cNumber('Row height', base + '.leading', { unit: '×', step: 0.02, min: 1, max: 2.4 }));
-    box.appendChild(r);
-    box.appendChild(cRange('Amount column', base + '.amountCol', { min: 0.4, max: 0.95, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
+    more.appendChild(r);
+    more.appendChild(cRange('Amount column', base + '.amountCol', { min: 0.4, max: 0.95, step: 0.01, fmt: v => Math.round(v * 100) + '%' }));
     const c2 = h('div', { class: 'row2' });
     c2.appendChild(cColor('Type and lines', base + '.color'));
     c2.appendChild(cColor('Box', base + '.box'));
-    box.appendChild(c2);
-    sub(box, 'Position');
-    blockPosition(box, base);
+    more.appendChild(c2);
+    sub(more, 'Position');
+    blockPosition(more, base);
   }
   function paragraphType(box, base, o) {
     box.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
@@ -3464,47 +3691,48 @@
     if (o && o.tracking) r2.appendChild(cNumber('Letter spacing', base + '.tracking', { unit: '‰', step: 5, min: -100, max: 400, digits: 0 }));
     box.appendChild(r2);
   }
-  function ingredientsInspector(box) {
-    const base = 'els.ingredients';
-    box.appendChild(cText('Heading', base + '.heading'));
+  function ingredientsInspector(box, more) {
+    const base = 'els.ingredients'; more = more || box;
     box.appendChild(cText('Ingredients', base + '.text', { multi: true, rows: 5, hint: 'The client’s exact words. What you type is exactly what prints.' }));
-    box.appendChild(cCheck('Line under the heading', base + '.rule'));
-    finClearCheck(box, base);
-    sub(box, 'Type');
-    paragraphType(box, base, { tracking: true });
-    box.appendChild(cNumber('Heading size', base + '.headSize', { unit: 'pt', step: 0.1, min: 2, max: 60 }));
-    box.appendChild(cColor('Colour', base + '.color'));
-    sub(box, 'Position');
-    blockPosition(box, base);
+    more.appendChild(cText('Heading', base + '.heading'));
+    more.appendChild(cCheck('Line under the heading', base + '.rule'));
+    finClearCheck(more, base);
+    sub(more, 'Type');
+    paragraphType(more, base, { tracking: true });
+    more.appendChild(cNumber('Heading size', base + '.headSize', { unit: 'pt', step: 0.1, min: 2, max: 60 }));
+    more.appendChild(cColor('Colour', base + '.color'));
+    sub(more, 'Position');
+    blockPosition(more, base);
   }
-  function claimsInspector(box) {
-    const base = 'els.claims'; const el = getP(base);
+  function claimsInspector(box, more) {
+    const base = 'els.claims'; const el = getP(base); more = more || box;
     box.appendChild(cText('Claims', base + '.text', { multi: true, rows: 2, hint: 'First line large, the next lines smaller. The client’s exact words.' }));
-    box.appendChild(cCheck('Add “Zinc Free”', base + '.zinc'));
-    box.appendChild(h('div', { class: 'note' + (el.zinc ? ' warn' : '') }, icon(el.zinc ? 'alert' : 'info') + '<span>The client’s label also prints “Zinc Free”. It looks like a proof error (zinc is not in the product and no other claim mentions it), so it is off. Switch it on only if the client confirms it.</span>'));
-    finClearCheck(box, base);
-    sub(box, 'Type');
-    box.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
+    const zinc = 'The client’s label also prints “Zinc Free”. It looks like a proof error (zinc is not in the product and no other claim mentions it), so it is off. Switch it on only if the client confirms it.';
+    box.appendChild(cCheck('Add “Zinc Free”', base + '.zinc', { rebuild: true, help: zinc }));
+    if (el.zinc) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>Switch it on only if the client confirms it.' + helpHTML(zinc, 'Zinc Free') + '</span>'));
+    finClearCheck(more, base);
+    sub(more, 'Type');
+    more.appendChild(cSelect('Font', base + '.font', fontOptions(), { rebuild: true, onChange: () => onFontChanged(base) }));
     const r = h('div', { class: 'row3' });
     r.appendChild(weightSelect(base + '.weight', base + '.font'));
     r.appendChild(cNumber('First line', base + '.size', { unit: 'pt', step: 0.1, min: 2, max: 60 }));
     r.appendChild(cNumber('Others', base + '.size2', { unit: 'pt', step: 0.1, min: 2, max: 60 }));
-    box.appendChild(r);
-    box.appendChild(cColor('Colour', base + '.color'));
-    sub(box, 'Position');
-    positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (first baseline)' });
+    more.appendChild(r);
+    more.appendChild(cColor('Colour', base + '.color'));
+    sub(more, 'Position');
+    positionControls(more, base, { xLabel: 'X (centre)', yLabel: 'Y (first baseline)' });
   }
-  function warningInspector(box) {
-    const base = 'els.warning'; const el = getP(base);
+  function warningInspector(box, more) {
+    const base = 'els.warning'; const el = getP(base); more = more || box;
     box.appendChild(cText('Warning', base + '.text', { multi: true, rows: 6, hint: 'The client’s exact words. Enter starts a new line.' }));
-    finClearCheck(box, base);
-    sub(box, 'Type');
-    paragraphType(box, base);
-    box.appendChild(cColor('Colour', base + '.color'));
-    box.appendChild(cCheck('Box behind the warning', base + '.box', { rebuild: true }));
-    if (el.box) box.appendChild(cColor('Box colour', base + '.boxColor'));
-    sub(box, 'Position');
-    blockPosition(box, base);
+    finClearCheck(more, base);
+    sub(more, 'Type');
+    paragraphType(more, base);
+    more.appendChild(cColor('Colour', base + '.color'));
+    more.appendChild(cCheck('Box behind the warning', base + '.box', { rebuild: true }));
+    if (el.box) more.appendChild(cColor('Box colour', base + '.boxColor'));
+    sub(more, 'Position');
+    blockPosition(more, base);
   }
 
   /* =========================================================================================
@@ -3560,6 +3788,7 @@
         else if (el.ai) { aiN++; if (!aiAt) aiAt = { side, key: k }; }
       });
     });
+    ['front', 'back'].forEach(side => { if (aiBackground(m.panels[side])) add({ side, level: 'info', key: 'background', short: side === 'back' ? 'AI background (back)' : 'AI background', text: (side === 'back' ? 'Back: the' : 'The') + ' background art was made by AI: a picture, not a photo.' }); });
     if (aiN) add(Object.assign({ level: 'info', short: aiN + ' AI-drawn element' + (aiN > 1 ? 's' : ''), text: aiN > 1 ? aiN + ' AI-drawn elements: drawings, not product photos.' : '1 AI-drawn element: a drawing, not a product photo.' }, aiAt));
     rasterInfo(m).forEach(r => {
       if (r.ppi < (r.min || PPI_MIN)) add({ side: r.side || 'front', key: r.key, text: r.label + ' is ' + Math.round(r.ppi) + ' ppi at print size (aim for 300). ' + r.tip });
@@ -3603,7 +3832,9 @@
     if (host.dataset.key === key) return;
     host.dataset.key = key; host.innerHTML = '';
     out.forEach(o => {
-      const d = h('div', { class: 'notice' + (o.level === 'info' ? ' info' : '') }, icon(o.level === 'info' ? 'info' : 'alert') + '<span>' + esc(o.text) + '</span>');
+      // one short sentence in view; the rest of it behind a "?"
+      const p = splitHelp(esc(o.text));
+      const d = h('div', { class: 'notice' + (o.level === 'info' ? ' info' : '') }, icon(o.level === 'info' ? 'info' : 'alert') + '<span>' + p[0] + (p[1] ? helpHTML(p[1], o.short || 'This note') : '') + '</span>');
       const b = h('button', { class: 'btn sm', type: 'button' }, esc(o.act)); b.addEventListener('click', () => focusEl(o.key, o.side)); d.appendChild(b);
       host.appendChild(d);
     });
@@ -3612,23 +3843,64 @@
   function issuesHTML(list) {
     if (!list.length) return '<div class="checklist ok">' + icon('check', 'ico-sm') + '<span>No open items found.</span></div>';
     const draft = list.some(i => i.draft);
-    return '<div class="checklist"><div class="cl-h">' + icon('alert', 'ico-sm') + '<span>Before you send</span></div><ul>' +
-      list.map(i => '<li class="' + (i.level === 'info' ? 'info' : 'warn') + '">' + esc(i.text) + '</li>').join('') + '</ul>' +
-      (draft ? '<p class="cl-f">Until these are done, the file names of that panel (and of the print layout) say <b>DRAFT</b>.</p>' : '') + '</div>';
+    // (an info item shows its short name, its words behind a "?"; a warning keeps its words in view)
+    return '<div class="checklist"><div class="cl-h">' + icon('alert', 'ico-sm') + '<span>Before you send</span>' +
+      (draft ? helpHTML('Until these are done, the file names of that panel (and of the print layout) say <b>DRAFT</b>.', 'Before you send') : '') + '</div><ul>' +
+      // (one short line per item: an info item shows its short name, a warning its first sentence; the rest is behind a "?")
+      list.map(i => {
+        if (i.level === 'info' && i.short) return '<li class="info">' + esc(i.short) + helpHTML(esc(i.text), i.short) + '</li>';
+        const p = splitHelp(esc(i.text));
+        return '<li class="' + (i.level === 'info' ? 'info' : 'warn') + '">' + p[0] + (p[1] ? helpHTML(p[1], i.short || 'This item') : '') + '</li>';
+      }).join('') + '</ul></div>';
   }
+  // The status bar: the panel's name, and ONE chip that counts the notes and opens their list (each with its "?").
+  // A real problem (an item the notice bar shows: a blank, a missing or stand-in picture…) turns the chip to the
+  // warning colour and it says how many to fix. The trim and bleed sizes are under Format → Size and specs.
+  const ITEM_SPECS_NOTE = 'The item specs are measured from the client’s drafts. Your printer’s dieline is the authority.';
   function renderStatus(list) {
     const m = state.model; const F = FORMATS[m.format];
-    const info = (list || collectIssues(m)).filter(o => o.level === 'info');
-    let main;
-    if (isLayoutView()) { const L = layoutGeometry(m); main = 'Print layout <b>' + n(L.w, 1) + ' × ' + n(L.h, 1) + ' mm</b> + ' + n(m.bleed, 1) + ' mm bleed'; }
-    else main = SIDES[state.side] + ' · trim <b>' + n(m.trim.w, 2) + ' × ' + n(m.trim.h, 2) + ' mm</b> · bleed ' + n(m.bleed, 2) + ' mm';
-    const html = '<span class="st-main"><i class="lg" title="Trim line" style="border-top-style:solid;border-color:#1f5fc9"></i>' + main + '</span>' +
-      info.map(o => '<button class="st-check" type="button" data-focus="' + esc(o.key) + '" data-side="' + esc(o.side || 'front') + '" title="' + esc(o.text) + '">' + icon('info', 'ico-sm') + esc(o.short || o.text) + '</button>').join('') +
-      '<span class="dieline" title="The item specs are measured from the client’s drafts. Your printer’s dieline is the authority.">' + icon('info', 'ico-sm') + 'Item specs ' + esc(INTERIM_NOTE) + '</span>';
-    const bar = $('#statusbar'); if (bar.dataset.html !== html) { bar.dataset.html = html; bar.innerHTML = html; }
+    const all = list || collectIssues(m);
+    const fix = all.filter(o => o.level !== 'info'), info = all.filter(o => o.level === 'info');
+    const bar = $('#statusbar');
+    if (!$('#st-notes', bar)) {
+      bar.innerHTML = '<span class="st-main"><i class="lg" title="Trim line" style="border-top-style:solid;border-color:#1f5fc9"></i><span id="st-name"></span></span>' +
+        '<span class="st-notes-w"><button class="st-chip" type="button" id="st-notes" aria-expanded="false" aria-controls="st-pop" aria-haspopup="dialog"></button>' +
+        '<div class="st-pop" id="st-pop" role="dialog" aria-label="Notes" hidden></div></span>';
+    }
+    const name = isLayoutView() ? 'Print layout' : SIDES[state.side];
+    if ($('#st-name', bar).textContent !== name) $('#st-name', bar).textContent = name;
+    const nCheck = info.length + 1;                                        // (+ the item specs note, always there)
+    const label = fix.length ? fix.length + ' to fix' : nCheck + ' to check';
+    const chip = $('#st-notes', bar);
+    const csig = label + (fix.length ? '!' : '');
+    if (chip.dataset.sig !== csig) {
+      chip.dataset.sig = csig;
+      chip.className = 'st-chip' + (fix.length ? ' warn' : '');
+      chip.innerHTML = icon(fix.length ? 'alert' : 'info', 'ico-sm') + '<span>' + esc(label) + '</span>';
+      chip.title = fix.length ? fix.length + ' to fix before the files are final' + (info.length ? ', and ' + nCheck + ' to check' : '') : nCheck + ' notes to check';
+    }
+    // the list: what the chips said before, each with its "?" (and the problems first)
+    const row = (o, warn) => {
+      const p = warn ? splitHelp(esc(o.text)) : [esc(o.short || o.text), esc(o.text)];
+      return '<li class="' + (warn ? 'warn' : 'info') + '"><button type="button" class="st-item" data-focus="' + esc(o.key) + '" data-side="' + esc(o.side || 'front') + '">' + icon(warn ? 'alert' : 'info', 'ico-sm') + '<span>' + p[0] + '</span></button>' +
+        (p[1] && p[1] !== p[0] ? helpHTML(p[1], o.short || (warn ? 'This problem' : 'This note')) : '') + '</li>';
+    };
+    // (redrawn only when the notes change, so a "?" or a button in it stays the same one)
+    const psig = all.map(o => [o.level, o.side, o.key, o.short, o.text].join('\u0001')).join('\u0002');
+    const pop = $('#st-pop', bar);
+    if (pop.dataset.sig !== psig) {
+      pop.dataset.sig = psig;
+      pop.innerHTML = '<ul class="st-list">' + fix.map(o => row(o, true)).join('') + info.map(o => row(o, false)).join('') +
+        '<li class="info"><span class="st-item">' + icon('info', 'ico-sm') + '<span>Item specs ' + esc(INTERIM_NOTE) + '</span></span>' + helpHTML(ITEM_SPECS_NOTE, 'Item specs') + '</li></ul>';
+    }
     $('#tg-guides-lbl').textContent = F.guides || 'Seals';
     $('#tg-guides').disabled = !F.guides || isLayoutView();
-    $('#mock-type').textContent = F.label;
+    const mt = $('#mock-type'); if (mt) mt.textContent = F.label;
+  }
+  function setNotesOpen(on, focusChip) {
+    const chip = $('#st-notes'), pop = $('#st-pop'); if (!chip || !pop) return;
+    ui.notesOpen = !!on; pop.hidden = !on; chip.setAttribute('aria-expanded', String(!!on)); chip.classList.toggle('open', !!on);
+    if (!on && focusChip) chip.focus();
   }
   function toast(msg, err) {
     const t = h('div', { class: 'toast' + (err ? ' err' : '') }, icon(err ? 'alert' : 'check') + '<span>' + esc(msg) + '</span>');
@@ -3639,7 +3911,7 @@
   function openModal(html, onMount) {
     const bg = $('#modal-bg'); $('#modal').innerHTML = html; bg.classList.add('on');
     if (onMount) onMount($('#modal'));
-    const first = $('#modal button, #modal input'); if (first) setTimeout(() => first.focus(), 30);
+    const first = $('#modal button:not(.help-q), #modal input'); if (first) setTimeout(() => first.focus(), 30);
   }
   function closeModal() { $('#modal-bg').classList.remove('on'); $('#modal').innerHTML = ''; }
 
@@ -3650,21 +3922,23 @@
     const L = layoutGeometry(m);
     const layoutSize = n(L.w, 1) + ' × ' + n(L.h, 1) + ' mm + ' + n(m.bleed, 1) + ' mm bleed';
     openModal(
-      '<div class="modal-h"><h3 id="modal-title">Export the files to send</h3><button class="btn ghost icon" data-close aria-label="Close">' + icon('close') + '</button></div>' +
+      '<div class="modal-h"><h3 id="modal-title">Export the files to send' + helpHTML('', 'File names', 'x-names') + '</h3><button class="btn ghost icon" data-close aria-label="Close">' + icon('close') + '</button></div>' +
       '<div class="modal-b">' +
-      '<div class="kv"><span>Design</span><span>' + esc(m.name) + '</span><span>Format</span><span>' + esc(F.label) + '</span><span>Panel trim</span><span>' + sizeLabel(m, false) + ' (with bleed ' + sizeLabel(m, true) + ')</span><span>Item specs</span><span>' + esc(INTERIM_NOTE) + '</span></div>' +
+      row('kit', 'Kit', 'One folder with a 3D picture of the pack, every layer as its own see-through PNG, all of them laid out on one sheet (PNG and SVG), and the design file.',
+        '', '<button class="btn" id="x-kit">' + icon('kit', 'ico-sm') + 'Save a kit</button>', '<div class="kit-prog" id="x-kit-prog" aria-live="polite" hidden></div>') +
+      // (what is being exported, and its sizes: in a fold)
+      '<details class="x-details"><summary>Design details</summary><div class="kv"><span>Design</span><span>' + esc(m.name) + '</span><span>Format</span><span>' + esc(F.label) + '</span><span>Panel trim</span><span>' + sizeLabel(m, false) + ' (with bleed ' + sizeLabel(m, true) + ')</span><span>Item specs</span><span>' + esc(INTERIM_NOTE) + '</span></div></details>' +
       issuesHTML(collectIssues(m)) +
-      '<div class="exp-sec"><div class="exp-sec-h">Print layout (all panels) · production</div>' +
-      row('layout', 'Print layout (all panels)', (L.kind === 'web' ? 'The flow-wrap web: ½ back | front | ½ back, fin-seal allowances at both edges' : L.kind === 'pouch' ? 'Front | back side by side, the bottom gusset below' : 'Front | back side by side') + ' · ' + layoutSize + '. Artwork only: the file to print.',
-        '<label class="chk"><input type="checkbox" id="x-die"' + (ui.lastPrint.dieline ? ' checked' : '') + '> Add the dieline (SVG: separate layer · PDF: separate page)</label>',
+      '<div class="exp-sec"><div class="exp-sec-h">Print layout</div>' +
+      row('layout', 'All panels', 'Print layout (all panels), for production. ' + (L.kind === 'web' ? 'The flow-wrap web: ½ back | front | ½ back, fin-seal allowances at both edges' : L.kind === 'pouch' ? 'Front | back side by side, the bottom gusset below' : 'Front | back side by side') + ' · ' + layoutSize + '. Artwork only: the file to print. <b>Add the dieline</b>: in the SVG it is a separate layer, in the PDF a separate page.',
+        '<label class="chk"><input type="checkbox" id="x-die"' + (ui.lastPrint.dieline ? ' checked' : '') + '> Add the dieline</label>',
         '<div class="btn-col"><button class="btn primary" id="x-lpdf">' + icon('print', 'ico-sm') + 'PDF…</button><button class="btn" id="x-lsvg">SVG</button></div>') + '</div>' +
       '<div class="exp-sec"><div class="exp-sec-h">One panel <span class="seg sm" role="group" aria-label="Panel to export" id="x-side"><button type="button" data-v="front">Front</button><button type="button" data-v="back">Back</button></span></div>' +
-      row('pdf', 'Print PDF', 'Vector, real text, fonts embedded; the trim centred on a trim + bleed page.', '<label class="chk"><input type="checkbox" id="x-crop"' + (ui.lastPrint.crop ? ' checked' : '') + '> Crop marks (only if your printer asks)</label>', '<button class="btn" id="x-pdf">' + icon('print', 'ico-sm') + 'Export PDF…</button>') +
+      row('pdf', 'Print PDF', 'Vector, real text, fonts embedded; the trim centred on a trim + bleed page. <b>Crop marks</b>: only if your printer asks.', '<label class="chk"><input type="checkbox" id="x-crop"' + (ui.lastPrint.crop ? ' checked' : '') + '> Crop marks</label>', '<button class="btn" id="x-pdf">' + icon('print', 'ico-sm') + 'Export PDF…</button>') +
       row('svg', 'SVG', 'Self-contained vector file: fonts and pictures embedded.', '<label class="chk"><input type="checkbox" id="x-svg-bleed"> Include bleed</label>', '<button class="btn" id="x-svg">Download SVG</button>') +
-      row('png', 'PNG · 300 dpi', 'Exact pixels of the same file (' + Math.round(m.trim.w / 25.4 * 300) + ' × ' + Math.round(m.trim.h / 25.4 * 300) + ' px at trim).', '<label class="chk"><input type="checkbox" id="x-png-bleed"> Include bleed</label>', '<button class="btn" id="x-png">Download PNG</button>') + '</div>' +
+      row('png', 'PNG', '300 dpi. Exact pixels of the same file (' + Math.round(m.trim.w / 25.4 * 300) + ' × ' + Math.round(m.trim.h / 25.4 * 300) + ' px at trim).', '<label class="chk"><input type="checkbox" id="x-png-bleed"> Include bleed</label>', '<button class="btn" id="x-png">Download PNG</button>') + '</div>' +
       row('cube', '3D render', has3D ? 'A high-resolution PNG of the mockup as it is posed now.' : 'Needs the 3D preview (mockup3d.js).', '<label class="chk"><input type="checkbox" id="x-3d-tr"' + (has3D ? '' : ' disabled') + '> Transparent background</label>', '<button class="btn" id="x-3d"' + (has3D ? '' : ' disabled') + '>Download render</button>') +
       row('json', 'Design file', 'Re-open and edit later. Both panels and the pictures are included.', '', '<button class="btn" id="x-json">Save .json</button>') +
-      '<p class="hint" id="x-names"></p>' +
       '</div>',
       root => {
         const busy = async (btn, fn) => { btn.disabled = true; const t = btn.innerHTML; btn.textContent = 'Working…'; try { await fn(); } catch (e) { toast('Export failed: ' + (e.message || e), true); } btn.disabled = false; btn.innerHTML = t; };
@@ -3681,9 +3955,17 @@
         $('#x-png', root).addEventListener('click', e => busy(e.currentTarget, () => exportPNGFile($('#x-png-bleed', root).checked, side)));
         $('#x-3d', root).addEventListener('click', e => busy(e.currentTarget, () => export3D($('#x-3d-tr', root).checked)));
         $('#x-json', root).addEventListener('click', () => saveDesignFile());
+        const kitBtn = $('#x-kit', root), kitProg = $('#x-kit-prog', root);
+        kitBtn.addEventListener('click', async () => {
+          kitBtn.disabled = true; kitProg.hidden = false; kitProg.textContent = 'Starting…';
+          try { await saveKit({ onProgress: t => { kitProg.textContent = t; } }); }
+          catch (e) { toast('The kit could not be saved: ' + (e.message || e), true); }
+          kitBtn.disabled = false; kitProg.hidden = true; kitProg.textContent = '';
+        });
       });
-    function row(ic, t, d, opts, btn) {
-      return '<div class="exp-row"><div class="ic">' + icon(ic) + '</div><div><div class="t">' + t + '</div><div class="d">' + d + '</div>' + (opts ? '<div class="opts">' + opts + '</div>' : '') + '</div><div>' + btn + '</div></div>';
+    function row(ic, t, d, opts, btn, more) {
+      // (its description waits behind the "?" after its title)
+      return '<div class="exp-row"><div class="ic">' + icon(ic) + '</div><div><div class="t">' + t + helpHTML(d, t.replace(/<[^>]*>/g, '')) + '</div>' + (opts ? '<div class="opts">' + opts + '</div>' : '') + (more || '') + '</div><div>' + btn + '</div></div>';
     }
   }
   // o: { crop, side } for one panel, or { layout: true, dieline }
@@ -3704,25 +3986,272 @@
     openModal(
       '<div class="modal-h"><h3 id="modal-title">Save the ' + (o.layout ? 'print layout' : SIDES[side].toLowerCase() + ' panel') + ' PDF</h3><button class="btn ghost icon" data-close aria-label="Close">' + icon('close') + '</button></div>' +
       '<div class="modal-b">' +
-      '<div class="kv"><span>Page</span><span>' + page + '</span><span>File name</span><span>' + esc(fname) + '.pdf</span></div>' +
-      '<p class="hint" style="margin:0">' + esc(where) + '</p>' +
+      '<div class="kv"><span class="lbl-t">Page' + helpHTML(esc(where), 'Page') + '</span><span>' + page + '</span><span>File name</span><span>' + esc(fname) + '.pdf</span></div>' +
       issuesHTML(collectIssues(m)) +
-      '<p style="margin:2px 0 0">The browser’s print window opens next. Set it up like this, once:</p>' +
+      // (the print window's settings are needed now and stay in view; the notes about the PDF wait behind a "?")
+      '<p style="margin:2px 0 0">The browser’s print window opens next. Set it up like this, once:' +
+      helpHTML('<span class="hp-p">The PDF is vector: real text with the fonts embedded, the pop at full resolution' + (o.layout ? ', every panel in place for the converter.' : ', the trim centred on the page, ready for the printer to place on their dieline.') + '</span>' +
+        ((o.layout || side === 'front') && lg.visible && lg.style !== 'upload' ? '<span class="hp-p">The logo has very fine hairlines. Ask your printer for their minimum line width for white type on a colour; if needed, lower the logo’s <b>Contrast (optical size)</b> for sturdier strokes.</span>' : ''), 'The PDF') + '</p>' +
       '<ol class="steps"><li><b>Destination:</b> Save as PDF</li><li><b>Margins:</b> None</li><li><b>Scale:</b> Default (100%) — never “Fit to page”</li><li>Under <b>More settings</b>, tick <b>Background graphics</b></li><li>Press <b>Save</b>.</li></ol>' +
-      '<div class="note">' + icon('info') + '<span>The PDF is vector: real text with the fonts embedded, the pop at full resolution' + (o.layout ? ', every panel in place for the converter.' : ', the trim centred on the page, ready for the printer to place on their dieline.') + '</span></div>' +
-      ((o.layout || side === 'front') && lg.visible && lg.style !== 'upload' ? '<div class="note">' + icon('info') + '<span>The logo has very fine hairlines. Ask your printer for their minimum line width for white type on a colour; if needed, lower the logo’s <b>Contrast (optical size)</b> for sturdier strokes.</span></div>' : '') +
       '</div><div class="modal-f"><button class="btn" data-close>Cancel</button><button class="btn primary" id="x-print">' + icon('print', 'ico-sm') + 'Open print window</button></div>',
       root => { $('#x-print', root).addEventListener('click', async () => { closeModal(); await printPDF(o.layout ? { layout: true, dieline: !!o.dieline } : { crop: !!o.crop, side }); }); });
   }
-  async function export3D(transparent) {
+  // the 3D render as a PNG blob. view (optional): take it in that view, then go back to the one on screen
+  async function snapshot3D(transparent, view) {
     if (!mock.inst) throw new Error('3D preview is not available');
     await update3D(true);
-    const r = $('#mock-view').getBoundingClientRect();
+    // always the size of the full 3D panel, also while the view is the small one beside the AI panel
+    const r = dock.slot ? fullViewRect() : $('#mock-view').getBoundingClientRect();
     const scale = clamp(2400 / Math.max(1, r.width, r.height), 2, 6);
-    const blob = await mock.inst.snapshot({ scale, transparent: !!transparent });
+    const was = mock.inst.view || mock.view, turn = view && view !== was;
+    if (turn) mock.inst.setView(view);
+    try {
+      let p; const back = holdFullSize(r);
+      try { p = mock.inst.snapshot({ scale, transparent: !!transparent }); } finally { back(); }
+      return await p;
+    }
+    finally { if (turn) mock.inst.setView(was); }
+  }
+  async function export3D(transparent) {
+    const blob = await snapshot3D(transparent);
     const name = fileBase('3d-' + (mock.inst.view || mock.view) + (transparent ? '-transparent' : '')) + '.png';
     download(blob, name); toast('Saved ' + name);
     return name;
+  }
+
+  /* ---- Save a kit: one folder with a 3D picture of the pack, every visible layer as its own see-through PNG, all
+   * of them laid out on one sheet (PNG, and SVG with one named group per piece), the design file and a README.
+   * Pieces are drawn one after another by the same renderer (buildDesign with only that layer) from a copy of the
+   * model, at 300 ppi of their printed size, and cropped to what they paint. Chrome and Edge on a computer write
+   * the folder where you choose; everywhere else it comes as one ZIP. */
+  // a panel whose background is a picture made in the AI panel (it is named so when it goes onto the design)
+  function aiBackground(P) { const a = P && P.bg && P.bg.mode === 'image' && P.bg.image ? ASSETS[P.bg.image.src] : null; return !!(a && /^AI background art\b/.test(a.name || '')); }
+  const KIT_K = 300 / 25.4;                               // px per mm at 300 ppi
+  const KIT_MARGIN = 1, KIT_GAP = 3;                      // mm around each piece / between pieces on the sheet
+  // the bounding box of the painted (not see-through) pixels of a canvas, or null when it is empty
+  function paintedBox(c) {
+    const W = c.width, H = c.height; const d = c.getContext('2d').getImageData(0, 0, W, H).data;
+    let x0 = W, y0 = H, x1 = -1, y1 = -1;
+    for (let y = 0; y < H; y++) {
+      let row = y * W * 4 + 3, a = -1, z = -1;
+      for (let x = 0; x < W; x++, row += 4) if (d[row]) { if (a < 0) a = x; z = x; }
+      if (a < 0) continue;
+      if (y < y0) y0 = y; y1 = y; if (a < x0) x0 = a; if (z > x1) x1 = z;
+    }
+    return x1 < 0 ? null : { x0, y0, x1: x1 + 1, y1: y1 + 1 };
+  }
+  async function pngBlob(c, dpi) {
+    const blob = await new Promise((res, rej) => c.toBlob(bl => bl ? res(bl) : rej(new Error('PNG encoding failed')), 'image/png'));
+    return new Blob([withPHYs(new Uint8Array(await blob.arrayBuffer()), dpi)], { type: 'image/png' });
+  }
+  // one layer of one panel, cropped: { blob, pxW, pxH, box (mm, in the panel's coordinates) } or null if it paints nothing
+  async function drawPiece(m, side, key) {
+    const W = m.trim.w, H = m.trim.h, b = m.bleed;
+    const pxW = Math.round((W + 2 * b) * KIT_K), pxH = Math.round((H + 2 * b) * KIT_K);
+    const kx = pxW / (W + 2 * b), ky = pxH / (H + 2 * b);
+    const r = await buildExportSVG({ model: m, side, bleed: true, pxW, pxH, only: key, idp: 'kit-' });
+    const c = await svgToCanvas(r.svg, pxW, pxH);
+    const p = paintedBox(c);
+    if (!p) { c.width = c.height = 0; return null; }
+    const mx = Math.round(KIT_MARGIN * kx), my = Math.round(KIT_MARGIN * ky);
+    const x0 = Math.max(0, p.x0 - mx), y0 = Math.max(0, p.y0 - my), x1 = Math.min(pxW, p.x1 + mx), y1 = Math.min(pxH, p.y1 + my);
+    const out = document.createElement('canvas'); out.width = x1 - x0; out.height = y1 - y0;
+    out.getContext('2d').drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+    c.width = c.height = 0;                                // (let the full-size canvas go before the next piece)
+    const blob = await pngBlob(out, 300);
+    const res = { blob, pxW: out.width, pxH: out.height, fontsOK: r.fontsOK, box: { x: -b + x0 / kx, y: -b + y0 / ky, w: out.width / kx, h: out.height / ky } };
+    out.width = out.height = 0;
+    return res;
+  }
+  // each panel's background at the left with that panel's other pieces in rows beside it, and the back panel's group
+  // under the front's; the same small gap everywhere. px at 300 ppi
+  function kitSheetLayout(pieces) {
+    const gap = Math.round(KIT_GAP * KIT_K);
+    let y0 = 0, w = 0;
+    ['front', 'back'].forEach(side => {
+      const ps = pieces.filter(p => p.side === side); if (!ps.length) return;
+      const bg = ps[0].key === 'background' ? ps[0] : null, rest = bg ? ps.slice(1) : ps;
+      let x0 = 0, groupH = 0;
+      if (bg) { bg.sx = 0; bg.sy = y0; x0 = bg.pxW + gap; groupH = bg.pxH; w = Math.max(w, bg.pxW); }
+      const widest = rest.length ? Math.max.apply(null, rest.map(p => p.pxW)) : 0;
+      const blockW = Math.max(widest, Math.round((bg ? bg.pxW : widest) * 1.9));     // the block beside the background
+      let x = 0, y = 0, rowH = 0;
+      rest.forEach(p => {
+        if (x > 0 && x + p.pxW > blockW) { y += rowH + gap; x = 0; rowH = 0; }
+        p.sx = x0 + x; p.sy = y0 + y;
+        x += p.pxW + gap; rowH = Math.max(rowH, p.pxH); w = Math.max(w, p.sx + p.pxW);
+      });
+      groupH = Math.max(groupH, y + rowH);
+      y0 += groupH + gap * 2;
+    });
+    return { w, h: y0 - gap * 2 };
+  }
+  // the sheet as an SVG in mm: each piece is its own group (id = the piece's file name, <title> = the layer), drawn
+  // by the same renderer as every other file, so words and the logo stay vector type with their fonts embedded
+  async function kitSheetSVG(m, pieces, L) {
+    let fontCSS = '', fontsOK = true;
+    try { fontCSS = (await embeddedFontCSS(m, ['front', 'back'])).css; } catch (e) { fontsOK = false; }
+    let body = '';
+    pieces.forEach(p => {
+      const env = { idp: p.name + '-', editor: false, href: id => assetHref(id, 'data') };
+      const d = buildDesign(m, env, 0, p.side, p.key);
+      const tx = p.sx / KIT_K - p.box.x, ty = p.sy / KIT_K - p.box.y;
+      body += '<g id="' + esc(p.name) + '" transform="translate(' + n(tx) + ' ' + n(ty) + ')"><title>' + esc(SIDES[p.side] + ' · ' + p.label + (p.ai ? ' (AI drawing)' : p.aiArt ? ' (AI art)' : '')) + '</title>' +
+        '<defs>' + d.defs + '</defs>' + d.body + '</g>';
+    });
+    const w = L.w / KIT_K, h = L.h / KIT_K;
+    const svg = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="' + n(w) + 'mm" height="' + n(h) + 'mm" viewBox="0 0 ' + n(w) + ' ' + n(h) + '" text-rendering="geometricPrecision">' +
+      '<title>' + esc('MODEL POPS · ' + m.name + ' · pieces') + '</title><desc>' + esc('Every visible layer of the design, side by side at its printed size. 1 unit = 1 mm. Made with Model Pops Label Studio, ' + today() + '.') + '</desc>' +
+      (fontCSS ? '<style><![CDATA[\n' + fontCSS + ']]></style>' : '') + body + '</svg>';
+    return { svg, fontsOK };
+  }
+  function kitReadme(m, pieces, has3D) {
+    const F = FORMATS[m.format]; const L = [];
+    const mm = p => n(p.box.w, 1) + ' × ' + n(p.box.h, 1) + ' mm';
+    L.push('Model Pops kit: ' + m.name, '', 'Format: ' + F.label + '. Panel trim ' + sizeLabel(m, false) + ', with ' + n(m.bleed, 2) + ' mm bleed ' + sizeLabel(m, true) + '.',
+      'Saved from Model Pops Label Studio on ' + today() + '.', '', 'What is here', '');
+    L.push(has3D ? 'preview-3d.png     The 3D pack in the hero view, as the studio shows it.' : 'preview-3d.png     Missing: the 3D preview was not available when this kit was saved.');
+    L.push('pieces/            Every visible layer on its own: a see-through PNG at 300 ppi of its printed size,',
+      '                   cropped to what it paints with about 1 mm to spare. Numbered in stacking order',
+      '                   (01 is the bottom), front first, then back.',
+      'pieces-sheet.png   All the pieces on one see-through picture, side by side at their true relative size',
+      '                   (300 ppi), front first, then back.',
+      'pieces-sheet.svg   The same sheet as vector: each piece is its own named group. Words and the logo stay',
+      '                   vector type, with their fonts embedded.',
+      'design.json        The design file. Open it again in the studio with Open.',
+      'README.txt         This file.', '', 'The pieces', '');
+    pieces.forEach(p => L.push('pieces/' + p.name + '.png   ' + SIDES[p.side] + ' · ' + p.label + ' · ' + mm(p)));
+    const ai = pieces.filter(p => p.ai), aiBg = pieces.filter(p => p.aiArt);
+    L.push('', 'AI drawings', '');
+    if (aiBg.length) { L.push('The background art was made by AI: a picture, not a photo.'); aiBg.forEach(p => L.push('- pieces/' + p.name + '.png (' + SIDES[p.side] + ' background)')); }
+    if (ai.length) { L.push('These pieces are AI drawings: drawings, not product photos.'); ai.forEach(p => L.push('- pieces/' + p.name + '.png (' + p.label + ')')); }
+    if (!ai.length && !aiBg.length) L.push('None.');
+    const drafts = collectIssues(m).filter(i => i.draft);
+    L.push('', 'Open DRAFT notes', '');
+    if (drafts.length) { L.push('This design is not final yet:'); drafts.forEach(i => L.push('- ' + i.text)); }
+    else L.push('None.');
+    return L.join('\r\n') + '\r\n';
+  }
+  // builds the kit's files in memory: { folder, files: [{ path, blob }], pieces, fontsOK, has3D }
+  async function buildKit(progress) {
+    const say = progress || (() => {});
+    const m = clone(state.model);                         // one snapshot: edits made while it builds wait for the next kit
+    const folder = slug(m.name) + '_kit_' + today() + (isDraft(m) ? '_DRAFT' : '');
+    const design = new Blob([JSON.stringify(serialize(true), null, 1)], { type: 'application/json' });
+    const files = [];
+    let has3D = false;
+    if (mock.inst) {
+      say('Drawing the 3D picture…');
+      try { files.push({ path: 'preview-3d.png', blob: await snapshot3D(false, 'hero') }); has3D = true; } catch (e) { console.warn('[label-studio] kit: 3D picture failed', e); }
+    }
+    const todo = [];
+    ['front', 'back'].forEach(side => {
+      const P = m.panels[side];
+      todo.push({ side, key: 'background', label: 'Background', ai: false, aiArt: aiBackground(P) });
+      P.order.forEach(k => { const el = P.els[k]; if (el && el.visible) todo.push({ side, key: k, label: infoOf(k, el).label, ai: !!(isPic(el) && el.ai) }); });
+    });
+    const pieces = [], count = { front: 0, back: 0 }; let fontsOK = true;
+    for (let i = 0; i < todo.length; i++) {
+      const t = todo[i];
+      say('Drawing piece ' + (i + 1) + ' of ' + todo.length + '…');
+      const r = await drawPiece(m, t.side, t.key);
+      if (!r) continue;                                   // (a layer with nothing to paint, such as an empty line)
+      if (!r.fontsOK) fontsOK = false;
+      const name = t.side + '-' + String(++count[t.side]).padStart(2, '0') + '-' + slug(t.label) + (t.ai || t.aiArt ? '-ai' : '');
+      pieces.push(Object.assign(t, r, { name }));
+      files.push({ path: 'pieces/' + name + '.png', blob: r.blob });
+      await nextFrame();
+    }
+    if (!pieces.length) throw new Error('nothing to draw');
+    say('Laying out the sheet…');
+    const L = kitSheetLayout(pieces);
+    const c = document.createElement('canvas'); c.width = L.w; c.height = L.h;
+    const ctx = c.getContext('2d');
+    for (const p of pieces) { const im = await createImageBitmap(p.blob); ctx.drawImage(im, p.sx, p.sy); im.close(); }
+    files.push({ path: 'pieces-sheet.png', blob: await pngBlob(c, 300) });
+    c.width = c.height = 0;
+    const sv = await kitSheetSVG(m, pieces, L); if (!sv.fontsOK) fontsOK = false;
+    files.push({ path: 'pieces-sheet.svg', blob: new Blob([sv.svg], { type: 'image/svg+xml' }) });
+    files.push({ path: 'design.json', blob: design });
+    files.push({ path: 'README.txt', blob: new Blob([kitReadme(m, pieces, has3D)], { type: 'text/plain' }) });
+    pieces.forEach(p => { delete p.blob; });
+    return { folder, files, pieces, fontsOK, has3D };
+  }
+  // a ZIP of the files, stored (not compressed: the PNGs are compressed already), names in UTF-8
+  async function makeZip(files) {
+    const enc = new TextEncoder(); const parts = [], central = []; let off = 0;
+    const d = new Date();
+    const time = d.getHours() << 11 | d.getMinutes() << 5 | d.getSeconds() >> 1;
+    const date = (d.getFullYear() - 1980) << 9 | (d.getMonth() + 1) << 5 | d.getDate();
+    for (const f of files) {
+      const name = enc.encode(f.path); const data = new Uint8Array(await f.blob.arrayBuffer()); const crc = crc32(data, 0, data.length);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true);
+      h.setUint16(10, time, true); h.setUint16(12, date, true); h.setUint32(14, crc, true);
+      h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true);
+      c.setUint16(12, time, true); c.setUint16(14, date, true); c.setUint32(16, crc, true);
+      c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+      parts.push(h.buffer, name, data); central.push(c.buffer, name);
+      off += 30 + name.length + data.length;
+    }
+    const size = central.reduce((s, p) => s + p.byteLength, 0);
+    const e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+    return new Blob(parts.concat(central, [e.buffer]), { type: 'application/zip' });
+  }
+  // writes the files into a new sub-folder of dir (a folder handle); a name that is taken gets -2, -3…
+  async function writeKitFolder(dir, folder, files) {
+    let name = folder;
+    for (let i = 2; i < 100; i++) {
+      try { await dir.getDirectoryHandle(name); } catch (e) { if (e && e.name === 'NotFoundError') break; }
+      name = folder + '-' + i;
+    }
+    const root = await dir.getDirectoryHandle(name, { create: true });
+    for (const f of files) {
+      const parts = f.path.split('/'); let d = root;
+      for (const p of parts.slice(0, -1)) d = await d.getDirectoryHandle(p, { create: true });
+      const w = await (await d.getFileHandle(parts[parts.length - 1], { create: true })).createWritable();
+      await w.write(f.blob); await w.close();
+    }
+    return name;
+  }
+  // The "Save a kit" button. o: { onProgress(text), dir (a folder handle, for checks), zip (true: always a ZIP) }
+  // -> { folder, saved: 'folder' | 'zip', name, files }. The folder is asked for first (the browser allows it only
+  // straight after the click), once per visit; without a folder picker, or if it is cancelled, the kit is a ZIP.
+  async function saveKit(o) {
+    o = o || {};
+    if (ui.kitBusy) throw new Error('a kit is already being saved');
+    ui.kitBusy = true;
+    try {
+      let dir = o.dir || null;
+      if (!dir && !o.zip && typeof window.showDirectoryPicker === 'function') {
+        try {
+          dir = ui.kitDir || await window.showDirectoryPicker({ id: 'model-pops-kit', mode: 'readwrite' });
+          if (dir.queryPermission && await dir.queryPermission({ mode: 'readwrite' }) !== 'granted' && await dir.requestPermission({ mode: 'readwrite' }) !== 'granted') dir = null;
+        } catch (e) { dir = null; if (!e || e.name !== 'AbortError') console.warn('[label-studio] kit: no folder', e); }
+        if (dir && !o.dir) ui.kitDir = dir;
+      }
+      const kit = await buildKit(o.onProgress);
+      const say = o.onProgress || (() => {});
+      const warn = kit.fontsOK ? '' : ' The fonts could not be fetched (offline?), so stand-in fonts were used: reconnect and save again.';
+      if (dir) {
+        try {
+          say('Writing the files…');
+          const name = await writeKitFolder(dir, kit.folder, kit.files);
+          toast('Saved the kit in the folder ' + (dir.name ? dir.name + '/' : '') + name + ' (' + kit.files.length + ' files).' + warn, !!warn);
+          return { folder: name, saved: 'folder', name, files: kit.files.map(f => name + '/' + f.path) };
+        } catch (e) { console.warn('[label-studio] kit: folder write failed, saving a ZIP instead', e); ui.kitDir = null; }
+      }
+      say('Packing the ZIP…');
+      const zip = await makeZip(kit.files.map(f => ({ path: kit.folder + '/' + f.path, blob: f.blob })));
+      const name = kit.folder + '.zip';
+      download(zip, name);
+      toast('Saved ' + name + ' (' + kit.files.length + ' files in the folder ' + kit.folder + ').' + warn, !!warn);
+      return { folder: kit.folder, saved: 'zip', name, files: kit.files.map(f => kit.folder + '/' + f.path) };
+    } finally { ui.kitBusy = false; }
   }
 
   /* =========================================================================================
@@ -4136,6 +4665,41 @@
     c.backColor = bg.mode === 'two-tone' ? bg.c2 : bg.c1;
     return c;
   }
+  // The front panel's hot-foil for the 3D pack: a canvas the shape of the front art, white where the print is foil
+  // and black elsewhere, or null when nothing is foil. Today that is a logo with the "Gold foil" fill (its letters
+  // and its sparkles). The print files are not touched: they carry the flat gold.
+  // art (optional): the finished front art of the same model, at the same size. With it, a layer stacked above the
+  // logo is respected: where it covers the letters the print is that layer, not foil.
+  async function renderFoilCanvas(longSide, model, art) {
+    const m0 = model || state.model; const P0 = m0.panels.front, lg = P0.els.logo;
+    if (!lg || !lg.visible || lg.style === 'upload' || lg.fill !== 'gold') return null;
+    const m = clone(m0); const P = m.panels.front;
+    Object.keys(P.els).forEach(k => { if (P.els[k] && k !== 'logo') P.els[k].visible = false; });
+    P.bg.mode = 'solid'; P.bg.c1 = '#000000'; P.bg.ribs = false;
+    if (P.bg.pattern) P.bg.pattern.kind = 'none';
+    if (P.bg.image) P.bg.image.src = null;
+    P.els.logo.fill = 'custom'; P.els.logo.fillColor = '#ffffff';
+    const S = P.els.logo.sparkles;                       // the sparkles are foil only when they print in the foil's own gold
+    if (S) { if (String(S.color || '').toLowerCase() === GOLD) S.color = '#ffffff'; else S.on = false; }
+    const W = m.trim.w, H = m.trim.h, k = (longSide || 2048) / Math.max(W, H);
+    const pxW = Math.round(W * k), pxH = Math.round(H * k);
+    const r = await buildExportSVG({ bleed: false, pxW, pxH, idp: 'fx-front-', model: m, side: 'front' });
+    const c = await svgToCanvas(r.svg, pxW, pxH);
+    const above = P0.order.slice(P0.order.indexOf('logo') + 1).some(key => P0.els[key] && P0.els[key].visible);
+    if (above && art && art.width === c.width && art.height === c.height) {
+      // foil only where the finished art still shows the foil's gold (fully at 10 levels from it or closer, none from 40)
+      const g = [parseInt(GOLD.slice(1, 3), 16), parseInt(GOLD.slice(3, 5), 16), parseInt(GOLD.slice(5, 7), 16)];
+      const cx = c.getContext('2d', { willReadFrequently: true }), d = cx.getImageData(0, 0, c.width, c.height), q = d.data;
+      const a = art.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, c.width, c.height).data;
+      for (let i = 0; i < q.length; i += 4) {
+        if (q[i + 1] < 8) continue;
+        const dist = Math.max(Math.abs(a[i] - g[0]), Math.abs(a[i + 1] - g[1]), Math.abs(a[i + 2] - g[2]));
+        if (dist > 10) { const v = dist >= 40 ? 0 : Math.round(q[i + 1] * (1 - (dist - 10) / 30)); q[i] = q[i + 1] = q[i + 2] = v; }
+      }
+      cx.putImageData(d, 0, 0);
+    }
+    return c;
+  }
   const specKey = m => m.format + '|' + JSON.stringify(specOf(m));
   async function init3D() {
     buildMockControls();
@@ -4149,6 +4713,7 @@
       $('#mock-view').insertBefore(host, $('#mock-view').firstChild);
       const m = state.model;
       const art = await renderArtCanvas(2048, m, 'front'), artBack = await renderArtCanvas(2048, m, 'back');
+      art.foil = await renderFoilCanvas(2048, m, art);
       mock.inst = await window.MPMockup.create(host, { type: FORMATS[m.format].mock, spec: specFor3D(m), art, artBack, finish: mock.finish, background: mock.bg, view: mock.view });
       mock.type = FORMATS[m.format].mock; mock.specKey = specKey(m);
       mockPH(null, false);
@@ -4170,6 +4735,7 @@
       // while the art renders wait for the next round)
       const m = clone(state.model); const type = FORMATS[m.format].mock; const key = specKey(m); const spec3 = specFor3D(m);
       const art = await renderArtCanvas(2048, m, 'front'), back = await renderArtCanvas(2048, m, 'back');
+      art.foil = await renderFoilCanvas(2048, m, art);
       if (mock.type !== type || mock.specKey !== key) {
         if (typeof mock.inst.setSpec === 'function') mock.inst.setSpec(spec3, art, back);      // rebuild from the spec, art in the same step
         else mock.inst.setType(type, { w: m.trim.w, h: m.trim.h }, art);                              // (an older mockup3d.js)
@@ -4183,6 +4749,7 @@
   }
   function buildMockControls() {
     const host = $('#mock-ctrls'); host.innerHTML = '';
+    const oldVf = $('#mock-viewf'); if (oldVf) oldVf.remove();          // (it may be beside the AI panel)
     const dis = !mock.inst;
     const seg = (label, opts, cur, fn) => {
       const s = h('div', { class: 'seg', role: 'group', 'aria-label': label });
@@ -4195,7 +4762,8 @@
     };
     const views = [['front', 'Front'], ['three-quarter', '¾ view'], ['hero', 'Hero']];
     if (!window.MPMockup || !window.MPMockup.VIEWS || window.MPMockup.VIEWS.indexOf('back') >= 0) views.push(['back', 'Back']);
-    host.appendChild(seg('View', views, mock.view, v => { mock.view = v; try { mock.inst.setView(v); } catch (e) { console.warn(e); } }));
+    const vf = seg('View', views, mock.view, v => { mock.view = v; try { mock.inst.setView(v); } catch (e) { console.warn(e); } });
+    vf.id = 'mock-viewf'; host.appendChild(vf);
     host.appendChild(seg('Finish', [['gloss', 'Gloss'], ['satin', 'Satin'], ['matte', 'Matte']], mock.finish, v => { mock.finish = v; try { mock.inst.setFinish(v); } catch (e) { console.warn(e); } }));
     const sws = h('div', { class: 'swatches' });
     [['#f4ece9', 'Warm white'], ['#ffffff', 'White'], ['#fbe3ee', 'Blush'], ['#e8efe4', 'Sage'], ['#d9d2cd', 'Stone'], ['#2a2125', 'Ink']].forEach(c => {
@@ -4207,7 +4775,77 @@
     const btn = h('button', { class: 'btn block', type: 'button', disabled: dis }, icon('png', 'ico-sm') + 'Save 3D render (PNG)');
     btn.addEventListener('click', async () => { btn.disabled = true; try { await export3D(false); } catch (e) { toast('Render failed: ' + e.message, true); } btn.disabled = false; });
     host.appendChild(btn);
-    host.appendChild(h('div', { class: 'mock-hint', text: mock.inst ? 'Drag to turn · scroll to zoom. The pack is built from the item specs and wears both exact panels.' : 'The 3D pack wears the exact export files.' }));
+    // how to turn it, behind the "?" after the "3D mockup" title
+    let mh = $('#mock-help'); const mt = $('.mock-head h2');
+    if (!mh && mt) { mh = h('span', { id: 'mock-help', class: 'help-host' }); mt.appendChild(mh); }
+    setHelp(mh, mock.inst ? 'Drag to turn · scroll to zoom. The pack is built from the item specs and wears both exact panels.' : 'The 3D pack wears the exact export files.', '3D mockup');
+    if (dock.slot) { $('#gd-mock-h', dock.slot).insertBefore(vf, dock.fold); setHelp(dock.help, mh && mh.dataset.help ? mh.dataset.help.split('\n').slice(1).join('\n') : '', '3D mockup'); }
+  }
+
+  /* ---- the 3D view beside the AI panel (gpu.js): while the panel is open, the one 3D view (the same WebGL
+   * canvas, moved, never a second one) sits at the top of the panel with its view switch, so applying a result
+   * shows on the pack at once. A stand-in keeps the 3D column's shape underneath, so nothing there moves; the
+   * Finish, Backdrop and Save controls wait until the panel closes. A chevron folds the view away (remembered in
+   * this browser, apart for narrow windows, where it starts folded). ---- */
+  const dock = { slot: null, stand: null, bar: null, body: null, fold: null, help: null, full: null };
+  const narrowDock = () => window.matchMedia('(max-width: 760px)').matches;
+  const foldKey = () => 'mp-studio-3d-folded' + (narrowDock() ? '-narrow' : '');
+  function readFolded() { try { const v = localStorage.getItem(foldKey()); if (v === '1' || v === '0') return v === '1'; } catch (e) { /* no storage */ } return narrowDock(); }
+  function setFolded(f) {
+    if (!dock.slot) return;
+    dock.slot.classList.toggle('folded', f);
+    dock.fold.setAttribute('aria-expanded', String(!f));
+    dock.fold.setAttribute('aria-label', f ? 'Show the 3D view' : 'Hide the 3D view'); dock.fold.title = f ? 'Show the 3D view' : 'Hide the 3D view';
+  }
+  function dock3D(slot) {
+    const view = $('#mock-view');
+    if (!slot || !view || dock.slot) return;
+    if (!dock.bar || !slot.contains(dock.bar)) {
+      dock.bar = h('div', { class: 'gd-mock-h', id: 'gd-mock-h' }, '<h3>3D mockup</h3>');
+      dock.help = h('span', { class: 'help-host' }); $('h3', dock.bar).appendChild(dock.help);
+      dock.fold = h('button', { type: 'button', class: 'btn ghost sm icon gd-fold', 'aria-controls': 'gd-mock-b' }, icon('up'));
+      dock.fold.addEventListener('click', () => { const f = !dock.slot.classList.contains('folded'); setFolded(f); try { localStorage.setItem(foldKey(), f ? '1' : '0'); } catch (e) { /* no storage */ } });
+      dock.bar.appendChild(dock.fold);
+      dock.body = h('div', { class: 'gd-mock-b', id: 'gd-mock-b' });
+      slot.innerHTML = ''; slot.appendChild(dock.bar); slot.appendChild(dock.body);
+    }
+    dock.full = view.getBoundingClientRect();
+    dock.stand = h('div', { class: 'mock-view mock-stand', 'aria-hidden': 'true' });
+    dock.stand.style.background = getComputedStyle(view).backgroundColor;
+    view.parentNode.insertBefore(dock.stand, view);
+    dock.slot = slot; slot.style.minHeight = '';
+    setFolded(readFolded());
+    dock.body.appendChild(view);
+    const vf = $('#mock-viewf'); if (vf) dock.bar.insertBefore(vf, dock.fold);
+    const mh = $('#mock-help'); setHelp(dock.help, mh && mh.dataset.help ? mh.dataset.help.split('\n').slice(1).join('\n') : '', '3D mockup');
+    document.body.classList.add('mock-docked');
+    if (mock.inst && typeof mock.inst.resize === 'function') mock.inst.resize();
+  }
+  function undock3D() {
+    const view = $('#mock-view');
+    if (!dock.slot || !view) return;
+    const slot = dock.slot;
+    slot.style.minHeight = slot.offsetHeight + 'px';        // (the panel slides away as it was)
+    if (dock.stand && dock.stand.parentNode) { dock.stand.parentNode.replaceChild(view, dock.stand); }
+    const vf = $('#mock-viewf'), ctrls = $('#mock-ctrls'); if (vf && ctrls) ctrls.insertBefore(vf, ctrls.firstChild);
+    dock.stand = null; dock.slot = null;
+    document.body.classList.remove('mock-docked');
+    if (mock.inst && typeof mock.inst.resize === 'function') mock.inst.resize();
+  }
+  // the full 3D panel's box: the stand-in has it while the view is docked
+  function fullViewRect() {
+    const r = dock.stand && dock.stand.getBoundingClientRect();
+    return r && r.width > 1 && r.height > 1 ? r : dock.full || { width: 352, height: 440 };
+  }
+  // for a snapshot: the pack is drawn at the full panel's size (all in the same task, so nothing on screen changes)
+  function holdFullSize(r) {
+    const host = $('#mock-host');
+    if (!dock.slot || !host) return () => {};
+    dock.slot.classList.add('snap');
+    const cs = getComputedStyle($('#mock-view'));             // (the host sits inside the view's border, as in the panel)
+    const w = r.width - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth), hh = r.height - parseFloat(cs.borderTopWidth) - parseFloat(cs.borderBottomWidth);
+    host.style.cssText = 'position:absolute;left:0;top:0;width:' + w + 'px;height:' + hh + 'px';
+    return () => { host.style.cssText = 'position:absolute;inset:0'; dock.slot && dock.slot.classList.remove('snap'); if (mock.inst && typeof mock.inst.resize === 'function') mock.inst.resize(); };
   }
 
   /* =========================================================================================
@@ -4234,7 +4872,7 @@
   function layoutAndRender(o) { layoutStage(); invalidate(Object.assign({ layers: true }, o || {})); }
   function select(key, fromStage) {
     if (state.sel === key) { drawSelection(); return; }
-    state.sel = key; buildInspector(); renderLayers(); drawSelection();
+    state.sel = key; buildInspector(); renderLayers(); drawSelection(); notifySel();
     if (fromStage && key) revealInspector();
   }
   function revealInspector() {
@@ -4249,7 +4887,7 @@
     renderPresets(); renderFormat(); buildInspector(); syncToggles(); syncViewSwitch();
     ensureFonts(state.model).then(() => { clearMeasureCache(); invalidate({ three: true }); });
     layoutAndRender({ three: true });
-    updateUndoButtons();
+    updateUndoButtons(); notifySel();
   }
   function applyPreset(id) {
     const p = PRESETS.find(x => x.id === id); if (!p) return;
@@ -4273,18 +4911,25 @@
   // the editor view: the front or the back panel (each with its own layers), or the whole print layout
   function syncViewSwitch() {
     $$('#view-switch button').forEach(b => b.classList.toggle('on', b.dataset.v === ui.view));
-    const h2 = $('#sec-layers .sec-h h2'); if (h2) h2.textContent = ui.view === 'layout' ? 'Layers' : 'Layers · ' + SIDES[state.side].toLowerCase();
+    const t = $('#layers-t') || $('#sec-layers .sec-h h2'); if (t) t.textContent = ui.view === 'layout' ? 'Layers' : 'Layers · ' + SIDES[state.side].toLowerCase();
+  }
+  // the "?" of the fixed titles in index.html (Start from, Layers)
+  function staticHelp() {
+    const add = (sel, html, topic) => { const t = $(sel); if (t && !$('.help-q', t)) t.insertAdjacentHTML('beforeend', helpHTML(html, topic)); };
+    add('#sec-presets .sec-h h2', 'Each picture is that design’s front panel: click one to start from it. Its name and size are on the picture’s tooltip. To see the client’s current pack beside the design, use <b>Compare</b> above the design.', 'Start from');
+    add('#sec-layers .sec-h h2', 'Click to edit · drag on the design', 'Layers');
   }
   function setView(v) {
     if (v !== 'front' && v !== 'back' && v !== 'layout') return;
     if (v !== 'layout') state.side = v;
     ui.view = v; state.sel = null; ui.hover = null; ui.zoomMode = 'fit';
     syncViewSwitch(); syncToggles(); buildInspector();
-    layoutAndRender();
+    layoutAndRender(); notifySel();
   }
 
   function wire() {
     $$('[data-icon]').forEach(i => { i.outerHTML = icon(i.getAttribute('data-icon')); });
+    staticHelp(); wireHelp();
     // the guide toggles carry their own line sample, so they double as the legend
     const sample = (sel, css) => { const t = $(sel); const ic = t.querySelector('svg'); if (ic) ic.outerHTML = '<i class="lg" style="' + css + '"></i>'; };
     sample('#tg-bleed', 'border-top-style:dashed;border-color:#e5484d');
@@ -4323,14 +4968,21 @@
       e.preventDefault(); ui.zoomMode = 'manual'; ui.k = clamp(ui.k * (e.deltaY < 0 ? 1.1 : 1 / 1.1), 0.6, 60); layoutAndRender();
     }, { passive: false });
     $('#modal-bg').addEventListener('click', e => { if (e.target.id === 'modal-bg' || (e.target.closest && e.target.closest('[data-close]'))) closeModal(); });
-    $('#statusbar').addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-focus]'); if (b) focusEl(b.getAttribute('data-focus'), b.getAttribute('data-side')); });
-    document.addEventListener('pointerdown', e => { if (ui.addMenu && !(e.target.closest && e.target.closest('.layer-add'))) closeAddMenu(); });   // the Add element menu closes on a click elsewhere
+    $('#statusbar').addEventListener('click', e => {
+      if (e.target.closest && e.target.closest('#st-notes')) { setNotesOpen(!ui.notesOpen); return; }
+      const b = e.target.closest && e.target.closest('[data-focus]'); if (b) { setNotesOpen(false); focusEl(b.getAttribute('data-focus'), b.getAttribute('data-side')); }
+    });
+    document.addEventListener('pointerdown', e => {
+      if (ui.addMenu && !(e.target.closest && e.target.closest('.layer-add'))) closeAddMenu();   // the Add element menu closes on a click elsewhere
+      if (ui.notesOpen && !(e.target.closest && e.target.closest('.st-notes-w, #help-pop'))) setNotesOpen(false);   // and so does the notes list
+    });
     document.addEventListener('keydown', e => {
       const tag = (e.target && e.target.tagName) || '';
       const typing = /INPUT|TEXTAREA|SELECT/.test(tag) || (e.target && e.target.isContentEditable);
       const mod = e.ctrlKey || e.metaKey;
       if (e.key === 'Escape') {
         if ($('#modal-bg').classList.contains('on')) closeModal();
+        else if (ui.notesOpen) setNotesOpen(false, true);
         else if (ui.addMenu) { closeAddMenu(); const b = $('#add-el'); if (b) b.focus(); }
         else if (!typing) select(null);
         return;
@@ -4393,6 +5045,7 @@
     if (restored && lostN) toast('Your last design was restored, but ' + (lostN > 1 ? lostN + ' pictures' : 'a picture') + ' could not be. See the note above the design.', true);
     else if (restored) toast('Welcome back: your last design was restored');
     window.MPStudio.ready = true;
+    drawTiles();                                                           // (the Start-from pictures, in idle time)
   }
 
   // Small API for scripted checks (QA) and power users in the console.
@@ -4402,6 +5055,7 @@
     applyPreset, select, undo, redo,
     buildExportSVG, renderPNG, preparePrint, renderArtCanvas,
     exportSVGFile, exportPNGFile, saveDesignFile, buildLayoutSVG, exportLayoutSVG, setView, resetSpec,
+    saveKit,                                                               // the "Save a kit" button: ({ onProgress, dir, zip }) -> { folder, saved, name, files }
     get side() { return state.side; }, get view() { return ui.view; },
     spec: () => specOf(state.model),
     layout: () => { const L = layoutGeometry(state.model); return { kind: L.kind, w: L.w, h: L.h, bleed: L.b, pieces: L.pieces.map(q => ({ side: q.side, x: q.x, y: q.y, w: q.w, h: q.h, src: q.src })) }; },
@@ -4421,6 +5075,8 @@
     get mockup() { return mock.inst; },
     get mockBusy() { return mock.busy || mock.pending; },
     export3D, update3D: () => update3D(true),
+    dock3D, undock3D,                                                      // (gpu.js: the 3D view beside the AI panel)
+    snapshot3D,
     ensureFonts: () => ensureFonts(state.model, 8000),
     set: (path, v) => { setP(path, v); commit(); afterModelReplaced(false); },
     geom: (key, side) => { const v = panelView(state.model, side || state.side); const el = v.els[key]; if (!el || isPic(el)) return null; const g = key === 'logo' ? logoGeometry(el) : textGeometry(el, elText(key, el)); return { cap: g.cap, fs: g.fs, lh: g.lh, lines: g.lines.map(l => ({ t: l.t, x1: l.x1, x2: l.x2, base: l.base })) }; },
@@ -4428,6 +5084,10 @@
     // for gpu.js (AI on your GPU): the studio's icons and toasts, one more picture, and AI background art set
     // behind a panel. Only the background changes: the logo, every word and the real pop stay on top, as they are.
     icon, toast,
+    // the "?" help, so the AI panel explains itself the same way: helpHTML(html, topic) -> the button and its words;
+    // setHelp(host, html, topic) puts one in host (redrawn only when the words change); splitHelp(html) -> [the
+    // first sentence (and a short second one), the rest] of a long message
+    helpHTML, setHelp, splitHelp, closeHelp,
     // (dataURL, { name, kind }) or ({ src, name, kind }) -> the new picture's id. kind 'element': a picture for an
     // added element (its `opaque` says whether it still has a solid backdrop). A picture that comes in this way is
     // never of kind 'pop': only the bundled photos and the user's own uploads are offered as the real pop.
@@ -4472,6 +5132,43 @@
     duplicateElement: (key, side) => duplicatePicture(key, side),          // the copy's key, or null
     deleteElement: (key, side) => deletePicture(key, side),                // true, or false if it was not there
     cutOutPlainBackground,                                                 // (dataURL) -> Promise of { dataURL, w, h, cut, note }
+    // for gpu.js: the AI panel edits what is selected, and its result goes straight onto the design.
+    // aiStep(token, fn): what fn changes is ONE undo step; the same token again replaces that step (see aiStep)
+    aiStep,
+    get undoDepth() { return hist.i; },                                    // (QA: how many steps there are to undo)
+    // onSelection(fn): fn({ sel, side, view }) after the selection or the panel being edited changes (once per change)
+    onSelection: fn => { if (typeof fn === 'function') selWatch.push(fn); },
+    // the name and kind of a layer: 'background', 'pop', 'picture', 'logo', 'badge' or 'text' (any other built-in layer)
+    layerInfo: (key, side) => {
+      const sd = side === 'front' || side === 'back' ? side : state.side;
+      if (!key || key === 'background') return { key: 'background', side: sd, kind: 'background', name: 'Background' };
+      const el = state.model.panels[sd].els[key]; if (!el) return null;
+      return { key, side: sd, kind: isPic(el) ? 'picture' : key === 'pop' || key === 'logo' || key === 'badge' ? key : 'text', name: infoOf(key, el).label, visible: !!el.visible };
+    },
+    // the real pop (the front's Pop layer): its picture as a data URL, and where it is (centre and height, mm)
+    popPicture: () => {
+      const pop = state.model.panels.front.els.pop; const a = pop && ASSETS[pop.src];
+      if (!a) return null;
+      const hh = Math.max(2, Number(pop.h) || 40);
+      return { dataURL: a.src, w: a.w, h: a.h, name: 'The pop', side: 'front', x: pop.x, y: pop.y + hh / 2, hmm: hh, visible: !!pop.visible };
+    },
+    // show or hide the Pop layer (never deleted, its picture never changed). One undo step, or part of an aiStep
+    setPopVisible: v => { const pop = state.model.panels.front.els.pop; if (!pop || pop.visible === !!v) return; pop.visible = !!v; commit(); invalidate({ three: true, layers: true }); },
+    // move or size an added picture: { x, y } its centre and w its width (mm). One undo step, or part of an aiStep
+    placeElement: (key, o, side) => {
+      const f = findPic(key, side); if (!f) return false; o = o || {};
+      if (isFinite(Number(o.x))) f.el.x = n(Number(o.x), 3);
+      if (isFinite(Number(o.y))) f.el.y = n(Number(o.y), 3);
+      if (Number(o.w) > 0) f.el.w = n(clamp(Number(o.w), PIC_MIN, PIC_MAX), 3);
+      commit(); invalidate({ three: true, layers: true }); if (state.sel === key) buildInspector();
+      return true;
+    },
+    // a panel's background, to put back as it was (gpu.js keeps it while a result is on the design)
+    backgroundOf: side => clone(state.model.panels[side === 'back' ? 'back' : 'front'].bg),
+    setBackground: (bg, side) => { const sd = side === 'back' ? 'back' : 'front'; if (!isObj(bg)) return; state.model.panels[sd].bg = clone(bg); commit(); invalidate({ three: true, layers: true }); if (state.sel === 'background') buildInspector(); },
+    // an added picture as it is now (to put back as it was), and putting it back
+    elementState: (key, side) => { const f = findPic(key, side); return f ? clone(f.el) : null; },
+    restoreElement: (key, el, side) => { const f = findPic(key, side); if (!f || !isPic(el)) return false; f.P.els[key] = pictureEl(el); commit(); invalidate({ three: true, layers: true }); if (state.sel === key) buildInspector(); return true; },
   };
   boot().catch(e => {
     console.error('[label-studio] could not start:', e);

@@ -27,6 +27,8 @@
  *     type: 'wrapper' | 'bag' | 'sleeve3',     // flow wrap · stand-up zip pouch · 3-pack sleeve box
  *     spec: MPItems.wrapper,                    // optional: the item spec (default window.MPItems[type])
  *     art: canvas,                              // the exact FRONT panel (flat w x h, no bleed); >= 2048 px long side
+ *                                               // optional art.foil: a canvas of the same shape, white where the print
+ *                                               // is hot-foil (black elsewhere): those pixels shade as metal foil
  *     artBack: canvas,                          // optional: the exact BACK panel (same size), as seen from behind
  *     finish: 'gloss' | 'satin' | 'matte',      // default 'satin'
  *     background: '#f4ece9' | 'transparent',    // scene backdrop
@@ -72,7 +74,7 @@
   'use strict';
   if (global.MPMockup && global.MPMockup.version) return;
 
-  var VERSION = '2.1.0';
+  var VERSION = '2.2.0';
   var THREE_URL = 'https://unpkg.com/three@0.160.0/build/three.module.js';
   var DEG = Math.PI / 180;
 
@@ -1291,6 +1293,7 @@
         warnedSmall[key] = true;
         warn('the art is ' + key + ' px; 2048+ px on the long side keeps small print sharp when zoomed.');
       }
+      uploadFoil(!isPlaceholder && artInfo && artInfo.ok && src ? src.foil || null : null);   // (see "hot-foil" below)
     }
     function noArt() { return placeholderArt(faceAspect, ['No art yet']); }
     // Back art: the back panel as seen from behind (same flat size as the front). null = plain back.
@@ -1341,6 +1344,112 @@
       t.wrapS = t.wrapT = T.ClampToEdgeWrapping; t.magFilter = T.LinearFilter; t.minFilter = T.LinearMipmapLinearFilter;
       t.generateMipmaps = true; t.anisotropy = aniso || 1; t.needsUpdate = true;
       return t;
+    }
+
+    // ---------- hot-foil on the front art (optional). art.foil is a canvas the shape of the front art, white where
+    // the print is foil (the studio: a logo with the "Gold foil" fill), black elsewhere. Those pixels are a different
+    // material from the film: polished metal in the art's own colour, lying on top of the film (no laminate haze or
+    // sheen over it). The art itself stays flat: nothing is drawn onto it, and without art.foil the pack looks
+    // exactly as before.
+    // Metal only looks like metal when it has something to mirror, and the room the film is lit by is too even for
+    // that. So the foil mirrors a small studio of its own, described here and fixed in space (its reflections travel
+    // over the foil as the pack turns):
+    //   sky / floor   how bright the room is above and below eye level (1 = as bright as the art's colour printed flat)
+    //   streaks       strip lights: [where (degrees round the pack, 0 = front, negative = left), how wide their
+    //                 reflection is (degrees), how strong]. Narrow and strong reads as shine; a negative strength
+    //                 is a dark flag beside a light, which deepens the gold there (shine is that contrast).
+    //   tilt          how much the strips lean; period: they repeat every so many degrees all round (0 = once)
+    //   white         how far the brightest reflections go from gold toward white
+    //   ibl           how much of the film's own studio the foil still mirrors; rough: how soft that is
+    // (chosen by eye on the bag's hero view: one white-hot band across the name with a soft halo, a fine glint
+    // further right, and a dark flag at the left that deepens the gold there)
+    var FOIL = { rough: 0.2, sky: 0.62, floor: 0.42, tilt: 0.5, period: 34, white: 0.7, ibl: 0.2,
+      streaks: [[-57, 1.6, 3.6], [-57, 6, 0.6], [-48, 0.6, 2.0], [-73, 6, -0.24]] };
+    var foilBlank = new T.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, T.RGBAFormat, T.UnsignedByteType);
+    foilBlank.needsUpdate = true;
+    var foilTex = null, foW = 0, foH = 0;
+    var foilU = {
+      foilMap: { value: foilBlank }, foilAmount: { value: 0 }, foilRoughness: { value: FOIL.rough },
+      foilLook: { value: new T.Vector4() }, foilWhite: { value: 0 }, foilIbl: { value: 0 },
+      foilStreaks: { value: [new T.Vector3(), new T.Vector3(), new T.Vector3(), new T.Vector3()] }
+    };
+    var foilSet = {};
+    function setFoilLook(o) {
+      ['rough', 'sky', 'floor', 'tilt', 'period', 'white', 'ibl'].forEach(function (k) { if (o && isFinite(o[k])) foilSet[k] = Number(o[k]); });
+      if (o && Array.isArray(o.streaks)) foilSet.streaks = o.streaks.slice(0, 4).map(function (q) { return [Number(q[0]) || 0, Math.max(0.05, Number(q[1]) || 1), Math.min(40, Math.max(-1, Number(q[2]) || 0))]; });
+      foilU.foilRoughness.value = Math.min(1, Math.max(0.04, foilSet.rough));
+      foilU.foilLook.value.set(Math.max(0, foilSet.sky), Math.max(0, foilSet.floor), foilSet.tilt, Math.max(0, foilSet.period) * DEG);
+      foilU.foilWhite.value = Math.min(1, Math.max(0, foilSet.white));
+      foilU.foilIbl.value = Math.min(4, Math.max(0, foilSet.ibl));
+      for (var i = 0; i < 4; i++) {
+        var q = foilSet.streaks[i];
+        if (q) foilU.foilStreaks.value[i].set(q[0] * DEG, q[1] * DEG, q[2]); else foilU.foilStreaks.value[i].set(0, 1, 0);
+      }
+    }
+    setFoilLook(FOIL);
+    function withFoil(m) {            // a material that wears the front art
+      m.onBeforeCompile = function (shader) {
+        Object.keys(foilU).forEach(function (k) { shader.uniforms[k] = foilU[k]; });
+        shader.fragmentShader = shader.fragmentShader
+          .replace('#include <common>', '#include <common>\nuniform sampler2D foilMap;\nuniform float foilAmount;\nuniform float foilRoughness;\n' +
+            'uniform vec4 foilLook;\nuniform float foilWhite;\nuniform float foilIbl;\nuniform vec3 foilStreaks[ 4 ];')
+          .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\n' +
+            'float foilMask = 0.0;\n#ifdef USE_MAP\n' +
+            '  foilMask = texture2D( foilMap, vMapUv ).g * foilAmount;\n' +
+            '  metalnessFactor = mix( metalnessFactor, 1.0, foilMask );\n' +
+            '  roughnessFactor = mix( roughnessFactor, foilRoughness, foilMask );\n#endif')
+          .replace('#include <lights_physical_fragment>', '#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\n  material.clearcoat *= ( 1.0 - foilMask );\n#endif\n#ifdef USE_SHEEN\n  material.sheenColor *= ( 1.0 - foilMask );\n#endif')
+          .replace('#include <lights_fragment_end>', '#include <lights_fragment_end>\n#if defined( USE_MAP ) && defined( RE_IndirectSpecular )\n' +
+            '  if ( foilMask > 0.001 ) {\n' +
+            '    vec3 fR = inverseTransformDirection( reflect( - normalize( vViewPosition ), normal ), viewMatrix );\n' +
+            '    float fAz = atan( fR.x, fR.z );\n' +
+            '    float fEl = asin( clamp( fR.y, - 1.0, 1.0 ) );\n' +
+            '    float fBase = mix( foilLook.y, foilLook.x, smoothstep( - 0.5, 0.6, fEl ) );\n' +
+            '    float fU = fAz + fEl * foilLook.z;\n' +
+            '    float fS = 0.0;\n    float fN = 0.0;\n' +
+            '    for ( int i = 0; i < 4; i ++ ) {\n' +
+            '      vec3 fT = foilStreaks[ i ];\n' +
+            '      float fD = fU - fT.x;\n' +
+            '      if ( foilLook.w > 0.0 ) fD = ( fract( fD / foilLook.w + 0.5 ) - 0.5 ) * foilLook.w;\n' +
+            '      float fE = exp( - ( fD * fD ) / ( fT.y * fT.y ) );\n' +
+            '      fS += max( fT.z, 0.0 ) * fE;\n      fN += min( fT.z, 0.0 ) * fE;\n' +
+            '    }\n' +
+            '    vec3 fSpec = material.specularColor * max( fBase + fN, 0.1 ) + mix( material.specularColor, vec3( 1.0 ), foilWhite ) * fS;\n' +
+            '    reflectedLight.directSpecular = mix( reflectedLight.directSpecular, fSpec, foilMask );\n' +
+            '    reflectedLight.indirectSpecular *= mix( 1.0, foilIbl, foilMask );\n' +
+            '  }\n#endif');
+      };
+      m.customProgramCacheKey = function () { return 'mp-foil-5'; };
+      return m;
+    }
+    function uploadFoil(src) {        // src: the foil canvas of the current front art, or null
+      if (!src || !src.width || !src.height) {
+        foilU.foilAmount.value = 0; foilU.foilMap.value = foilBlank;
+        if (foilTex) { foilTex.dispose(); foilTex = null; foW = foH = 0; }
+        return;
+      }
+      var img = fitArt(src, faceAspect, '#000000', true, 'foil');
+      if (Math.max(img.width, img.height) > maxTex) {
+        var k = maxTex / Math.max(img.width, img.height), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.floor(img.width * k)); c.height = Math.max(1, Math.floor(img.height * k));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        img = c;
+      }
+      if (foilTex && img.width === foW && img.height === foH) {
+        if (foilTex.image !== img) foilTex.image = img;
+        foilTex.needsUpdate = true;
+      } else {
+        var old = foilTex;
+        foilTex = new T.Texture(img);
+        foilTex.colorSpace = T.NoColorSpace;
+        foilTex.anisotropy = maxAniso; foilTex.generateMipmaps = true;
+        foilTex.minFilter = T.LinearMipmapLinearFilter; foilTex.magFilter = T.LinearFilter;
+        foilTex.wrapS = foilTex.wrapT = T.ClampToEdgeWrapping;
+        foilTex.needsUpdate = true;
+        foW = img.width; foH = img.height;
+        if (old) old.dispose();
+      }
+      foilU.foilMap.value = foilTex; foilU.foilAmount.value = 1;
     }
 
     // ---------- the pack
@@ -1446,7 +1555,7 @@
         p.detail = D; p.rough = dataTex(r1.data, r1.W, r1.H, 4); p.ccRough = dataTex(r2.data, r2.W, r2.H, 4);
         p.textures.push(nrm, p.rough, p.ccRough);
         var d = { normal: nrm, rough: p.rough, ccRough: p.ccRough };
-        var front = filmMaterial(null, artTex, d), back = filmMaterial(backColorHex(), backTex, d);
+        var front = withFoil(filmMaterial(null, artTex, d)), back = filmMaterial(backColorHex(), backTex, d);
         p.filmMats.push(front, back); p.backMats.push(back); p.materials.push(front, back);
         var tg = performance.now();
         full = type === 'wrapper' ? buildWrapperGeos(T, spec, true) : buildBagGeos(T, spec, true);
@@ -1479,7 +1588,7 @@
         geos = buildSleeveGeos(T, spec, true);
         var fib = getFibre(), fibFront = fib.clone();
         fibFront.needsUpdate = true; fibFront.repeat.set(spec.w / 25, spec.h / 25); p.textures.push(fibFront);
-        var frontB = boardMaterial(true, fibFront, 0.22), sideB = boardMaterial(false, fib, 0.22);
+        var frontB = withFoil(boardMaterial(true, fibFront, 0.22)), sideB = boardMaterial(false, fib, 0.22);
         var backB = boardMaterial(false, fibFront, 0.22);   // the back face: back art when given, else its plain colour
         p.boardMats.push(frontB, sideB, backB); p.backMats.push(backB); p.materials.push(frontB, sideB, backB);
         p.colorAttrs = {};
@@ -1843,6 +1952,11 @@
       get sizeMM() { return { w: R.w, h: R.h, d: type === 'bag' ? R.gusset : type === 'sleeve3' ? R.depth : undefined }; },
       get canvas() { return canvas; },
       get lastError() { return lastError; },
+      // the foil's look (see "hot-foil"): foil() reads it; foil({ rough, sky, floor, tilt, period, white, ibl, streaks }) changes it
+      foil: function (o) {
+        if (o && typeof o === 'object') { setFoilLook(o); requestRender(); }
+        return Object.assign({ on: foilU.foilAmount.value > 0 }, JSON.parse(JSON.stringify(foilSet)));
+      },
       // setArt(front[, back]): front = the front panel canvas; back = the back panel canvas (as seen from
       // behind), null for a plain back, or left out to keep the back as it is. Re-uploads in place, no rebuild.
       setArt: function (c, back) {
@@ -1947,6 +2061,8 @@
         canvas.removeEventListener('webglcontextlost', onContextLost); canvas.removeEventListener('webglcontextrestored', onContextRestored);
         disposePackage();
         if (artTex) artTex.dispose();
+        if (foilTex) foilTex.dispose();
+        foilBlank.dispose();
         if (backTex) backTex.dispose();
         if (fibreTex) fibreTex.dispose();
         if (knurlTex) knurlTex.dispose();

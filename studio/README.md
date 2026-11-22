@@ -20,18 +20,27 @@ browser (uploaded pictures included); use **Save design** to keep a file. Each b
 copies, keep their own.
 
 ## The flow
-1. **Start from** a preset: *Current wrapper*, *Current bag*, *Green wrapper*, *Green bag* or *3-pack sleeve*.
-   The small pictures next to them are the client's drafts; click one (or **Compare**) to see it beside the design.
+1. **Start from** a preset: *Current wrapper*, *Current bag*, *Green wrapper*, *Green bag* or *3-pack sleeve*, each
+   shown as a small picture of its own front panel (its full name and size are in the tooltip). **Compare** (above
+   the design) shows the client's draft beside the design.
 2. **Front | Back | Layout** (above the design): each item has a front and a back panel, each with its own layers.
    **Layout** shows the print layout: every panel as it prints, with the dieline on top (click a panel to edit it).
-3. **Edit**: click anything on the design (or in **Layers**) to change its words, font, size, colour and position.
+3. **Edit**: click anything on the design (or in **Layers**) to change its words, font, size, colour and position
+   (the controls changed most are in view; the rest, such as the font, spacing and the X / Y numbers, are under **More**).
    Drag to move (it snaps to the centre line); arrow keys nudge 0.5 mm, Shift + arrow 5 mm; or type exact X / Y in mm.
    Ctrl+Z / Ctrl+Shift+Z undo / redo. (Arrow keys on the 3D view only turn the pack.) **Add element**, at the top of
    Layers, adds a picture of your own (see *Elements*).
 4. **Open items** show above the design (on either panel): a blank to fill in, a missing picture, words that do not
-   fit the heart, words on a seal, a picture too small for print. Quieter notes sit in the status bar below the
-   design. The export dialog repeats them all under **Before you send**.
+   fit the heart, words on a seal, a picture too small for print. Quieter notes sit behind one chip in the status bar below
+   the design ("4 to check"; it turns to the warning colour and says "to fix" while an open item above is unsolved). The export dialog repeats them all under **Before you send**.
 5. **Export files** (top right).
+
+**The "?" buttons.** The explanations wait behind a small **?** at the end of the title or label they belong to, so
+the panels show only the controls and what needs doing. Hover over a **?** (or Tab to it) to read it; click or tap it
+to keep it open until the next click, Escape or a click elsewhere. Only one is open at a time, and it floats over the
+page, so nothing moves. Warnings and errors stay in view, in one short sentence, with any longer explanation behind
+their own **?**. In the AI panel the connect steps are under **How to connect**. (In the code: `helpHTML(html, topic)`
+in studio.js, also on `MPStudio.helpHTML` for gpu.js, with one delegated handler for the whole page.)
 
 ## The items: one spec for everything (`items.js`)
 `items.js` (`window.MPItems`) is the single source of truth for each item: flat size, seals, fin seal, zip, tear
@@ -47,7 +56,8 @@ on new numbers every element keeps its place relative to the panel.
 | Stand-up bag (100 g) | 150 × 189.2 mm (W/H 647/816: the bag itself, above its shadow and the floor) | top corners R 9.2 mm; zip track 21.8–30.5 mm below the top; small round tear notches (R 1.3) 16.0 mm below the top on both sides | top seal 8 mm, side seals 6 mm, round-bottom gusset 40 mm |
 | 3-pack sleeve | 165 × 110 mm, depth 30 | no client reference yet | |
 
-**Format** shows these numbers under *Item specs: from your drafts (interim)* (click the line to open it). Any of
+**Format** shows these numbers under *Size and specs* (click the row to open it; it also shows the trim, the bleed
+and the print layout size). Any of
 them can be edited for this design; an edited number is tinted, and **Reset to draft values** puts them all back.
 Edits flow to the guides, the exports and the 3D pack at once (the layout moves with the size unless you untick
 *Move the layout with the size*). A size change and its way back cancel exactly: Reset (or typing the draft value
@@ -143,6 +153,24 @@ Names: `format_design-name_date[_DRAFT]_side_suffix`, for example
 has an open item that makes it unfinished (a blank `___`, a missing pop photo or a stand-in); the print layout and
 the design file say DRAFT while any panel does.
 
+### Save a kit
+The **Kit** card at the top of **Export files** saves one folder named after the design (for example
+`current-wrapper_kit_2026-11-22`, with `_DRAFT` while the design has open items), holding, side by side:
+
+| File | What it is |
+|---|---|
+| `preview-3d.png` | The 3D pack in the hero view, as the studio shows it. |
+| `pieces/` | Every visible layer on its own: a see-through PNG at 300 ppi of its printed size, cropped to what it paints (about 1 mm to spare). Named in stacking order, front then back: `front-01-background.png`, `front-02-the-pop.png`, … An AI drawing ends in `-ai`. |
+| `pieces-sheet.png` | All the pieces on one see-through picture, in rows, each at its true relative size (300 ppi), front first, then back. No labels: it is meant to be used. |
+| `pieces-sheet.svg` | The same sheet as vector: each piece is its own group, named like its file (id and title), so it opens as separate objects. Words and the logo stay vector type, fonts embedded. |
+| `design.json` | The design file: open it again with **Open**. |
+| `README.txt` | What each file is, the design's name and size, which pieces are AI drawings, and any open DRAFT notes. |
+
+Chrome and Edge on a computer ask for a folder the first time (once per visit) and write the kit there as a new
+sub-folder. Everywhere else (phones, Firefox, Safari), or if you cancel the folder choice, the kit comes as one ZIP
+of that folder. The pieces are drawn one after another by the same renderer as every other file, from a copy of the
+design, so edits made while it builds wait for the next kit.
+
 ## The printer's dieline
 **Format → Load printer's dieline (SVG or PDF)** lays the printer's file over the design (or over the print layout
 in **Layout**), semi-transparent, scaled to millimetres from the file's own size, its page centred on the trim. Line
@@ -160,7 +188,7 @@ Every word on the pack is a field you control; nothing is added for you. Words t
 left as visible blanks (`___`) to fill in: the green presets' flavour, net weight and back-label facts, the bag's
 servings per container, and the 3-pack's count and net weight. **Net weight** is automatic from grams
 (`Net Wt. 0.35 oz (10 g)`, oz = g ÷ 28.3495), or type your own. The studio also compares the height of the net
-weight's lowercase "o" with the US minimum for the panel size (21 CFR 101.105) and notes it in the status bar: a
+weight's lowercase "o" with the US minimum for the panel size (21 CFR 101.105) and notes it under the status bar's notes chip: a
 quiet check, not a rule the studio enforces.
 
 ## The pop
@@ -182,8 +210,8 @@ it is a layer of its own, marked as an AI drawing, and it is never offered here 
 An element is a picture added as a layer of its own, on the front or the back panel: a second pop, a heart, a
 slice of lemon. The built-in layers stay as they are, and the Pop layer is still the real product photo.
 - **Add.** **Layers → Add element**: *The real pop photo* (the bundled photo again, as an element), *Upload a
-  picture…* (PNG, JPG or WebP) or *Make with AI…* (opens **AI on your GPU** on *Element*, below). The new element
-  lands in the middle of the panel being edited, about 40 % of its width, selected.
+  picture…* (PNG, JPG or WebP) or *Make with AI…* (opens **AI on your GPU** on *New element*, below). The new
+  element lands in the middle of the panel being edited, about 40 % of its width, selected.
 - **Move and size.** Drag it; the arrow keys nudge it. On the design, the small square at its corner resizes it and
   the round knob above it turns it (Shift: steps of 15°). Its panel has the name, the width in mm (the height
   follows: a picture is never stretched), the rotation, the position and Arrange.
@@ -193,8 +221,9 @@ slice of lemon. The built-in layers stay as they are, and the Pop layer is still
 - **Replace picture…** puts another picture in the same place at the same size. **Remove plain background** (shown
   for a picture that still has a solid backdrop) cuts a one-colour backdrop out from the edges inwards; an enclosed
   area, such as the hole of a ring, keeps the colour.
-- **Rework with AI…** opens **AI on your GPU** on *Element → Rework* for that element: say what should change, and
-  the result can replace the element (same place, same size) or be added as a copy.
+- **Rework with AI…** (or simply selecting the element with **AI on your GPU** open) makes that element what the AI
+  panel edits: say what should change and Generate; the result replaces its picture in place (same centre, same
+  longer side), and **Back to before** puts the old one back.
 - **AI drawings are marked.** An element drawn or reworked by AI has an **AI** tag in Layers and in its own panel,
   with the words it was made from; the AI panel labels its results *AI drawing*; and the checks before export say
   how many there are (*1 AI-drawn element: a drawing, not a product photo.*). An upload, or the pop photo added as
@@ -208,13 +237,13 @@ slice of lemon. The built-in layers stay as they are, and the Pop layer is still
 A link that ends in `#gpu=<bridge address>` opens the studio with the AI panel already connected to that
 address (the part after `#` stays in the browser). The desktop launcher on the GPU PC opens the studio that way,
 and its sharing version prints such a link for another device.
-**AI on your GPU** (top bar) makes background art, picture elements and logo or pack ideas with ComfyUI on **your
-own PC**, from the local studio or the online one. The studio never needs a GPU itself; without a connection the
+**AI on your GPU** (top bar) edits what you select in the design (the background, a picture element, the pop) with
+ComfyUI on **your own PC**, from the local studio or the online one, and makes logo or pack ideas. The studio never needs a GPU itself; without a connection the
 panel only explains itself and everything else works as before. The GPU side is the **Model Pops GPU bridge**: the
 `gpu-bridge` folder next to `label-studio` in the model-pops-packaging folder on the GPU PC (it is not part of the
 online site); its `README.md` has the setup and the settings. It runs ComfyUI capped, so the PC stays usable: one
 picture at a time, the GPU working about 60 % of the time with 5 GB of its memory kept free, at low priority, the
-models freed when idle, and ComfyUI stopped with the bridge. It also guards memory: the models take about 30 GB of
+models freed when idle, and ComfyUI stopped with the bridge. It also guards memory: the models take about 34 GB of
 Windows memory (RAM + page file), so it loads them only when that fits with room to spare, and stops ComfyUI at
 once if memory still gets close to full. When memory is short, the panel says how much to free before you generate.
 
@@ -231,7 +260,8 @@ once if memory still gets close to full. When memory is short, the panel says ho
      `https://….trycloudflare.com`, a new random one each start: paste the new one), or `ngrok http 127.0.0.1:8189`
      (free account; gives `https://….ngrok-free.app`, the same one each time; the studio sends ngrok's
      skip-the-warning header).
-3. In the panel, paste the address, then **Connect**. No key is needed by default. If the bridge asks for one (its
+3. In the panel, paste the address, then **Connect**. Once connected the panel shows only the status light; the
+   address, the bridge version, the GPU line, **Change** and **Disconnect** are under the closed row *Connection*. No key is needed by default. If the bridge asks for one (its
    `requireKey` is on), the panel shows a **Key** field with the line *This bridge asks for a key: it is shown in
    the bridge window on the GPU PC*. **Remember on this browser** keeps the address (and the key, if one was used)
    in this browser only (**Forget the saved address** removes them). In a studio opened from disk (`index.html`
@@ -252,47 +282,52 @@ is asleep), a key the bridge asks for, an http address on the https page (it nee
 page the bridge does not allow (its `allowedOrigins`), or a PC short of memory for the models. While the bridge's
 ComfyUI is stopped, **Generate** is off and the reason is shown under it.
 
-**Make**
-- **What.** *Background art* (the default) is for print: no words, no logo, no pop. *Element* draws one picture
-  element for the design (a lollipop, a heart, a slice of lemon): an **AI drawing**, marked as one wherever it
-  shows, and never the pop. *Logo ideas* and *Pack ideas* are **ideas, not print files**: they are labelled so
-  everywhere and can never be placed in the design. Element needs bridge 1.1.0 or later: on an older bridge it is
-  shown switched off, with *Needs a newer bridge*.
-- **Element** has no *Start from* and no *How far*. **New**: describe the element, or pick an example (a strawberry
-  lollipop, a heart, a sparkle, a seashell, a palm leaf, a slice of lemon). **Rework**: pick the element (the one
-  selected in the design is picked for you; click another card to change it) and say what should change. The GPU
-  draws the element whole on one flat colour, and the studio cuts that colour out when the picture comes back. The
-  colour is chosen for you: green, or blue when the words or the element itself are green
-  (magenta only when it is both green and blue). For a rework the
-  studio sends the element itself, centred on a 1024 × 1024 square of that colour.
-- **Start from** (art and ideas). *My current design* (the design open in this browser: its front panel, drawn by
-  the studio's own renderer at about 1 megapixel with its bleed): for art only its **background** is sent (no
-  words, logo, pop or added elements, so nothing of the product can end up in the art); for ideas the front as it
-  is, with its exact words passed on for pack ideas and the real pop as the product lock. Or the client's current
-  **wrapper** or **bag** draft (bases already on the GPU PC).
-- **How far from it** (0–1) has four bands, the same as in ComfyUI's Design brief: from *Refine* (0–0.25) through a
-  variation (0.25–0.5) and a new style (0.5–0.75) to *All new* (0.75–1). The panel names each band for the chosen
-  kind and says what it does; a click on a band sets the slider to its middle.
-- **Style**: describe the look, or pick a suggestion. **Seed**: a new idea each time, or *Fixed* (then change only the
-  distance to see the same idea nearer or further). **Versions**: 1–4, made one after another.
-- **Generate** shows each step (waiting in line, making it, the time) and **Cancel** stops waiting. The bridge has no
-  stop button, so the GPU still finishes the picture it was given; it is just not added.
+**Make: it edits what is selected.** The top of *Make* names what is being edited (with a small picture of it),
+and it follows your clicks on the design and in Layers while the panel is open:
+- **Nothing, or the Background** (*Background · front*, or back: the panel being edited): new background art made
+  from that panel's current background. Only the background is sent (no words, logo, pop or added elements), so
+  nothing of the product can end up in the art. *Describe the background* (or pick a suggestion) and choose **How
+  much to change**: *Refine*, *Variation* (the default), *New style* or *All new* (the bands of ComfyUI's Design
+  brief).
+- **A picture element**: *What should change*. The studio sends the element itself, centred on a 1024 × 1024 square
+  of one flat colour, and the result replaces its picture.
+- **The pop** (*The pop*): the Pop layer's photo is sent as an element rework. The result is an **AI drawing**
+  element at the pop's centre and height, and the Pop layer is hidden (never deleted, its photo never changed) while
+  the drawing is on the design. The box is *Angle or style* (examples: tilted a little to the left, seen slightly
+  from above, a flat illustration, a watercolour): the job is sent with `subject: "pop"`, and the bridge (1.2.0 or
+  later) keeps the same lollipop, so only the angle, the tilt, the light or the drawing style can change, never its
+  shape, colour, collar or stick. With an older bridge, Generate is off for the pop (*Needs a newer bridge.*).
+- **New element** (the button on the right of that line, or *Make with AI…*): *Describe the element*, or pick an
+  example (a strawberry lollipop, a heart, a sparkle, a seashell, a palm leaf, a slice of lemon).
+- **The logo, the heart badge or a line of words**: Generate is off (*AI can't redraw words: they must print
+  exactly.*); for the logo, a link opens *Logo ideas*.
 
-**Results** stay in this browser for a day (the last 24). For background art, **Use as front background** (or back:
-the panel being edited) sets it as that panel's background image, cover fit, exactly like Background → Image; the
-logo, every word and the real pop stay on top as live layers, and Ctrl+Z undoes it. **Download PNG** saves the
-picture; **Reuse settings** puts its style, distance and seed back under Make. A result is about 1 megapixel:
-about 260 ppi on the wrapper (fine), but about 145 ppi on the bag. The panel has no upscale step: for the final
-print, download it, upscale it 2× (for example with an upscale model in ComfyUI), and bring it back with
-Background → **Replace background art**.
+Elements are drawn whole on one flat colour (green, or blue when the words or the element are green; magenta only
+when both green and blue) and the studio cuts that colour out when the picture comes back; if it cannot, the raw
+picture is used and the reason is behind a "?". Pictures need bridge 1.1.0 or later. **More options** (folded):
+**Seed** (a new one each time, or *Fixed*) and **Versions** (1–4). **Generate** shows each step (waiting in line,
+making it, the time) and **Cancel** stops waiting; the bridge has no stop button, so the GPU still finishes the
+picture it was given, it is just not used.
 
-An element result shows on a checker (it is see-through) with an **AI drawing** tag. A new one has **Add to
-design**: it becomes a picture element in the middle of the panel being edited. A rework has **Replace the
-element** (the same element, in the same place at the same size, now with the new picture) and **Add as a copy** (a
-second element in the middle of the same panel, as large as the first). Each is one Ctrl+Z, and each says which
-panel it went to. If the element has been deleted meanwhile, the panel says so and offers **Add to design**
-instead. If the flat colour could not be cut out, the card says why and keeps the picture as it came. **Download
-PNG** saves the picture as the card shows it.
+**The result goes straight onto the design**, so the stage and the 3D pack show it at once: a background becomes the
+panel's background image (cover fit; the logo, every word and the real pop stay on top as live layers), an element
+gets the new picture, a new element lands in the middle of the panel, selected. Right under what is being edited,
+*On the design* shows **Before** and each version made for it (several versions, or Generate again): a click shows
+that one on the design, and **Back to before** returns to how it was. All of it is **one** undo step: switching
+never piles up history, and Ctrl+Z returns to the design before the first result. Selecting something else, or
+closing the panel, keeps what is showing. A background result is about 1 megapixel: about 260 ppi on the wrapper
+(fine), about 145 ppi on the bag; for the final print, download it, upscale it 2× (for example in ComfyUI) and bring
+it back with Background → **Replace background art**.
+
+**Recent** keeps the results for a day (the last 24) as a strip: a click puts an older one on the design again (a
+background on the panel being edited, a rework on its element if it is still there); otherwise it offers **Add as a
+new element**. **Download PNG** saves the picture; its details (seed, size, print resolution) are behind the "?".
+
+**Ideas (not print files)**, folded at the bottom: *Logo ideas* and *Pack ideas*, to choose a direction. They start
+from *My current design* (the front as it is, with its exact words passed on for pack ideas and the real pop as the
+product lock) or the client's **wrapper** or **bag** draft, with **How far from it** (0–1, four bands) and a style.
+Each idea is a card with **Download PNG** and **Reuse settings**; ideas are labelled so everywhere and are never
+placed in the design.
 
 ## Using ComfyUI art (by hand)
 Background → **Image** → import the AI art **without words**. It fills the panel and bleed (cover fit; drag it
@@ -310,8 +345,9 @@ The studio shows the art's print resolution; a 1024 px image on the bag is only 
   check the printer's minimum line for white type on a colour.
 - The printed rib texture on the wrapper's end seals gives the draft's look; the sealing jaws emboss the real
   ribs. Ask the printer whether to keep it (Background → *Rib texture on the end seals*).
-- The PDF is RGB (not PDF/X). Gold foil is shown as a gradient: for real hot-foil, tell the printer the logo is a
-  foil layer. Ask the printer which PDF standard they accept.
+- The PDF is RGB (not PDF/X). The logo's *Gold foil* fill is a flat bright gold in the print files (no
+  drawn shading or outline); the 3D pack shows it as a real foil material with its own shine. For real
+  hot-foil, tell the printer the logo is a foil layer. Ask the printer which PDF standard they accept.
 - The SVG embeds web fonts; browsers render it exactly, but desktop apps such as Illustrator may substitute
   fonts when opening an SVG. Send the PDF to printers.
 - Autosave keeps the design in this browser's storage and uploaded pictures in its IndexedDB. If a picture

@@ -5,16 +5,21 @@
  * that PC, or from anywhere through a tunnel the user starts on that same PC (an https trycloudflare or ngrok
  * address). Without a bridge this panel only explains itself, and the studio works exactly as before.
  *
- * What comes back is one of three things, and they never mix:
- *  - Background art: text-free, pop-free art for the print file. "Use as background" sets it as the panel's
- *    background image (cover fit, as Background > Image does); the exact logo, every word and the real pop stay
- *    on top as live layers. Made from "My current design", only the design's background is sent.
- *  - Elements: one picture element (a lollipop, a heart, a slice of lemon), new from a description or a rework of
- *    one that is already in the design. The bridge draws it on one flat colour and the studio's own remover cuts
- *    that colour out here; "Add to design" and "Replace the element" then place it as a picture layer. It is an
- *    AI drawing and is marked as one wherever it shows. It is never the Pop layer: that stays the real photo.
- *  - Ideas (logo or pack pictures): to choose a direction. Always labelled "ideas, not print files", and never
- *    placed in the design.
+ * The panel edits what is selected in the design (the target line follows the selection), and what comes back goes
+ * straight onto the design, so the stage and the 3D pack show it at once. Versions and "Back to before" switch
+ * what is showing; all of it is ONE undo step (MPStudio.aiStep).
+ *  - Nothing or the Background selected: new background art from the panel's current background (only the
+ *    background is sent: no words, no logo, no pop). It becomes the panel's background image (cover fit); the
+ *    exact logo, every word and the real pop stay on top as live layers.
+ *  - A picture element: reworked in place (its centre and longer side kept). "New element": a new one from a
+ *    description, in the middle of the panel. The bridge draws it on one flat colour and the studio's own remover
+ *    cuts that colour out here. It is an AI drawing and is marked as one wherever it shows.
+ *  - The pop: its picture is sent as an element rework, and the drawing goes on the design as a picture element
+ *    at the pop's centre and height while the Pop layer is hidden (never deleted, its photo never changed). It
+ *    is sent with "subject": "pop", so the bridge (1.2.0 on) locks the product: only its angle, tilt, light or
+ *    drawing style may change, never its shape, colour, collar or stick. An older bridge: the pop's Generate is off.
+ *  - Words (logo, badge, text): never redrawn. Logo and pack ideas, folded away at the bottom, are pictures to
+ *    choose a direction: always labelled "ideas, not print files", and never placed in the design.
  * No key by default: the panel asks only for the address. A bridge that asks for a key (it answers 401: its
  * requireKey is on) gets it in the X-MP-Key header only, never in a URL. This browser keeps the address (and a key,
  * if one was used) only when asked to.
@@ -87,7 +92,7 @@
       ],
     },
   };
-  const MODE_ORDER = ['art', 'element', 'logo', 'pack'];       // the "What" control, two by two: what can go into the design, then the ideas
+  const IDEA_ORDER = ['logo', 'pack'];                         // the Ideas section (folded away at the bottom)
   const BAND_AT = [0.15, 0.4, 0.6, 0.9];                      // a click on a band sets the slider to its middle
   const bandOf = d => d < 0.25 ? 0 : d < 0.5 ? 1 : d < 0.75 ? 2 : 3;    // (the bands of the Design brief node)
   const BAND_RANGE = ['0–0.25', '0.25–0.5', '0.5–0.75', '0.75–1'];
@@ -97,6 +102,10 @@
     wrapper: { label: 'Wrapper draft', sub: 'client’s current', name: 'individual-wrapper (current).png', thumb: 'assets/ref/individual-wrapper-current.png' },
     bag: { label: 'Bag draft', sub: 'client’s current', name: 'bag 100 g (current).png', thumb: 'assets/ref/bag-100g-current.png' },
   };
+  // the pop's one-click examples under "Angle or style": only what the bridge's pop lock lets change
+  const POP_CHIPS = [['Tilted a little to the left', 'tilted a little to the left'], ['Seen slightly from above', 'seen slightly from above'],
+    ['Flat illustration', 'a flat illustration'], ['Watercolour', 'a watercolour painting']];
+  const POP_HELP = 'Your pop stays your pop. AI can turn it, tilt it, light it differently or draw it in another style. It never changes its shape, its colour, its collar or its stick.';
   // ideas only: the lollipop the bridge holds the drawing to, matched to the pop on the current design
   const LOLLIPOPS = { 'pop-gold': 'pink pop, gold stick (current wrapper art).png', 'pop-white': 'pink pop, white stick (old printed pack).png' };
   const SAME_AS_BASE = 'same lollipop as the base design';
@@ -113,6 +122,10 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const icon = (n, c) => (typeof MP.icon === 'function' ? MP.icon(n, c) : '');
   const toast = (m, e) => { try { MP.toast(m, e); } catch (x) { /* no toasts */ } };
+  // the studio's "?" help (one pattern for both): the button and its hidden words. (An older studio without it:
+  // the words stay in view.) setHelp: one "?" in host whose words change; none when html is empty
+  const help = (html, topic) => (typeof MP.helpHTML === 'function' ? MP.helpHTML(html, topic) : ' ' + html);
+  const setHelp = (host, html, topic) => { if (!host) return; if (typeof MP.setHelp === 'function') MP.setHelp(host, html, topic); else host.innerHTML = html ? ' ' + html : ''; };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const clock = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
   const gb = mb => (Math.round(mb / 102.4) / 10).toFixed(1);
@@ -150,14 +163,18 @@
   const st = {
     open: false, restored: false, autoTried: false,
     conn: { url: '', key: '', askKey: false, state: 'off', health: null, err: '', seen: 0, editing: true },   // askKey: the bridge asked for a key (401)
-    mode: 'art', base: 'mine', distance: 0.4, styleTouched: false,
-    elOp: 'new', target: null, seenSel: null,   // Element: New or Rework; the element to rework { key, side }; the studio's selection when last looked at
-    seedMode: 'random', seed: 20261120, versions: 2,
-    run: null, runMsg: '', results: [], sel: null, mineThumb: '', clearArm: 0,
+    // Ideas (folded): logo or pack, the base, how far from it, the style
+    mode: 'logo', base: 'mine', distance: 0.4, styleTouched: false,
+    // Make: the words for each kind of target, how much a background changes (a band), "New element" pressed
+    texts: { bg: '', change: '', new: '', pop: '' }, band: 1, pin: null,
+    seedMode: 'random', seed: 20261120, versions: 1,
+    // go: what is showing on the design for one target ({ t, tok, before, thumb, ids, showing, drawKey, gone, depth })
+    go: null, tthumb: { sig: '', url: '' },
+    run: null, runMsg: '', results: [], sel: null, rsel: null, mineThumb: '', clearArm: 0,
   };
   let D = null;                     // the drawer
-  let connSeq = 0, runSeq = 0, hTimer = 0, tick = 0, thumbSeq = 0;
-  let elSig = null, pvSig = '', lookTimer = 0;      // what the rework cards and the result card were last drawn from
+  let connSeq = 0, runSeq = 0, hTimer = 0, tick = 0, thumbSeq = 0, goSeq = 0, tthumbSeq = 0;
+  let tSig = '', lookTimer = 0;     // what the target line was last drawn from
 
   /* ------------------------------------------------------------------------------------------ remembered address (+ key) */
   // A studio opened from disk (file://, origin "null") shares ONE browser storage with every other HTML file opened
@@ -175,26 +192,25 @@
     try { const old = localStorage.getItem(LS_KEY); if (old) { if (!sessionStorage.getItem(LS_KEY)) sessionStorage.setItem(LS_KEY, old); localStorage.removeItem(LS_KEY); } } catch (e) { /* storage blocked */ }
   }
   function saveMake() {
-    try { localStorage.setItem(LS_MAKE, JSON.stringify({ mode: st.mode, base: st.base, distance: st.distance, style: $('#gd-style', D).value, styleTouched: st.styleTouched, elOp: st.elOp, what: $('#gd-what', D).value, seedMode: st.seedMode, seed: clampSeed($('#gd-seed', D).value), versions: st.versions })); } catch (e) { /* storage blocked */ }
+    try { localStorage.setItem(LS_MAKE, JSON.stringify({ v: 2, texts: st.texts, band: st.band, mode: st.mode, base: st.base, distance: st.distance, style: $('#gd-style', D).value, styleTouched: st.styleTouched, seedMode: st.seedMode, seed: clampSeed($('#gd-seed', D).value), versions: st.versions })); } catch (e) { /* storage blocked */ }
   }
   function readMake() {
     let o = null; try { o = JSON.parse(localStorage.getItem(LS_MAKE) || 'null'); } catch (e) { o = null; }
     if (!o || typeof o !== 'object') return;
-    if (MODES[o.mode]) st.mode = o.mode;
+    if (IDEA_ORDER.indexOf(o.mode) >= 0) st.mode = o.mode;
     if (BASES[o.base]) st.base = o.base;
     if (typeof o.distance === 'number' && o.distance >= 0 && o.distance <= 1) st.distance = Math.round(o.distance * 20) / 20;
-    if (typeof o.style === 'string' && o.style.trim()) { $('#gd-style', D).value = o.style.slice(0, 600); st.styleTouched = !!o.styleTouched; }
-    if (o.elOp === 'new' || o.elOp === 'rework') st.elOp = o.elOp;
-    if (typeof o.what === 'string') $('#gd-what', D).value = o.what.slice(0, 600);
+    if (o.v === 2 && typeof o.style === 'string' && o.style.trim()) { $('#gd-style', D).value = o.style.slice(0, 600); st.styleTouched = !!o.styleTouched; }
+    if (o.texts && typeof o.texts === 'object') ['bg', 'change', 'new', 'pop'].forEach(k => { if (typeof o.texts[k] === 'string') st.texts[k] = o.texts[k].slice(0, 600); });
+    if ([0, 1, 2, 3].indexOf(o.band) >= 0) st.band = o.band;
     if (o.seedMode === 'fixed' || o.seedMode === 'random') st.seedMode = o.seedMode;
     if (Number.isFinite(o.seed)) { st.seed = clampSeed(o.seed); $('#gd-seed', D).value = st.seed; }
-    if ([1, 2, 3, 4].indexOf(o.versions) >= 0) st.versions = o.versions;
+    if (o.v === 2 && [1, 2, 3, 4].indexOf(o.versions) >= 0) st.versions = o.versions;
   }
   // bring something in the panel into view, gently (never while the user is typing in the panel)
+  const typing = () => { const a = document.activeElement; return !!a && !!D && D.contains(a) && /^(TEXTAREA|INPUT)$/.test(a.tagName) && a.type !== 'range'; };
   function reveal(node) {
-    if (!node || !st.open) return;
-    const a = document.activeElement;
-    if (a && D.contains(a) && /^(TEXTAREA|INPUT)$/.test(a.tagName) && a.type !== 'range') return;
+    if (!node || !st.open || typing()) return;
     try { node.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { node.scrollIntoView(false); }
   }
 
@@ -295,6 +311,7 @@
       if (seq !== connSeq) return;
     }
     renderAll();
+    if (c.state === 'on') showMake();
     if (askNow && st.open) $('#gd-key', D).focus();
   }
   function connFail(html) { const c = st.conn; ++connSeq; c.state = 'error'; c.err = html; c.health = null; renderConn(); renderMake(); }
@@ -361,12 +378,13 @@
     const s = out.length > 1 ? out.slice(0, -1).join(', ') + ' and ' + out[out.length - 1] : out.join('');
     return s.slice(0, 600);
   }
-  async function buildBase(mode, baseKey) {
+  // side: the panel whose background is sent (art: the one being edited; ideas: always the front)
+  async function buildBase(mode, baseKey, side) {
     if (baseKey !== 'mine') return { base: { name: BASES[baseKey].name }, label: BASES[baseKey].label };
     await whenReady();
-    const m = baseModel(mode); const M = MODES[mode];
-    const r = await renderPanel(m, 'front', BASE_PIXELS, !M.bgOnly);
-    const out = { base: { png: r.url }, label: BASES.mine.label, w: r.w, h: r.h };
+    const m = baseModel(mode); const M = MODES[mode]; const sd = side === 'back' ? 'back' : 'front';
+    const r = await renderPanel(m, sd, BASE_PIXELS, !M.bgOnly);
+    const out = { base: { png: r.url }, label: M.bgOnly ? 'Background · ' + sd : BASES.mine.label, w: r.w, h: r.h, thumb: r.url };
     if (M.words) { const w = frontWords(m); if (w) out.words = w; }
     if (M.lollipop) out.lollipop = lollipopFor(m.panels.front.els.pop);
     if (!out.lollipop) delete out.lollipop;
@@ -382,9 +400,9 @@
   }
   // a bundled base the bridge does not have (when it lists its bases) cannot be chosen
   const baseAvailable = k => { const h = st.conn.health; return k === 'mine' || !h || !Array.isArray(h.bases) || h.bases.indexOf(BASES[k].name) >= 0; };
-  // the small picture on the "My current design" card: what is sent, for the chosen mode
+  // the small picture on the Ideas' "My current design" card: what is sent, for the chosen kind of idea
   async function refreshMineThumb() {
-    if (!st.open || !MP.ready || MODES[st.mode].element) return;          // (an element has no "Start from")
+    if (!st.open || !MP.ready || !D || !$('#gd-ideas', D).open) return;
     const seq = ++thumbSeq;
     try {
       const r = await renderPanel(baseModel(st.mode), 'front', 15000, !MODES[st.mode].bgOnly);
@@ -396,28 +414,34 @@
   /* ------------------------------------------------------------------------------------------ elements */
   // Element is offered only by a bridge that lists it (1.1.0 on); an older one answers 400 to it
   const elementOK = () => { const h = st.conn.health; return !!h && Array.isArray(h.modes) && h.modes.indexOf('element') >= 0; };
-  const modeOK = k => !MODES[k].element || elementOK();
-  // the picture elements in the design that have their picture (both panels, front first, top layer first);
-  // all: also one that has lost its picture (it is still in the design, but cannot be reworked)
-  function pictures(all) {
-    try { return MP.elements().map(e => Object.assign(e, { pic: MP.elementPicture(e.key, e.side) })).filter(e => all || e.pic); }
+  // the pop is reworked only by a bridge that locks it to the product (it lists the subject "pop": 1.2.0 on)
+  const popOK = () => { const h = st.conn.health; return !!h && Array.isArray(h.subjects) && h.subjects.indexOf('pop') >= 0; };
+  // the picture elements in the design (both panels, front first, top layer first), each with its picture or null
+  function pictures() {
+    try { return MP.elements().map(e => Object.assign(e, { pic: MP.elementPicture(e.key, e.side) })); }
     catch (e) { return []; }                                              // (the studio is still starting)
   }
-  const findPicture = (t, list) => (t ? (list || pictures()).find(e => e.key === t.key && e.side === t.side) || null : null);
-  const findElement = t => findPicture(t, pictures(true));
-  const sigOf = e => (e ? e.side + ':' + e.key : '');                    // (a key never has a colon in it)
-  const selectedIn = list => list.find(e => e.key === MP.sel && e.side === MP.side) || null;
-  // The element to rework. The studio sends no events, so this is looked at again whenever the panel redraws: a
-  // picture newly selected in the design becomes the target; one picked here stays until then; a target that has
-  // gone gives way to the selected picture, or to the top one.
-  function syncTarget() {
-    const list = pictures(), sel = selectedIn(list), now = sigOf(sel);
-    if (now !== st.seenSel) { st.seenSel = now; if (sel) st.target = { key: sel.key, side: sel.side }; }
-    if (!findPicture(st.target, list)) { const e = sel || list[0]; st.target = e ? { key: e.key, side: e.side } : null; }
-    return list;
+  const findElement = t => (t ? pictures().find(e => e.key === t.key && e.side === t.side) || null : null);
+  // The target: what the panel edits. It is the selection in the design (MPStudio.onSelection tells when it
+  // changes), except while a target is pinned: "New element" pressed, or the drawing the panel itself just put on
+  // the design (the pop's, a new element's) is what is selected. A click anywhere else ends the pin.
+  //   kind: 'bg' (nothing or the Background selected), 'el' (a picture element), 'pop', 'new' or 'text' (words)
+  const selSig = () => (MP.view || '') + ':' + (MP.side || '') + ':' + (MP.sel || '');
+  function curTarget() {
+    if (!MP.ready || !MP.model) return null;
+    if (st.pin && st.pin.sel === selSig()) return st.pin.t;
+    st.pin = null;
+    const side = MP.side === 'back' ? 'back' : 'front', sel = MP.sel;
+    const info = sel ? MP.layerInfo(sel, side) : null;
+    if (!info || info.kind === 'background') return { kind: 'bg', side, sig: 'bg:' + side, name: 'Background · ' + side };
+    if (info.kind === 'pop') return { kind: 'pop', side: 'front', sig: 'pop', name: 'The pop' };
+    if (info.kind === 'picture') return { kind: 'el', side, key: sel, sig: 'el:' + side + ':' + sel, name: info.name };
+    return { kind: 'text', side, key: sel, sig: 'tx:' + side + ':' + sel, name: info.name, logo: info.kind === 'logo' };
   }
-  // one picked on purpose (a card here, "Rework with AI…" in the studio, Reuse settings)
-  function setTarget(e) { st.target = { key: e.key, side: e.side }; st.seenSel = sigOf(selectedIn(pictures())); }
+  const pinTarget = t => { st.pin = t ? { t, sel: selSig() } : null; };
+  const textKey = t => (!t || t.kind === 'bg' ? 'bg' : t.kind === 'new' ? 'new' : t.kind === 'pop' ? 'pop' : 'change');
+  // the picture a rework sends: the element's own, or the real pop's (never changed)
+  const sourceOf = t => (t.kind === 'pop' ? MP.popPicture() : MP.elementPicture(t.key, t.side));
   // the flat colour an element is drawn on (it is cut out afterwards): green by default; blue when the words or
   // the element itself are green; magenta only when the subject is both green and blue (this brand is pink, and
   // hot pink sits close to magenta, so magenta is the last choice). pic: what looksGreen found in the element
@@ -451,9 +475,9 @@
   // itself, whole, centred and padded on a 1024 px square filled with that colour, as an opaque PNG (the bridge
   // would turn see-through parts white).
   async function buildElement(op, target, words) {
-    if (op !== 'rework') { const bg = pickBackground(words, false); return { label: '', background: bg.name, send: bg.hex ? { background: bg.name } : {} }; }
+    if (op !== 'rework') { const bg = pickBackground(words, false); return { label: '', background: bg.name, send: bg.hex ? { background: bg.name } : {}, thumb: '' }; }
     await whenReady();
-    const p = MP.elementPicture(target.key, target.side);
+    const p = sourceOf(target);
     if (!p) throw userErr('That element is no longer in the design, or it has lost its picture. Pick another one to rework.');
     const img = await loadImg(p.dataURL);
     try { await img.decode(); } catch (e) { /* already decoded */ }
@@ -463,7 +487,7 @@
     const x = cv.getContext('2d'); x.fillStyle = bg.hex; x.fillRect(0, 0, EL_PX, EL_PX); x.imageSmoothingQuality = 'high';
     const k = EL_PX * EL_FILL / Math.max(img.naturalWidth, img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
     x.drawImage(img, (EL_PX - w) / 2, (EL_PX - h) / 2, w, h);
-    return { label: p.name, background: bg.name, send: { background: bg.name, base: { png: cv.toDataURL('image/png') } } };
+    return { label: p.name, background: bg.name, send: { background: bg.name, base: { png: cv.toDataURL('image/png') } }, thumb: p.dataURL };
   }
   // An element comes back on its flat colour: the studio's own remover cuts it out (it reads the colour from the
   // picture's border). If it cannot, the picture is kept as it came and the result card says why.
@@ -477,27 +501,31 @@
 
   /* ------------------------------------------------------------------------------------------ generate */
   function setPhase(r, ph) { if (st.run !== r) return; const was = r.phase; r.phase = ph; if (was !== ph) renderRun(); else updateRunTime(); }
-  async function generate() {
+  // idea: false for Make (the target), true for the Ideas section. Make's results go straight onto the design.
+  async function generate(idea) {
+    idea = idea === true;
     if (st.run || st.conn.state !== 'on') return;
-    const mode = st.mode, M = MODES[mode], op = M.element ? st.elOp : '';
-    const box = textBox(); const style = box.value.trim();
-    if (!style) { st.runMsg = noteHTML('warn', !M.element ? 'Describe a style first, or pick one of the suggestions under it.' : op === 'rework' ? 'Say what should change first.' : 'Describe the element first, or pick one of the examples under it.'); renderRun(); box.focus(); return; }
-    // a rework keeps the element it started with, whatever is selected or picked while it runs
-    const target = op === 'rework' ? findPicture(st.target) : null;
-    if (op === 'rework' && !target) { st.runMsg = noteHTML('warn', 'Pick the element to rework first.'); renderRun(); renderMake(); return; }
-    const baseKey = M.element ? '' : st.base, distance = M.element ? 0 : Math.round(st.distance * 100) / 100, of = st.versions;
+    const t = idea ? null : curTarget();
+    if (!idea && (!t || !canMake(t))) return;
+    const mode = idea ? st.mode : t.kind === 'bg' ? 'art' : 'element', M = MODES[mode];
+    const op = M.element ? (t.kind === 'new' ? 'new' : 'rework') : '';
+    const box = idea ? $('#gd-style', D) : $('#gd-text', D); const style = box.value.trim();
+    if (!style) { st.runMsg = noteHTML('warn', idea || t.kind === 'bg' ? 'Describe a style first, or pick one of the suggestions under it.' : op === 'rework' ? 'Say what should change first.' : 'Describe the element first, or pick one of the examples under it.'); st.runIdea = idea; renderRun(); box.focus(); return; }
+    const baseKey = idea ? st.base : M.element ? '' : 'mine';
+    const distance = idea ? Math.round(st.distance * 100) / 100 : M.element ? 0 : BAND_AT[st.band], of = st.versions;
     const seed0 = st.seedMode === 'fixed' ? clampSeed($('#gd-seed', D).value) : null;
-    const r = { id: ++runSeq, phase: 'render', n: 1, of, t0: Date.now(), tSent: 0, position: null, ctl: new AbortController(), cancelled: false, made: 0, element: !!M.element };
-    st.run = r; st.runMsg = ''; renderRun(); renderMake(); startTicker(); scheduleHealth(2500); saveMake();
-    reveal($('#gd-run', D));
+    const r = { id: ++runSeq, phase: 'render', n: 1, of, t0: Date.now(), tSent: 0, position: null, ctl: new AbortController(), cancelled: false, made: 0, element: !!M.element, idea, t };
+    st.run = r; st.runMsg = ''; st.runIdea = idea; renderRun(); renderMake(); startTicker(); scheduleHealth(2500); saveMake();
+    reveal($(idea ? '#gd-irun' : '#gd-run', D));
     try {
-      const b = M.element ? await buildElement(op, target, style) : await buildBase(mode, baseKey);
+      const b = M.element ? await buildElement(op, t, style) : await buildBase(mode, baseKey, t ? t.side : 'front');
       for (let i = 0; i < of; i++) {
         if (r.cancelled) return;
         const seed = seed0 != null ? (seed0 + i) % 2147483647 : randomSeed();
         r.n = i + 1; r.tSent = Date.now(); r.position = null; r.phase = ''; setPhase(r, 'send');
         // an element: its words, the flat colour, and for a rework the element itself; no base name, no distance
         const body = M.element ? Object.assign({ mode, op, style, seed }, b.send) : { mode, base: b.base, distance, style, seed };
+        if (M.element && op === 'rework' && t.kind === 'pop') body.subject = 'pop';     // the bridge locks the product
         if (b.words) body.wordsOverride = b.words;
         if (b.lollipop) body.lollipop = b.lollipop;
         const res = await call('POST', '/api/generate', body, { timeout: 180000, signal: r.ctl.signal });
@@ -511,14 +539,15 @@
         for (let k = 0; k < imgs.length; k++) {
           const blob = await fetchImage(imgs[k].url, r);
           if (r.cancelled) return;
-          const o = { jobId: String(res.jobId), n: k, mode, base: baseKey, baseLabel: b.label, distance, style, seed, blob };
+          const o = { jobId: String(res.jobId), n: k, mode, base: baseKey, baseLabel: b.label, distance, style, seed, blob, kind: idea ? 'idea' : t.kind, side: t ? t.side : 'front' };
           if (M.element) {                                      // the cut-out is what is kept, shown, downloaded and placed
             setPhase(r, 'cut');
-            Object.assign(o, await cutOut(blob), { op, target: target ? { key: target.key, side: target.side, name: target.name } : null, background: b.background });
+            Object.assign(o, await cutOut(blob), { op, target: t.kind === 'el' ? { key: t.key, side: t.side, name: t.name } : t.kind === 'pop' ? { pop: true, side: 'front', name: 'The pop' } : null, background: b.background });
             if (r.cancelled) return;
           }
-          await addResult(o);
-          if (!r.made++) reveal($('#gd-prev', D));            // the first new picture comes into view
+          const rec = await addResult(o);
+          if (idea) { if (!r.made++) reveal($('#gd-prev', D)); }
+          else { r.made++; await place(rec, t, b.thumb || ''); }    // straight onto the design
         }
       }
       finishRun(r, null);
@@ -563,7 +592,9 @@
   function finishRun(r, e) {
     if (st.run !== r) return;
     st.run = null; stopTicker();
-    st.runMsg = e ? noteHTML('warn', runError(e) + ' <button type="button" class="gd-link" data-act="go">Try again</button>') : '';
+    // (a long reason keeps its first sentence in view, the rest behind a "?"; "Try again" always stays in view)
+    const why = e ? (typeof MP.splitHelp === 'function' ? MP.splitHelp(runError(e)) : [runError(e), '']) : null;
+    st.runMsg = e ? noteHTML('warn', why[0] + (why[1] ? help(why[1], 'Generate') : '') + ' <button type="button" class="gd-link" data-act="' + (r.idea ? 'igo' : 'go') + '">Try again</button>') : st.runMsg;      // (a note made during the run, such as an element gone, stays)
     if (e && e.status === 401) { st.conn.askKey = true; st.conn.editing = true; }      // the bridge asks for a key: show its field now
     if (e && e.kind === 'network' && st.conn.state === 'on') { st.conn.state = 'lost'; st.conn.err = 'The connection dropped while it was working. The bridge may still finish the image on the GPU PC.'; scheduleHealth(3000); }
     renderAll();
@@ -584,7 +615,7 @@
     const r = st.run; if (!r) return;
     r.cancelled = true; try { r.ctl.abort(); } catch (e) { /* done */ }
     st.run = null; stopTicker();
-    st.runMsg = quiet ? '' : noteHTML('info', r.phase === 'render' ? 'Cancelled.' : 'Cancelled. The bridge has no stop button, so your GPU still finishes the image it was given; it is not added here.');
+    st.runMsg = quiet ? '' : noteHTML('info', 'Cancelled.' + (r.phase === 'render' ? '' : help('The bridge has no stop button, so your GPU still finishes the image it was given; it is not added here.', 'Cancelled')));
     renderRun(); renderMake();
   }
   function startTicker() { stopTicker(); tick = setInterval(updateRunTime, 500); }
@@ -612,9 +643,12 @@
     }));
   }
   // what is kept of a result (an element also keeps: new or rework, the element it reworks, whether its background
-  // was cut out and, if not, why, and the flat colour it was drawn on)
+  // was cut out and, if not, why, and the flat colour it was drawn on; every result: what it was for, and the panel)
   const record = r => ({ id: r.id, jobId: r.jobId, n: r.n, mode: r.mode, base: r.base, baseLabel: r.baseLabel, distance: r.distance, style: r.style, seed: r.seed, w: r.w, h: r.h, createdAt: r.createdAt, blob: r.blob,
-    op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background });
+    op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background, kind: r.kind, side: r.side });
+  // what a result is for: 'bg', 'el', 'pop', 'new' or 'idea' (one kept before the panel edited the selection: from its mode)
+  const kindOf = r => r.kind || (r.mode === 'art' ? 'bg' : MODES[r.mode] && MODES[r.mode].element ? (r.op === 'rework' ? 'el' : 'new') : 'idea');
+  const isIdea = r => kindOf(r) === 'idea';
   async function restoreResults() {
     if (st.restored) return; st.restored = true;
     let all = [];
@@ -626,7 +660,6 @@
     const have = new Set(st.results.map(r => r.id));
     keep.forEach(r => { if (!have.has(r.id)) { r.url = URL.createObjectURL(r.blob); st.results.push(r); } });
     st.results.sort((a, b) => b.createdAt - a.createdAt);
-    if (!st.sel && st.results.length) st.sel = st.results[0].id;
     renderResults();
   }
   async function addResult(o) {
@@ -635,102 +668,144 @@
     catch (e) { throw userErr('The picture from the bridge could not be read.'); }
     const r = Object.assign({ id: 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), createdAt: Date.now(), w, h }, o);
     r.url = URL.createObjectURL(r.blob);
-    st.results.unshift(r); st.sel = r.id;
+    st.results.unshift(r); if (isIdea(r)) st.sel = r.id; else st.rsel = r.id;
     const extra = st.results.splice(KEEP_N);
     extra.forEach(x => { URL.revokeObjectURL(x.url); });
     renderResults();
     try { await tx('readwrite', s => { s.put(record(r)); extra.forEach(x => s.delete(x.id)); }); } catch (e) { /* kept in memory for this visit */ }
+    return r;
   }
   function removeResult(id) {
     const i = st.results.findIndex(r => r.id === id); if (i < 0) return;
     const [r] = st.results.splice(i, 1); URL.revokeObjectURL(r.url);
-    if (st.sel === id) st.sel = st.results[Math.min(i, st.results.length - 1)] ? st.results[Math.min(i, st.results.length - 1)].id : null;
+    if (st.sel === id) st.sel = null;
+    if (st.rsel === id) st.rsel = null;
     tx('readwrite', s => s.delete(id)).catch(() => {});
     renderResults();
   }
   function clearResults() {
-    st.results.forEach(r => URL.revokeObjectURL(r.url)); st.results = []; st.sel = null;
+    st.results.forEach(r => URL.revokeObjectURL(r.url)); st.results = []; st.sel = null; st.rsel = null;
     tx('readwrite', s => s.clear()).catch(() => {});
     renderResults();
   }
-  const curResult = () => st.results.find(r => r.id === st.sel) || null;
+  const curResult = () => st.results.find(r => r.id === st.sel && isIdea(r)) || null;          // the idea shown in Ideas
+  const curRecent = () => st.results.find(r => r.id === st.rsel && !isIdea(r)) || null;       // the one picked under Recent
+  const byId = id => st.results.find(r => r.id === id) || null;
   function download(r) {
     const a = document.createElement('a'); a.href = r.url;
     a.download = 'model-pops_ai-' + MODES[r.mode].file + '_' + today() + '_seed-' + r.seed + '.png';
     document.body.appendChild(a); a.click(); a.remove();
   }
-  async function useAsBackground(r) {
-    if (!r || MODES[r.mode].use !== 'background') return;     // ideas are never placed in the design
-    try {
+  // An AI drawing goes into the design as a picture element (never as the pop's photo), marked as an AI drawing there.
+  const aiOf = r => ({ op: r.op === 'rework' ? 'rework' : 'new', prompt: r.style, seed: r.seed });
+  const nameOf = r => { const s = (r.target && !r.target.pop && r.target.name) || String(r.style || '').replace(/\s+/g, ' ').trim() || 'AI drawing'; return (s.charAt(0).toUpperCase() + s.slice(1)).slice(0, 40); };
+  // the result as a picture of the studio's (made once per result and visit, then reused when versions switch)
+  async function assetOf(r) {
+    if (!r.asset) {
       await whenReady();
       const src = await blobToDataURL(r.blob);
-      const id = await MP.addImageAsset({ src, name: 'AI background art (seed ' + r.seed + ')', kind: 'background' });
-      const side = MP.useBackgroundImage(id);
-      toast('The AI art is now the ' + side + ' panel’s background. The exact logo, words and pop stay on top · Ctrl+Z to undo');
-      refreshMineThumb(); renderPreview();
-    } catch (e) { toast('Could not use it: ' + (e.message || e), true); }
+      r.asset = await MP.addImageAsset(MODES[r.mode].element ? { src, name: 'AI drawing (seed ' + r.seed + ')', kind: 'element' } : { src, name: 'AI background art (seed ' + r.seed + ')', kind: 'background' });
+    }
+    return r.asset;
   }
-  // An AI drawing goes into the design as a picture element (never as the pop), marked as an AI drawing there.
-  // Each of the three actions is one undo step in the studio, and says which panel it went to.
-  const aiOf = r => ({ op: r.op === 'rework' ? 'rework' : 'new', prompt: r.style, seed: r.seed });
-  const nameOf = r => { const s = (r.target && r.target.name) || String(r.style || '').replace(/\s+/g, ' ').trim() || 'AI drawing'; return (s.charAt(0).toUpperCase() + s.slice(1)).slice(0, 40); };
-  async function elementAsset(r) { await whenReady(); return MP.addImageAsset(await blobToDataURL(r.blob), { name: 'AI drawing (seed ' + r.seed + ')', kind: 'element' }); }
-  const sideOf = key => { const e = pictures(true).find(x => x.key === key); return e ? e.side : MP.side; };       // (the panel the studio put it on)
-  function afterPlaced() { renderMake(); refreshMineThumb(); renderPreview(); }
+  const sideOf = key => { const e = pictures().find(x => x.key === key); return e ? e.side : MP.side; };       // (the panel the studio put it on)
+  // "Add as a new element": a picture element in the middle of the panel being edited (its own undo step)
   async function addToDesign(r) {
     if (!r || MODES[r.mode].use !== 'element') return;
     try {
-      const key = MP.addElement(await elementAsset(r), { name: nameOf(r), ai: aiOf(r) });
+      const key = MP.addElement(await assetOf(r), { name: nameOf(r), ai: aiOf(r) });
       toast('The AI drawing is now a picture element on the ' + sideOf(key) + ' panel · Ctrl+Z to undo');
-      afterPlaced();
+      renderTarget(); renderResults();
     } catch (e) { toast('Could not add it: ' + (e.message || e), true); }
   }
-  // the element may have gone since (deleted, another design opened): then nothing is replaced, and the card offers Add to design
-  async function replaceElement(r) {
-    if (!r || MODES[r.mode].use !== 'element' || !r.target) return;
-    const t = r.target;
-    try {
-      const e = findElement(t);
-      if (!e || !MP.replaceElementPicture(t.key, await elementAsset(r), { ai: aiOf(r) }, t.side)) {
-        toast('“' + t.name + '” is no longer in the design, so nothing was replaced. “Add to design” puts this picture in as a new element.', true);
-        renderPreview(); return;
-      }
-      toast('“' + e.name + '” on the ' + t.side + ' panel now shows the reworked picture · Ctrl+Z to undo');
-      afterPlaced();
-    } catch (e) { toast('Could not replace it: ' + (e.message || e), true); }
+
+  /* ------------------------------------------------------------------------------------------ results on the design */
+  // A "go": the results made (or picked under Recent) for one target, and what is showing on the design: Before or
+  // one of them. Every switch is part of ONE undo step (MPStudio.aiStep with the go's token).
+  function startGo(t, thumb) {
+    const before = t.kind === 'bg' ? { bg: MP.backgroundOf(t.side) } : t.kind === 'el' ? { el: MP.elementState(t.key, t.side) } : t.kind === 'pop' ? { pop: !!(MP.popPicture() || {}).visible } : {};
+    st.go = { t, tok: 'ai-go-' + (++goSeq) + '-' + Date.now().toString(36), before, thumb: thumb || '', ids: [], showing: 'before', drawKey: null, gone: false, depth: -1 };
+    return st.go;
   }
-  // a second element with the reworked picture: on the same panel and as large as the one it was made from
-  // (if that one has gone meanwhile, it is simply added)
-  async function addAsCopy(r) {
-    if (!r || MODES[r.mode].use !== 'element') return;
-    const t = findPicture(r.target);
-    if (!t) { addToDesign(r); return; }
-    try {
-      const el = MP.model.panels[t.side].els[t.key];
-      const long = Math.max(el.w, el.w * t.pic.h / t.pic.w);            // the longer side keeps its printed length
-      const key = MP.addElement(await elementAsset(r), { name: (t.name.replace(/ copy$/, '') + ' copy').slice(0, 80), ai: aiOf(r), side: t.side, w: r.w >= r.h ? long : long * r.w / r.h });
-      toast('The reworked picture is now a second element on the ' + sideOf(key) + ' panel · Ctrl+Z to undo');
-      afterPlaced();
-    } catch (e) { toast('Could not add it: ' + (e.message || e), true); }
+  // one change on the design; the target stays this go's while what the change selected stays selected
+  function goStep(g, fn) {
+    const out = MP.aiStep(g.tok, fn);
+    g.depth = MP.undoDepth; pinTarget(g.t);
+    return out;
   }
-  function reuse(r) {
-    const M = MODES[r.mode];
-    if (st.conn.health && !modeOK(r.mode)) { toast('The bridge you are connected to cannot make elements: it needs a newer bridge.', true); return; }
-    let gone = false;
-    st.mode = r.mode;
-    if (M.element) {
-      st.elOp = r.op === 'rework' ? 'rework' : 'new';
-      $(st.elOp === 'rework' ? '#gd-change' : '#gd-what', D).value = r.style;
-      if (st.elOp === 'rework') { const t = findPicture(r.target); if (t) setTarget(t); else gone = true; }
-    } else {
-      st.base = BASES[r.base] ? r.base : 'mine'; st.distance = r.distance;
-      $('#gd-style', D).value = r.style; st.styleTouched = true;
+  async function place(r, t, thumb) {
+    if (!st.go || st.go.t.sig !== t.sig) startGo(t, thumb);
+    const g = st.go; if (g.ids.indexOf(r.id) < 0) g.ids.push(r.id);
+    await show(g, r);
+  }
+  async function show(g, r) {
+    if (!g || st.go !== g || !r) return;
+    let id; try { id = await assetOf(r); } catch (e) { toast('Could not put it on the design: ' + (e.message || e), true); return; }
+    if (st.go !== g) return;
+    const t = g.t; let ok = true;
+    try {
+      goStep(g, () => {
+        if (t.kind === 'bg') { MP.useBackgroundImage(id, t.side); return; }
+        if (t.kind === 'el') { ok = MP.replaceElementPicture(t.key, id, { ai: aiOf(r) }, t.side); return; }
+        // the pop or a new element: this go's own drawing (added again when the step was replaced)
+        if (g.drawKey && MP.elementState(g.drawKey, t.side)) { MP.replaceElementPicture(g.drawKey, id, { ai: aiOf(r) }, t.side); return; }
+        if (t.kind === 'pop') {
+          const p = MP.popPicture(); if (!p) { ok = false; return; }
+          g.drawKey = MP.addElement(id, { name: 'Pop drawing', ai: aiOf(r), side: 'front', w: p.hmm * r.w / r.h });     // as tall as the pop
+          MP.placeElement(g.drawKey, { x: p.x, y: p.y }, 'front'); MP.setPopVisible(false);
+        } else g.drawKey = MP.addElement(id, { name: nameOf(r), ai: aiOf(r), side: t.side });
+      });
+    } catch (e) { toast('Could not put it on the design: ' + (e.message || e), true); return; }
+    if (!ok) {
+      // the element went meanwhile (deleted, undone): nothing was changed; say so, and offer it as a new element
+      st.go = null; pinTarget(null);
+      st.runMsg = noteHTML('info', '“' + esc(t.name) + '” is no longer in the design. <button type="button" class="gd-link" data-act="addnew" data-id="' + esc(r.id) + '">Add as a new element</button>'); st.runIdea = false;
+      tSig = ''; renderTarget(true); renderRun(); renderResults(); return;
     }
-    st.seedMode = 'fixed'; $('#gd-seed', D).value = r.seed;
-    renderMake(); refreshMineThumb();
-    $('#gd-make', D).scrollIntoView({ block: 'start', behavior: 'smooth' });
-    toast(!M.element ? 'Its settings are back under Make, with its seed fixed: move the distance to see the same idea nearer or further.'
-      : 'Its words are back under Make, with its seed fixed: change the words to steer it.' + (gone ? ' The element it reworked is no longer in the design, so pick another one.' : ''));
+    g.gone = false; g.showing = r.id;
+    afterShow();
+  }
+  // "Back to before" (or the Before thumbnail): the step is taken back; if something else changed since, the target
+  // alone is put back as it was
+  function backToBefore(g) {
+    if (!g || st.go !== g || g.showing === 'before') return;
+    const t = g.t;
+    try {
+      goStep(g, replaced => {
+        if (replaced) return;
+        if (t.kind === 'bg') MP.setBackground(g.before.bg, t.side);
+        else if (t.kind === 'el') { if (g.before.el) MP.restoreElement(t.key, g.before.el, t.side); }
+        else { if (g.drawKey) MP.deleteElement(g.drawKey, t.side); if (t.kind === 'pop') MP.setPopVisible(g.before.pop); }
+      });
+    } catch (e) { toast('Could not go back: ' + (e.message || e), true); return; }
+    g.drawKey = null; g.showing = 'before'; g.gone = false;
+    afterShow();
+  }
+  function afterShow() { tSig = ''; renderTarget(true); renderGoStrip(); renderResults(); if (!typing()) showMake(); }
+  // Make at the top of the panel (under the docked 3D view): what is being edited, the words, Generate
+  function showMake() { const b = $('.gd-body', D), m = $('#gd-make', D); if (!st.open || !b || m.hidden) return; b.scrollTop += m.getBoundingClientRect().top - b.getBoundingClientRect().top; }
+  // Recent: an older result goes onto the matching target (a background: the panel being edited); an element whose
+  // element has gone, and a new element, are offered as a new element instead
+  function recentTarget(r) {
+    const k = kindOf(r), side = MP.side === 'back' ? 'back' : 'front';
+    if (k === 'bg') return { kind: 'bg', side, sig: 'bg:' + side, name: 'Background · ' + side };
+    if (k === 'pop') return MP.popPicture() ? { kind: 'pop', side: 'front', sig: 'pop', name: 'The pop' } : null;
+    if (k === 'el') { const e = findElement(r.target); return e && e.pic ? { kind: 'el', side: e.side, key: e.key, sig: 'el:' + e.side + ':' + e.key, name: e.name } : null; }
+    return null;
+  }
+  async function useRecent(r) {
+    st.rsel = r.id; renderResults();
+    const t = recentTarget(r); if (!t) return;
+    if (st.go && st.go.t.sig === t.sig && st.go.showing === r.id) return;
+    const thumb = t.kind === 'bg' ? (st.tthumb.sig === t.sig ? st.tthumb.url : '') : ((sourceOf(t) || {}).dataURL || '');
+    await place(r, t, thumb);
+  }
+  // the selection or the panel changed in the studio (or Undo ran): the target line follows
+  function onSelChange() {
+    if (!D || !st.open) return;
+    const g = st.go;
+    if (g && g.showing !== 'before' && g.depth >= 0 && MP.undoDepth < g.depth) { g.showing = 'before'; g.drawKey = null; }    // undone in the studio
+    renderTarget(true); renderGoStrip(); renderRecentRow();
   }
   // print resolution of art on the current panel (cover fit over trim + bleed, as the studio places it)
   function fitInfo(r) {
@@ -740,9 +815,26 @@
     const shape = Math.abs((r.w / r.h) / (bw / bh) - 1);
     return { ppi: Math.round(ppi), crop: shape > 0.06 };
   }
+  // Ideas: "Reuse settings" puts an idea's settings back in the Ideas section, with its seed fixed
+  function reuse(r) {
+    if (!isIdea(r)) return;
+    st.mode = IDEA_ORDER.indexOf(r.mode) >= 0 ? r.mode : 'logo';
+    st.base = BASES[r.base] ? r.base : 'mine'; st.distance = r.distance;
+    $('#gd-style', D).value = r.style; st.styleTouched = true;
+    st.seedMode = 'fixed'; $('#gd-seed', D).value = r.seed;
+    $('#gd-ideas', D).open = true; $('#gd-more', D).open = true;
+    renderMake(); refreshMineThumb();
+    $('#gd-ideas', D).scrollIntoView({ block: 'start', behavior: 'smooth' });
+    toast('Its settings are back under Ideas, with its seed fixed: move the distance to see the same idea nearer or further.');
+  }
 
   /* ------------------------------------------------------------------------------------------ the panel */
-  function noteHTML(kind, html) { return '<div class="note gd-note ' + kind + '">' + icon(kind === 'warn' ? 'alert' : kind === 'ok' ? 'check' : 'info') + '<span>' + html + '</span></div>'; }
+  // topic: a long message keeps its first sentence (and a short second one) in view; the rest goes behind a "?"
+  function noteHTML(kind, html, topic) {
+    let body = html;
+    if (topic && typeof MP.splitHelp === 'function') { const p = MP.splitHelp(html); body = p[0] + (p[1] ? help(p[1], topic) : ''); }
+    return '<div class="note gd-note ' + kind + '">' + icon(kind === 'warn' ? 'alert' : kind === 'ok' ? 'check' : 'info') + '<span>' + body + '</span></div>';
+  }
   function buildButton() {
     const save = document.getElementById('btn-save');
     const group = save && save.closest('.tb-group');
@@ -758,16 +850,22 @@
     D.innerHTML =
       '<div class="gd-h"><div class="gd-mk">' + icon('chip') + '</div><div class="gd-ht"><h2>AI on your GPU</h2><div class="s">ComfyUI on your own PC, through its bridge</div></div>' +
       '<button type="button" class="btn ghost icon" data-act="close" aria-label="Close" title="Close (Esc)">' + icon('close') + '</button></div>' +
+      // the studio's own 3D view stays in sight above the AI controls while the panel is open (studio.js dock3D)
+      '<div class="gd-mock" id="gd-mock"></div>' +
       '<div class="gd-body">' +
       // 1 · connect
       '<section class="gd-sec" id="gd-conn"><div class="gd-sec-h"><h3>Connect</h3><span class="gd-pill" id="gd-pill"><i></i><span></span></span></div>' +
-      '<div class="gd-intro" id="gd-intro"><p>Make <b>background art</b>, <b>picture elements</b> (a lollipop, a heart: AI drawings you can add to the design) and <b>logo or pack ideas</b> with ComfyUI on your own PC. The studio itself needs no GPU: everything else works without this.</p>' +
+      // one line, with the rest (what elements are, the steps to connect) in a section the user opens
+      '<div class="gd-intro" id="gd-intro"><p>Edit what you select in the design with ComfyUI on your own PC: <b>the background</b>, <b>a picture</b> or <b>the pop</b>.</p>' +
+      '<details class="gd-how"><summary>How to connect</summary><div class="gd-how-b"><p>Select something in the design, describe the change and Generate: the result goes straight onto the design, and one click goes back. Words are never redrawn. The studio itself needs no GPU: everything else works without this.</p>' +
       '<ol class="gd-steps"><li>On the PC with the GPU, start the <b>Model Pops GPU bridge</b> (the <code>gpu-bridge</code> folder; its README has the steps). It shows the address.</li>' +
       '<li>On that PC, the address is <b>' + LOCAL_URL + '</b>. For another device, start a tunnel on that same PC, next to the bridge (cloudflared or ngrok), then paste the <b>https</b> address it shows on that device. That device needs nothing installed.</li>' +
-      '<li>Paste the address here, then Connect.</li></ol></div>' +
+      '<li>Paste the address here, then Connect.</li></ol></div></details></div>' +
       '<div class="gd-form" id="gd-form">' +
-      '<div class="field"><label class="lbl" for="gd-url">Bridge address</label><input class="inp" id="gd-url" type="url" inputmode="url" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="' + LOCAL_URL + '  or  https://….trycloudflare.com">' +
-      '<div class="gd-hint">On the GPU PC: <button type="button" class="gd-link" data-act="local">' + LOCAL_URL + '</button> · another device: the https address of the tunnel running on the GPU PC</div></div>' +
+      // (the GPU PC's own address stays one click away, beside the label; where the address comes from is behind the "?")
+      '<div class="field"><span class="lbl"><span class="lbl-t"><label for="gd-url">Bridge address</label>' + help('On the GPU PC: <b>' + LOCAL_URL + '</b> · another device: the https address of the tunnel running on the GPU PC', 'Bridge address') + '</span>' +
+      '<button type="button" class="gd-link" data-act="local" title="Fill in the address on the GPU PC itself">' + LOCAL_URL + '</button></span>' +
+      '<input class="inp" id="gd-url" type="url" inputmode="url" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="' + LOCAL_URL + '  or  https://….trycloudflare.com"></div>' +
       // the key: shown only when the bridge asks for one (it answered 401: its requireKey is on)
       '<div class="field" id="gd-keyf" hidden><label class="lbl" for="gd-key">Key</label><div class="gd-keyrow"><input class="inp" id="gd-key" type="password" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="The key in the bridge window">' +
       '<button type="button" class="btn sm" data-act="showkey" aria-pressed="false" aria-label="Show the key">Show</button></div></div>' +
@@ -775,37 +873,43 @@
       '<div class="gd-row"><button type="button" class="btn primary" data-act="connect" id="gd-connect">Connect</button><button type="button" class="btn ghost sm" data-act="forget" id="gd-forget" hidden>' + icon('trash', 'ico-sm') + 'Forget the saved address</button></div></div>' +
       '<div class="gd-summary" id="gd-summary" hidden></div>' +
       '<div id="gd-msg" role="status" aria-live="polite"></div></section>' +
-      // 2 · make
+      // 2 · make: what is being edited (the selection), one text box, Generate, and what is showing on the design
       '<section class="gd-sec" id="gd-make" hidden><div class="gd-sec-h"><h3>Make</h3></div>' +
-      '<div class="field"><span class="lbl" id="gd-mode-l">What</span><div class="seg" role="group" aria-labelledby="gd-mode-l" id="gd-mode">' +
-      MODE_ORDER.map(k => '<button type="button" data-act="mode" data-v="' + k + '">' + MODES[k].label + '</button>').join('') + '</div>' +
-      '<div class="gd-hint" id="gd-modewhy" hidden>Element needs a newer bridge (1.1.0 or later): update the gpu-bridge folder on the GPU PC and start it again.</div></div>' +
-      '<div id="gd-modenote"></div>' +
-      // art and ideas: a design to start from, and how far to go from it
-      '<div class="field" id="gd-basef"><span class="lbl" id="gd-base-l">Start from</span><div class="gd-bases" role="group" aria-labelledby="gd-base-l" id="gd-bases">' +
-      Object.keys(BASES).map(k => '<button type="button" class="gd-base" data-act="base" data-v="' + k + '"><span class="gd-bth"><img alt="" id="gd-thumb-' + k + '"' + (BASES[k].thumb ? ' src="' + BASES[k].thumb + '"' : '') + '></span><span class="t">' + BASES[k].label + '</span><span class="s">' + BASES[k].sub + '</span></button>').join('') +
-      '</div><div class="gd-hint" id="gd-basenote"></div></div>' +
-      '<div class="field" id="gd-distf"><label class="lbl" for="gd-dist">How far from it <span class="val" id="gd-dist-v"></span></label><input type="range" id="gd-dist" min="0" max="1" step="0.05">' +
-      '<div class="gd-bands" id="gd-bands" role="group" aria-label="Distance bands">' + BAND_AT.map((v, i) => '<button type="button" data-act="band" data-i="' + i + '"><span class="t"></span><span class="s">' + BAND_RANGE[i] + '</span></button>').join('') + '</div>' +
-      '<div class="gd-hint" id="gd-bandnote"></div></div>' +
-      '<div class="field" id="gd-stylef"><label class="lbl" for="gd-style">Style <span class="val" id="gd-style-n"></span></label><textarea class="ta" id="gd-style" rows="3" maxlength="600" placeholder="Describe the look, or pick one below"></textarea><div class="gd-chips" id="gd-chips"></div></div>' +
-      // an element, in their place: a new one from a description, or a rework of one that is in the design
-      '<div class="field" id="gd-opf" hidden><span class="lbl" id="gd-op-l">New or rework</span><div class="seg" role="group" aria-labelledby="gd-op-l" id="gd-op">' +
-      '<button type="button" data-act="elop" data-v="new">New</button><button type="button" data-act="elop" data-v="rework">Rework</button></div></div>' +
-      '<div class="field" id="gd-tgf" hidden><span class="lbl" id="gd-tg-l">Element to rework</span><div class="gd-bases gd-els" role="group" aria-labelledby="gd-tg-l" id="gd-els"></div><div class="gd-hint" id="gd-tgnote"></div></div>' +
-      '<div class="field" id="gd-whatf" hidden><label class="lbl" for="gd-what">Describe the element <span class="val" id="gd-what-n"></span></label><textarea class="ta" id="gd-what" rows="2" maxlength="600" placeholder="One thing, for example: a strawberry lollipop"></textarea><div class="gd-chips" id="gd-what-chips"></div></div>' +
-      '<div class="field" id="gd-changef" hidden><label class="lbl" for="gd-change">What should change <span class="val" id="gd-change-n"></span></label><textarea class="ta" id="gd-change" rows="2" maxlength="600" placeholder="For example: make the candy orange"></textarea></div>' +
-      '<div class="gd-two"><div class="field"><span class="lbl" id="gd-seed-l">Seed</span><div class="seg sm" role="group" aria-labelledby="gd-seed-l" id="gd-seedmode">' +
-      '<button type="button" data-act="seedmode" data-v="random" title="A new idea every time">New each time</button><button type="button" data-act="seedmode" data-v="fixed" title="The same idea again: change only the distance to see it nearer to or further from the base">Fixed</button></div>' +
+      '<div class="gd-target" id="gd-target"><span class="gd-tth" id="gd-tth" aria-hidden="true"></span>' +
+      '<span class="gd-tn"><span class="gd-tk">Editing</span><b id="gd-tname" aria-live="polite"></b></span>' +
+      '<button type="button" class="btn sm" data-act="newel" id="gd-newel" aria-pressed="false" title="Make a new picture element from a description">' + icon('plus', 'ico-sm') + 'New element</button></div>' +
+      '<div class="gd-tline" id="gd-tline" hidden></div>' +
+      // what is showing on the design for this target: Before and the versions (right under what is being edited)
+      '<div class="gd-vers" id="gd-vers" hidden></div>' +
+      '<div class="field" id="gd-textf"><span class="lbl"><span class="lbl-t"><label for="gd-text" id="gd-text-l">Describe the background</label><span class="help-host" id="gd-text-h"></span></span><span class="val" id="gd-text-n"></span></span><textarea class="ta" id="gd-text" rows="3" maxlength="600"></textarea><div class="gd-chips" id="gd-text-chips"></div></div>' +
+      '<div class="field" id="gd-howf"><span class="lbl"><span class="lbl-t"><span id="gd-how-l">How much to change</span><span class="help-host" id="gd-hownote"></span></span></span><div class="seg gd-howseg" role="group" aria-labelledby="gd-how-l" id="gd-how">' +
+      MODES.art.bands.map((b, i) => '<button type="button" data-act="how" data-i="' + i + '">' + b[0] + '</button>').join('') + '</div></div>' +
+      '<details class="gd-how gd-more" id="gd-more"><summary>More options</summary><div class="gd-two gd-more-b"><div class="field"><span class="lbl" id="gd-seed-l">Seed</span><div class="seg sm" role="group" aria-labelledby="gd-seed-l" id="gd-seedmode">' +
+      '<button type="button" data-act="seedmode" data-v="random" title="A new idea every time">New each time</button><button type="button" data-act="seedmode" data-v="fixed" title="The same seed again: change only the words to steer it">Fixed</button></div>' +
       '<input class="inp" id="gd-seed" type="number" min="0" max="2147483647" step="1" aria-label="Seed number" hidden></div>' +
       '<div class="field"><span class="lbl" id="gd-ver-l">Versions</span><div class="seg sm" role="group" aria-labelledby="gd-ver-l" id="gd-versions">' +
-      [1, 2, 3, 4].map(v => '<button type="button" data-act="versions" data-v="' + v + '">' + v + '</button>').join('') + '</div></div></div>' +
+      [1, 2, 3, 4].map(v => '<button type="button" data-act="versions" data-v="' + v + '">' + v + '</button>').join('') + '</div></div></div></details>' +
       '<button type="button" class="btn primary block" data-act="go" id="gd-go">' + icon('wand', 'ico-sm') + '<span>Generate</span></button>' +
       '<div id="gd-gowhy" hidden></div>' +
       '<div class="gd-run" id="gd-run" hidden></div></section>' +
-      // 3 · results
-      '<section class="gd-sec" id="gd-res" hidden><div class="gd-sec-h"><h3>Results</h3><button type="button" class="btn ghost sm" data-act="clear" id="gd-clear">' + icon('trash', 'ico-sm') + '<span>Clear</span></button></div>' +
-      '<div id="gd-prev"></div><div class="gd-grid" id="gd-grid"></div><p class="gd-hint">Kept in this browser for a day (the last ' + KEEP_N + ').</p></section>' +
+      // 3 · recent results (kept a day): a click puts one on the design again
+      '<section class="gd-sec" id="gd-res" hidden><div class="gd-sec-h"><h3>Recent' + help('Kept in this browser for a day (the last ' + KEEP_N + '). Click one to put it on the design again.', 'Recent') + '</h3><button type="button" class="btn ghost sm" data-act="clear" id="gd-clear">' + icon('trash', 'ico-sm') + '<span>Clear</span></button></div>' +
+      '<div class="gd-strip" id="gd-grid" role="group" aria-label="Recent results"></div><div id="gd-rrow"></div></section>' +
+      // 4 · ideas, folded away: pictures to choose a direction, never placed in the design
+      '<section class="gd-sec" id="gd-isec" hidden><details class="gd-ideas" id="gd-ideas"><summary>Ideas (not print files)</summary><div class="gd-ideas-b">' +
+      '<div class="field"><span class="lbl" id="gd-mode-l">What</span><div class="seg" role="group" aria-labelledby="gd-mode-l" id="gd-mode">' +
+      IDEA_ORDER.map(k => '<button type="button" data-act="mode" data-v="' + k + '">' + MODES[k].label + '</button>').join('') + '</div></div>' +
+      '<div id="gd-modenote"></div>' +
+      // a design to start from, and how far to go from it (what is sent, and what the distance does: behind the "?")
+      '<div class="field" id="gd-basef"><span class="lbl"><span class="lbl-t"><span id="gd-base-l">Start from</span><span class="help-host" id="gd-basenote"></span></span></span><div class="gd-bases" role="group" aria-labelledby="gd-base-l" id="gd-bases">' +
+      Object.keys(BASES).map(k => '<button type="button" class="gd-base" data-act="base" data-v="' + k + '"><span class="gd-bth"><img alt="" id="gd-thumb-' + k + '"' + (BASES[k].thumb ? ' src="' + BASES[k].thumb + '"' : '') + '></span><span class="t">' + BASES[k].label + '</span><span class="s">' + BASES[k].sub + '</span></button>').join('') +
+      '</div></div>' +
+      '<div class="field" id="gd-distf"><span class="lbl"><span class="lbl-t"><label for="gd-dist">How far from it</label><span class="help-host" id="gd-bandnote"></span></span><span class="val" id="gd-dist-v"></span></span><input type="range" id="gd-dist" min="0" max="1" step="0.05">' +
+      '<div class="gd-bands" id="gd-bands" role="group" aria-label="Distance bands">' + BAND_AT.map((v, i) => '<button type="button" data-act="band" data-i="' + i + '"><span class="t"></span><span class="s">' + BAND_RANGE[i] + '</span></button>').join('') + '</div></div>' +
+      '<div class="field" id="gd-stylef"><label class="lbl" for="gd-style">Style <span class="val" id="gd-style-n"></span></label><textarea class="ta" id="gd-style" rows="3" maxlength="600" placeholder="Describe the look, or pick one below"></textarea><div class="gd-chips" id="gd-chips"></div></div>' +
+      '<button type="button" class="btn block" data-act="igo" id="gd-igo">' + icon('wand', 'ico-sm') + '<span>Generate ideas</span></button>' +
+      '<div class="gd-run" id="gd-irun" hidden></div>' +
+      '<div id="gd-prev"></div><div class="gd-grid" id="gd-igrid"></div></div></details></section>' +
       '</div>';
     document.body.appendChild(D);
     D.addEventListener('click', onClick);
@@ -816,24 +920,18 @@
     });
     $('#gd-dist', D).addEventListener('input', e => { st.distance = Math.round(parseFloat(e.target.value) * 100) / 100; renderDistance(); });
     $('#gd-style', D).addEventListener('input', () => { st.styleTouched = true; renderStyleCount(); renderChips(); });
-    $('#gd-what', D).addEventListener('input', () => { renderStyleCount(); renderChips(); });
-    $('#gd-change', D).addEventListener('input', renderStyleCount);
+    $('#gd-text', D).addEventListener('input', () => { st.texts[st.textKind || 'bg'] = $('#gd-text', D).value; renderStyleCount(); renderChips(); });
     $('#gd-seed', D).addEventListener('change', e => { e.target.value = clampSeed(e.target.value); st.seed = Number(e.target.value); });
+    $('#gd-ideas', D).addEventListener('toggle', () => { if ($('#gd-ideas', D).open) refreshMineThumb(); });
     $('#gd-remember', D).addEventListener('change', e => {
       if (!e.target.checked) { removeCreds(); toast('This browser no longer keeps the bridge address' + (st.conn.key ? ' or key.' : '.')); }
       else if (st.conn.state === 'on') saveCreds();
     });
-    // the "Use as background" button names the panel it goes on: keep it right when the panel changes
-    const vs = document.getElementById('view-switch'); if (vs) vs.addEventListener('click', () => setTimeout(renderPreview, 0));
-    // The studio sends no events when an element is selected, added, renamed, deleted or undone. So after a click
-    // or a key anywhere on the page, the open panel looks again: which element a rework is for, and whether the
-    // element a result was made for is still there.
-    const lookAgain = () => { if (!st.open || lookTimer) return; lookTimer = setTimeout(() => { lookTimer = 0; if (st.open) syncElements(); }, 80); };
+    // the target line follows the selection: the studio says when it changes (MPStudio.onSelection). A click or a
+    // key anywhere also looks again (cheap: redrawn only when something changed), for a drag, a rename or a delete.
+    if (typeof MP.onSelection === 'function') MP.onSelection(() => onSelChange());
+    const lookAgain = () => { if (!st.open || lookTimer) return; lookTimer = setTimeout(() => { lookTimer = 0; if (st.open) { renderTarget(); renderGoStrip(); } }, 80); };
     document.addEventListener('pointerup', lookAgain, true); document.addEventListener('keyup', lookAgain, true);
-  }
-  function syncElements() {
-    if (!$('#gd-make', D).hidden && MODES[st.mode].element && st.elOp === 'rework') { renderTargets(); renderGo(); }
-    stalePreview();
   }
   function onClick(e) {
     const t = e.target.closest && e.target.closest('[data-act]'); if (!t || !D.contains(t) || t.disabled) return;
@@ -845,46 +943,52 @@
     else if (a === 'change') { st.conn.editing = true; renderConn(); $('#gd-url', D).focus(); }
     else if (a === 'disconnect') disconnect();
     else if (a === 'forget') { const k = (readCreds() || {}).key; removeCreds(); $('#gd-remember', D).checked = false; $('#gd-key', D).value = ''; st.conn.key = ''; st.conn.askKey = false; disconnect('Forgot the saved address' + (k ? ' and key' : '') + ' on this browser.'); }
+    // Make
+    else if (a === 'newel') { const cur = curTarget(); pinTarget(cur && cur.kind === 'new' ? null : newTarget()); renderTarget(); if (curTarget().kind === 'new') $('#gd-text', D).focus({ preventScroll: true }); }
+    else if (a === 'chip') { const tk = st.textKind, c = chipsFor(tk)[Number(t.getAttribute('data-i'))]; if (c) { $('#gd-text', D).value = c[1]; st.texts[tk] = c[1]; renderStyleCount(); renderChips(); } }
+    else if (a === 'how') { st.band = Math.min(3, Math.max(0, Number(t.getAttribute('data-i')) || 0)); renderHow(); }
+    else if (a === 'logoideas') { st.mode = 'logo'; if (!st.styleTouched || styleIsChipOf('pack')) { $('#gd-style', D).value = MODES.logo.chips[0][1]; st.styleTouched = false; } $('#gd-ideas', D).open = true; renderMake(); refreshMineThumb(); $('#gd-ideas', D).scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+    else if (a === 'seedmode') { st.seedMode = v === 'fixed' ? 'fixed' : 'random'; renderSeed(); if (st.seedMode === 'fixed') $('#gd-seed', D).focus(); }
+    else if (a === 'versions') { st.versions = Math.min(4, Math.max(1, Number(v) || 1)); renderSeed(); renderGo(); }
+    else if (a === 'go') generate(false);
+    else if (a === 'igo') generate(true);
+    else if (a === 'cancel') cancelRun();
+    // what is showing on the design
+    else if (a === 'ver') { const g = st.go, id = t.getAttribute('data-id'); if (!g) return; if (id === 'before') backToBefore(g); else if (g.showing !== id) show(g, byId(id)); }
+    else if (a === 'before') backToBefore(st.go);
+    else if (a === 'addnew') { const r = byId(t.getAttribute('data-id')); if (!r) return; const now = Date.now(); if (now - ((r.at = r.at || {}).add || 0) < 1200) return; r.at.add = now; if (/no longer in the design/.test(st.runMsg)) { st.runMsg = ''; renderRun(); } addToDesign(r); }
+    // recent
+    else if (a === 'recent') { const r = byId(t.getAttribute('data-id')); if (r) useRecent(r); }
+    else if (a === 'rdownload') { const r = curRecent(); if (r) download(r); }
+    else if (a === 'rremove') { const r = curRecent(); if (r) removeResult(r.id); }
+    else if (a === 'clear') {
+      if (Date.now() - st.clearArm < 4000) { st.clearArm = 0; clearResults(); }
+      else { st.clearArm = Date.now(); $('#gd-clear span', D).textContent = 'Clear all ' + st.results.length + '?'; setTimeout(() => { if (st.clearArm && Date.now() - st.clearArm >= 3900) { st.clearArm = 0; const s = $('#gd-clear span', D); if (s) s.textContent = 'Clear'; } }, 4000); }
+    }
+    // ideas
     else if (a === 'mode') {
-      if (MODES[v] && v !== st.mode && modeOK(v)) {
+      if (IDEA_ORDER.indexOf(v) >= 0 && v !== st.mode) {
         const was = st.mode; st.mode = v;
-        if (MODES[v].element) st.seenSel = null;                    // a rework starts from the picture selected in the design
-        else if (!st.styleTouched || styleIsChipOf(was)) { $('#gd-style', D).value = MODES[v].chips[0][1]; st.styleTouched = false; }
+        if (!st.styleTouched || styleIsChipOf(was)) { $('#gd-style', D).value = MODES[v].chips[0][1]; st.styleTouched = false; }
         renderMake(); refreshMineThumb();
       }
     }
     else if (a === 'base') { if (BASES[v]) { st.base = v; renderMake(); if (v === 'mine') refreshMineThumb(); } }
     else if (a === 'band') { st.distance = BAND_AT[Number(t.getAttribute('data-i'))]; renderDistance(); }
-    else if (a === 'chip') { const M = MODES[st.mode], c = M.chips[Number(t.getAttribute('data-i'))]; if (c) { $(M.element ? '#gd-what' : '#gd-style', D).value = c[1]; if (!M.element) st.styleTouched = false; renderStyleCount(); renderChips(); } }
-    else if (a === 'elop') { st.elOp = v === 'rework' ? 'rework' : 'new'; st.seenSel = null; renderMake(); }
-    else if (a === 'target') { const i = String(v).indexOf(':'); const e = findPicture({ side: v.slice(0, i), key: v.slice(i + 1) }); if (e) setTarget(e); renderTargets(); renderGo(); }
-    else if (a === 'seedmode') { st.seedMode = v === 'fixed' ? 'fixed' : 'random'; renderSeed(); if (st.seedMode === 'fixed') $('#gd-seed', D).focus(); }
-    else if (a === 'versions') { st.versions = Math.min(4, Math.max(1, Number(v) || 1)); renderSeed(); renderGo(); }
-    else if (a === 'go') generate();
-    else if (a === 'cancel') cancelRun();
+    else if (a === 'ichip') { const c = MODES[st.mode].chips[Number(t.getAttribute('data-i'))]; if (c) { $('#gd-style', D).value = c[1]; st.styleTouched = false; renderStyleCount(); renderChips(); } }
     else if (a === 'sel') { st.sel = t.getAttribute('data-id'); renderResults(); }
-    else if (a === 'use') useAsBackground(curResult());
-    else if (a === 'add' || a === 'replace' || a === 'copy') {
-      // (a double click would stack a second element exactly on the first: the same button waits a moment)
-      const r = curResult(), now = Date.now(); if (!r || now - ((r.at = r.at || {})[a] || 0) < 1200) return;
-      r.at[a] = now; (a === 'add' ? addToDesign : a === 'replace' ? replaceElement : addAsCopy)(r);
-    }
     else if (a === 'download') { const r = curResult(); if (r) download(r); }
     else if (a === 'reuse') { const r = curResult(); if (r) reuse(r); }
     else if (a === 'remove') { const r = curResult(); if (r) removeResult(r.id); }
-    else if (a === 'clear') {
-      if (Date.now() - st.clearArm < 4000) { st.clearArm = 0; clearResults(); }
-      else { st.clearArm = Date.now(); $('#gd-clear span', D).textContent = 'Clear all ' + st.results.length + '?'; setTimeout(() => { if (st.clearArm && Date.now() - st.clearArm >= 3900) { st.clearArm = 0; const s = $('#gd-clear span', D); if (s) s.textContent = 'Clear'; } }, 4000); }
-    }
   }
   const styleIsChipOf = mode => MODES[mode].chips.some(c => c[1] === $('#gd-style', D).value.trim());
-  // the words that are sent: the style, or for an element its description (New) or what should change (Rework)
-  const textBox = () => $(!MODES[st.mode].element ? '#gd-style' : st.elOp === 'rework' ? '#gd-change' : '#gd-what', D);
+  const newTarget = () => ({ kind: 'new', side: MP.side === 'back' ? 'back' : 'front', sig: 'new', name: 'New element' });
 
   function open() {
     if (st.open) return;
     st.open = true; D.classList.add('on'); D.removeAttribute('inert'); D.setAttribute('aria-hidden', 'false');
     document.body.classList.add('gd-open');                  // the design column makes room (studio.css)
+    if (typeof MP.dock3D === 'function') { try { MP.dock3D($('#gd-mock', D)); } catch (e) { console.warn('[gpu] 3D view not docked', e); } }
     const b = $('#btn-gpu'); b.classList.add('open'); b.setAttribute('aria-expanded', 'true');
     restoreResults();
     const saved = readCreds();
@@ -893,34 +997,36 @@
       $('#gd-url', D).value = saved.url; $('#gd-key', D).value = saved.key; $('#gd-remember', D).checked = true;
       connect();
     } else if (st.conn.state === 'on' || st.conn.state === 'lost') pollHealth();
-    renderAll(); refreshMineThumb();
-    if (!MP.ready) whenReady().then(() => { if (st.open) syncElements(); }, () => {});      // (opened while the studio was still starting)
+    tSig = ''; renderAll(); refreshMineThumb(); showMake();
+    if (!MP.ready) whenReady().then(() => { if (st.open) { tSig = ''; renderTarget(true); } }, () => {});      // (opened while the studio was still starting)
     setTimeout(() => { const f = st.conn.state === 'on' ? $('#gd-go', D) : (!$('#gd-url', D).value ? $('#gd-url', D) : st.conn.askKey && !$('#gd-key', D).value ? $('#gd-key', D) : $('#gd-connect', D)); if (f && !f.disabled) f.focus({ preventScroll: true }); }, 220);
   }
+  // closing leaves the design as it is showing (what you see is what you have)
   function close() {
     if (!st.open) return;
     st.open = false; D.classList.remove('on'); D.setAttribute('inert', ''); D.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('gd-open');
+    st.go = null; st.pin = null;
+    if (typeof MP.undock3D === 'function') { try { MP.undock3D(); } catch (e) { console.warn('[gpu] 3D view not given back', e); } }
     const b = $('#btn-gpu'); b.classList.remove('open'); b.setAttribute('aria-expanded', 'false');
     if (D.contains(document.activeElement)) b.focus({ preventScroll: true });
   }
   // The studio's "Make with AI…" (Add element) and "Rework with AI…" (a picture's own panel) land here: the panel
-  // opens in Element, on New, or on Rework with that element as the one to rework. It always says where things
-  // stand: a run still going, no connection yet, or a bridge too old for elements.
+  // opens with "New element" as the target, or with that element selected. It always says where things stand: a
+  // run still going, no connection yet, or a bridge too old for elements.
   function askElement(op, key) {
     if (!D) return;
     open();
     const c = st.conn.state, live = c === 'on' || c === 'lost';
     if (live && !elementOK()) { toast('The bridge you are connected to cannot make elements yet: it needs a newer bridge (1.1.0 or later).', true); return; }
-    st.mode = 'element'; st.elOp = op === 'rework' ? 'rework' : 'new'; st.seenSel = null;
-    if (st.elOp === 'rework' && key) {
+    if (op === 'rework' && key) {
       const list = pictures(); const e = list.find(x => x.key === key && x.side === MP.side) || list.find(x => x.key === key);
-      if (e) setTarget(e); else toast('That element has no picture to rework.', true);
-    }
-    renderMake();
+      if (e && e.pic) { if (e.side !== MP.side) MP.setView(e.side); MP.select(e.key); } else toast('That element has no picture to rework.', true);
+    } else pinTarget(newTarget());
+    tSig = ''; renderTarget(true);
     if (st.run) toast('Your GPU is still making a picture. Generate comes back when it has finished (or press Cancel).');
-    else if (c === 'off' || c === 'error') toast('Connect to your GPU first: paste the bridge address here, then Connect. Element is ready after that.');
-    if (live) setTimeout(() => { if (!st.open) return; $('#gd-make', D).scrollIntoView({ block: 'start' }); textBox().focus({ preventScroll: true }); }, 260);
+    else if (c === 'off' || c === 'error') toast('Connect to your GPU first: paste the bridge address here, then Connect. Then describe it and Generate.');
+    if (live) setTimeout(() => { if (!st.open) return; $('#gd-make', D).scrollIntoView({ block: 'start' }); $('#gd-text', D).focus({ preventScroll: true }); }, 260);
   }
 
   /* ---- rendering */
@@ -947,7 +1053,7 @@
     if (c.state !== 'on' || !h) return ['off', 'Not connected'];
     if (h.comfy === 'error') return ['err', 'ComfyUI error'];
     if (h.comfy === 'starting') return ['busy', 'ComfyUI starting'];
-    if (h.busy || h.queued) return ['busy', 'Busy' + (h.queued ? ' · ' + h.queued + ' waiting' : '')];
+    if (h.busy || h.queued) return ['busy', 'Busy'];                       // (how many wait: under Connection)
     if (h.comfy === 'down') return ['on', 'Connected'];
     return ['on', 'Ready'];
   }
@@ -964,75 +1070,153 @@
     $('#gd-connect', D).disabled = c.state === 'checking';
     $('#gd-connect', D).textContent = c.state === 'checking' ? 'Connecting…' : 'Connect';
     renderForget();
+    // connected: the status light says it in one word (above); the address, the bridge version, the ComfyUI and GPU
+    // line, "GPU capped", Change and Disconnect wait in one closed row, "Connection". Lost: Reconnect stays in view.
     const sum = $('#gd-summary', D);
     sum.hidden = !live || c.editing;
     if (!sum.hidden) {
+      if (!$('#gd-conn-d', sum)) {
+        sum.innerHTML = '<div class="gd-row" id="gd-lost" hidden><button type="button" class="btn sm primary" data-act="reconnect">Reconnect</button></div>' +
+          '<details class="gd-how gd-conn-d" id="gd-conn-d"><summary>Connection</summary><div class="gd-conn-b" id="gd-conn-b"></div></details>';
+        $('#gd-conn-d', sum).addEventListener('toggle', e => { st.connOpen = e.target.open; });
+        if (st.connOpen) $('#gd-conn-d', sum).open = true;
+      }
+      $('#gd-lost', sum).hidden = c.state !== 'lost';
       let where = c.url; try { where = new URL(c.url).host; } catch (e) { /* as typed */ }
-      sum.innerHTML = '<div class="gd-sum-t">' + (c.state === 'lost' ? 'Lost the connection to <b>' : 'Connected to <b>') + esc(where) + '</b>' + (c.health && c.health.version ? ' <span class="gd-ver">bridge ' + esc(c.health.version) + '</span>' : '') + '</div>' +
-        (c.health && c.state === 'on' ? '<div class="gd-sum-s">' + healthText(c.health) + '</div>' + (c.health.message ? '<div class="gd-sum-m' + (c.health.comfy === 'error' ? ' err' : '') + '">' + esc(String(c.health.message).slice(0, 300)) + '</div>' : '') + (capText(c.health) ? '<div class="gd-sum-cap">' + icon('check', 'ico-sm') + '<span>' + esc(capText(c.health)) + '</span></div>' : '') : '') +
-        '<div class="gd-row">' + (c.state === 'lost' ? '<button type="button" class="btn sm primary" data-act="reconnect">Reconnect</button>' : '') +
-        '<button type="button" class="btn sm" data-act="change">Change</button><button type="button" class="btn ghost sm" data-act="disconnect">Disconnect</button></div>';
+      const h = c.health, on = !!h && c.state === 'on';
+      // (redrawn only when what it says changes, so a focused button or an open "?" in it stays the same one)
+      const bsig = [c.state, where, h && h.version, on && healthText(h), on && h.message, on && h.comfy, on && capText(h)].join('\u0001');
+      const body = $('#gd-conn-b', sum);
+      if (body.dataset.sig !== bsig) {
+        body.dataset.sig = bsig;
+        body.innerHTML = '<div class="gd-sum-t">' + (c.state === 'lost' ? 'Lost the connection to <b>' : 'Connected to <b>') + esc(where) + '</b>' + (h && h.version ? ' <span class="gd-ver">bridge ' + esc(h.version) + '</span>' : '') + '</div>' +
+          (on ? '<div class="gd-sum-s">' + healthText(h) + '</div>' + (h.message ? '<div class="gd-sum-m' + (h.comfy === 'error' ? ' err' : '') + '">' + esc(String(h.message).slice(0, 300)) + '</div>' : '') + (capText(h) ? '<div class="gd-sum-cap">' + icon('check', 'ico-sm') + '<span>GPU capped</span>' + help(esc(capText(h)), 'GPU capped') + '</div>' : '') : '') +
+          '<div class="gd-row"><button type="button" class="btn sm" data-act="change">Change</button><button type="button" class="btn ghost sm" data-act="disconnect">Disconnect</button></div>';
+      }
     }
     const msg = $('#gd-msg', D);
-    msg.innerHTML = c.err && (c.state === 'error' || c.state === 'lost' || c.state === 'off') ? noteHTML(c.state === 'off' ? 'info' : 'warn', c.err) : '';
+    const show = c.err && (c.state === 'error' || c.state === 'lost' || c.state === 'off'), sig = show ? (c.state === 'off' ? 'i' : 'w') + c.err : '';
+    if (msg.dataset.err !== sig) { msg.dataset.err = sig; msg.innerHTML = show ? noteHTML(c.state === 'off' ? 'info' : 'warn', c.err, 'Connection') : ''; }   // (redrawn only when it changes, so its "?" stays put)
   }
   function renderForget() { if (!D) return; const f = $('#gd-forget', D); if (f) f.hidden = !readCreds(); }
   function renderMake() {
     if (!D) return;
     const live = st.conn.state === 'on' || st.conn.state === 'lost';
-    $('#gd-make', D).hidden = !live;
+    $('#gd-make', D).hidden = !live; $('#gd-isec', D).hidden = !live;
     if (!live) return;
-    if (!modeOK(st.mode)) { st.mode = 'art'; refreshMineThumb(); }           // (an older bridge: no Element)
-    const M = MODES[st.mode], isEl = !!M.element, rework = isEl && st.elOp === 'rework';
-    $$('#gd-mode button', D).forEach(b => { const k = b.getAttribute('data-v'); const on = k === st.mode, ok = modeOK(k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = !ok; b.title = ok ? '' : 'Needs a newer bridge'; });
-    $('#gd-modewhy', D).hidden = elementOK();
-    $('#gd-modenote', D).innerHTML = noteHTML(M.badge ? 'idea' : 'ok', M.note);
-    // an element has no "Start from", "How far" or style: it is new (described) or a rework of one in the design
-    $('#gd-basef', D).hidden = isEl; $('#gd-distf', D).hidden = isEl; $('#gd-stylef', D).hidden = isEl;
-    $('#gd-opf', D).hidden = !isEl; $('#gd-whatf', D).hidden = !isEl || rework; $('#gd-tgf', D).hidden = !rework; $('#gd-changef', D).hidden = !rework;
-    $$('#gd-op button', D).forEach(b => { const on = b.getAttribute('data-v') === st.elOp; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-    if (rework) renderTargets();
+    renderTarget(); renderHow(); renderSeed(); renderIdeas(); renderGo(); renderGoStrip();
+  }
+  // can Generate work on this target? '' if so, else the one short line that says why not (HTML)
+  function blockOf(t) {
+    if (!t) return 'The studio is still starting.';
+    if (t.kind === 'text') return 'AI can’t redraw words: they must print exactly.' + (t.logo ? ' <button type="button" class="gd-link" data-act="logoideas">Logo ideas</button>' : '');
+    if (t.kind === 'bg') return '';
+    if (!elementOK()) return 'Pictures need a newer bridge (1.1.0 or later).' + help('Update the gpu-bridge folder on the GPU PC and start it again. Background art works with this one.', 'Newer bridge');
+    if (t.kind === 'pop' && !popOK()) return 'Needs a newer bridge.' + help('Reworking the pop needs bridge 1.2.0 or later, which keeps the pop exactly what it is. Update the gpu-bridge folder on the GPU PC and start it again. Pictures and the background work with this one.', 'Newer bridge');
+    if (t.kind === 'pop' && !MP.popPicture()) return 'The pop has no picture yet.';
+    if (t.kind === 'el' && !MP.elementPicture(t.key, t.side)) return 'This element has lost its picture.';
+    return '';
+  }
+  const canMake = t => !!t && !blockOf(t);
+  // The target line: a small picture of what is being edited, its name, and "New element". The text box takes the
+  // words for that kind of target (each kind keeps its own). force: the target's picture is drawn again.
+  function renderTarget(force) {
+    if (!D) return;
+    const t = curTarget();
+    // a go ends when the target changes (its own run still going keeps it): the design stays as it is showing
+    if (st.go && (!t || st.go.t.sig !== t.sig) && !(st.run && !st.run.idea && st.run.t && st.run.t.sig === st.go.t.sig)) st.go = null;
+    const k = textKey(t);
+    if (k !== st.textKind) {
+      st.textKind = k;
+      const ta = $('#gd-text', D); ta.value = st.texts[k] || '';
+      $('#gd-text-l', D).textContent = k === 'bg' ? 'Describe the background' : k === 'new' ? 'Describe the element' : k === 'pop' ? 'Angle or style' : 'What should change';
+      setHelp($('#gd-text-h', D), k === 'pop' ? esc(POP_HELP) : '', 'Angle or style');
+      ta.placeholder = k === 'bg' ? 'Describe the look, or pick one below' : k === 'new' ? 'One thing, for example: a strawberry lollipop' : k === 'pop' ? 'Pick one below, or describe the angle or style' : 'For example: make the candy orange';
+      ta.rows = k === 'bg' ? 3 : 2;
+      renderStyleCount(); renderChips();
+    }
+    const block = blockOf(t);
+    const sig = t ? [t.sig, t.name, block, st.conn.state].join('|') : '';
+    if (sig !== tSig || force) {
+      tSig = sig;
+      $('#gd-tname', D).textContent = t ? t.name : '';
+      const nb = $('#gd-newel', D), isNew = !!t && t.kind === 'new';
+      nb.classList.toggle('on', isNew); nb.setAttribute('aria-pressed', String(isNew));
+      const words = !!t && t.kind === 'text';
+      $('#gd-textf', D).hidden = words; $('#gd-howf', D).hidden = !t || t.kind !== 'bg'; $('#gd-more', D).hidden = words;
+      const tl = $('#gd-tline', D); tl.hidden = !block;
+      if (tl.dataset.sig !== block) { tl.dataset.sig = block; tl.innerHTML = block ? noteHTML(words ? 'info' : 'warn', block) : ''; }
+      refreshTargetThumb(t, force);
+    }
+    renderGo(); renderGoStrip();
+  }
+  // the small picture: the panel's background as it is now, the element's or the pop's own picture, or an icon
+  async function refreshTargetThumb(t, force) {
+    const box = $('#gd-tth', D); if (!box) return;
+    const put = (html, k) => { if (box.dataset.k !== k) { box.dataset.k = k; box.innerHTML = html; } };
+    if (!t || t.kind === 'new' || t.kind === 'text') { put(icon(!t ? 'image' : t.kind === 'new' ? 'sparkle' : t.logo ? 'logo' : 'text'), 'i:' + (t ? t.kind + (t.logo ? 'logo' : '') : '')); box.classList.remove('img'); return; }
+    if (t.kind === 'el' || t.kind === 'pop') {
+      const p = sourceOf(t); box.classList.toggle('img', !!p);
+      if (!p) { put(icon(t.kind === 'pop' ? 'pop' : 'image'), 'i:' + t.kind); return; }
+      put('<img alt="">', 'img'); const im = $('img', box); if (im.getAttribute('src') !== p.dataURL) im.src = p.dataURL;
+      return;
+    }
+    box.classList.add('img'); put('<img alt="">', 'img');
+    const im = $('img', box);
+    if (st.tthumb.sig === t.sig && st.tthumb.url && !force) { if (im.getAttribute('src') !== st.tthumb.url) im.src = st.tthumb.url; return; }
+    if (st.tthumb.sig === t.sig && st.tthumb.url) { if (im.getAttribute('src') !== st.tthumb.url) im.src = st.tthumb.url; }
+    const seq = ++tthumbSeq;
+    try {
+      await whenReady();
+      const r = await renderPanel(baseModel('art'), t.side, 12000, false);
+      if (seq !== tthumbSeq) return;
+      st.tthumb = { sig: t.sig, url: r.url };
+      const im2 = $('#gd-tth img', D); if (im2) im2.src = r.url;
+    } catch (e) { /* the line keeps its last picture */ }
+  }
+  // background: how much to change, as four bands (the distance in the middle of each)
+  function renderHow() {
+    $$('#gd-how button', D).forEach((b, i) => { const on = i === st.band; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.title = MODES.art.bands[i][1]; });
+    setHelp($('#gd-hownote', D), esc(MODES.art.bands[st.band][1] + ' Never any words or a pop.'), 'How much to change');
+  }
+  // the Ideas section (folded): logo or pack, the base, how far from it, the style
+  function renderIdeas() {
+    const M = MODES[st.mode];
+    $$('#gd-mode button', D).forEach(b => { const on = b.getAttribute('data-v') === st.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    // the honesty marker stays in view as a short tag; the sentence that explains it is behind the "?" beside it
+    const nm = /^<b>(.*?)\.?<\/b>\s*([\s\S]*)$/.exec(M.note) || [null, M.label, M.note];
+    if ($('#gd-modenote', D).dataset.mode !== st.mode) {
+      $('#gd-modenote', D).dataset.mode = st.mode;
+      $('#gd-modenote', D).innerHTML = '<div class="gd-modetag idea">' + icon('info', 'ico-sm') + '<b>' + nm[1] + '</b>' + help(nm[2], nm[1]) + '</div>';
+    }
     if (!baseAvailable(st.base)) st.base = 'mine';
     $$('#gd-bases .gd-base', D).forEach(b => { const k = b.getAttribute('data-v'); const on = k === st.base, ok = baseAvailable(k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = !ok; b.title = ok ? '' : 'Not among the bases the bridge has on that PC'; });
     const im = $('#gd-thumb-mine', D); if (im && st.mineThumb && im.getAttribute('src') !== st.mineThumb) im.src = st.mineThumb;
-    $('#gd-basenote', D).textContent = st.base === 'mine'
-      ? 'Uses the design open in this browser. ' + (M.bgOnly ? 'Sent as its background only: no words, no logo, no pop, no added elements.' : 'Sent as it is now: the logo, the words and the real pop' + (M.words ? ', with its words passed on to be spelled exactly.' : '.'))
-      : 'The client’s current ' + (st.base === 'bag' ? 'bag' : 'wrapper') + ' draft (a base already on the GPU PC, with its words).';
-    if (!isEl && !$('#gd-style', D).value.trim() && !st.styleTouched) $('#gd-style', D).value = M.chips[0][1];
-    renderDistance(); renderStyleCount(); renderChips(); renderSeed(); renderGo();
-    stalePreview();
-  }
-  // Rework: one card per picture element in the design, the one to rework marked. Redrawn only when the list changes.
-  function renderTargets() {
-    const list = syncTarget(); const box = $('#gd-els', D);
-    const sig = list.map(e => [e.side, e.key, e.src, e.ai ? 1 : 0, e.name].join(':')).join('\n');
-    if (sig !== elSig) {
-      elSig = sig;
-      box.innerHTML = list.map(e => '<button type="button" class="gd-base" data-act="target" data-v="' + esc(sigOf(e)) + '" title="' + esc(e.name) + '"><span class="gd-bth"><img alt=""></span><span class="t">' + esc(e.name) + '</span><span class="s">' + e.side + (e.ai ? ' · AI drawing' : ' panel') + '</span></button>').join('');
-      $$('img', box).forEach((im, i) => { im.src = list[i].pic.dataURL; });
-    }
-    const cur = sigOf(st.target);
-    $$('.gd-base', box).forEach(b => { const on = b.getAttribute('data-v') === cur; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-    box.hidden = !list.length;
-    $('#gd-tgnote', D).textContent = list.length ? 'The picture selected in the design is picked for you; click another one here to rework that instead. Its place and size in the design stay.'
-      : 'There is no picture element in this design yet. Add one under Layers → Add element, or make a New one here first.';
+    setHelp($('#gd-basenote', D), esc(st.base === 'mine'
+      ? 'Uses the design open in this browser, as it is now: the logo, the words and the real pop' + (M.words ? ', with its words passed on to be spelled exactly.' : '.')
+      : 'The client’s current ' + (st.base === 'bag' ? 'bag' : 'wrapper') + ' draft (a base already on the GPU PC, with its words).'), 'Start from');
+    if (!$('#gd-style', D).value.trim() && !st.styleTouched) $('#gd-style', D).value = M.chips[0][1];
+    renderDistance(); renderStyleCount(); renderChips();
   }
   function renderDistance() {
-    const M = MODES[st.mode]; if (!M.bands) return;          // (an element has no distance)
+    const M = MODES[st.mode];
     const d = st.distance, bi = bandOf(d);
     const r = $('#gd-dist', D); if (Number(r.value) !== d) r.value = d;
     $('#gd-dist-v', D).textContent = d.toFixed(2);
     $$('#gd-bands button', D).forEach((b, i) => { b.classList.toggle('on', i === bi); b.setAttribute('aria-pressed', String(i === bi)); $('.t', b).textContent = M.bands[i][0]; b.title = M.bands[i][1]; });
-    $('#gd-bandnote', D).textContent = M.bands[bi][1] + (M.bgOnly ? ' Never any words or a pop.' : ' The pop stays the real product.');
+    setHelp($('#gd-bandnote', D), esc(M.bands[bi][1] + ' The pop stays the real product.'), 'How far from it');
   }
-  function renderStyleCount() { ['style', 'what', 'change'].forEach(k => { $('#gd-' + k + '-n', D).textContent = $('#gd-' + k, D).value.length + ' / 600'; }); }
+  // (the count shows only near the 600-character limit, where it matters)
+  function renderStyleCount() { ['style', 'text'].forEach(k => { const len = $('#gd-' + k, D).value.length; $('#gd-' + k + '-n', D).textContent = len >= 500 ? len + ' / 600' : ''; }); }
+  const chipsFor = tk => (tk === 'pop' ? POP_CHIPS : tk === 'new' ? MODES.element.chips : tk === 'change' ? [] : MODES.art.chips);
   function renderChips() {
-    const M = MODES[st.mode]; const cur = $(M.element ? '#gd-what' : '#gd-style', D).value.trim();
-    $(M.element ? '#gd-what-chips' : '#gd-chips', D).innerHTML = M.chips.map((c, i) => '<button type="button" class="gd-chip' + (c[1] === cur ? ' on' : '') + '" data-act="chip" data-i="' + i + '" title="' + esc(c[1]) + '">' + esc(c[0]) + '</button>').join('');
+    const chips = (list, cur, act) => list.map((c, i) => '<button type="button" class="gd-chip' + (c[1] === cur ? ' on' : '') + '" data-act="' + act + '" data-i="' + i + '" title="' + esc(c[1]) + '">' + esc(c[0]) + '</button>').join('');
+    const tk = st.textKind || 'bg';
+    $('#gd-text-chips', D).innerHTML = tk === 'change' ? '' : chips(chipsFor(tk), $('#gd-text', D).value.trim(), 'chip');
+    $('#gd-chips', D).innerHTML = chips(MODES[st.mode].chips, $('#gd-style', D).value.trim(), 'ichip');
   }
   function renderSeed() {
     $$('#gd-seedmode button', D).forEach(b => { const on = b.getAttribute('data-v') === st.seedMode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-    $('#gd-seedmode [data-v="fixed"]', D).title = MODES[st.mode].element ? 'The same seed again: change only the words to steer the same drawing' : 'The same idea again: change only the distance to see it nearer to or further from the base';
     const s = $('#gd-seed', D); s.hidden = st.seedMode !== 'fixed'; if (s.value === '') s.value = st.seed;
     $$('#gd-versions button', D).forEach(b => { const on = Number(b.getAttribute('data-v')) === st.versions; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   }
@@ -1042,20 +1226,35 @@
     if (!m || typeof m !== 'object' || m.enoughToLoad !== false || h.modelsLoaded) return '';
     const need = Number(m.modelsNeedGB) || 0, free = Number(m.commitFreeGB) || 0, lim = Number(m.commitLimitGB) || 0, below = Number(m.loadBelowPct) || 85;
     const more = Math.max(1, Math.ceil(need - (free - lim * (1 - below / 100))));
+    if (m.restartPending) return 'The GPU PC is short of memory for the AI models right now. A bigger page file' + (m.pageFileSetGB ? ' (<b>' + Math.round(Number(m.pageFileSetGB)) + ' GB</b>)' : '') + ' is already set there, but it is not in use yet: restart that PC once (Start > Power > <b>Restart</b>, not Shut down) and this goes away. Until then, close apps there to free about <b>' + more + ' GB</b> more.';
     return 'The GPU PC is short of memory for the AI models right now: they take about <b>' + Math.round(need) + ' GB</b> of Windows memory (RAM + page file), and ' + Math.round(free) + ' GB is free. Close apps there to free about <b>' + more + ' GB</b> more (games, browser tabs, other AI tools) before you generate. Until then the bridge won’t load them, so that PC never runs out of memory.';
   }
+  // the memory warning in one short sentence (what is wrong, what to do); memWarn has the whole of it
+  function memShort(h) {
+    const m = h.memory, need = Number(m.modelsNeedGB) || 0, free = Number(m.commitFreeGB) || 0, lim = Number(m.commitLimitGB) || 0, below = Number(m.loadBelowPct) || 85;
+    const more = Math.max(1, Math.ceil(need - (free - lim * (1 - below / 100))));
+    return m.restartPending ? 'The GPU PC is short of memory for the AI models: restart that PC once, or close apps there to free about <b>' + more + ' GB</b>.'
+      : 'The GPU PC is short of memory for the AI models: close apps there to free about <b>' + more + ' GB</b>.';
+  }
   function renderGo() {
-    const g = $('#gd-go', D);
+    const g = $('#gd-go', D), ig = $('#gd-igo', D);
     const h = st.conn.state === 'on' ? st.conn.health : null;
     const comfyDown = !!h && h.comfy === 'error';          // the bridge would answer 503: say why here instead
-    const noTarget = !!MODES[st.mode].element && st.elOp === 'rework' && !st.target;       // (the note under "Element to rework" says why)
-    g.disabled = !!st.run || st.conn.state !== 'on' || comfyDown || noTarget;
+    const off = !!st.run || st.conn.state !== 'on' || comfyDown;
+    g.disabled = off || !canMake(curTarget());              // (the line under the target says why)
+    ig.disabled = off;
     $('span', g).textContent = 'Generate' + (st.versions > 1 ? ' ' + st.versions + ' versions' : '');
+    $('span', ig).textContent = 'Generate ' + (st.versions > 1 ? st.versions + ' ideas' : 'an idea');
     const why = $('#gd-gowhy', D);
-    const html = comfyDown ? noteHTML('warn', 'Your GPU can’t take a job right now' + (h.message ? ': ' + esc(String(h.message).slice(0, 300).replace(/\.?$/, '.')) : '.') + ' This button comes back by itself when the bridge is ready.')
-      : !st.run && memWarn(h) ? noteHTML('warn', memWarn(h)) : '';
-    why.hidden = !html;
-    if (why.innerHTML !== html) why.innerHTML = html;
+    // (what is wrong and what to do stay in view; the bridge's own words and the details are behind the "?")
+    const mw = !comfyDown && !st.run ? memWarn(h) : '';
+    const sig = comfyDown ? 'c' + (h.message || '') : mw;
+    why.hidden = !sig;
+    if (why.dataset.sig !== sig) {
+      why.dataset.sig = sig;
+      why.innerHTML = comfyDown ? noteHTML('warn', 'Your GPU can’t take a job right now.' + help('Your GPU can’t take a job right now' + (h.message ? ': ' + esc(String(h.message).slice(0, 300).replace(/\.?$/, '.')) : '.') + ' This button comes back by itself when the bridge is ready.', 'GPU not ready'))
+        : mw ? noteHTML('warn', memShort(h) + help(mw, 'GPU PC memory')) : '';
+    }
   }
   function runLine(r) {
     const lead = r.of > 1 ? 'Version ' + r.n + ' of ' + r.of + ' · ' : '';
@@ -1071,7 +1270,11 @@
   function renderRun() {
     if (!D) return;
     renderGo();
-    const box = $('#gd-run', D); const r = st.run;
+    // Make's progress shows under Make; an idea's under Ideas
+    const idea = st.run ? !!st.run.idea : !!st.runIdea;
+    const box = $(idea ? '#gd-irun' : '#gd-run', D), other = $(idea ? '#gd-run' : '#gd-irun', D);
+    other.hidden = true; other.innerHTML = '';
+    const r = st.run;
     if (!r) { box.hidden = !st.runMsg; box.innerHTML = st.runMsg || ''; return; }
     box.hidden = false;
     box.innerHTML = '<div class="gd-run-box"><div class="gd-run-t"><span id="gd-run-line">' + esc(runLine(r)) + '</span><span class="gd-time" id="gd-time"></span></div>' +
@@ -1090,62 +1293,97 @@
   }
   function renderResults() {
     if (!D) return;
-    $('#gd-res', D).hidden = !st.results.length;
-    if (!st.results.length) { $('#gd-grid', D).innerHTML = ''; $('#gd-prev', D).innerHTML = ''; return; }
-    if (!curResult()) st.sel = st.results[0].id;
-    $('#gd-grid', D).innerHTML = st.results.map(r => {
+    const design = st.results.filter(r => !isIdea(r)), ideas = st.results.filter(isIdea);
+    // Recent: a strip of what was made for the design (a click puts one on the design again)
+    $('#gd-res', D).hidden = !design.length;
+    const showing = st.go && st.go.showing;
+    $('#gd-grid', D).innerHTML = design.map(r => {
+      const M = MODES[r.mode], on = r.id === st.rsel;
+      return '<button type="button" class="gd-th' + (r.cut ? ' cut' : '') + (on ? ' on' : '') + (r.id === showing ? ' live' : '') + '" data-act="recent" data-id="' + esc(r.id) + '" aria-pressed="' + on + '" title="' + esc(M.label + ' · seed ' + r.seed) + '">' +
+        '<img src="' + r.url + '" alt="' + esc(M.label + ', seed ' + r.seed) + '"><span class="gd-tag">' + M.tag + '</span></button>';
+    }).join('');
+    renderRecentRow();
+    // Ideas: their own grid and card, never placed in the design
+    if (!curResult()) st.sel = ideas.length ? ideas[0].id : null;
+    $('#gd-igrid', D).innerHTML = ideas.map(r => {
       const M = MODES[r.mode];
-      return '<button type="button" class="gd-th' + (r.cut ? ' cut' : '') + (r.id === st.sel ? ' on' : '') + '" data-act="sel" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === st.sel) + '" title="' + esc(M.label + ' · seed ' + r.seed) + '">' +
-        '<img src="' + r.url + '" alt="' + esc(M.label + ', seed ' + r.seed) + '"><span class="gd-tag' + (M.badge ? ' idea' : '') + '">' + M.tag + '</span></button>';
+      return '<button type="button" class="gd-th' + (r.id === st.sel ? ' on' : '') + '" data-act="sel" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === st.sel) + '" title="' + esc(M.label + ' · seed ' + r.seed) + '">' +
+        '<img src="' + r.url + '" alt="' + esc(M.label + ', seed ' + r.seed) + '"><span class="gd-tag idea">' + M.tag + '</span></button>';
     }).join('');
     renderPreview();
+    renderGoStrip();
   }
-  // what the result card is drawn from besides the result: the panel being edited and, for a rework, whether its
-  // element is still in the design (it can go, and come back with Undo, without a word to this panel)
-  const previewSig = r => (r ? r.id + ':' + (MP.side === 'back' ? 'back' : 'front') + ':' + (r.op === 'rework' ? !!findElement(r.target) : '') : '');
-  function stalePreview() { if (D && previewSig(curResult()) !== pvSig) renderPreview(); }
+  // the one picked under Recent: what it is (the details behind the "?"), Download, and when it cannot go back
+  // onto its target, "Add as a new element"
+  function renderRecentRow() {
+    const box = $('#gd-rrow', D); if (!box) return;
+    const r = curRecent();
+    if (!r) { if (box.innerHTML) box.innerHTML = ''; box.dataset.sig = ''; return; }
+    const k = kindOf(r), t = recentTarget(r), M = MODES[r.mode];
+    const live = !!st.go && st.go.showing === r.id;
+    const sig = r.id + '|' + (t ? t.sig : '') + '|' + (MP.side || '') + '|' + live;
+    if (box.dataset.sig === sig) return; box.dataset.sig = sig;
+    const tname = esc((r.target && r.target.name) || 'the element');
+    const what = k === 'bg' ? 'Background art' : k === 'pop' ? 'The pop, as an AI drawing' : k === 'el' ? 'A rework of “' + tname + '”' : 'A new element';
+    let details = 'Seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px · “' + esc(r.style) + '”';
+    if (k === 'bg') { const f = fitInfo(r); if (f) details += ' · about ' + f.ppi + ' ppi on this panel' + (f.ppi >= 300 ? ': print-ready.' : f.ppi >= 250 ? ' (300 is ideal).' : ': fine for proofs. For the final print, download it, upscale it 2× (for example in ComfyUI) and bring it back with Background → Replace background art.') + (f.crop ? ' A different shape from this panel, so its edges are cropped to fit.' : ''); }
+    else details += ' · ' + (r.cut ? 'background cut out.' : 'with its background' + (r.note ? ' (' + esc(r.note) + ')' : '') + '.');
+    const offer = !t && M.element && !live;            // (not while it is the one showing on the design)
+    box.innerHTML = '<div class="gd-rrow"><div class="gd-rrow-t"><b>' + what + '</b>' + help(details, 'This result') + '</div>' +
+      (k === 'el' && !t ? noteHTML('info', '“' + tname + '” is no longer in the design.') : '') +
+      '<div class="gd-pv-a">' + (offer ? '<button type="button" class="btn primary sm" data-act="addnew" data-id="' + esc(r.id) + '">' + icon('plus', 'ico-sm') + 'Add as a new element</button>' : '') +
+      '<button type="button" class="btn sm" data-act="rdownload">' + icon('save', 'ico-sm') + 'Download PNG</button>' +
+      '<button type="button" class="btn ghost sm icon" data-act="rremove" aria-label="Remove this result" title="Remove this result">' + icon('trash', 'ico-sm') + '</button></div></div>';
+  }
+  // What is showing on the design for this target: Before and each version, and "Back to before"
+  function renderGoStrip() {
+    const box = $('#gd-vers', D); if (!box) return;
+    const g = st.go, t = curTarget();
+    const list = g ? g.ids.map(byId).filter(Boolean) : [];
+    if (!g || !t || g.t.sig !== t.sig || !list.length) { box.hidden = true; if (box.innerHTML) box.innerHTML = ''; box.dataset.sig = ''; return; }
+    const cur = list.find(r => r.id === g.showing);
+    const sig = [g.tok, g.showing, g.gone, list.map(r => r.id).join(',')].join('|');
+    if (box.dataset.sig === sig && !box.hidden) return;
+    box.dataset.sig = sig; box.hidden = false;
+    const what = g.showing === 'before' ? 'Before' : 'Version ' + (list.indexOf(cur) + 1);
+    let notes = '';
+    if (cur && MODES[cur.mode].element && !cur.cut) notes += noteHTML('warn', 'Its background could not be cut out, so this is the picture as it came.' + (cur.note ? help(esc(cur.note), 'Background not cut out') : ''));
+    if (g.gone) {
+      const r = list[list.length - 1];
+      notes += noteHTML('info', '“' + esc(g.t.name) + '” is no longer in the design. <button type="button" class="gd-link" data-act="addnew" data-id="' + esc(r.id) + '">Add as a new element</button>');
+    }
+    box.innerHTML = '<div class="gd-vers-h"><span class="gd-vers-t">On the design: <b>' + what + '</b></span>' +
+      (g.showing !== 'before' ? '<button type="button" class="btn sm" data-act="before">' + icon('undo', 'ico-sm') + 'Back to before</button>' : '') + '</div>' +
+      '<div class="gd-vers-row" role="group" aria-label="Before and the versions">' +
+      '<button type="button" class="gd-v' + (g.showing === 'before' ? ' on' : '') + '" data-act="ver" data-id="before" aria-pressed="' + (g.showing === 'before') + '" title="As it was before">' +
+      '<span class="gd-v-i">' + (g.thumb ? '<img alt="" src="' + g.thumb + '">' : icon('minus')) + '</span><span class="gd-v-l">Before</span></button>' +
+      list.map((r, i) => '<button type="button" class="gd-v' + (r.cut ? ' cut' : '') + (r.id === g.showing ? ' on' : '') + '" data-act="ver" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === g.showing) + '" title="Version ' + (i + 1) + ' · seed ' + esc(r.seed) + '">' +
+        '<span class="gd-v-i"><img alt="" src="' + r.url + '"></span><span class="gd-v-l">' + (i + 1) + '</span></button>').join('') +
+      '</div>' + notes;
+  }
+  // the idea picked in the Ideas section: Download, Reuse settings, remove (never placed in the design)
   function renderPreview() {
     if (!D) return;
     const r = curResult(); const box = $('#gd-prev', D);
-    pvSig = previewSig(r);
     if (!r) { box.innerHTML = ''; return; }
     const M = MODES[r.mode];
-    const side = MP.side === 'back' ? 'back' : 'front';
-    let from = 'from ' + esc(r.baseLabel || ''), line = '', fit = '', notes = '', acts = '';
-    if (M.use === 'background') {
-      const f = fitInfo(r);
-      if (f) fit = '<div class="gd-pv-fit">' + (f.ppi >= 300 ? 'About ' + f.ppi + ' ppi on this panel: print-ready.' : f.ppi >= 250 ? 'About ' + f.ppi + ' ppi on this panel (300 is ideal).' : 'About ' + f.ppi + ' ppi on this panel: fine for proofs. For the final print, download it, upscale it 2× (for example in ComfyUI) and bring it back with Background → Replace background art.') +
-        (f.crop ? ' A different shape from this panel, so its edges are cropped to fit (drag it to place it).' : '') + '</div>';
-      acts = '<button type="button" class="btn primary sm" data-act="use">' + icon('background', 'ico-sm') + 'Use as ' + side + ' background</button>';
-    }
-    if (M.element) {
-      // a new element is added; a rework replaces its element or is added beside it. If that element has gone, it can only be added
-      const rework = r.op === 'rework', t = rework ? findElement(r.target) : null, name = esc((t && t.name) || (r.target && r.target.name) || 'The element');
-      from = rework ? 'a rework of “' + name + '”' : 'new, from a description';
-      line = 'seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px · ' + (r.cut ? 'background cut out' : 'with its background');
-      if (!r.cut) notes += noteHTML('warn', 'Its background could not be cut out, so this is the picture as it came. ' + esc(r.note || ''));
-      if (rework && !t) notes += noteHTML('info', '“' + name + '” is no longer in the design, so there is nothing to replace. This picture can still be added as a new element.');
-      acts = rework && t
-        ? '<button type="button" class="btn primary sm" data-act="replace" title="Puts this picture in place of “' + name + '” on the ' + t.side + ' panel: the same place, the same size">' + icon('image', 'ico-sm') + 'Replace the element</button>' +
-          '<button type="button" class="btn sm" data-act="copy" title="Keeps “' + name + '” and adds this picture as a second element on the ' + t.side + ' panel">' + icon('copy', 'ico-sm') + 'Add as a copy</button>'
-        : '<button type="button" class="btn primary sm" data-act="add" title="Adds it as a picture element in the middle of the ' + side + ' panel (the one being edited)">' + icon('plus', 'ico-sm') + 'Add to design</button>';
-    } else line = esc(M.bands[bandOf(r.distance)][0]) + ' (distance ' + Number(r.distance).toFixed(2) + ') · seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px';
-    box.innerHTML = '<figure class="gd-pv"><div class="gd-pv-img' + (r.cut ? ' cut' : '') + '"><img src="' + r.url + '" alt="' + esc(M.label + ' result, seed ' + r.seed) + '">' +
-      (M.badge ? '<span class="gd-badge">' + M.badge + '</span>' : '') + '</div>' +
-      '<figcaption><div class="gd-pv-t">' + esc(M.label) + ' <span>' + from + '</span></div>' +
-      '<div class="gd-pv-s">' + line + '</div>' +
-      '<div class="gd-pv-s gd-pv-style">“' + esc(r.style) + '”</div>' + fit + '</figcaption>' + notes +
-      '<div class="gd-pv-a">' + acts +
-      '<button type="button" class="btn sm" data-act="download">' + icon('save', 'ico-sm') + 'Download PNG</button>' +
-      '<button type="button" class="btn sm" data-act="reuse" title="' + (M.element ? 'Put its words and seed back under Make' : 'Put its style, distance and seed back under Make, to try it nearer or further') + '">' + icon('reset', 'ico-sm') + 'Reuse settings</button>' +
-      '<button type="button" class="btn ghost sm icon" data-act="remove" aria-label="Remove this result" title="Remove this result">' + icon('trash', 'ico-sm') + '</button></div></figure>';
+    const line = esc(M.bands[bandOf(r.distance)][0]) + ' (distance ' + Number(r.distance).toFixed(2) + ') · seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px';
+    box.innerHTML = '<figure class="gd-pv"><div class="gd-pv-img"><img src="' + r.url + '" alt="' + esc(M.label + ' result, seed ' + r.seed) + '">' +
+      '<span class="gd-badge">' + M.badge + '</span></div>' +
+      // (its distance, seed and size are behind the "?")
+      '<figcaption><div class="gd-pv-t">' + esc(M.label) + ' <span>from ' + esc(r.baseLabel || '') + '</span>' + help(line, 'This idea') + '</div>' +
+      '<div class="gd-pv-s gd-pv-style">“' + esc(r.style) + '”</div></figcaption>' +
+      '<div class="gd-pv-a"><button type="button" class="btn sm" data-act="download">' + icon('save', 'ico-sm') + 'Download PNG</button>' +
+      '<button type="button" class="btn sm" data-act="reuse" title="Put its style, distance and seed back, to try it nearer or further">' + icon('reset', 'ico-sm') + 'Reuse settings</button>' +
+      '<button type="button" class="btn ghost sm icon" data-act="remove" aria-label="Remove this idea" title="Remove this idea">' + icon('trash', 'ico-sm') + '</button></div></figure>';
   }
 
   /* ------------------------------------------------------------------------------------------ start */
   try {
     moveFileCreds();
     buildButton(); buildDrawer();
-    $('#gd-style', D).value = MODES.art.chips[0][1]; $('#gd-seed', D).value = st.seed;
+    st.texts.bg = MODES.art.chips[0][1];
+    $('#gd-style', D).value = MODES.logo.chips[0][1]; $('#gd-seed', D).value = st.seed;
     readMake();
     $('#gd-dist', D).value = st.distance;
     const saved = readCreds();
@@ -1153,10 +1391,11 @@
     renderAll();
   } catch (e) { console.warn('[label-studio] AI on your GPU is unavailable:', e); }
   // for scripted checks (QA), and for the studio: its "Make with AI…" and "Rework with AI…" call makeElement() and
-  // rework(key), which open this panel in Element (New, or Rework on that element)
+  // rework(key), which open this panel on "New element", or with that element selected
+  const goState = () => { const g = st.go; return g ? { sig: g.t.sig, kind: g.t.kind, showing: g.showing, ids: g.ids.slice(), drawKey: g.drawKey, gone: g.gone } : null; };
   MP.gpu = {
-    get state() { return { open: st.open, conn: st.conn.state, health: st.conn.health, err: st.conn.err, run: st.run ? { phase: st.run.phase, n: st.run.n, of: st.run.of, position: st.run.position } : null, runMsg: st.runMsg, results: st.results.map(r => ({ id: r.id, mode: r.mode, base: r.base, seed: r.seed, w: r.w, h: r.h, distance: r.distance, op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background })), sel: st.sel, mode: st.mode, base: st.base, distance: st.distance, elOp: st.elOp, target: st.target }; },
-    open, close, connect, disconnect, generate, cancel: () => cancelRun(), frontWords: () => frontWords(MP.model),
+    get state() { return { open: st.open, conn: st.conn.state, health: st.conn.health, err: st.conn.err, run: st.run ? { phase: st.run.phase, n: st.run.n, of: st.run.of, position: st.run.position, idea: st.run.idea } : null, runMsg: st.runMsg, results: st.results.map(r => ({ id: r.id, mode: r.mode, kind: kindOf(r), side: r.side, base: r.base, seed: r.seed, w: r.w, h: r.h, distance: r.distance, op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background })), sel: st.sel, rsel: st.rsel, mode: st.mode, base: st.base, distance: st.distance, band: st.band, target: curTarget(), go: goState() }; },
+    open, close, connect, disconnect, generate: () => generate(false), generateIdea: () => generate(true), cancel: () => cancelRun(), frontWords: () => frontWords(MP.model),
     makeElement: () => askElement('new'), rework: key => askElement('rework', key),
   };
 
