@@ -164,6 +164,20 @@ input[type=range] { width: 100%; accent-color: var(--accent); height: 20px; marg
 .layer .name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .layer .meta { color: var(--ink-3); font-size: 11px; padding-right: 4px; max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .layer.off .name span, .layer.off .meta { opacity: .45; text-decoration: line-through; text-decoration-color: rgba(0, 0, 0, .25); }
+/* elements: pictures of your own, added as layers ("Add element", the small picture in a row, the AI tag) */
+.layer-add { position: relative; display: flex; align-items: center; margin: 0 0 4px; }
+.add-menu { position: absolute; left: 0; top: 32px; z-index: 6; min-width: 208px; display: grid; gap: 2px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-sm); box-shadow: var(--shadow); }
+.add-menu button { display: flex; align-items: center; gap: 9px; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; text-align: left; font-size: 12.5px; font-weight: 550; white-space: nowrap; }
+.add-menu button:hover { background: var(--panel-2); }
+.add-menu button .ico { color: var(--ink-3); }
+.layer .name .pic-th { width: 18px; height: 18px; flex: none; object-fit: contain; border-radius: 3px; background: #f3eeea; margin: 0 -1.5px; }
+.ai-tag { flex: none; display: inline-block; font-size: 10px; font-weight: 650; letter-spacing: .04em; line-height: 1; text-transform: none; padding: 2px 6px; border-radius: 8px; background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); }
+.sec-h h2 .ai-tag { margin-left: 8px; vertical-align: 2px; }
+.numslide { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; align-items: center; }
+.btn-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+.btn-pair .btn { padding: 0 4px; gap: 6px; min-width: 0; }
+#stage .mp-h[data-h="size"] { cursor: nwse-resize; }
+#stage .mp-h[data-h="rotate"] { cursor: grab; }
 
 /* inspector */
 .inspector-empty { color: var(--ink-3); font-size: 12.5px; padding: 6px 0 2px; }
@@ -492,3 +506,18 @@ body.gd-open .center { margin-right: 36px; }
   #print-sheet.multi .pg { width: 100%; overflow: hidden; break-after: page; page-break-after: always; break-inside: avoid; }
   #print-sheet.multi .pg:last-child { break-after: auto; page-break-after: auto; }
 }
+
+/* ---------- AI on your GPU: Element (gpu.js) ---------- */
+/* the four-way "What" is two by two, so every name fits at 420 px and on a phone; Element is off on an older bridge */
+#gd-mode { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#gd-mode button[disabled] { opacity: .45; cursor: default; }
+#gd-mode button[disabled]:hover { background: transparent; color: var(--ink-2); }
+/* (a card that cannot be chosen does not answer to the pointer either) */
+.gd-base[disabled]:hover { border-color: var(--line); background: var(--panel); }
+/* Rework: the picture elements of the design as cards (the look of "Start from"); a long name is cut short */
+.gd-els .t, .gd-els .s { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* a cut-out element is see-through: it shows on a checker, without the frame a print picture gets */
+.gd-pv-img.cut, .gd-th.cut { background: repeating-conic-gradient(#e2dbd6 0% 25%, #fff 0% 50%) 50% / 16px 16px; }
+.gd-pv-img.cut img { box-shadow: none; border-radius: 0; }
+/* (a cut-out is often taller than the 4:5 thumbnail: it is shown whole) */
+.gd-th.cut img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); max-width: none; max-height: none; object-fit: contain; }

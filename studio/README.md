@@ -5,6 +5,9 @@ are real vector type (never AI-drawn, so nothing warps), and the pop is the real
 exactly. The items themselves (the single-pop wrapper and the 100 g bag) are replicas of the client's two
 drafts, so a design made here fits the pack, and the same files are wrapped onto a 3D pack for mockups.
 
+You can also add pictures of your own as layers (**Elements**, below): an upload, the pop photo again, or an AI
+drawing. An AI drawing is marked as one wherever it shows, and it never takes the place of the pop.
+
 ## Open it
 - **On this PC:** double-click `index.html` (Chrome). It works straight from the folder; no install, no server.
   (Or serve the folder, for example `python -m http.server 8000` in it, then open http://localhost:8000.)
@@ -23,7 +26,8 @@ copies, keep their own.
    **Layout** shows the print layout: every panel as it prints, with the dieline on top (click a panel to edit it).
 3. **Edit**: click anything on the design (or in **Layers**) to change its words, font, size, colour and position.
    Drag to move (it snaps to the centre line); arrow keys nudge 0.5 mm, Shift + arrow 5 mm; or type exact X / Y in mm.
-   Ctrl+Z / Ctrl+Shift+Z undo / redo. (Arrow keys on the 3D view only turn the pack.)
+   Ctrl+Z / Ctrl+Shift+Z undo / redo. (Arrow keys on the 3D view only turn the pack.) **Add element**, at the top of
+   Layers, adds a picture of your own (see *Elements*).
 4. **Open items** show above the design (on either panel): a blank to fill in, a missing picture, words that do not
    fit the heart, words on a seal, a picture too small for print. Quieter notes sit in the status bar below the
    design. The export dialog repeats them all under **Before you send**.
@@ -171,16 +175,48 @@ A photo that still has its backdrop is flagged (it would print as a box). If the
 the pop: pale parts of the product (a white stick on a white sweep) are kept whole. A floor shadow in the photo
 stays; for that, upload a cut-out PNG. Undo brings the original back.
 
+The Pop layer is always a photo of the real product. An AI-drawn lollipop can be added as an element (below), but
+it is a layer of its own, marked as an AI drawing, and it is never offered here under *Picture of the real pop*.
+
+## Elements (pictures of your own)
+An element is a picture added as a layer of its own, on the front or the back panel: a second pop, a heart, a
+slice of lemon. The built-in layers stay as they are, and the Pop layer is still the real product photo.
+- **Add.** **Layers → Add element**: *The real pop photo* (the bundled photo again, as an element), *Upload a
+  picture…* (PNG, JPG or WebP) or *Make with AI…* (opens **AI on your GPU** on *Element*, below). The new element
+  lands in the middle of the panel being edited, about 40 % of its width, selected.
+- **Move and size.** Drag it; the arrow keys nudge it. On the design, the small square at its corner resizes it and
+  the round knob above it turns it (Shift: steps of 15°). Its panel has the name, the width in mm (the height
+  follows: a picture is never stretched), the rotation, the position and Arrange.
+- **Duplicate** (or Ctrl+D) makes a copy 4 mm to the right and down, showing the same picture. **Delete** (or the
+  Delete or Backspace key) takes the element out; Ctrl+Z brings it back. Built-in layers cannot be deleted, only
+  hidden.
+- **Replace picture…** puts another picture in the same place at the same size. **Remove plain background** (shown
+  for a picture that still has a solid backdrop) cuts a one-colour backdrop out from the edges inwards; an enclosed
+  area, such as the hole of a ring, keeps the colour.
+- **Rework with AI…** opens **AI on your GPU** on *Element → Rework* for that element: say what should change, and
+  the result can replace the element (same place, same size) or be added as a copy.
+- **AI drawings are marked.** An element drawn or reworked by AI has an **AI** tag in Layers and in its own panel,
+  with the words it was made from; the AI panel labels its results *AI drawing*; and the checks before export say
+  how many there are (*1 AI-drawn element: a drawing, not a product photo.*). An upload, or the pop photo added as
+  an element, has no tag.
+- Elements are part of the design: they are in the PDF, SVG and PNG, the print layout and the 3D pack, and they are
+  saved with the design and remembered in this browser. An element printed below 200 ppi gets a warning. One that
+  has lost its picture shows as a dashed outline in the editor only and is left out of the files.
+
 ## AI on your GPU (optional)
-**AI on your GPU** (top bar) makes background art and logo or pack ideas with ComfyUI on **your own PC**, from the
-local studio or the online one. The studio never needs a GPU itself; without a connection the panel only explains
-itself and everything else works as before. The GPU side is the **Model Pops GPU bridge**: the `gpu-bridge` folder
-next to `label-studio` in the model-pops-packaging folder on the GPU PC (it is not part of the online site); its
-`README.md` has the setup and the settings. It runs ComfyUI capped, so the PC stays usable: one picture at
-a time, the GPU working about 60 % of the time with 5 GB of its memory kept free, at low priority, the models freed
-when idle, and ComfyUI stopped with the bridge. It also guards memory: the models take about 30 GB of Windows
-memory (RAM + page file), so it loads them only when that fits with room to spare, and stops ComfyUI at once if
-memory still gets close to full. When memory is short, the panel says how much to free before you generate.
+
+A link that ends in `#gpu=<bridge address>` opens the studio with the AI panel already connected to that
+address (the part after `#` stays in the browser). The desktop launcher on the GPU PC opens the studio that way,
+and its sharing version prints such a link for another device.
+**AI on your GPU** (top bar) makes background art, picture elements and logo or pack ideas with ComfyUI on **your
+own PC**, from the local studio or the online one. The studio never needs a GPU itself; without a connection the
+panel only explains itself and everything else works as before. The GPU side is the **Model Pops GPU bridge**: the
+`gpu-bridge` folder next to `label-studio` in the model-pops-packaging folder on the GPU PC (it is not part of the
+online site); its `README.md` has the setup and the settings. It runs ComfyUI capped, so the PC stays usable: one
+picture at a time, the GPU working about 60 % of the time with 5 GB of its memory kept free, at low priority, the
+models freed when idle, and ComfyUI stopped with the bridge. It also guards memory: the models take about 30 GB of
+Windows memory (RAM + page file), so it loads them only when that fits with room to spare, and stops ComfyUI at
+once if memory still gets close to full. When memory is short, the panel says how much to free before you generate.
 
 **Connect**
 1. On the PC with the GPU, start the bridge (`gpu-bridge\start-gpu-bridge.cmd`). It prints its address.
@@ -208,7 +244,8 @@ tunnel (its random address changes at every start, so it works like a one-time p
 the same between sessions), stop it when you are done, and watch the bridge window: it lists each job and where it
 came from. To turn the key back on: set `"requireKey": true` in `gpu-bridge\config.json` and restart the bridge; the
 key then shows in the bridge window. To try all of this without the GPU, start the bridge with
-`start-gpu-bridge.cmd --fake` (placeholder pictures; the bridge's README has the steps, with a tunnel too).
+`start-gpu-bridge.cmd --fake` (placeholder pictures: an element comes back as a plain candy shape, pink when new
+and orange when reworked; the bridge's README has the steps, with a tunnel too).
 
 The panel says what went wrong in plain words: a bridge or a tunnel that is not running on the GPU PC (or a PC that
 is asleep), a key the bridge asks for, an http address on the https page (it needs the tunnel's https address), a
@@ -216,13 +253,23 @@ page the bridge does not allow (its `allowedOrigins`), or a PC short of memory f
 ComfyUI is stopped, **Generate** is off and the reason is shown under it.
 
 **Make**
-- **What.** *Background art* (the default) is for print: no words, no logo, no pop. *Logo ideas* and *Pack ideas* are
-  **ideas, not print files**: they are labelled so everywhere and can never be placed in the design.
-- **Start from.** *My current design* (the design open in this browser: its front panel, drawn by the studio's own
-  renderer at about 1 megapixel with its bleed): for art only its **background** is sent (no words, logo or pop, so
-  nothing of the product can end up in the art); for ideas the front as it is, with its exact words passed on for
-  pack ideas and the real pop as the product lock. Or the client's current **wrapper** or **bag** draft (bases
-  already on the GPU PC).
+- **What.** *Background art* (the default) is for print: no words, no logo, no pop. *Element* draws one picture
+  element for the design (a lollipop, a heart, a slice of lemon): an **AI drawing**, marked as one wherever it
+  shows, and never the pop. *Logo ideas* and *Pack ideas* are **ideas, not print files**: they are labelled so
+  everywhere and can never be placed in the design. Element needs bridge 1.1.0 or later: on an older bridge it is
+  shown switched off, with *Needs a newer bridge*.
+- **Element** has no *Start from* and no *How far*. **New**: describe the element, or pick an example (a strawberry
+  lollipop, a heart, a sparkle, a seashell, a palm leaf, a slice of lemon). **Rework**: pick the element (the one
+  selected in the design is picked for you; click another card to change it) and say what should change. The GPU
+  draws the element whole on one flat colour, and the studio cuts that colour out when the picture comes back. The
+  colour is chosen for you: green, or blue when the words or the element itself are green
+  (magenta only when it is both green and blue). For a rework the
+  studio sends the element itself, centred on a 1024 × 1024 square of that colour.
+- **Start from** (art and ideas). *My current design* (the design open in this browser: its front panel, drawn by
+  the studio's own renderer at about 1 megapixel with its bleed): for art only its **background** is sent (no
+  words, logo, pop or added elements, so nothing of the product can end up in the art); for ideas the front as it
+  is, with its exact words passed on for pack ideas and the real pop as the product lock. Or the client's current
+  **wrapper** or **bag** draft (bases already on the GPU PC).
 - **How far from it** (0–1) has four bands, the same as in ComfyUI's Design brief: from *Refine* (0–0.25) through a
   variation (0.25–0.5) and a new style (0.5–0.75) to *All new* (0.75–1). The panel names each band for the chosen
   kind and says what it does; a click on a band sets the slider to its middle.
@@ -238,6 +285,14 @@ picture; **Reuse settings** puts its style, distance and seed back under Make. A
 about 260 ppi on the wrapper (fine), but about 145 ppi on the bag. The panel has no upscale step: for the final
 print, download it, upscale it 2× (for example with an upscale model in ComfyUI), and bring it back with
 Background → **Replace background art**.
+
+An element result shows on a checker (it is see-through) with an **AI drawing** tag. A new one has **Add to
+design**: it becomes a picture element in the middle of the panel being edited. A rework has **Replace the
+element** (the same element, in the same place at the same size, now with the new picture) and **Add as a copy** (a
+second element in the middle of the same panel, as large as the first). Each is one Ctrl+Z, and each says which
+panel it went to. If the element has been deleted meanwhile, the panel says so and offers **Add to design**
+instead. If the flat colour could not be cut out, the card says why and keeps the picture as it came. **Download
+PNG** saves the picture as the card shows it.
 
 ## Using ComfyUI art (by hand)
 Background → **Image** → import the AI art **without words**. It fills the panel and bleed (cover fit; drag it

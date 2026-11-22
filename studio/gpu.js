@@ -5,10 +5,14 @@
  * that PC, or from anywhere through a tunnel the user starts on that same PC (an https trycloudflare or ngrok
  * address). Without a bridge this panel only explains itself, and the studio works exactly as before.
  *
- * What comes back is one of two things, and they never mix:
+ * What comes back is one of three things, and they never mix:
  *  - Background art: text-free, pop-free art for the print file. "Use as background" sets it as the panel's
  *    background image (cover fit, as Background > Image does); the exact logo, every word and the real pop stay
  *    on top as live layers. Made from "My current design", only the design's background is sent.
+ *  - Elements: one picture element (a lollipop, a heart, a slice of lemon), new from a description or a rework of
+ *    one that is already in the design. The bridge draws it on one flat colour and the studio's own remover cuts
+ *    that colour out here; "Add to design" and "Replace the element" then place it as a picture layer. It is an
+ *    AI drawing and is marked as one wherever it shows. It is never the Pop layer: that stays the real photo.
  *  - Ideas (logo or pack pictures): to choose a direction. Always labelled "ideas, not print files", and never
  *    placed in the design.
  * No key by default: the panel asks only for the address. A bridge that asks for a key (it answers 401: its
@@ -28,9 +32,15 @@
   const KEEP_MS = 24 * 3600e3, KEEP_N = 24;
   const BASE_PIXELS = 1.0e6;                                    // the workflow works at about 1 megapixel
   const LOCAL_URL = 'http://127.0.0.1:8189';
+  // What each kind of picture is, as flags the rest of the panel reads:
+  //   use      where a result may go: 'background' (art), 'element' (a picture element) or '' (ideas: nowhere)
+  //   badge    the words on a result that is not a print file
+  //   bgOnly   "My current design" is sent as its background only
+  //   words, lollipop   ideas from the current design: its exact words, and the real pop as the product lock
+  //   element  no "Start from" and no "How far": a new element from a description, or a rework of one (so no bands)
   const MODES = {
     art: {
-      label: 'Background art', tag: 'Art', file: 'background-art', print: true,
+      label: 'Background art', tag: 'Art', file: 'background-art', use: 'background', bgOnly: true,
       note: '<b>For print.</b> No words, no logo, no pop: art to go behind your design. The studio keeps the exact logo, every word and the real pop on top.',
       bands: [['Refine', 'The same background (its colours, shapes and patterns), refined.'], ['Variation', 'A fresh variation of the background.'],
         ['New style', 'A new background, loosely inspired by it.'], ['All new', 'A completely new background.']],
@@ -44,7 +54,7 @@
       ],
     },
     logo: {
-      label: 'Logo ideas', tag: 'Idea', file: 'logo-idea', print: false,
+      label: 'Logo ideas', tag: 'Idea', file: 'logo-idea', use: '', badge: 'Idea · not a print file', lollipop: true,
       note: '<b>Ideas, not print files.</b> To choose a direction for the MODEL POPS logo. The logo that prints stays the studio’s exact type (or your final vector logo, under Logo → Upload).',
       bands: [['Refine', 'A close refinement of the MODEL POPS lettering.'], ['New take', 'A new take on the logo, keeping its spirit.'],
         ['Loose', 'A new logo, only loosely inspired by it.'], ['All new', 'A completely new MODEL POPS logo.']],
@@ -56,7 +66,7 @@
       ],
     },
     pack: {
-      label: 'Pack ideas', tag: 'Idea', file: 'pack-idea', print: false,
+      label: 'Pack ideas', tag: 'Idea', file: 'pack-idea', use: '', badge: 'Idea · not a print file', lollipop: true, words: true,
       note: '<b>Ideas, not print files.</b> Pictures of a whole pack, to choose a direction. AI words can be misspelled and the pop is drawn, so these never go to print: the real file is made here in the studio.',
       bands: [['Refine', 'The same pack; only the logo lettering changes.'], ['New logo', 'Same layout, pop and words; a new logo, colours to match.'],
         ['New style', 'A new design for the same pack; the words and the pop stay.'], ['All new', 'Everything new except the words and the pop.']],
@@ -67,7 +77,17 @@
         ['Pop-art candy', 'bold pop-art candy: big glossy shapes, high energy, joyful'],
       ],
     },
+    // a picture element for the design. Its chips are the one-click examples under "Describe the element"
+    element: {
+      label: 'Element', tag: 'AI drawing', file: 'element', use: 'element', badge: 'AI drawing', element: true,
+      note: '<b>AI drawing.</b> A picture element for your design: a lollipop, a heart, fruit. AI draws it, so it is not your product photo: the real pop stays under Pop.',
+      chips: [
+        ['A strawberry lollipop', 'a strawberry lollipop'], ['A heart', 'a heart'], ['A sparkle', 'a sparkle'],
+        ['A seashell', 'a seashell'], ['A palm leaf', 'a palm leaf'], ['A slice of lemon', 'a slice of lemon'],
+      ],
+    },
   };
+  const MODE_ORDER = ['art', 'element', 'logo', 'pack'];       // the "What" control, two by two: what can go into the design, then the ideas
   const BAND_AT = [0.15, 0.4, 0.6, 0.9];                      // a click on a band sets the slider to its middle
   const bandOf = d => d < 0.25 ? 0 : d < 0.5 ? 1 : d < 0.75 ? 2 : 3;    // (the bands of the Design brief node)
   const BAND_RANGE = ['0–0.25', '0.25–0.5', '0.5–0.75', '0.75–1'];
@@ -80,6 +100,12 @@
   // ideas only: the lollipop the bridge holds the drawing to, matched to the pop on the current design
   const LOLLIPOPS = { 'pop-gold': 'pink pop, gold stick (current wrapper art).png', 'pop-white': 'pink pop, white stick (old printed pack).png' };
   const SAME_AS_BASE = 'same lollipop as the base design';
+  // elements: a rework sends the element on a square of one flat colour, filling about two thirds of it (as the
+  // bridge asks the model to draw a new one). Words that say the element is green, or blue, decide the flat
+  // colour it is drawn on (see pickBackground). Teal, turquoise and aqua count as both.
+  const EL_PX = 1024, EL_FILL = 0.66;
+  const GREENISH = /\b(green(ish|ery)?|lime|mint|lea(f|ves)|leafy|palm|grass|kiwi|olive|emerald|jade|sage|matcha|avocado|pistachio|clover|cactus|fern|herb|basil|veggie|vegetable|plant|tree|teal|turquoise|aqua)s?\b/i;
+  const BLUEISH = /\b(blue(ish)?|navy|sky|ocean|sea|wave|water|denim|sapphire|cobalt|azure|indigo|blueberr(y|ies)|teal|turquoise|aqua)s?\b/i;
 
   /* ------------------------------------------------------------------------------------------ helpers */
   const $ = (s, r) => (r || document).querySelector(s);
@@ -102,6 +128,7 @@
   function utf8ToB64(str) { const u8 = new TextEncoder().encode(str); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
   function loadImg(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('The picture could not be read.')); im.src = src; }); }
   function blobToDataURL(b) { return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); }); }
+  function dataURLToBlob(u) { const s = atob(u.slice(u.indexOf(',') + 1)); const a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return new Blob([a], { type: 'image/png' }); }
   async function whenReady() { for (let i = 0; i < 300 && !MP.ready; i++) await sleep(100); if (!MP.ready) throw new Error('The studio is still starting.'); }
   const isLoopback = h => /^(localhost|127(\.\d{1,3}){3}|\[::1\])$/i.test(h) || /\.localhost$/i.test(h);
   const isTunnel = h => /(^|\.)(ngrok-free\.app|ngrok-free\.dev|ngrok\.app|ngrok\.dev|ngrok\.io|trycloudflare\.com)$/i.test(h);
@@ -110,6 +137,7 @@
   function normalizeURL(raw) {
     let s = String(raw || '').trim();
     if (!s) return { error: 'Paste the bridge address first (on the PC with the GPU it is ' + LOCAL_URL + ').' };
+    const found = /https?:\/\/[^\s|<>"']+/i.exec(s); if (found) s = found[0];          // (a whole line copied from the tunnel window: take the address in it)
     if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) s = (/^(localhost|127\.|\[::1\])/i.test(s) ? 'http://' : 'https://') + s;
     let u; try { u = new URL(s); } catch (e) { return { error: 'That is not a web address. Example: ' + LOCAL_URL }; }
     if (u.protocol !== 'http:' && u.protocol !== 'https:') return { error: 'The address starts with http:// or https://.' };
@@ -123,11 +151,13 @@
     open: false, restored: false, autoTried: false,
     conn: { url: '', key: '', askKey: false, state: 'off', health: null, err: '', seen: 0, editing: true },   // askKey: the bridge asked for a key (401)
     mode: 'art', base: 'mine', distance: 0.4, styleTouched: false,
+    elOp: 'new', target: null, seenSel: null,   // Element: New or Rework; the element to rework { key, side }; the studio's selection when last looked at
     seedMode: 'random', seed: 20261120, versions: 2,
     run: null, runMsg: '', results: [], sel: null, mineThumb: '', clearArm: 0,
   };
   let D = null;                     // the drawer
   let connSeq = 0, runSeq = 0, hTimer = 0, tick = 0, thumbSeq = 0;
+  let elSig = null, pvSig = '', lookTimer = 0;      // what the rework cards and the result card were last drawn from
 
   /* ------------------------------------------------------------------------------------------ remembered address (+ key) */
   // A studio opened from disk (file://, origin "null") shares ONE browser storage with every other HTML file opened
@@ -145,7 +175,7 @@
     try { const old = localStorage.getItem(LS_KEY); if (old) { if (!sessionStorage.getItem(LS_KEY)) sessionStorage.setItem(LS_KEY, old); localStorage.removeItem(LS_KEY); } } catch (e) { /* storage blocked */ }
   }
   function saveMake() {
-    try { localStorage.setItem(LS_MAKE, JSON.stringify({ mode: st.mode, base: st.base, distance: st.distance, style: $('#gd-style', D).value, styleTouched: st.styleTouched, seedMode: st.seedMode, seed: clampSeed($('#gd-seed', D).value), versions: st.versions })); } catch (e) { /* storage blocked */ }
+    try { localStorage.setItem(LS_MAKE, JSON.stringify({ mode: st.mode, base: st.base, distance: st.distance, style: $('#gd-style', D).value, styleTouched: st.styleTouched, elOp: st.elOp, what: $('#gd-what', D).value, seedMode: st.seedMode, seed: clampSeed($('#gd-seed', D).value), versions: st.versions })); } catch (e) { /* storage blocked */ }
   }
   function readMake() {
     let o = null; try { o = JSON.parse(localStorage.getItem(LS_MAKE) || 'null'); } catch (e) { o = null; }
@@ -154,6 +184,8 @@
     if (BASES[o.base]) st.base = o.base;
     if (typeof o.distance === 'number' && o.distance >= 0 && o.distance <= 1) st.distance = Math.round(o.distance * 20) / 20;
     if (typeof o.style === 'string' && o.style.trim()) { $('#gd-style', D).value = o.style.slice(0, 600); st.styleTouched = !!o.styleTouched; }
+    if (o.elOp === 'new' || o.elOp === 'rework') st.elOp = o.elOp;
+    if (typeof o.what === 'string') $('#gd-what', D).value = o.what.slice(0, 600);
     if (o.seedMode === 'fixed' || o.seedMode === 'random') st.seedMode = o.seedMode;
     if (Number.isFinite(o.seed)) { st.seed = clampSeed(o.seed); $('#gd-seed', D).value = st.seed; }
     if ([1, 2, 3, 4].indexOf(o.versions) >= 0) st.versions = o.versions;
@@ -308,11 +340,12 @@
     x.drawImage(img, 0, 0, pxW, pxH);
     return { url: cv.toDataURL('image/png'), w: pxW, h: pxH };
   }
-  // art: only the design's background goes (no words, no logo, no pop, no printed seal ribs), so the art is made
-  // for behind them and nothing of the product can end up in it. Ideas: the front exactly as it is.
+  // art: only the design's background goes (no words, no logo, no pop, no added elements, no printed seal ribs),
+  // on both panels, so the art is made for behind them and nothing of the product can end up in it. Ideas: the
+  // front exactly as it is.
   function baseModel(mode) {
     const m = JSON.parse(JSON.stringify(MP.model));
-    if (mode === 'art') { const P = m.panels.front; Object.keys(P.els).forEach(k => { if (P.els[k]) P.els[k].visible = false; }); P.bg.ribs = false; }
+    if (MODES[mode].bgOnly) ['front', 'back'].forEach(sd => { const P = m.panels[sd]; Object.keys(P.els).forEach(k => { if (P.els[k]) P.els[k].visible = false; }); P.bg.ribs = false; });
     return m;
   }
   // the exact words on the front, for pack ideas (like a base's .txt): never a blank (___) or an invented word
@@ -331,11 +364,11 @@
   async function buildBase(mode, baseKey) {
     if (baseKey !== 'mine') return { base: { name: BASES[baseKey].name }, label: BASES[baseKey].label };
     await whenReady();
-    const m = baseModel(mode);
-    const r = await renderPanel(m, 'front', BASE_PIXELS, mode !== 'art');
+    const m = baseModel(mode); const M = MODES[mode];
+    const r = await renderPanel(m, 'front', BASE_PIXELS, !M.bgOnly);
     const out = { base: { png: r.url }, label: BASES.mine.label, w: r.w, h: r.h };
-    if (mode === 'pack') { const w = frontWords(m); if (w) out.words = w; }
-    if (mode !== 'art') out.lollipop = lollipopFor(m.panels.front.els.pop);
+    if (M.words) { const w = frontWords(m); if (w) out.words = w; }
+    if (M.lollipop) out.lollipop = lollipopFor(m.panels.front.els.pop);
     if (!out.lollipop) delete out.lollipop;
     return out;
   }
@@ -351,33 +384,120 @@
   const baseAvailable = k => { const h = st.conn.health; return k === 'mine' || !h || !Array.isArray(h.bases) || h.bases.indexOf(BASES[k].name) >= 0; };
   // the small picture on the "My current design" card: what is sent, for the chosen mode
   async function refreshMineThumb() {
-    if (!st.open || !MP.ready) return;
+    if (!st.open || !MP.ready || MODES[st.mode].element) return;          // (an element has no "Start from")
     const seq = ++thumbSeq;
     try {
-      const r = await renderPanel(baseModel(st.mode), 'front', 15000, st.mode !== 'art');
+      const r = await renderPanel(baseModel(st.mode), 'front', 15000, !MODES[st.mode].bgOnly);
       if (seq !== thumbSeq) return;
       st.mineThumb = r.url; const im = $('#gd-thumb-mine', D); if (im) im.src = r.url;
     } catch (e) { /* the card keeps its last picture */ }
+  }
+
+  /* ------------------------------------------------------------------------------------------ elements */
+  // Element is offered only by a bridge that lists it (1.1.0 on); an older one answers 400 to it
+  const elementOK = () => { const h = st.conn.health; return !!h && Array.isArray(h.modes) && h.modes.indexOf('element') >= 0; };
+  const modeOK = k => !MODES[k].element || elementOK();
+  // the picture elements in the design that have their picture (both panels, front first, top layer first);
+  // all: also one that has lost its picture (it is still in the design, but cannot be reworked)
+  function pictures(all) {
+    try { return MP.elements().map(e => Object.assign(e, { pic: MP.elementPicture(e.key, e.side) })).filter(e => all || e.pic); }
+    catch (e) { return []; }                                              // (the studio is still starting)
+  }
+  const findPicture = (t, list) => (t ? (list || pictures()).find(e => e.key === t.key && e.side === t.side) || null : null);
+  const findElement = t => findPicture(t, pictures(true));
+  const sigOf = e => (e ? e.side + ':' + e.key : '');                    // (a key never has a colon in it)
+  const selectedIn = list => list.find(e => e.key === MP.sel && e.side === MP.side) || null;
+  // The element to rework. The studio sends no events, so this is looked at again whenever the panel redraws: a
+  // picture newly selected in the design becomes the target; one picked here stays until then; a target that has
+  // gone gives way to the selected picture, or to the top one.
+  function syncTarget() {
+    const list = pictures(), sel = selectedIn(list), now = sigOf(sel);
+    if (now !== st.seenSel) { st.seenSel = now; if (sel) st.target = { key: sel.key, side: sel.side }; }
+    if (!findPicture(st.target, list)) { const e = sel || list[0]; st.target = e ? { key: e.key, side: e.side } : null; }
+    return list;
+  }
+  // one picked on purpose (a card here, "Rework with AI…" in the studio, Reuse settings)
+  function setTarget(e) { st.target = { key: e.key, side: e.side }; st.seenSel = sigOf(selectedIn(pictures())); }
+  // the flat colour an element is drawn on (it is cut out afterwards): green by default; blue when the words or
+  // the element itself are green; magenta only when the subject is both green and blue (this brand is pink, and
+  // hot pink sits close to magenta, so magenta is the last choice). pic: what looksGreen found in the element
+  // (a rework), or nothing (a new one). The bridge owns the colours: only a name it lists is sent, with its hex.
+  function pickBackground(words, pic) {
+    const t = st.conn.health && st.conn.health.elementBackgrounds; const tab = t && typeof t === 'object' ? t : {};
+    const ok = n => typeof tab[n] === 'string' && /^#[0-9a-f]{6}$/i.test(tab[n]);
+    const w = String(words || ''), p = pic || {};
+    const green = !!p.green || GREENISH.test(w), blue = !!p.blue || BLUEISH.test(w);
+    let name = 'green';
+    if (green && blue && ok('magenta')) name = 'magenta';
+    else if (green && ok('blue')) name = 'blue';
+    else if (green && ok('magenta')) name = 'magenta';                 // (a bridge that does not list blue)
+    return { name, hex: ok(name) ? tab[name] : '' };
+  }
+  // how green and how blue is the element? green: a third or more of what is not see-through is green. blue: a
+  // part of a green element is blue (it would be lost on a blue backdrop), or a third or more of any other one.
+  function looksGreen(img) {
+    const n = 48, cv = document.createElement('canvas'); cv.width = cv.height = n;
+    const x = cv.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, n, n);
+    const d = x.getImageData(0, 0, n, n).data; let seen = 0, green = 0, blue = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] < 128) continue; seen++;
+      if (d[i + 1] > 60 && d[i + 1] > d[i] * 1.2 && d[i + 1] > d[i + 2] * 1.2) green++;
+      else if (d[i + 2] > 60 && d[i + 2] > d[i] * 1.3 && d[i + 2] > d[i + 1] * 1.1) blue++;
+    }
+    const g = seen > 0 && green / seen > 1 / 3;
+    return { green: g, blue: seen > 0 && blue / seen > (g ? 0.08 : 1 / 3) };
+  }
+  // What an element job sends besides its words. New: only the colour to draw it on. Rework: also the element
+  // itself, whole, centred and padded on a 1024 px square filled with that colour, as an opaque PNG (the bridge
+  // would turn see-through parts white).
+  async function buildElement(op, target, words) {
+    if (op !== 'rework') { const bg = pickBackground(words, false); return { label: '', background: bg.name, send: bg.hex ? { background: bg.name } : {} }; }
+    await whenReady();
+    const p = MP.elementPicture(target.key, target.side);
+    if (!p) throw userErr('That element is no longer in the design, or it has lost its picture. Pick another one to rework.');
+    const img = await loadImg(p.dataURL);
+    try { await img.decode(); } catch (e) { /* already decoded */ }
+    const bg = pickBackground(words, looksGreen(img));
+    if (!bg.hex) throw userErr('This bridge does not say which flat colours it draws elements on, so the element cannot be sent. It needs a newer bridge.');
+    const cv = document.createElement('canvas'); cv.width = cv.height = EL_PX;
+    const x = cv.getContext('2d'); x.fillStyle = bg.hex; x.fillRect(0, 0, EL_PX, EL_PX); x.imageSmoothingQuality = 'high';
+    const k = EL_PX * EL_FILL / Math.max(img.naturalWidth, img.naturalHeight), w = img.naturalWidth * k, h = img.naturalHeight * k;
+    x.drawImage(img, (EL_PX - w) / 2, (EL_PX - h) / 2, w, h);
+    return { label: p.name, background: bg.name, send: { background: bg.name, base: { png: cv.toDataURL('image/png') } } };
+  }
+  // An element comes back on its flat colour: the studio's own remover cuts it out (it reads the colour from the
+  // picture's border). If it cannot, the picture is kept as it came and the result card says why.
+  async function cutOut(blob) {
+    try {
+      const r = await MP.cutOutPlainBackground(await blobToDataURL(blob));
+      if (r && r.cut) return { blob: dataURLToBlob(r.dataURL), cut: true, note: '' };
+      return { blob, cut: false, note: String((r && r.note) || 'Its background could not be removed.').slice(0, 300) };
+    } catch (e) { return { blob, cut: false, note: 'Its background could not be removed (' + String((e && e.message) || e).slice(0, 200) + ').' }; }
   }
 
   /* ------------------------------------------------------------------------------------------ generate */
   function setPhase(r, ph) { if (st.run !== r) return; const was = r.phase; r.phase = ph; if (was !== ph) renderRun(); else updateRunTime(); }
   async function generate() {
     if (st.run || st.conn.state !== 'on') return;
-    const style = $('#gd-style', D).value.trim();
-    if (!style) { st.runMsg = noteHTML('warn', 'Describe a style first, or pick one of the suggestions under it.'); renderRun(); $('#gd-style', D).focus(); return; }
-    const mode = st.mode, baseKey = st.base, distance = Math.round(st.distance * 100) / 100, of = st.versions;
+    const mode = st.mode, M = MODES[mode], op = M.element ? st.elOp : '';
+    const box = textBox(); const style = box.value.trim();
+    if (!style) { st.runMsg = noteHTML('warn', !M.element ? 'Describe a style first, or pick one of the suggestions under it.' : op === 'rework' ? 'Say what should change first.' : 'Describe the element first, or pick one of the examples under it.'); renderRun(); box.focus(); return; }
+    // a rework keeps the element it started with, whatever is selected or picked while it runs
+    const target = op === 'rework' ? findPicture(st.target) : null;
+    if (op === 'rework' && !target) { st.runMsg = noteHTML('warn', 'Pick the element to rework first.'); renderRun(); renderMake(); return; }
+    const baseKey = M.element ? '' : st.base, distance = M.element ? 0 : Math.round(st.distance * 100) / 100, of = st.versions;
     const seed0 = st.seedMode === 'fixed' ? clampSeed($('#gd-seed', D).value) : null;
-    const r = { id: ++runSeq, phase: 'render', n: 1, of, t0: Date.now(), tSent: 0, position: null, ctl: new AbortController(), cancelled: false, made: 0 };
+    const r = { id: ++runSeq, phase: 'render', n: 1, of, t0: Date.now(), tSent: 0, position: null, ctl: new AbortController(), cancelled: false, made: 0, element: !!M.element };
     st.run = r; st.runMsg = ''; renderRun(); renderMake(); startTicker(); scheduleHealth(2500); saveMake();
     reveal($('#gd-run', D));
     try {
-      const b = await buildBase(mode, baseKey);
+      const b = M.element ? await buildElement(op, target, style) : await buildBase(mode, baseKey);
       for (let i = 0; i < of; i++) {
         if (r.cancelled) return;
         const seed = seed0 != null ? (seed0 + i) % 2147483647 : randomSeed();
         r.n = i + 1; r.tSent = Date.now(); r.position = null; r.phase = ''; setPhase(r, 'send');
-        const body = { mode, base: b.base, distance, style, seed };
+        // an element: its words, the flat colour, and for a rework the element itself; no base name, no distance
+        const body = M.element ? Object.assign({ mode, op, style, seed }, b.send) : { mode, base: b.base, distance, style, seed };
         if (b.words) body.wordsOverride = b.words;
         if (b.lollipop) body.lollipop = b.lollipop;
         const res = await call('POST', '/api/generate', body, { timeout: 180000, signal: r.ctl.signal });
@@ -391,7 +511,13 @@
         for (let k = 0; k < imgs.length; k++) {
           const blob = await fetchImage(imgs[k].url, r);
           if (r.cancelled) return;
-          await addResult({ jobId: String(res.jobId), n: k, mode, base: baseKey, baseLabel: b.label, distance, style, seed, blob });
+          const o = { jobId: String(res.jobId), n: k, mode, base: baseKey, baseLabel: b.label, distance, style, seed, blob };
+          if (M.element) {                                      // the cut-out is what is kept, shown, downloaded and placed
+            setPhase(r, 'cut');
+            Object.assign(o, await cutOut(blob), { op, target: target ? { key: target.key, side: target.side, name: target.name } : null, background: b.background });
+            if (r.cancelled) return;
+          }
+          await addResult(o);
           if (!r.made++) reveal($('#gd-prev', D));            // the first new picture comes into view
         }
       }
@@ -485,7 +611,10 @@
       t.oncomplete = () => res(q && 'result' in q ? q.result : undefined); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('aborted'));
     }));
   }
-  const record = r => ({ id: r.id, jobId: r.jobId, n: r.n, mode: r.mode, base: r.base, baseLabel: r.baseLabel, distance: r.distance, style: r.style, seed: r.seed, w: r.w, h: r.h, createdAt: r.createdAt, blob: r.blob });
+  // what is kept of a result (an element also keeps: new or rework, the element it reworks, whether its background
+  // was cut out and, if not, why, and the flat colour it was drawn on)
+  const record = r => ({ id: r.id, jobId: r.jobId, n: r.n, mode: r.mode, base: r.base, baseLabel: r.baseLabel, distance: r.distance, style: r.style, seed: r.seed, w: r.w, h: r.h, createdAt: r.createdAt, blob: r.blob,
+    op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background });
   async function restoreResults() {
     if (st.restored) return; st.restored = true;
     let all = [];
@@ -531,7 +660,7 @@
     document.body.appendChild(a); a.click(); a.remove();
   }
   async function useAsBackground(r) {
-    if (!r || r.mode !== 'art') return;                       // ideas are never placed in the design
+    if (!r || MODES[r.mode].use !== 'background') return;     // ideas are never placed in the design
     try {
       await whenReady();
       const src = await blobToDataURL(r.blob);
@@ -541,13 +670,67 @@
       refreshMineThumb(); renderPreview();
     } catch (e) { toast('Could not use it: ' + (e.message || e), true); }
   }
+  // An AI drawing goes into the design as a picture element (never as the pop), marked as an AI drawing there.
+  // Each of the three actions is one undo step in the studio, and says which panel it went to.
+  const aiOf = r => ({ op: r.op === 'rework' ? 'rework' : 'new', prompt: r.style, seed: r.seed });
+  const nameOf = r => { const s = (r.target && r.target.name) || String(r.style || '').replace(/\s+/g, ' ').trim() || 'AI drawing'; return (s.charAt(0).toUpperCase() + s.slice(1)).slice(0, 40); };
+  async function elementAsset(r) { await whenReady(); return MP.addImageAsset(await blobToDataURL(r.blob), { name: 'AI drawing (seed ' + r.seed + ')', kind: 'element' }); }
+  const sideOf = key => { const e = pictures(true).find(x => x.key === key); return e ? e.side : MP.side; };       // (the panel the studio put it on)
+  function afterPlaced() { renderMake(); refreshMineThumb(); renderPreview(); }
+  async function addToDesign(r) {
+    if (!r || MODES[r.mode].use !== 'element') return;
+    try {
+      const key = MP.addElement(await elementAsset(r), { name: nameOf(r), ai: aiOf(r) });
+      toast('The AI drawing is now a picture element on the ' + sideOf(key) + ' panel · Ctrl+Z to undo');
+      afterPlaced();
+    } catch (e) { toast('Could not add it: ' + (e.message || e), true); }
+  }
+  // the element may have gone since (deleted, another design opened): then nothing is replaced, and the card offers Add to design
+  async function replaceElement(r) {
+    if (!r || MODES[r.mode].use !== 'element' || !r.target) return;
+    const t = r.target;
+    try {
+      const e = findElement(t);
+      if (!e || !MP.replaceElementPicture(t.key, await elementAsset(r), { ai: aiOf(r) }, t.side)) {
+        toast('“' + t.name + '” is no longer in the design, so nothing was replaced. “Add to design” puts this picture in as a new element.', true);
+        renderPreview(); return;
+      }
+      toast('“' + e.name + '” on the ' + t.side + ' panel now shows the reworked picture · Ctrl+Z to undo');
+      afterPlaced();
+    } catch (e) { toast('Could not replace it: ' + (e.message || e), true); }
+  }
+  // a second element with the reworked picture: on the same panel and as large as the one it was made from
+  // (if that one has gone meanwhile, it is simply added)
+  async function addAsCopy(r) {
+    if (!r || MODES[r.mode].use !== 'element') return;
+    const t = findPicture(r.target);
+    if (!t) { addToDesign(r); return; }
+    try {
+      const el = MP.model.panels[t.side].els[t.key];
+      const long = Math.max(el.w, el.w * t.pic.h / t.pic.w);            // the longer side keeps its printed length
+      const key = MP.addElement(await elementAsset(r), { name: (t.name.replace(/ copy$/, '') + ' copy').slice(0, 80), ai: aiOf(r), side: t.side, w: r.w >= r.h ? long : long * r.w / r.h });
+      toast('The reworked picture is now a second element on the ' + sideOf(key) + ' panel · Ctrl+Z to undo');
+      afterPlaced();
+    } catch (e) { toast('Could not add it: ' + (e.message || e), true); }
+  }
   function reuse(r) {
-    st.mode = r.mode; st.base = BASES[r.base] ? r.base : 'mine'; st.distance = r.distance;
-    $('#gd-style', D).value = r.style; st.styleTouched = true;
+    const M = MODES[r.mode];
+    if (st.conn.health && !modeOK(r.mode)) { toast('The bridge you are connected to cannot make elements: it needs a newer bridge.', true); return; }
+    let gone = false;
+    st.mode = r.mode;
+    if (M.element) {
+      st.elOp = r.op === 'rework' ? 'rework' : 'new';
+      $(st.elOp === 'rework' ? '#gd-change' : '#gd-what', D).value = r.style;
+      if (st.elOp === 'rework') { const t = findPicture(r.target); if (t) setTarget(t); else gone = true; }
+    } else {
+      st.base = BASES[r.base] ? r.base : 'mine'; st.distance = r.distance;
+      $('#gd-style', D).value = r.style; st.styleTouched = true;
+    }
     st.seedMode = 'fixed'; $('#gd-seed', D).value = r.seed;
     renderMake(); refreshMineThumb();
     $('#gd-make', D).scrollIntoView({ block: 'start', behavior: 'smooth' });
-    toast('Its settings are back under Make, with its seed fixed: move the distance to see the same idea nearer or further.');
+    toast(!M.element ? 'Its settings are back under Make, with its seed fixed: move the distance to see the same idea nearer or further.'
+      : 'Its words are back under Make, with its seed fixed: change the words to steer it.' + (gone ? ' The element it reworked is no longer in the design, so pick another one.' : ''));
   }
   // print resolution of art on the current panel (cover fit over trim + bleed, as the studio places it)
   function fitInfo(r) {
@@ -563,7 +746,7 @@
   function buildButton() {
     const save = document.getElementById('btn-save');
     const group = save && save.closest('.tb-group');
-    const b = el('button', { class: 'btn gpu-btn', id: 'btn-gpu', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'gpu-drawer', 'aria-label': 'AI on your GPU', title: 'AI on your GPU: background art and ideas from ComfyUI on your own PC' },
+    const b = el('button', { class: 'btn gpu-btn', id: 'btn-gpu', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'gpu-drawer', 'aria-label': 'AI on your GPU', title: 'AI on your GPU: background art, picture elements and ideas from ComfyUI on your own PC' },
       icon('chip') + '<span class="lbl-long">AI on your GPU</span><i class="gdot" aria-hidden="true"></i>');
     const wrap = el('div', { class: 'tb-group' }); wrap.appendChild(b);
     if (group) { group.parentNode.insertBefore(wrap, group); group.parentNode.insertBefore(el('div', { class: 'divider-v' }), group); }
@@ -578,7 +761,7 @@
       '<div class="gd-body">' +
       // 1 · connect
       '<section class="gd-sec" id="gd-conn"><div class="gd-sec-h"><h3>Connect</h3><span class="gd-pill" id="gd-pill"><i></i><span></span></span></div>' +
-      '<div class="gd-intro" id="gd-intro"><p>Make <b>background art</b> and <b>logo or pack ideas</b> with ComfyUI on your own PC. The studio itself needs no GPU: everything else works without this.</p>' +
+      '<div class="gd-intro" id="gd-intro"><p>Make <b>background art</b>, <b>picture elements</b> (a lollipop, a heart: AI drawings you can add to the design) and <b>logo or pack ideas</b> with ComfyUI on your own PC. The studio itself needs no GPU: everything else works without this.</p>' +
       '<ol class="gd-steps"><li>On the PC with the GPU, start the <b>Model Pops GPU bridge</b> (the <code>gpu-bridge</code> folder; its README has the steps). It shows the address.</li>' +
       '<li>On that PC, the address is <b>' + LOCAL_URL + '</b>. For another device, start a tunnel on that same PC, next to the bridge (cloudflared or ngrok), then paste the <b>https</b> address it shows on that device. That device needs nothing installed.</li>' +
       '<li>Paste the address here, then Connect.</li></ol></div>' +
@@ -595,15 +778,23 @@
       // 2 · make
       '<section class="gd-sec" id="gd-make" hidden><div class="gd-sec-h"><h3>Make</h3></div>' +
       '<div class="field"><span class="lbl" id="gd-mode-l">What</span><div class="seg" role="group" aria-labelledby="gd-mode-l" id="gd-mode">' +
-      Object.keys(MODES).map(k => '<button type="button" data-act="mode" data-v="' + k + '">' + MODES[k].label + '</button>').join('') + '</div></div>' +
+      MODE_ORDER.map(k => '<button type="button" data-act="mode" data-v="' + k + '">' + MODES[k].label + '</button>').join('') + '</div>' +
+      '<div class="gd-hint" id="gd-modewhy" hidden>Element needs a newer bridge (1.1.0 or later): update the gpu-bridge folder on the GPU PC and start it again.</div></div>' +
       '<div id="gd-modenote"></div>' +
-      '<div class="field"><span class="lbl" id="gd-base-l">Start from</span><div class="gd-bases" role="group" aria-labelledby="gd-base-l" id="gd-bases">' +
+      // art and ideas: a design to start from, and how far to go from it
+      '<div class="field" id="gd-basef"><span class="lbl" id="gd-base-l">Start from</span><div class="gd-bases" role="group" aria-labelledby="gd-base-l" id="gd-bases">' +
       Object.keys(BASES).map(k => '<button type="button" class="gd-base" data-act="base" data-v="' + k + '"><span class="gd-bth"><img alt="" id="gd-thumb-' + k + '"' + (BASES[k].thumb ? ' src="' + BASES[k].thumb + '"' : '') + '></span><span class="t">' + BASES[k].label + '</span><span class="s">' + BASES[k].sub + '</span></button>').join('') +
       '</div><div class="gd-hint" id="gd-basenote"></div></div>' +
-      '<div class="field"><label class="lbl" for="gd-dist">How far from it <span class="val" id="gd-dist-v"></span></label><input type="range" id="gd-dist" min="0" max="1" step="0.05">' +
+      '<div class="field" id="gd-distf"><label class="lbl" for="gd-dist">How far from it <span class="val" id="gd-dist-v"></span></label><input type="range" id="gd-dist" min="0" max="1" step="0.05">' +
       '<div class="gd-bands" id="gd-bands" role="group" aria-label="Distance bands">' + BAND_AT.map((v, i) => '<button type="button" data-act="band" data-i="' + i + '"><span class="t"></span><span class="s">' + BAND_RANGE[i] + '</span></button>').join('') + '</div>' +
       '<div class="gd-hint" id="gd-bandnote"></div></div>' +
-      '<div class="field"><label class="lbl" for="gd-style">Style <span class="val" id="gd-style-n"></span></label><textarea class="ta" id="gd-style" rows="3" maxlength="600" placeholder="Describe the look, or pick one below"></textarea><div class="gd-chips" id="gd-chips"></div></div>' +
+      '<div class="field" id="gd-stylef"><label class="lbl" for="gd-style">Style <span class="val" id="gd-style-n"></span></label><textarea class="ta" id="gd-style" rows="3" maxlength="600" placeholder="Describe the look, or pick one below"></textarea><div class="gd-chips" id="gd-chips"></div></div>' +
+      // an element, in their place: a new one from a description, or a rework of one that is in the design
+      '<div class="field" id="gd-opf" hidden><span class="lbl" id="gd-op-l">New or rework</span><div class="seg" role="group" aria-labelledby="gd-op-l" id="gd-op">' +
+      '<button type="button" data-act="elop" data-v="new">New</button><button type="button" data-act="elop" data-v="rework">Rework</button></div></div>' +
+      '<div class="field" id="gd-tgf" hidden><span class="lbl" id="gd-tg-l">Element to rework</span><div class="gd-bases gd-els" role="group" aria-labelledby="gd-tg-l" id="gd-els"></div><div class="gd-hint" id="gd-tgnote"></div></div>' +
+      '<div class="field" id="gd-whatf" hidden><label class="lbl" for="gd-what">Describe the element <span class="val" id="gd-what-n"></span></label><textarea class="ta" id="gd-what" rows="2" maxlength="600" placeholder="One thing, for example: a strawberry lollipop"></textarea><div class="gd-chips" id="gd-what-chips"></div></div>' +
+      '<div class="field" id="gd-changef" hidden><label class="lbl" for="gd-change">What should change <span class="val" id="gd-change-n"></span></label><textarea class="ta" id="gd-change" rows="2" maxlength="600" placeholder="For example: make the candy orange"></textarea></div>' +
       '<div class="gd-two"><div class="field"><span class="lbl" id="gd-seed-l">Seed</span><div class="seg sm" role="group" aria-labelledby="gd-seed-l" id="gd-seedmode">' +
       '<button type="button" data-act="seedmode" data-v="random" title="A new idea every time">New each time</button><button type="button" data-act="seedmode" data-v="fixed" title="The same idea again: change only the distance to see it nearer to or further from the base">Fixed</button></div>' +
       '<input class="inp" id="gd-seed" type="number" min="0" max="2147483647" step="1" aria-label="Seed number" hidden></div>' +
@@ -625,6 +816,8 @@
     });
     $('#gd-dist', D).addEventListener('input', e => { st.distance = Math.round(parseFloat(e.target.value) * 100) / 100; renderDistance(); });
     $('#gd-style', D).addEventListener('input', () => { st.styleTouched = true; renderStyleCount(); renderChips(); });
+    $('#gd-what', D).addEventListener('input', () => { renderStyleCount(); renderChips(); });
+    $('#gd-change', D).addEventListener('input', renderStyleCount);
     $('#gd-seed', D).addEventListener('change', e => { e.target.value = clampSeed(e.target.value); st.seed = Number(e.target.value); });
     $('#gd-remember', D).addEventListener('change', e => {
       if (!e.target.checked) { removeCreds(); toast('This browser no longer keeps the bridge address' + (st.conn.key ? ' or key.' : '.')); }
@@ -632,6 +825,15 @@
     });
     // the "Use as background" button names the panel it goes on: keep it right when the panel changes
     const vs = document.getElementById('view-switch'); if (vs) vs.addEventListener('click', () => setTimeout(renderPreview, 0));
+    // The studio sends no events when an element is selected, added, renamed, deleted or undone. So after a click
+    // or a key anywhere on the page, the open panel looks again: which element a rework is for, and whether the
+    // element a result was made for is still there.
+    const lookAgain = () => { if (!st.open || lookTimer) return; lookTimer = setTimeout(() => { lookTimer = 0; if (st.open) syncElements(); }, 80); };
+    document.addEventListener('pointerup', lookAgain, true); document.addEventListener('keyup', lookAgain, true);
+  }
+  function syncElements() {
+    if (!$('#gd-make', D).hidden && MODES[st.mode].element && st.elOp === 'rework') { renderTargets(); renderGo(); }
+    stalePreview();
   }
   function onClick(e) {
     const t = e.target.closest && e.target.closest('[data-act]'); if (!t || !D.contains(t) || t.disabled) return;
@@ -643,16 +845,30 @@
     else if (a === 'change') { st.conn.editing = true; renderConn(); $('#gd-url', D).focus(); }
     else if (a === 'disconnect') disconnect();
     else if (a === 'forget') { const k = (readCreds() || {}).key; removeCreds(); $('#gd-remember', D).checked = false; $('#gd-key', D).value = ''; st.conn.key = ''; st.conn.askKey = false; disconnect('Forgot the saved address' + (k ? ' and key' : '') + ' on this browser.'); }
-    else if (a === 'mode') { if (MODES[v] && v !== st.mode) { const was = st.mode; st.mode = v; if (!st.styleTouched || styleIsChipOf(was)) { $('#gd-style', D).value = MODES[v].chips[0][1]; st.styleTouched = false; } renderMake(); refreshMineThumb(); } }
+    else if (a === 'mode') {
+      if (MODES[v] && v !== st.mode && modeOK(v)) {
+        const was = st.mode; st.mode = v;
+        if (MODES[v].element) st.seenSel = null;                    // a rework starts from the picture selected in the design
+        else if (!st.styleTouched || styleIsChipOf(was)) { $('#gd-style', D).value = MODES[v].chips[0][1]; st.styleTouched = false; }
+        renderMake(); refreshMineThumb();
+      }
+    }
     else if (a === 'base') { if (BASES[v]) { st.base = v; renderMake(); if (v === 'mine') refreshMineThumb(); } }
     else if (a === 'band') { st.distance = BAND_AT[Number(t.getAttribute('data-i'))]; renderDistance(); }
-    else if (a === 'chip') { const c = MODES[st.mode].chips[Number(t.getAttribute('data-i'))]; if (c) { $('#gd-style', D).value = c[1]; st.styleTouched = false; renderStyleCount(); renderChips(); } }
+    else if (a === 'chip') { const M = MODES[st.mode], c = M.chips[Number(t.getAttribute('data-i'))]; if (c) { $(M.element ? '#gd-what' : '#gd-style', D).value = c[1]; if (!M.element) st.styleTouched = false; renderStyleCount(); renderChips(); } }
+    else if (a === 'elop') { st.elOp = v === 'rework' ? 'rework' : 'new'; st.seenSel = null; renderMake(); }
+    else if (a === 'target') { const i = String(v).indexOf(':'); const e = findPicture({ side: v.slice(0, i), key: v.slice(i + 1) }); if (e) setTarget(e); renderTargets(); renderGo(); }
     else if (a === 'seedmode') { st.seedMode = v === 'fixed' ? 'fixed' : 'random'; renderSeed(); if (st.seedMode === 'fixed') $('#gd-seed', D).focus(); }
     else if (a === 'versions') { st.versions = Math.min(4, Math.max(1, Number(v) || 1)); renderSeed(); renderGo(); }
     else if (a === 'go') generate();
     else if (a === 'cancel') cancelRun();
     else if (a === 'sel') { st.sel = t.getAttribute('data-id'); renderResults(); }
     else if (a === 'use') useAsBackground(curResult());
+    else if (a === 'add' || a === 'replace' || a === 'copy') {
+      // (a double click would stack a second element exactly on the first: the same button waits a moment)
+      const r = curResult(), now = Date.now(); if (!r || now - ((r.at = r.at || {})[a] || 0) < 1200) return;
+      r.at[a] = now; (a === 'add' ? addToDesign : a === 'replace' ? replaceElement : addAsCopy)(r);
+    }
     else if (a === 'download') { const r = curResult(); if (r) download(r); }
     else if (a === 'reuse') { const r = curResult(); if (r) reuse(r); }
     else if (a === 'remove') { const r = curResult(); if (r) removeResult(r.id); }
@@ -662,6 +878,8 @@
     }
   }
   const styleIsChipOf = mode => MODES[mode].chips.some(c => c[1] === $('#gd-style', D).value.trim());
+  // the words that are sent: the style, or for an element its description (New) or what should change (Rework)
+  const textBox = () => $(!MODES[st.mode].element ? '#gd-style' : st.elOp === 'rework' ? '#gd-change' : '#gd-what', D);
 
   function open() {
     if (st.open) return;
@@ -676,6 +894,7 @@
       connect();
     } else if (st.conn.state === 'on' || st.conn.state === 'lost') pollHealth();
     renderAll(); refreshMineThumb();
+    if (!MP.ready) whenReady().then(() => { if (st.open) syncElements(); }, () => {});      // (opened while the studio was still starting)
     setTimeout(() => { const f = st.conn.state === 'on' ? $('#gd-go', D) : (!$('#gd-url', D).value ? $('#gd-url', D) : st.conn.askKey && !$('#gd-key', D).value ? $('#gd-key', D) : $('#gd-connect', D)); if (f && !f.disabled) f.focus({ preventScroll: true }); }, 220);
   }
   function close() {
@@ -684,6 +903,24 @@
     document.body.classList.remove('gd-open');
     const b = $('#btn-gpu'); b.classList.remove('open'); b.setAttribute('aria-expanded', 'false');
     if (D.contains(document.activeElement)) b.focus({ preventScroll: true });
+  }
+  // The studio's "Make with AI…" (Add element) and "Rework with AI…" (a picture's own panel) land here: the panel
+  // opens in Element, on New, or on Rework with that element as the one to rework. It always says where things
+  // stand: a run still going, no connection yet, or a bridge too old for elements.
+  function askElement(op, key) {
+    if (!D) return;
+    open();
+    const c = st.conn.state, live = c === 'on' || c === 'lost';
+    if (live && !elementOK()) { toast('The bridge you are connected to cannot make elements yet: it needs a newer bridge (1.1.0 or later).', true); return; }
+    st.mode = 'element'; st.elOp = op === 'rework' ? 'rework' : 'new'; st.seenSel = null;
+    if (st.elOp === 'rework' && key) {
+      const list = pictures(); const e = list.find(x => x.key === key && x.side === MP.side) || list.find(x => x.key === key);
+      if (e) setTarget(e); else toast('That element has no picture to rework.', true);
+    }
+    renderMake();
+    if (st.run) toast('Your GPU is still making a picture. Generate comes back when it has finished (or press Cancel).');
+    else if (c === 'off' || c === 'error') toast('Connect to your GPU first: paste the bridge address here, then Connect. Element is ready after that.');
+    if (live) setTimeout(() => { if (!st.open) return; $('#gd-make', D).scrollIntoView({ block: 'start' }); textBox().focus({ preventScroll: true }); }, 260);
   }
 
   /* ---- rendering */
@@ -745,32 +982,57 @@
     const live = st.conn.state === 'on' || st.conn.state === 'lost';
     $('#gd-make', D).hidden = !live;
     if (!live) return;
-    const M = MODES[st.mode];
-    $$('#gd-mode button', D).forEach(b => { const on = b.getAttribute('data-v') === st.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
-    $('#gd-modenote', D).innerHTML = noteHTML(M.print ? 'ok' : 'idea', M.note);
+    if (!modeOK(st.mode)) { st.mode = 'art'; refreshMineThumb(); }           // (an older bridge: no Element)
+    const M = MODES[st.mode], isEl = !!M.element, rework = isEl && st.elOp === 'rework';
+    $$('#gd-mode button', D).forEach(b => { const k = b.getAttribute('data-v'); const on = k === st.mode, ok = modeOK(k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = !ok; b.title = ok ? '' : 'Needs a newer bridge'; });
+    $('#gd-modewhy', D).hidden = elementOK();
+    $('#gd-modenote', D).innerHTML = noteHTML(M.badge ? 'idea' : 'ok', M.note);
+    // an element has no "Start from", "How far" or style: it is new (described) or a rework of one in the design
+    $('#gd-basef', D).hidden = isEl; $('#gd-distf', D).hidden = isEl; $('#gd-stylef', D).hidden = isEl;
+    $('#gd-opf', D).hidden = !isEl; $('#gd-whatf', D).hidden = !isEl || rework; $('#gd-tgf', D).hidden = !rework; $('#gd-changef', D).hidden = !rework;
+    $$('#gd-op button', D).forEach(b => { const on = b.getAttribute('data-v') === st.elOp; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    if (rework) renderTargets();
     if (!baseAvailable(st.base)) st.base = 'mine';
     $$('#gd-bases .gd-base', D).forEach(b => { const k = b.getAttribute('data-v'); const on = k === st.base, ok = baseAvailable(k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); b.disabled = !ok; b.title = ok ? '' : 'Not among the bases the bridge has on that PC'; });
     const im = $('#gd-thumb-mine', D); if (im && st.mineThumb && im.getAttribute('src') !== st.mineThumb) im.src = st.mineThumb;
     $('#gd-basenote', D).textContent = st.base === 'mine'
-      ? 'Uses the design open in this browser. ' + (st.mode === 'art' ? 'Sent as its background only: no words, no logo, no pop.' : 'Sent as it is now: the logo, the words and the real pop' + (st.mode === 'pack' ? ', with its words passed on to be spelled exactly.' : '.'))
+      ? 'Uses the design open in this browser. ' + (M.bgOnly ? 'Sent as its background only: no words, no logo, no pop, no added elements.' : 'Sent as it is now: the logo, the words and the real pop' + (M.words ? ', with its words passed on to be spelled exactly.' : '.'))
       : 'The client’s current ' + (st.base === 'bag' ? 'bag' : 'wrapper') + ' draft (a base already on the GPU PC, with its words).';
-    if (!$('#gd-style', D).value.trim() && !st.styleTouched) $('#gd-style', D).value = M.chips[0][1];
+    if (!isEl && !$('#gd-style', D).value.trim() && !st.styleTouched) $('#gd-style', D).value = M.chips[0][1];
     renderDistance(); renderStyleCount(); renderChips(); renderSeed(); renderGo();
+    stalePreview();
+  }
+  // Rework: one card per picture element in the design, the one to rework marked. Redrawn only when the list changes.
+  function renderTargets() {
+    const list = syncTarget(); const box = $('#gd-els', D);
+    const sig = list.map(e => [e.side, e.key, e.src, e.ai ? 1 : 0, e.name].join(':')).join('\n');
+    if (sig !== elSig) {
+      elSig = sig;
+      box.innerHTML = list.map(e => '<button type="button" class="gd-base" data-act="target" data-v="' + esc(sigOf(e)) + '" title="' + esc(e.name) + '"><span class="gd-bth"><img alt=""></span><span class="t">' + esc(e.name) + '</span><span class="s">' + e.side + (e.ai ? ' · AI drawing' : ' panel') + '</span></button>').join('');
+      $$('img', box).forEach((im, i) => { im.src = list[i].pic.dataURL; });
+    }
+    const cur = sigOf(st.target);
+    $$('.gd-base', box).forEach(b => { const on = b.getAttribute('data-v') === cur; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    box.hidden = !list.length;
+    $('#gd-tgnote', D).textContent = list.length ? 'The picture selected in the design is picked for you; click another one here to rework that instead. Its place and size in the design stay.'
+      : 'There is no picture element in this design yet. Add one under Layers → Add element, or make a New one here first.';
   }
   function renderDistance() {
-    const d = st.distance, bi = bandOf(d), M = MODES[st.mode];
+    const M = MODES[st.mode]; if (!M.bands) return;          // (an element has no distance)
+    const d = st.distance, bi = bandOf(d);
     const r = $('#gd-dist', D); if (Number(r.value) !== d) r.value = d;
     $('#gd-dist-v', D).textContent = d.toFixed(2);
     $$('#gd-bands button', D).forEach((b, i) => { b.classList.toggle('on', i === bi); b.setAttribute('aria-pressed', String(i === bi)); $('.t', b).textContent = M.bands[i][0]; b.title = M.bands[i][1]; });
-    $('#gd-bandnote', D).textContent = M.bands[bi][1] + (st.mode === 'art' ? ' Never any words or a pop.' : ' The pop stays the real product.');
+    $('#gd-bandnote', D).textContent = M.bands[bi][1] + (M.bgOnly ? ' Never any words or a pop.' : ' The pop stays the real product.');
   }
-  function renderStyleCount() { $('#gd-style-n', D).textContent = $('#gd-style', D).value.length + ' / 600'; }
+  function renderStyleCount() { ['style', 'what', 'change'].forEach(k => { $('#gd-' + k + '-n', D).textContent = $('#gd-' + k, D).value.length + ' / 600'; }); }
   function renderChips() {
-    const cur = $('#gd-style', D).value.trim();
-    $('#gd-chips', D).innerHTML = MODES[st.mode].chips.map((c, i) => '<button type="button" class="gd-chip' + (c[1] === cur ? ' on' : '') + '" data-act="chip" data-i="' + i + '" title="' + esc(c[1]) + '">' + esc(c[0]) + '</button>').join('');
+    const M = MODES[st.mode]; const cur = $(M.element ? '#gd-what' : '#gd-style', D).value.trim();
+    $(M.element ? '#gd-what-chips' : '#gd-chips', D).innerHTML = M.chips.map((c, i) => '<button type="button" class="gd-chip' + (c[1] === cur ? ' on' : '') + '" data-act="chip" data-i="' + i + '" title="' + esc(c[1]) + '">' + esc(c[0]) + '</button>').join('');
   }
   function renderSeed() {
     $$('#gd-seedmode button', D).forEach(b => { const on = b.getAttribute('data-v') === st.seedMode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    $('#gd-seedmode [data-v="fixed"]', D).title = MODES[st.mode].element ? 'The same seed again: change only the words to steer the same drawing' : 'The same idea again: change only the distance to see it nearer to or further from the base';
     const s = $('#gd-seed', D); s.hidden = st.seedMode !== 'fixed'; if (s.value === '') s.value = st.seed;
     $$('#gd-versions button', D).forEach(b => { const on = Number(b.getAttribute('data-v')) === st.versions; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
   }
@@ -786,7 +1048,8 @@
     const g = $('#gd-go', D);
     const h = st.conn.state === 'on' ? st.conn.health : null;
     const comfyDown = !!h && h.comfy === 'error';          // the bridge would answer 503: say why here instead
-    g.disabled = !!st.run || st.conn.state !== 'on' || comfyDown;
+    const noTarget = !!MODES[st.mode].element && st.elOp === 'rework' && !st.target;       // (the note under "Element to rework" says why)
+    g.disabled = !!st.run || st.conn.state !== 'on' || comfyDown || noTarget;
     $('span', g).textContent = 'Generate' + (st.versions > 1 ? ' ' + st.versions + ' versions' : '');
     const why = $('#gd-gowhy', D);
     const html = comfyDown ? noteHTML('warn', 'Your GPU can’t take a job right now' + (h.message ? ': ' + esc(String(h.message).slice(0, 300).replace(/\.?$/, '.')) : '.') + ' This button comes back by itself when the bridge is ready.')
@@ -796,11 +1059,12 @@
   }
   function runLine(r) {
     const lead = r.of > 1 ? 'Version ' + r.n + ' of ' + r.of + ' · ' : '';
-    if (r.phase === 'render') return 'Preparing your design…';
+    if (r.phase === 'render') return r.element ? 'Getting the element ready…' : 'Preparing your design…';
     if (r.phase === 'send') return lead + 'Sending it to your GPU…';
     if (r.phase === 'queued') return lead + 'Waiting for your GPU' + (r.position > 1 ? ' (number ' + r.position + ' in line)' : r.position === 1 ? ' (next in line)' : '');
     if (r.phase === 'running') return lead + 'Making it on your GPU';
     if (r.phase === 'fetch') return lead + 'Bringing it back…';
+    if (r.phase === 'cut') return lead + 'Cutting out its background…';
     return lead + 'Working…';
   }
   function runMs(r) { if (!r.tSent) return 0; if (r.phase === 'running' && r.serverMs != null) return r.serverMs + (Date.now() - r.polledAt); return Date.now() - r.tSent; }
@@ -831,31 +1095,49 @@
     if (!curResult()) st.sel = st.results[0].id;
     $('#gd-grid', D).innerHTML = st.results.map(r => {
       const M = MODES[r.mode];
-      return '<button type="button" class="gd-th' + (r.id === st.sel ? ' on' : '') + '" data-act="sel" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === st.sel) + '" title="' + esc(M.label + ' · seed ' + r.seed) + '">' +
-        '<img src="' + r.url + '" alt="' + esc(M.label + ', seed ' + r.seed) + '"><span class="gd-tag' + (M.print ? '' : ' idea') + '">' + M.tag + '</span></button>';
+      return '<button type="button" class="gd-th' + (r.cut ? ' cut' : '') + (r.id === st.sel ? ' on' : '') + '" data-act="sel" data-id="' + esc(r.id) + '" aria-pressed="' + (r.id === st.sel) + '" title="' + esc(M.label + ' · seed ' + r.seed) + '">' +
+        '<img src="' + r.url + '" alt="' + esc(M.label + ', seed ' + r.seed) + '"><span class="gd-tag' + (M.badge ? ' idea' : '') + '">' + M.tag + '</span></button>';
     }).join('');
     renderPreview();
   }
+  // what the result card is drawn from besides the result: the panel being edited and, for a rework, whether its
+  // element is still in the design (it can go, and come back with Undo, without a word to this panel)
+  const previewSig = r => (r ? r.id + ':' + (MP.side === 'back' ? 'back' : 'front') + ':' + (r.op === 'rework' ? !!findElement(r.target) : '') : '');
+  function stalePreview() { if (D && previewSig(curResult()) !== pvSig) renderPreview(); }
   function renderPreview() {
     if (!D) return;
     const r = curResult(); const box = $('#gd-prev', D);
+    pvSig = previewSig(r);
     if (!r) { box.innerHTML = ''; return; }
-    const M = MODES[r.mode]; const B = MODES[r.mode].bands[bandOf(r.distance)][0];
+    const M = MODES[r.mode];
     const side = MP.side === 'back' ? 'back' : 'front';
-    let fit = '';
-    if (M.print) {
+    let from = 'from ' + esc(r.baseLabel || ''), line = '', fit = '', notes = '', acts = '';
+    if (M.use === 'background') {
       const f = fitInfo(r);
       if (f) fit = '<div class="gd-pv-fit">' + (f.ppi >= 300 ? 'About ' + f.ppi + ' ppi on this panel: print-ready.' : f.ppi >= 250 ? 'About ' + f.ppi + ' ppi on this panel (300 is ideal).' : 'About ' + f.ppi + ' ppi on this panel: fine for proofs. For the final print, download it, upscale it 2× (for example in ComfyUI) and bring it back with Background → Replace background art.') +
         (f.crop ? ' A different shape from this panel, so its edges are cropped to fit (drag it to place it).' : '') + '</div>';
+      acts = '<button type="button" class="btn primary sm" data-act="use">' + icon('background', 'ico-sm') + 'Use as ' + side + ' background</button>';
     }
-    box.innerHTML = '<figure class="gd-pv"><div class="gd-pv-img"><img src="' + r.url + '" alt="' + esc(M.label + ' result, seed ' + r.seed) + '">' +
-      (M.print ? '' : '<span class="gd-badge">Idea · not a print file</span>') + '</div>' +
-      '<figcaption><div class="gd-pv-t">' + esc(M.label) + ' <span>from ' + esc(r.baseLabel || '') + '</span></div>' +
-      '<div class="gd-pv-s">' + esc(B) + ' (distance ' + Number(r.distance).toFixed(2) + ') · seed ' + r.seed + ' · ' + r.w + ' × ' + r.h + ' px</div>' +
-      '<div class="gd-pv-s gd-pv-style">“' + esc(r.style) + '”</div>' + fit + '</figcaption>' +
-      '<div class="gd-pv-a">' + (M.print ? '<button type="button" class="btn primary sm" data-act="use">' + icon('background', 'ico-sm') + 'Use as ' + side + ' background</button>' : '') +
+    if (M.element) {
+      // a new element is added; a rework replaces its element or is added beside it. If that element has gone, it can only be added
+      const rework = r.op === 'rework', t = rework ? findElement(r.target) : null, name = esc((t && t.name) || (r.target && r.target.name) || 'The element');
+      from = rework ? 'a rework of “' + name + '”' : 'new, from a description';
+      line = 'seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px · ' + (r.cut ? 'background cut out' : 'with its background');
+      if (!r.cut) notes += noteHTML('warn', 'Its background could not be cut out, so this is the picture as it came. ' + esc(r.note || ''));
+      if (rework && !t) notes += noteHTML('info', '“' + name + '” is no longer in the design, so there is nothing to replace. This picture can still be added as a new element.');
+      acts = rework && t
+        ? '<button type="button" class="btn primary sm" data-act="replace" title="Puts this picture in place of “' + name + '” on the ' + t.side + ' panel: the same place, the same size">' + icon('image', 'ico-sm') + 'Replace the element</button>' +
+          '<button type="button" class="btn sm" data-act="copy" title="Keeps “' + name + '” and adds this picture as a second element on the ' + t.side + ' panel">' + icon('copy', 'ico-sm') + 'Add as a copy</button>'
+        : '<button type="button" class="btn primary sm" data-act="add" title="Adds it as a picture element in the middle of the ' + side + ' panel (the one being edited)">' + icon('plus', 'ico-sm') + 'Add to design</button>';
+    } else line = esc(M.bands[bandOf(r.distance)][0]) + ' (distance ' + Number(r.distance).toFixed(2) + ') · seed ' + esc(r.seed) + ' · ' + esc(r.w) + ' × ' + esc(r.h) + ' px';
+    box.innerHTML = '<figure class="gd-pv"><div class="gd-pv-img' + (r.cut ? ' cut' : '') + '"><img src="' + r.url + '" alt="' + esc(M.label + ' result, seed ' + r.seed) + '">' +
+      (M.badge ? '<span class="gd-badge">' + M.badge + '</span>' : '') + '</div>' +
+      '<figcaption><div class="gd-pv-t">' + esc(M.label) + ' <span>' + from + '</span></div>' +
+      '<div class="gd-pv-s">' + line + '</div>' +
+      '<div class="gd-pv-s gd-pv-style">“' + esc(r.style) + '”</div>' + fit + '</figcaption>' + notes +
+      '<div class="gd-pv-a">' + acts +
       '<button type="button" class="btn sm" data-act="download">' + icon('save', 'ico-sm') + 'Download PNG</button>' +
-      '<button type="button" class="btn sm" data-act="reuse" title="Put its style, distance and seed back under Make, to try it nearer or further">' + icon('reset', 'ico-sm') + 'Reuse settings</button>' +
+      '<button type="button" class="btn sm" data-act="reuse" title="' + (M.element ? 'Put its words and seed back under Make' : 'Put its style, distance and seed back under Make, to try it nearer or further') + '">' + icon('reset', 'ico-sm') + 'Reuse settings</button>' +
       '<button type="button" class="btn ghost sm icon" data-act="remove" aria-label="Remove this result" title="Remove this result">' + icon('trash', 'ico-sm') + '</button></div></figure>';
   }
 
@@ -870,9 +1152,27 @@
     if (saved) { $('#gd-url', D).value = saved.url; $('#gd-remember', D).checked = true; }
     renderAll();
   } catch (e) { console.warn('[label-studio] AI on your GPU is unavailable:', e); }
-  // for scripted checks (QA)
+  // for scripted checks (QA), and for the studio: its "Make with AI…" and "Rework with AI…" call makeElement() and
+  // rework(key), which open this panel in Element (New, or Rework on that element)
   MP.gpu = {
-    get state() { return { open: st.open, conn: st.conn.state, health: st.conn.health, err: st.conn.err, run: st.run ? { phase: st.run.phase, n: st.run.n, of: st.run.of, position: st.run.position } : null, runMsg: st.runMsg, results: st.results.map(r => ({ id: r.id, mode: r.mode, base: r.base, seed: r.seed, w: r.w, h: r.h, distance: r.distance })), sel: st.sel, mode: st.mode, base: st.base, distance: st.distance }; },
+    get state() { return { open: st.open, conn: st.conn.state, health: st.conn.health, err: st.conn.err, run: st.run ? { phase: st.run.phase, n: st.run.n, of: st.run.of, position: st.run.position } : null, runMsg: st.runMsg, results: st.results.map(r => ({ id: r.id, mode: r.mode, base: r.base, seed: r.seed, w: r.w, h: r.h, distance: r.distance, op: r.op, target: r.target, cut: r.cut, note: r.note, background: r.background })), sel: st.sel, mode: st.mode, base: st.base, distance: st.distance, elOp: st.elOp, target: st.target }; },
     open, close, connect, disconnect, generate, cancel: () => cancelRun(), frontWords: () => frontWords(MP.model),
+    makeElement: () => askElement('new'), rework: key => askElement('rework', key),
   };
+
+  // A link can carry the bridge address after "#gpu=" (the desktop launcher opens the studio that way, and the same
+  // link can be sent to another device). The part after # never leaves the browser. The address is filled in, the
+  // panel opens and connects, and the address is taken out of the address bar again.
+  (function linkAddress() {
+    const m = /(?:^#|&)gpu=([^&]+)/.exec(location.hash || '');
+    if (!m) return;
+    let raw = ''; try { raw = decodeURIComponent(m[1]); } catch (e) { return; }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* a page opened from disk may refuse */ }
+    const n = normalizeURL(raw); if (n.error) return;
+    whenReady().then(() => {
+      st.autoTried = true;                                   // this address, not a remembered one
+      open(); $('#gd-url', D).value = n.url;
+      if (st.conn.state !== 'on' || st.conn.url !== n.url) connect();
+    }, () => {});
+  })();
 })();

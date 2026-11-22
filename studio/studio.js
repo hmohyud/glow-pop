@@ -3,6 +3,8 @@
  * One design model (JSON) -> one SVG renderer (buildDesign). The inline SVG on screen, the print PDF,
  * the SVG and PNG exports and the 3D mockup texture all come from that same markup, so what you see
  * is exactly the file you send. Every word is live vector type; the pop is the real product picture.
+ * Pictures of your own can be added as extra layers ("elements": an upload, the pop photo again, or an AI
+ * drawing). An AI drawing is marked as one wherever it is listed, and never takes the place of the pop.
  *
  * Classic script on purpose: it has to work when index.html is double-clicked (file://).
  */
@@ -111,6 +113,8 @@
     chip: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/><rect x="9.75" y="9.75" width="4.5" height="4.5" rx=".8"/><path d="M9.5 3.5v3M14.5 3.5v3M9.5 17.5v3M14.5 17.5v3M3.5 9.5h3M3.5 14.5h3M17.5 9.5h3M17.5 14.5h3"/>',
     trash: '<path d="M4.5 7h15M9.5 7V4.8h5V7M6.8 7l.9 12.2h8.6L17.2 7"/><path d="M10.2 10.5v5.5M13.8 10.5v5.5"/>',
     stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2"/>',
+    // elements (pictures of your own)
+    copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="1.5"/><path d="M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/>',
   };
   function icon(name, cls) { return '<svg class="ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>'; }
 
@@ -288,6 +292,31 @@
   function textEl(o) {
     return Object.assign({ visible: true, text: '', font: 'poppins', weight: 500, italic: false, size: 8, color: '#b0105a', align: 'center', tracking: 0, leading: 1.15, x: 40, y: 100, pill: false, pillColor: '#ffffff' }, o || {});
   }
+  // ---- picture elements: layers of your own, one picture each (an upload, the real pop photo again, or an AI
+  // drawing). They sit in a panel's els / order beside the built-in layers, under a generated key: 'pic-' + 7
+  // characters, never a dot (paths are split on '.'). The pixels stay in ASSETS: `src` is an asset id.
+  // x, y = the centre (mm); w = the width (mm), the height follows the picture's own shape (never stretched);
+  // rotate in degrees, the same way as the heart badge's tilt. ai: null, or { op: 'new' | 'rework', prompt, seed }
+  // for an AI drawing, which is then marked as one in Layers, in its own panel and in the checks before export.
+  const PIC_KEY = /^pic-[a-z0-9]{1,16}$/;
+  const PIC_MIN = 2, PIC_MAX = 600;                       // width, mm
+  const isPic = el => !!el && el.type === 'picture';
+  const picKey = () => 'pic-' + (Math.random().toString(36).slice(2) + '0000000').slice(0, 7);
+  function aiMark(ai) {
+    if (!ai) return null;
+    const o = isObj(ai) ? ai : {};
+    const seed = o.seed === null || o.seed === undefined || o.seed === '' ? NaN : Number(o.seed);
+    return { op: o.op === 'rework' ? 'rework' : 'new', prompt: String(o.prompt || '').slice(0, 600), seed: isFinite(seed) ? seed : null };
+  }
+  function pictureEl(o) {
+    o = isObj(o) ? o : {};
+    const num = (v, d) => (v === null || v === '' || !isFinite(Number(v)) ? d : Number(v));
+    return { type: 'picture', visible: o.visible !== false, name: String(o.name || 'Picture').slice(0, 80), src: typeof o.src === 'string' && o.src ? o.src : null,
+      x: num(o.x, 0), y: num(o.y, 0), w: clamp(num(o.w, 20), PIC_MIN, PIC_MAX), rotate: clamp(num(o.rotate, 0), -180, 180), ai: aiMark(o.ai) };
+  }
+  // label and icon of a layer: the built-in ones are a fixed set, an added picture carries its own name
+  function infoOf(key, el) { return EL_INFO[key] || { label: (el && String(el.name || '').trim()) || 'Picture', icon: 'image' }; }
+  const AI_TAG = '<b class="ai-tag" title="AI drawing: a drawing, not a photo of the product">AI</b>';
   function blankBg(c1, c2, W, H) {
     return {
       mode: 'solid', c1, c2,
@@ -370,8 +399,9 @@
     return m;
   }
   const OLD_TRIM = { wrapper: { w: 80, h: 120 }, bag: { w: 150, h: 190 }, sleeve3: { w: 165, h: 110 } };   // the placeholder formats of version 1
-  // lost (optional): collects the pictures the design refers to that are not here any more. They are never
-  // swapped for another picture: the slot is left empty (the editor shows an outline) and a notice asks for it.
+  // lost (optional): collects the pictures the design refers to that are not here any more ({ pop, logo,
+  // background: true, elements: how many added pictures }). They are never swapped for another picture: the slot
+  // is left empty (the editor shows an outline) and a notice asks for it.
   function normalizeModel(raw, lost) {
     raw = isObj(raw) ? clone(raw) : {};
     const fmt = FORMATS[raw.format] ? raw.format : 'wrapper';
@@ -400,14 +430,17 @@
       if (!P) return;
       const base = m.panels[side];
       if (isObj(P.bg)) deepMerge(base.bg, P.bg);
-      if (isObj(P.els)) Object.keys(base.els).forEach(k => { if (isObj(P.els[k])) deepMerge(base.els[k], P.els[k]); });
+      if (isObj(P.els)) Object.keys(base.els).forEach(k => { if (isObj(P.els[k])) { deepMerge(base.els[k], P.els[k]); delete base.els[k].type; } });   // (a built-in layer is never a picture element)
       // arrays are replaced whole, never merged item by item (the facts rows, the pattern points, the sparkles)
       if (isObj(P.els) && isObj(P.els.facts) && Array.isArray(P.els.facts.rows)) base.els.facts.rows = clone(P.els.facts.rows);
       if (isObj(P.bg) && isObj(P.bg.pattern) && Array.isArray(P.bg.pattern.points)) base.bg.pattern.points = clone(P.bg.pattern.points);
       if (isObj(P.els) && isObj(P.els.logo) && isObj(P.els.logo.sparkles) && Array.isArray(P.els.logo.sparkles.points)) base.els.logo.sparkles.points = clone(P.els.logo.sparkles.points);
-      const known = new Set(ORDERS[side]);
-      base.order = (Array.isArray(P.order) ? P.order : []).filter(k => known.has(k));
-      ORDERS[side].forEach(k => { if (!base.order.includes(k)) base.order.push(k); });
+      // added pictures keep their own keys and their place in the stacking order (the built-in layers are a fixed set)
+      const pics = [];
+      if (isObj(P.els)) Object.keys(P.els).forEach(k => { if (!base.els[k] && PIC_KEY.test(k) && isPic(P.els[k])) { base.els[k] = pictureEl(P.els[k]); pics.push(k); } });
+      const known = new Set(ORDERS[side].concat(pics));
+      base.order = (Array.isArray(P.order) ? P.order : []).filter((k, i, a) => known.has(k) && a.indexOf(k) === i);
+      ORDERS[side].concat(pics).forEach(k => { if (!base.order.includes(k)) base.order.push(k); });
     });
     if (raw._fromTrim && (Math.abs(raw._fromTrim.w - W) > 0.01 || Math.abs(raw._fromTrim.h - H) > 0.01)) remapPanel(m.panels.front, raw._fromTrim.w, raw._fromTrim.h, W, H);
     // saved on other item numbers (items.js has changed since, e.g. the bag 193.3 -> 189.2 mm): the layout moves onto
@@ -422,6 +455,10 @@
     if (gone(F.bg.image.src)) { if (lost) lost.background = true; F.bg.image.src = null; }
     if (gone(F.els.logo.upload.src)) { if (lost) lost.logo = true; F.els.logo.upload.src = null; }
     if (gone(m.panels.back.bg.image.src)) { if (lost) lost.background = true; m.panels.back.bg.image.src = null; }
+    ['front', 'back'].forEach(sd => {
+      const els = m.panels[sd].els;
+      Object.keys(els).forEach(k => { if (isPic(els[k]) && gone(els[k].src)) { if (lost) lost.elements = (lost.elements || 0) + 1; els[k].src = null; } });
+    });
     return m;
   }
 
@@ -541,8 +578,8 @@
   /* =========================================================================================
    * 5. State, history, autosave
    * ======================================================================================= */
-  // lost: pictures of the last design that could not be restored ({ pop, logo, background }), so the notice
-  // can say so instead of swapping in something else
+  // lost: pictures of the last design that could not be restored ({ pop, logo, background, elements }), so the
+  // notice can say so instead of swapping in something else
   // side: the panel being edited (front / back); ui.view adds the read-only print-layout view
   const state = { model: null, sel: null, side: 'front', greenPop: null, lost: {}, warnedQuota: false };
   const ui = { showBleed: true, showSafe: true, showGuides: true, compare: false, compareMode: 'side', compareOpacity: 0.5, view: 'front', zoomMode: 'fit', k: 4, snapX: null, hover: null, dragging: false, dieline: null, lastPrint: { crop: false, layout: false, dieline: false, side: 'front' } };
@@ -566,7 +603,10 @@
     const ids = new Set();
     const F = m.panels.front, B = m.panels.back;
     if (F.els.pop && F.els.pop.src) ids.add(F.els.pop.src);
-    [F, B].forEach(P => { if (P.bg.image && P.bg.image.src) ids.add(P.bg.image.src); });
+    [F, B].forEach(P => {
+      if (P.bg.image && P.bg.image.src) ids.add(P.bg.image.src);
+      Object.keys(P.els).forEach(k => { if (isPic(P.els[k]) && P.els[k].src) ids.add(P.els[k].src); });      // added pictures (hidden ones too)
+    });
     if (F.els.logo.upload && F.els.logo.upload.src) ids.add(F.els.logo.upload.src);
     if (state.greenPop) ids.add(state.greenPop);
     return [...ids].filter(id => ASSETS[id] && (includeBundled || !BUNDLED.has(id)));
@@ -639,7 +679,7 @@
       if (BUNDLED.has(id)) continue;
       let w = a.w, h = a.h; if (!(w > 0 && h > 0)) { const d = await imageSize(a.src); w = d.w; h = d.h; }
       const kind = a.kind || 'image';
-      const opaque = typeof a.opaque === 'boolean' ? a.opaque : (kind === 'pop' ? await edgeOpaque(a.src) : false);
+      const opaque = typeof a.opaque === 'boolean' ? a.opaque : (kind === 'pop' || kind === 'element' ? await edgeOpaque(a.src) : false);
       const nm = a.name || id;
       registerAsset({ id, src: a.src, w, h, name: nm, short: a.short || (nm.length > 18 ? nm.slice(0, 17) + '…' : nm), kind, opaque });
     }
@@ -746,7 +786,7 @@
     return s + '</text>';
   }
   function grpOpen(key, env, extra) {
-    return '<g id="' + env.idp + SVG_IDS[key] + '"' + (env.editor ? ' class="mp-el" data-el="' + key + '"' : '') + (extra || '') + '>';
+    return '<g id="' + env.idp + (SVG_IDS[key] || key) + '"' + (env.editor ? ' class="mp-el" data-el="' + key + '"' : '') + (extra || '') + '>';   // (an added picture: its own key)
   }
   // A panel of the design as the renderer sees it: the model's sizes and spec, plus that panel's background,
   // elements and stacking order. Every render function takes this view in place of the model.
@@ -1064,6 +1104,26 @@
     }
     xs.forEach(p => { s += '<use xlink:href="#' + pid + '" x="' + n(p.cx - w / 2) + '" y="' + n(el.y) + '"/>'; });
     return s + '</g>';
+  }
+  // An added picture (see pictureEl): centred on x, y; w mm wide, its height from the picture's own shape; turned
+  // by `rotate`. Each picture is stored once per file, however many elements show it: one <image> per asset in
+  // <defs> (1 unit = 1 pixel, centred on 0,0) and a <use> per element with its translate, rotate and scale.
+  function picSize(el) { const a = ASSETS[el.src]; const w = clamp(Number(el.w) || 20, PIC_MIN, PIC_MAX); return { w, h: a ? w * a.h / a.w : w }; }
+  function renderPicture(key, el, m, env, defs) {
+    const a = ASSETS[el.src]; const g = picSize(el);
+    const tf = 'translate(' + n(el.x) + ' ' + n(el.y) + ')' + (Number(el.rotate) ? ' rotate(' + n(Number(el.rotate), 2) + ')' : '');
+    if (!a) {
+      // a lost picture: an outline in the editor, nothing at all in the files (never swapped for another picture)
+      if (!env.editor) return '';
+      return grpOpen(key, env) + '<g transform="' + tf + '">' + placeholderMarkup(-g.w / 2, -g.h / 2, g.w, g.h, ['Picture missing', 'replace or delete']) + '</g></g>';
+    }
+    const pics = env.pics || (env.pics = {});                             // asset id -> the id of its <image>
+    let pid = pics[el.src];
+    if (!pid) {
+      pid = pics[el.src] = env.idp + 'picture-' + (Object.keys(pics).length + 1);
+      defs.push('<image id="' + pid + '" x="' + n(-a.w / 2) + '" y="' + n(-a.h / 2) + '" width="' + n(a.w) + '" height="' + n(a.h) + '" preserveAspectRatio="xMidYMid meet" xlink:href="' + esc(env.href(el.src)) + '"/>');
+    }
+    return grpOpen(key, env) + '<use xlink:href="#' + pid + '" transform="' + tf + ' scale(' + n(g.w / a.w, 6) + ')"/></g>';
   }
 
   /* ---- back-panel blocks: Supplement Facts, Ingredients, claims, Warning ----
@@ -1397,6 +1457,7 @@
     return out + '</g>';
   }
   function renderEl(key, el, m, env, defs) {
+    if (isPic(el)) return renderPicture(key, el, m, env, defs);
     if (key === 'logo') return renderLogo(el, m, env, defs);
     if (key === 'badge') return renderBadge(el, m, env, defs);
     if (key === 'pop') return renderPop(el, m, env, defs);
@@ -1445,7 +1506,7 @@
       const v = panelView(m, side);
       for (const key of v.order) {
         const el = v.els[key]; if (!el || !el.visible) continue;
-        if (key === 'pop') continue;
+        if (key === 'pop' || isPic(el)) continue;
         if (key === 'logo') { if (el.style !== 'upload') { const lf = logoFont(el); add(lf.font, el.weight, lf.italic, el.text); } continue; }
         if (key === 'facts') {
           add(el.font, 700, false, (el.showTitle ? el.title : '') + (el.showHead ? (el.headAmount || '') + (el.headDV || '') : ''));
@@ -1787,6 +1848,7 @@
     const idp = opts.idp || 'ly-';
     const href = opts.href || (id => assetHref(id, 'data'));
     const defs = []; let art = '';
+    const pics = {};                 // added pictures: one <image> for the whole sheet (the web draws the back twice)
     L.pieces.forEach((p, i) => {
       const cid = idp + 'piece-' + i;
       // outer edges get the bleed (and the page's extra), inner joins of the web none
@@ -1802,7 +1864,7 @@
           '<rect x="' + n(p.x - bl) + '" y="' + n(mid) + '" width="' + n(p.w + bl + br) + '" height="' + n(p.y + p.h + bb - mid) + '" fill="' + esc(col('back')) + '"/></g>';
         return;
       }
-      const env = { idp: idp + i + '-', editor: false, href };
+      const env = { idp: idp + i + '-', editor: false, href, pics };
       const d = buildDesign(m, env, over, p.side);
       defs.push(d.defs);
       art += '<g id="' + idp + 'panel-' + i + '-' + p.side + '" clip-path="url(#' + cid + ')"><g transform="translate(' + n(p.x - p.src) + ' ' + n(p.y) + ')">' + d.body + '</g></g>';
@@ -2118,11 +2180,28 @@
       const p = 0.8;
       return '<rect x="' + n(bb.x - p) + '" y="' + n(bb.y - p) + '" width="' + n(bb.width + 2 * p) + '" height="' + n(bb.height + 2 * p) + '" fill="none" stroke="' + (sel ? '#1f5fc9' : 'rgba(31,95,201,0.55)') + '" stroke-width="' + (sel ? 1.5 : 1) + '"' + (sel ? '' : ' stroke-dasharray="4 3"') + ' vector-effect="non-scaling-stroke"/>';
     };
-    if (ui.hover && ui.hover !== state.sel && ui.hover !== 'background') { const bb = elBBox(ui.hover); if (bb) s += box(bb, false); }
-    if (state.sel && state.sel !== 'background') {
-      const bb = elBBox(state.sel);
-      if (bb) s += box(bb, true);
-    }
+    // an added picture: its own outline, turned with it
+    const picBox = (el, sel) => {
+      const g = picSize(el), p = 0.8;
+      return '<rect x="' + n(-g.w / 2 - p) + '" y="' + n(-g.h / 2 - p) + '" width="' + n(g.w + 2 * p) + '" height="' + n(g.h + 2 * p) + '" transform="translate(' + n(el.x) + ' ' + n(el.y) + ') rotate(' + n(Number(el.rotate) || 0, 2) + ')" fill="none" stroke="' + (sel ? '#1f5fc9' : 'rgba(31,95,201,0.55)') + '" stroke-width="' + (sel ? 1.5 : 1) + '"' + (sel ? '' : ' stroke-dasharray="4 3"') + ' vector-effect="non-scaling-stroke"/>';
+    };
+    // ... and, when it is the selected one, two handles: a corner to resize it (about its centre) and a knob
+    // above it to turn it. They are redrawn with the stage; the gesture itself lives in `drag` (onStageDown).
+    const picHandles = el => {
+      const g = picSize(el), u = 1 / ui.k, hx = g.w / 2 + 0.8, hy = g.h / 2 + 0.8, ry = -hy - 18 * u;      // u: one screen pixel, in mm
+      const st = ' fill="#ffffff" stroke="#1f5fc9" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="all"';
+      return '<g transform="translate(' + n(el.x) + ' ' + n(el.y) + ') rotate(' + n(Number(el.rotate) || 0, 2) + ')">' +
+        '<line x1="0" y1="' + n(-hy) + '" x2="0" y2="' + n(ry) + '" stroke="#1f5fc9" stroke-width="1" vector-effect="non-scaling-stroke"/>' +
+        '<circle class="mp-h" data-h="rotate" cx="0" cy="' + n(ry) + '" r="' + n(5 * u) + '"' + st + '><title>Drag to turn (Shift: steps of 15°)</title></circle>' +
+        '<rect class="mp-h" data-h="size" x="' + n(hx - 4.5 * u) + '" y="' + n(hy - 4.5 * u) + '" width="' + n(9 * u) + '" height="' + n(9 * u) + '" rx="' + n(1.5 * u) + '"' + st + '><title>Drag to resize</title></rect></g>';
+    };
+    const outline = (key, sel) => {
+      const el = curPanel().els[key];
+      if (isPic(el) && el.visible) return picBox(el, sel) + (sel ? picHandles(el) : '');
+      const bb = elBBox(key); return bb ? box(bb, sel) : '';
+    };
+    if (ui.hover && ui.hover !== state.sel && ui.hover !== 'background') s += outline(ui.hover, false);
+    if (state.sel && state.sel !== 'background') s += outline(state.sel, true);
     host.innerHTML = s;
   }
   function toMM(evt) {
@@ -2132,7 +2211,7 @@
   }
   function visualCenterX(key) {
     const v = curView(); const el = v.els[key]; if (!el) return 0;
-    if (key === 'pop' || key === 'badge' || (key === 'logo' && el.style === 'upload')) return el.x;
+    if (isPic(el) || key === 'pop' || key === 'badge' || (key === 'logo' && el.style === 'upload')) return el.x;
     if (BLOCK_KEYS.includes(key)) { const b = blockLayout(key, el, v).bbox; return (b.x1 + b.x2) / 2; }
     const g = key === 'logo' ? logoGeometry(el) : textGeometry(el, elText(key, el));
     const ls = g.lines.filter(l => l.t); if (!ls.length) return el.x;
@@ -2144,6 +2223,17 @@
     if (isLayoutView()) {
       const t = e.target.closest ? e.target.closest('[data-side]') : null;
       if (t) setView(t.getAttribute('data-side'));
+      return;
+    }
+    // a handle of the selected picture (drawSelection): resize about its centre, or turn
+    const hd = e.target.closest ? e.target.closest('[data-h]') : null;
+    const hel = hd && state.sel ? curPanel().els[state.sel] : null;
+    if (isPic(hel)) {
+      const p = toMM(e);
+      drag = { key: state.sel, handle: hd.getAttribute('data-h'), p0: p, moved: false, id: e.pointerId,
+        start: { w: picSize(hel).w, rotate: Number(hel.rotate) || 0, d: Math.hypot(p.x - hel.x, p.y - hel.y), a: Math.atan2(p.y - hel.y, p.x - hel.x) } };
+      try { stage().setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      e.preventDefault();
       return;
     }
     const t = e.target.closest ? e.target.closest('[data-el]') : null;
@@ -2170,6 +2260,16 @@
     if (!drag.moved && Math.hypot(dx, dy) * ui.k < 3) return;
     drag.moved = true; ui.dragging = true;
     const m = state.model; const P = curPanel();
+    if (drag.handle) {
+      const el = P.els[drag.key]; if (!isPic(el)) return;
+      if (drag.handle === 'size') el.w = n(clamp(drag.start.w * Math.hypot(p.x - el.x, p.y - el.y) / Math.max(0.5, drag.start.d), PIC_MIN, PIC_MAX), 1);
+      else {
+        const r = drag.start.rotate + (Math.atan2(p.y - el.y, p.x - el.x) - drag.start.a) * 180 / Math.PI;
+        el.rotate = ((Math.round(e.shiftKey ? Math.round(r / 15) * 15 : r) + 180) % 360 + 360) % 360 - 180;      // whole degrees, -180 to 179
+      }
+      invalidate({ layers: drag.handle === 'size' });
+      return;
+    }
     if (e.shiftKey) { if (Math.abs(dx) > Math.abs(dy)) dy = 0; else dx = 0; }
     let nx = n(drag.start.x + dx, 1), ny = n(drag.start.y + dy, 1);
     ui.snapX = null;
@@ -2262,6 +2362,28 @@
     inp.addEventListener('change', () => { commit(); invalidate({ three: true }); });
     bindings.push({ el: inp, sync: show });
     return fieldWrap(label, inp, val);
+  }
+  // a slider and a number field for the same value (an added picture's width and rotation). o.smax: the slider's
+  // own upper end, when the number field allows more; o.note(v): a short text beside the label
+  function cSlideNumber(label, path, o) {
+    o = Object.assign({ step: 0.5, min: 0, max: 100, unit: '', digits: 2 }, o || {});
+    const f = h('div', { class: 'field' }); const l = h('span', { class: 'lbl' }); const val = h('span', { class: 'val' });
+    l.appendChild(document.createTextNode(label)); l.appendChild(val); f.appendChild(l);
+    const rng = h('input', { type: 'range', min: o.min, max: o.smax !== undefined ? o.smax : o.max, step: o.step, 'aria-label': label + ' (slider)' });
+    const inp = h('input', { class: 'inp', type: 'number', step: o.step, min: o.min, max: o.max, inputmode: 'decimal', 'aria-label': label });
+    const show = force => {
+      const v = Number(getP(path)) || 0; rng.value = v;
+      if (force || document.activeElement !== inp) inp.value = n(v, o.digits);
+      val.textContent = o.note ? o.note(v) : '';
+    };
+    show(true);
+    rng.addEventListener('input', () => { setP(path, parseFloat(rng.value)); show(true); invalidate(o.after); });
+    inp.addEventListener('input', () => { const v = parseFloat(inp.value); if (!isFinite(v)) return; setP(path, clamp(v, o.min, o.max)); show(); invalidate(o.after); });
+    [rng, inp].forEach(c => c.addEventListener('change', () => { commit(); show(true); invalidate({ three: true }); }));
+    bindings.push({ el: f, sync: () => show() });
+    const row = h('div', { class: 'numslide' }); const wrap = h('div', { class: 'unit', 'data-unit': o.unit || '' });
+    wrap.appendChild(inp); row.appendChild(rng); row.appendChild(wrap); f.appendChild(row);
+    return f;
   }
   function cText(label, path, o) {
     o = o || {};
@@ -2449,10 +2571,11 @@
     if (!key) { title.textContent = 'Edit'; host.innerHTML = '<p class="inspector-empty">Select a layer above, or click something on the design. Drag to move it; arrow keys nudge 0.5 mm (Shift: 5 mm).</p>'; return; }
     const box = h('div', { class: 'fields' }); host.appendChild(box);
     if (key === 'background') { title.innerHTML = '<span class="sec-title">Background</span>'; return bgInspector(box); }
-    title.innerHTML = '<span class="sec-title">' + esc(EL_INFO[key].label) + '</span>';
     const el = curPanel().els[key];
+    title.innerHTML = '<span class="sec-title">' + esc(infoOf(key, el).label) + '</span>' + (isPic(el) && el.ai ? AI_TAG : '');
     box.appendChild(cCheck('Show on the pack', 'els.' + key + '.visible', { after: { layers: true } }));
-    if (key === 'logo') logoInspector(box);
+    if (isPic(el)) pictureInspector(box, key);
+    else if (key === 'logo') logoInspector(box);
     else if (key === 'badge') badgeInspector(box);
     else if (key === 'pop') popInspector(box);
     else if (key === 'facts') factsInspector(box);
@@ -2640,8 +2763,48 @@
     const el = state.model.panels.front.els.pop; const a = ASSETS[el.src] || ASSETS['pop-gold'];
     if (a) inp.value = n(el.h * a.w / a.h, 2);
   }
+  // An added picture (an upload, the pop photo again, or an AI drawing): its name, the picture itself, its size,
+  // rotation and position. Arrange follows it, as for every layer.
+  function pictureInspector(box, key) {
+    const m = state.model; const side = state.side; const el = curPanel().els[key]; const base = 'els.' + key; const a = ASSETS[el.src];
+    if (el.ai) {
+      const p = String(el.ai.prompt || '').trim();
+      box.appendChild(h('div', { class: 'note', title: p || null }, icon('info') + '<span><b>AI drawing.</b> ' + (p ? (el.ai.op === 'rework' ? 'Reworked with: ' : 'Made from: ') + '“' + esc(p.length > 160 ? p.slice(0, 159) + '…' : p) + '”. ' : '') + 'A drawing, not a photo of your product.</span>'));
+    }
+    const nameF = cText('Name', base + '.name'); const nameI = $('input', nameF);
+    nameI.setAttribute('maxlength', 80);
+    nameI.addEventListener('input', () => { const t = $('#insp-title .sec-title'); if (t) t.textContent = infoOf(key, el).label; });
+    box.appendChild(nameF);
+    const r0 = h('div', { class: 'btn-pair' });
+    r0.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'A copy, 4 mm to the right and down (Ctrl+D)', onclick: () => duplicatePicture(key, side) }, icon('copy', 'ico-sm') + 'Duplicate'));
+    r0.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'Take this element out of the design (Delete key)', onclick: () => removePicture(key, side) }, icon('trash', 'ico-sm') + 'Delete'));
+    box.appendChild(r0);
+    sub(box, 'Picture');
+    const r1 = h('div', { class: 'btn-pair' });
+    r1.appendChild(h('button', { class: 'btn sm', type: 'button', title: 'Put another picture (PNG, JPG or WebP) in its place: the same spot, the same size', onclick: () => pickPictureFile(id => {
+      if (!replacePicture(key, id, { ai: null }, side)) { toast('That element is no longer in the design.', true); return; }
+      toast('Picture replaced' + (ASSETS[id].opaque ? '. If it has a plain background, use “Remove plain background”.' : ' · Ctrl+Z to go back'));
+    }) }, icon('upload', 'ico-sm') + 'Replace picture…'));
+    r1.appendChild(h('button', { class: 'btn sm', type: 'button', disabled: !a, title: a ? 'Describe a change and let AI redraw this picture (AI on your GPU)' : 'This element has no picture to rework', onclick: () => askAI('rework', key) }, icon('chip', 'ico-sm') + 'Rework with AI…'));
+    box.appendChild(r1);
+    if (a && a.opaque) {                                                  // (only a picture that still has a solid backdrop)
+      const rb = h('button', { class: 'btn sm block', type: 'button', title: 'Clears a plain backdrop from the edges inwards. The subject itself is not touched.' }, icon('wand', 'ico-sm') + 'Remove plain background');
+      rb.addEventListener('click', async () => { rb.disabled = true; try { await cutOutElement(key, side); } catch (e) { toast(e.message || String(e), true); } rb.disabled = false; });
+      box.appendChild(rb);
+    }
+    if (!a) box.appendChild(h('div', { class: 'note warn' }, icon('alert') + '<span>' + (state.lost.elements ? 'This picture could not be restored (it was too large to keep in this browser). ' : 'This element has no picture. ') + 'Use “Replace picture…”, or delete the element. Until then it is left out of the files; the dashed outline only shows where it goes.</span>'));
+    else if (a.opaque) box.appendChild(h('div', { class: 'note' }, icon('info') + '<span>This picture has a solid background, so it prints as a rectangle. If that background is one plain colour, “Remove plain background” cuts the subject out.</span>'));
+    sub(box, 'Size and rotation');
+    box.appendChild(cSlideNumber('Width', base + '.w', { unit: 'mm', step: 0.5, min: PIC_MIN, max: PIC_MAX, smax: Math.max(40, Math.ceil(Math.max(m.trim.w, m.trim.h) * 1.2)), after: { layers: true }, note: v => (a ? 'height ' + n(v * a.h / a.w, 1) + ' mm' : '') }));
+    box.appendChild(h('div', { class: 'note', 'data-ppi': key, style: 'display:none' }));
+    box.appendChild(cSlideNumber('Rotation', base + '.rotate', { unit: '°', step: 1, min: -180, max: 180, digits: 1 }));
+    sub(box, 'Position');
+    positionControls(box, base, { xLabel: 'X (centre)', yLabel: 'Y (centre)' });
+    updatePPINotes();
+  }
   // effective resolution of each raster picture at its printed size (an SVG is vector: no limit)
   const PPI_MIN = 250, PPI_IDEAL = 300;          // under 250: a warning; 250-299: a note; 300 and up: fine
+  const PIC_PPI_MIN = 200;                       // an added picture: a warning under 200
   function rasterInfo(m) {
     const out = []; const isVec = a => /^data:image\/svg/i.test(a.src || '');
     const F = m.panels.front;
@@ -2664,14 +2827,22 @@
       const a = ASSETS[lg.upload.src];
       if (a && !isVec(a)) out.push({ key: 'logo', label: 'The logo file', ppi: a.w / (Math.max(1, Number(lg.upload.w) || 40) / 25.4), tip: 'Use a larger file, or an SVG logo (vector).' });
     }
+    // added pictures (min: their own warning line; between it and 300 only the element's own panel says so)
+    ['front', 'back'].forEach(side => {
+      const P = m.panels[side];
+      P.order.forEach(k => {
+        const el = P.els[k]; const a = isPic(el) && el.visible ? ASSETS[el.src] : null;
+        if (a && !isVec(a)) out.push({ key: k, side, label: 'The picture “' + infoOf(k, el).label + '”', ppi: a.w / (picSize(el).w / 25.4), min: PIC_PPI_MIN, tip: 'Use a larger picture, or make it smaller on the pack.' });
+      });
+    });
     return out;
   }
   function updatePPINotes() {
     $$('[data-ppi]').forEach(box => {
       const k = box.getAttribute('data-ppi');
-      const r = rasterInfo(state.model).find(x => x.key === k && (k !== 'background' || x.side === state.side));
+      const r = rasterInfo(state.model).find(x => x.key === k && ((k !== 'background' && !PIC_KEY.test(k)) || x.side === state.side));
       if (!r) { box.style.display = 'none'; return; }
-      const ok = r.ppi >= PPI_IDEAL, low = r.ppi < PPI_MIN;
+      const ok = r.ppi >= PPI_IDEAL, low = r.ppi < (r.min || PPI_MIN);
       box.style.display = ''; box.className = 'note' + (low ? ' warn' : '');
       box.innerHTML = icon(ok ? 'check' : low ? 'alert' : 'info') + '<span>Print resolution: <b>' + Math.round(r.ppi) + ' ppi</b> at this size' + (ok ? ' (300 is ideal).' : low ? '. Aim for 300. ' + esc(r.tip) : ', under the 300 ppi ideal. ' + esc(r.tip)) + '</span>';
     });
@@ -2756,15 +2927,19 @@
 
   function renderLayers() {
     const host = $('#layers'); host.innerHTML = '';
-    if (isLayoutView()) { host.innerHTML = '<p class="inspector-empty">The print layout shows every panel as it prints. Click a panel (or Front / Back above the design) to edit it.</p>'; return; }
+    if (isLayoutView()) { ui.addMenu = false; host.innerHTML = '<p class="inspector-empty">The print layout shows every panel as it prints. Click a panel (or Front / Back above the design) to edit it.</p>'; return; }
     const P = curPanel();
+    host.appendChild(addElementControl());
     const rows = P.order.slice().reverse().concat(['background']);
     rows.forEach(key => {
       const isBg = key === 'background';
       const el = isBg ? null : P.els[key];
-      const label = isBg ? 'Background' : EL_INFO[key].label;
+      if (!isBg && !el) return;                                        // (an order entry without its layer: nothing to list)
+      const pic = isPic(el), info = isBg ? null : infoOf(key, el);
+      const label = isBg ? 'Background' : info.label;
       let meta = '';
       if (isBg) meta = P.bg.mode === 'two-tone' ? 'Two-tone' : P.bg.mode === 'image' ? 'Image' : 'Solid';
+      else if (pic) meta = ASSETS[el.src] ? n(picSize(el).w, 1) + ' mm' : 'No picture';
       else if (key === 'pop') meta = (ASSETS[el.src] && (ASSETS[el.src].short || ASSETS[el.src].name)) || 'No picture yet';
       else if (key === 'logo') meta = el.style === 'upload' ? 'Uploaded file' : fontOf(el.font).family + (el.italic ? ' italic' : '');
       else if (key === 'badge') meta = String(el.text || '').replace(/\n/g, ' ');
@@ -2779,12 +2954,163 @@
         eye.addEventListener('click', () => { el.visible = !el.visible; commit(); invalidate({ three: true, layers: true }); if (state.sel === key) buildInspector(); });
         row.appendChild(eye);
       }
-      const nm = h('button', { class: 'name', type: 'button' }, (isBg ? '' : icon(EL_INFO[key].icon, 'ico-sm')) + '<span>' + esc(label) + '</span>');
+      // an added picture shows itself in small, and an AI drawing says so
+      const mark = isBg ? '' : pic && ASSETS[el.src] ? '<img class="pic-th" src="' + esc(assetHref(el.src, 'blob')) + '" alt="">' : icon(info.icon, 'ico-sm');
+      const nm = h('button', { class: 'name', type: 'button' }, mark + '<span>' + esc(label) + '</span>' + (pic && el.ai ? AI_TAG : ''));
       nm.addEventListener('click', () => select(key));
       row.appendChild(nm);
       row.appendChild(h('span', { class: 'meta', title: meta, text: meta }));
       host.appendChild(row);
     });
+  }
+
+  /* ---- elements: pictures of your own, added as layers (pictureEl). Each change is one undo step, leaves the
+   * element selected and redraws the stage, the layers and the 3D pack. Built-in layers are never deleted. ---- */
+  // "Add element", at the top of the Layers list, with its small menu
+  function addElementControl() {
+    const wrap = h('div', { class: 'layer-add' });
+    const btn = h('button', { class: 'btn sm', type: 'button', id: 'add-el', 'aria-haspopup': 'menu', 'aria-expanded': ui.addMenu ? 'true' : 'false', title: 'Add a picture of your own to the ' + state.side + ' panel' }, icon('plus', 'ico-sm') + 'Add element');
+    btn.addEventListener('click', () => { ui.addMenu = !ui.addMenu; renderLayers(); const f = $(ui.addMenu ? '.add-menu button' : '#add-el'); if (f) f.focus(); });
+    wrap.appendChild(btn);
+    if (ui.addMenu) {
+      const menu = h('div', { class: 'add-menu', role: 'menu', 'aria-label': 'Add element' });
+      const item = (ic, text, fn) => { const b = h('button', { type: 'button', role: 'menuitem' }, icon(ic, 'ico-sm') + '<span>' + esc(text) + '</span>'); b.addEventListener('click', () => { closeAddMenu(); fn(); }); menu.appendChild(b); };
+      item('pop', 'The real pop photo', addRealPop);
+      item('upload', 'Upload a picture…', addUploadedPicture);
+      item('chip', 'Make with AI…', () => askAI('makeElement'));
+      wrap.appendChild(menu);
+    }
+    return wrap;
+  }
+  function closeAddMenu() {
+    if (!ui.addMenu) return;
+    ui.addMenu = false;
+    const mn = $('.add-menu'); if (mn) mn.remove();
+    const b = $('#add-el'); if (b) b.setAttribute('aria-expanded', 'false');
+  }
+  // the bundled photo of the real pop as an element of its own (the Pop layer keeps its own, untouched)
+  function addRealPop() {
+    const pop = state.model.panels.front.els.pop; const a = ASSETS[pop.src];
+    const key = addPicture(a && a.kind === 'pop' ? pop.src : 'pop-gold', { name: 'Pop photo' });
+    toast('The real pop photo was added to the ' + findPic(key).side + ' panel as an element');
+  }
+  // one hidden file field for "Upload a picture…" and "Replace picture…" (the Layers list and the Edit panel are
+  // rebuilt often, so the field lives outside them)
+  let picFile = null, picFileThen = null;
+  function pickPictureFile(then) {
+    if (!picFile) {
+      picFile = h('input', { type: 'file', id: 'pic-file', accept: 'image/png,image/jpeg,image/webp', hidden: true, tabindex: '-1', 'aria-hidden': 'true' });
+      picFile.addEventListener('change', async () => {
+        const file = picFile.files && picFile.files[0]; const cb = picFileThen; picFileThen = null;
+        if (!file || !cb) return;
+        try {
+          if (!/^image\/(png|jpeg|webp)$/i.test(file.type) && !/\.(png|jpe?g|webp)$/i.test(file.name)) throw new Error('please choose a PNG, JPG or WebP picture');
+          const id = await addUpload(file, 'element');
+          picFile.value = '';
+          cb(id);
+        } catch (e) { picFile.value = ''; toast('Could not read that picture: ' + (e.message || e), true); }
+      });
+      document.body.appendChild(picFile);
+    }
+    picFileThen = then; picFile.value = ''; picFile.click();
+  }
+  function addUploadedPicture() {
+    pickPictureFile(id => {
+      const key = addPicture(id, { name: ASSETS[id].name });
+      toast('Picture added to the ' + findPic(key).side + ' panel' + (ASSETS[id].opaque ? '. If it has a plain background, “Remove plain background” cuts it out.' : ''));
+    });
+  }
+  // "Make with AI…" and "Rework with AI…" belong to the AI panel (gpu.js), which is optional: without it they say so
+  function askAI(what, key) {
+    const g = window.MPStudio.gpu;
+    if (!g || typeof g[what] !== 'function') {
+      toast(g ? 'To ' + (what === 'rework' ? 'rework a picture' : 'make a picture') + ' with AI, open “AI on your GPU” in the top bar.' : 'AI pictures need the “AI on your GPU” panel, which is not loaded here. Everything else works as usual.', !g);
+      return;
+    }
+    try { g[what](key); } catch (e) { toast('The AI panel could not start: ' + (e && e.message || e), true); }
+  }
+  // the panel that holds a picture element: the given side, else the one being edited, then the other one
+  function findPic(key, side) {
+    const m = state.model; if (!m || typeof key !== 'string' || !PIC_KEY.test(key)) return null;
+    const sides = side === 'front' || side === 'back' ? [side] : [state.side, state.side === 'front' ? 'back' : 'front'];
+    for (const sd of sides) { const el = m.panels[sd].els[key]; if (isPic(el)) return { side: sd, P: m.panels[sd], el }; }
+    return null;
+  }
+  // after a change: one undo step; the element selected, on its own panel; everything redrawn. key null: a delete
+  function afterPicChange(side, key) {
+    commit();
+    if (key && (isLayoutView() || side !== state.side)) setView(side);
+    if (key) state.sel = key;
+    ui.hover = null;
+    buildInspector(); renderLayers(); invalidate({ three: true });
+  }
+  // o: { name, ai, side, w }. In the middle of the panel, about 40 % of its width (a tall picture: at most 60 %
+  // of its height), on top of the other layers
+  function addPicture(assetId, o) {
+    o = o || {};
+    const a = ASSETS[assetId]; if (!a) throw new Error('unknown picture');
+    const m = state.model; const side = o.side === 'front' || o.side === 'back' ? o.side : state.side; const P = m.panels[side];
+    let key; do { key = picKey(); } while (m.panels.front.els[key] || m.panels.back.els[key]);
+    const w = Number(o.w) > 0 ? Number(o.w) : Math.min(m.trim.w * 0.4, m.trim.h * 0.6 * a.w / a.h);
+    P.els[key] = pictureEl({ name: o.name || a.name, src: assetId, x: n(m.trim.w / 2, 2), y: n(m.trim.h / 2, 2), w: n(w, 1), ai: o.ai });
+    P.order.push(key);
+    afterPicChange(side, key);
+    return key;
+  }
+  // a copy that shows the same picture (the same asset: nothing is stored twice), 4 mm to the right and down, just
+  // above its source
+  function duplicatePicture(key, side) {
+    const f = findPic(key, side); if (!f) return null;
+    const m = state.model; let k2; do { k2 = picKey(); } while (m.panels.front.els[k2] || m.panels.back.els[k2]);
+    const c = pictureEl(f.el); c.x = n(c.x + 4, 2); c.y = n(c.y + 4, 2); c.name = (c.name.replace(/ copy$/, '') + ' copy').slice(0, 80);
+    f.P.els[k2] = c;
+    const i = f.P.order.indexOf(key); f.P.order.splice(i < 0 ? f.P.order.length : i + 1, 0, k2);
+    afterPicChange(f.side, k2);
+    return k2;
+  }
+  function deletePicture(key, side) {
+    const f = findPic(key, side); if (!f) return false;
+    delete f.P.els[key];
+    for (let i = f.P.order.length - 1; i >= 0; i--) if (f.P.order[i] === key) f.P.order.splice(i, 1);
+    afterPicChange(f.side, null);
+    return true;
+  }
+  // the Delete button and the Delete key
+  function removePicture(key, side) {
+    const f = findPic(key, side); if (!f) return;
+    const nm = infoOf(key, f.el).label;
+    if (deletePicture(key, f.side)) toast('Deleted “' + nm + '” · Ctrl+Z brings it back');
+  }
+  // another picture in the same element: the same centre, and the longer side keeps its printed length (the new
+  // picture may have another shape). meta: { name, ai }; ai undefined leaves the AI mark as it is, null clears it
+  function replacePicture(key, assetId, meta, side) {
+    const a = ASSETS[assetId]; if (!a) throw new Error('unknown picture');
+    const f = findPic(key, side); if (!f) return false;
+    meta = meta || {};
+    const el = f.el, g = picSize(el), long = Math.max(g.w, g.h);
+    el.w = n(clamp(a.w >= a.h ? long : long * a.w / a.h, PIC_MIN, PIC_MAX), 3); el.src = assetId;
+    if (meta.name) el.name = String(meta.name).slice(0, 80);
+    if (meta.ai !== undefined) el.ai = aiMark(meta.ai);
+    afterPicChange(f.side, key);
+    return true;
+  }
+  // "Remove plain background" for an added picture: the subject stays exactly where it is and as large as it is;
+  // only the backdrop and the empty margins go. Undo brings the original back.
+  async function cutOutElement(key, side) {
+    const f0 = findPic(key, side); const a = f0 && ASSETS[f0.el.src]; if (!a) return;
+    const from = f0.el.src;
+    const r = await cutOutPlainBackground(a.src);
+    if (!r.cut) { toast(r.note, true); return; }
+    const f = findPic(key, side);                                         // (the design may have changed meanwhile)
+    if (!f || f.el.src !== from) { toast('The element changed while its background was being removed, so nothing was replaced.', true); return; }
+    const id = uid('element'); const nm = a.name + ' (cut out)';
+    registerAsset({ id, src: r.dataURL, w: r.w, h: r.h, name: nm, short: nm.length > 18 ? nm.slice(0, 17) + '…' : nm, kind: 'element', opaque: false });
+    const el = f.el, k = picSize(el).w / r.fromW, rad = (Number(el.rotate) || 0) * Math.PI / 180;
+    const dx = (r.x0 + r.w / 2 - r.fromW / 2) * k, dy = (r.y0 + r.h / 2 - r.fromH / 2) * k;
+    el.x = n(el.x + dx * Math.cos(rad) - dy * Math.sin(rad), 3); el.y = n(el.y + dx * Math.sin(rad) + dy * Math.cos(rad), 3);
+    el.w = n(clamp(r.w * k, PIC_MIN, PIC_MAX), 3); el.src = id;
+    afterPicChange(f.side, key);
+    toast('Background removed. Check the edges on the design; Undo brings the original back.');
   }
 
   /* ---- Format: the item spec (MPItems) with the design's own edits, and the printer's dieline overlay ---- */
@@ -2898,6 +3224,7 @@
       else if (k === 'ingredients') { el.w = q(el.w * sx); el.size = q(el.size * s); el.headSize = q(el.headSize * s); }
       else if (k === 'claims') { el.size = q(el.size * s); el.size2 = q(el.size2 * s); }
       else if (k === 'warning') { el.w = q(el.w * sx); el.size = q(el.size * s); }
+      else if (isPic(el)) el.w = q(el.w * s);                             // an added picture: its centre moved above, its width follows
       else el.size = q(el.size * s);
     });
     P.bg.wave.y = q(P.bg.wave.y * sy); P.bg.wave.depth = q(P.bg.wave.depth * sy); P.bg.wave.tilt = q((P.bg.wave.tilt || 0) * sy);
@@ -3222,9 +3549,21 @@
       if (blanks.length) add({ side, draft: true, key: blanks[0].key, act: 'Fill in', text: (side === 'back' ? 'Back: f' : 'F') + 'ill in the blanks (___): ' + blanks.map(b => b.label).join(', ') + '.' });
     });
     if (F.els.badge.visible && badgeOverflow(F.els.badge)) add({ key: 'badge', text: 'The words do not fit inside the heart: make the heart wider or the text smaller.' });
+    // added pictures: one without its picture is an open item; AI drawings are named as such before anything is sent
+    let aiN = 0, aiAt = null;
+    ['front', 'back'].forEach(side => {
+      const P = m.panels[side];
+      P.order.forEach(k => {
+        const el = P.els[k]; if (!isPic(el) || !el.visible) return;
+        const nm = infoOf(k, el).label;
+        if (!ASSETS[el.src]) add({ side, draft: true, key: k, act: 'Replace', text: (side === 'back' ? 'Back: ' : '') + (state.lost.elements ? 'The picture of “' + nm + '” could not be restored. Replace it, delete the element, or open your saved design file (.json).' : '“' + nm + '” has no picture: replace it, or delete the element.') });
+        else if (el.ai) { aiN++; if (!aiAt) aiAt = { side, key: k }; }
+      });
+    });
+    if (aiN) add(Object.assign({ level: 'info', short: aiN + ' AI-drawn element' + (aiN > 1 ? 's' : ''), text: aiN > 1 ? aiN + ' AI-drawn elements: drawings, not product photos.' : '1 AI-drawn element: a drawing, not a product photo.' }, aiAt));
     rasterInfo(m).forEach(r => {
-      if (r.ppi < PPI_MIN) add({ side: r.side || 'front', key: r.key, text: r.label + ' is ' + Math.round(r.ppi) + ' ppi at print size (aim for 300). ' + r.tip });
-      else if (r.ppi < PPI_IDEAL) add({ level: 'info', side: r.side || 'front', key: r.key, short: r.label.replace(/^The /, '') + ' ' + Math.round(r.ppi) + ' ppi', text: r.label + ' is ' + Math.round(r.ppi) + ' ppi at print size: printable, but under the 300 ppi ideal. ' + r.tip });
+      if (r.ppi < (r.min || PPI_MIN)) add({ side: r.side || 'front', key: r.key, text: r.label + ' is ' + Math.round(r.ppi) + ' ppi at print size (aim for 300). ' + r.tip });
+      else if (r.ppi < PPI_IDEAL && !r.min) add({ level: 'info', side: r.side || 'front', key: r.key, short: r.label.replace(/^The /, '') + ' ' + Math.round(r.ppi) + ' ppi', text: r.label + ' is ' + Math.round(r.ppi) + ' ppi at print size: printable, but under the 300 ppi ideal. ' + r.tip });
     });
     const nw = F.els.netWeight;
     if (nw.visible && netWeightText(nw).trim()) {
@@ -3246,7 +3585,7 @@
     if (under.length) {
       const blocks = BLOCK_KEYS.some(k => under.includes(EL_INFO[k].label));
       const how = blocks ? 'Tick “Keep clear of the fin seal”' + (under.length > BLOCK_KEYS.filter(k => under.includes(EL_INFO[k].label)).length ? ' (and move the other lines clear of the hatched band)' : '') : 'Move ' + (under.length > 1 ? 'them' : 'it') + ' clear of the hatched band';
-      add({ level: 'info', side: 'back', key: m.panels.back.order.find(k => under.includes(EL_INFO[k].label)) || 'facts', short: 'Type under the fin seal', text: 'Fin seal: ' + under.join(', ') + ' run' + (under.length > 1 ? '' : 's') + ' where the fin can lie (its seam runs down the middle of the back). ' + how + ', or, once the converter confirms which way the fin is laid, set it under Format.' });
+      add({ level: 'info', side: 'back', key: m.panels.back.order.find(k => EL_INFO[k] && under.includes(EL_INFO[k].label)) || 'facts', short: 'Type under the fin seal', text: 'Fin seal: ' + under.join(', ') + ' run' + (under.length > 1 ? '' : 's') + ' where the fin can lie (its seam runs down the middle of the back). ' + how + ', or, once the converter confirms which way the fin is laid, set it under Format.' });
     }
     return out;
   }
@@ -3396,7 +3735,7 @@
     const d = await imageSize(src);
     const id = uid(kind);
     const nm = file.name.replace(/\.[a-z0-9]+$/i, '');
-    const opaque = kind === 'pop' ? await edgeOpaque(src) : false;
+    const opaque = kind === 'pop' || kind === 'element' ? await edgeOpaque(src) : false;
     registerAsset({ id, src, w: d.w, h: d.h, name: nm, short: nm.length > 18 ? nm.slice(0, 17) + '…' : nm, kind, opaque });
     return id;
   }
@@ -3414,10 +3753,147 @@
       return solid / tot > 0.9;
     } catch (e) { return false; }
   }
-  async function removePlainBackground(id) {
-    const a = ASSETS[id]; const im = await loadImage(a.src);
+  // The remover itself: a picture (any data URL) in, its cut-out out: { dataURL, w, h } plus where the cut-out sat
+  // in the picture (x0, y0, of fromW x fromH pixels). When it leaves the picture alone it throws an Error whose
+  // `why` names the case (the keys of CUT_WHY); the callers word it for a pop photo or for any picture.
+  const CUT_WHY = {
+    large: ['That photo is very large; please use one under 24 megapixels.', 'This picture is very large (over 24 megapixels), so its background was left alone.'],
+    edges: ['The photo edges are not one plain colour, so the background was left alone.', 'The edges of this picture are not one plain colour, so its background was left alone.'],
+    none: ['No plain background found around the pop.', 'No plain background was found around the subject, so the picture was left as it is.'],
+    empty: ['That photo is one plain colour: no pop was found in it.', 'The whole picture is one plain colour: there is nothing to cut out.'],
+  };
+  const cutErr = why => Object.assign(new Error(CUT_WHY[why][1]), { why });
+  // The cut-out for a strong flat key colour K (an AI element drawn on green, blue or magenta), by hue rather than by
+  // distance. d: the opaque RGBA pixels, B: K from the border. Returns new RGBA pixels, or null when K is white, grey,
+  // pale or dark (those keep the remover below). Tuned on the real pictures in .studio-qa/elements/fixtures.
+  //  (b) Pixels within a small angle of K (as RGB vectors) at about K's brightness are backdrop: everything joined to
+  //      the edges, and every closed-in piece of 8 px or more (a donut's hole, the gaps between a leaf's fronds).
+  //  (c) From there it grows into K's hue made darker: a shadow or halo on a flat colour (under 14°, not brighter than
+  //      K by more than 12%, not near black). A different colour is further off: leaf green is ~25° from key green.
+  //  (d) Along the edge, the backdrop is un-mixed out of the first two pixels (a soft edge), and in a 3 px band the
+  //      key's hue is taken down to the least key-like colour of the object close by (no coloured rim, the inside
+  //      keeps its colour). Thin key-hued leftovers inside (hairline gaps) are treated as edge too.
+  //  (e) Further in, a run of pixels that are a mix of K and the object's colour beside them is un-mixed; a detail of
+  //      its own colour (a green sprinkle on pink icing) is not such a mix and is left alone.
+  const KEY = { minSat: 0.45, aTight: [4, 7], rTight: [0.7, 1.25], aHole: 8, holeMin: 8, aShadow: 14, rShadowMax: 1.12, darkMin: 0.16,
+    aSliver: 16, aSliverGrow: 22, sliverSteps: 3, band: 3, mixAngle: 34, mixRadius: 4, mixResidual: 20 };
+  function keyedMatte(d, W, H, B) {
+    const O = KEY, N = W * H, BL = Math.hypot(B[0], B[1], B[2]), mx = Math.max(B[0], B[1], B[2]), mn = Math.min(B[0], B[1], B[2]);
+    if (mx < 70 || (mx - mn) / mx < O.minSat) return null;
+    const ang = new Float32Array(N), rat = new Float32Array(N);                  // angle to K (degrees), brightness / K's
+    for (let p = 0, i = 0; p < N; p++, i += 4) {
+      const L = Math.hypot(d[i], d[i + 1], d[i + 2]) || 1e-6;
+      ang[p] = Math.acos(Math.min(1, (d[i] * B[0] + d[i + 1] * B[1] + d[i + 2] * B[2]) / (L * BL))) * 57.29578; rat[p] = L / BL;
+    }
+    const step4 = (p, go) => { const x = p % W; if (x > 0) go(p - 1); if (x < W - 1) go(p + 1); if (p >= W) go(p - W); if (p < N - W) go(p + W); };
+    // the backdrop's own spread along the border sets the tight angle (4° to 7°)
+    const bs = []; for (let x = 0; x < W; x += 2) bs.push(ang[x], ang[(H - 1) * W + x]); for (let y = 0; y < H; y += 2) bs.push(ang[y * W], ang[y * W + W - 1]);
+    bs.sort((a, b) => a - b);
+    const aT = clamp(bs[Math.floor(bs.length * 0.99)] * 2 + 1.5, O.aTight[0], O.aTight[1]);
+    const tight = new Uint8Array(N);                                             // 2: within aT, 1: within aHole
+    for (let p = 0; p < N; p++) if (rat[p] > O.rTight[0] && rat[p] < O.rTight[1]) tight[p] = ang[p] < aT ? 2 : ang[p] < O.aHole ? 1 : 0;
+    // (b) backdrop: tight pieces joined to the edges, and closed-in pieces of at least holeMin pixels
+    const bg = new Uint8Array(N), seen = new Uint8Array(N), q = new Int32Array(N);
+    for (let p0 = 0; p0 < N; p0++) {
+      if (!tight[p0] || seen[p0]) continue;
+      let h = 0, t = 0, edge = false; seen[p0] = 1; q[t++] = p0;
+      while (h < t) {
+        const p = q[h++], x = p % W; if (x === 0 || x === W - 1 || p < W || p >= N - W) edge = true;
+        step4(p, r => { if (tight[r] && !seen[r]) { seen[r] = 1; q[t++] = r; } });
+      }
+      if (edge) { for (let k = 0; k < t; k++) if (tight[q[k]] === 2) bg[q[k]] = 1; }
+      else if (t >= O.holeMin) for (let k = 0; k < t; k++) bg[q[k]] = 1;
+    }
+    // (c) shadows and halos: grow from the backdrop into K's hue, darker
+    { let h = 0, t = 0; for (let p = 0; p < N; p++) if (bg[p]) q[t++] = p;
+      const go = r => { if (!bg[r] && ang[r] < O.aShadow && rat[r] < O.rShadowMax && rat[r] > O.darkMin) { bg[r] = 1; q[t++] = r; } };
+      while (h < t) step4(q[h++], go); }
+    // leftovers of K's hue inside (hairline gaps): seeds under aSliver, grown up to sliverSteps px under aSliverGrow
+    const keyish = (p, a) => ang[p] < a && rat[p] > O.darkMin && rat[p] < O.rTight[1];
+    const sl = new Uint8Array(N);
+    { let h = 0, t = 0; for (let p = 0; p < N; p++) if (bg[p] || keyish(p, O.aSliver)) { sl[p] = 1; q[t++] = p; }
+      while (h < t) { const p = q[h++], ns = sl[p] + 1; if (ns > O.sliverSteps + 1) continue;
+        step4(p, r => { if (!sl[r] && !bg[r] && keyish(r, O.aSliverGrow)) { sl[r] = ns; q[t++] = r; } }); } }
+    // distance in 4-steps from the backdrop (0) or a leftover (1), up to band + 3
+    const DMAX = O.band + 3, dist = new Uint8Array(N).fill(255);
+    { let h = 0, t = 0; for (let p = 0; p < N; p++) if (bg[p]) { dist[p] = 0; q[t++] = p; } else if (sl[p]) { dist[p] = 1; q[t++] = p; }
+      while (h < t) { const p = q[h++], nd = dist[p] + 1; if (nd > DMAX) continue; step4(p, r => { if (dist[r] > nd) { dist[r] = nd; q[t++] = r; } }); } }
+    const out = new Uint8ClampedArray(d);
+    for (let p = 0; p < N; p++) if (bg[p]) out[p * 4 + 3] = 0;
+    // K's hue as a direction around grey; spill = how much of it a colour has
+    const bm = (B[0] + B[1] + B[2]) / 3, u = [B[0] - bm, B[1] - bm, B[2] - bm], ul = Math.hypot(u[0], u[1], u[2]); u[0] /= ul; u[1] /= ul; u[2] /= ul;
+    const spill = (r, g, b) => { const m = (r + g + b) / 3; return (r - m) * u[0] + (g - m) * u[1] + (b - m) * u[2]; };
+    // (d) the edge band
+    const R = 5;
+    for (let p = 0, i = 0; p < N; p++, i += 4) {
+      const dp = dist[p]; if (dp === 0 || dp > O.band) continue;
+      const x = p % W, y = (p / W) | 0;
+      let lr = 0, lg = 0, lb = 0, ln = 0, fr = 0, fg = 0, fb = 0, fn = 0, smin = 1e9;   // backdrop close by; the object further in
+      for (let yy = Math.max(0, y - R); yy <= Math.min(H - 1, y + R); yy++) for (let xx = Math.max(0, x - R); xx <= Math.min(W - 1, x + R); xx++) {
+        const r = yy * W + xx, j = r * 4;
+        if (dist[r] === 0) { if (Math.abs(xx - x) <= 2 && Math.abs(yy - y) <= 2) { lr += d[j]; lg += d[j + 1]; lb += d[j + 2]; ln++; } }
+        else if (dist[r] > O.band) { fr += d[j]; fg += d[j + 1]; fb += d[j + 2]; fn++; const sv = spill(d[j], d[j + 1], d[j + 2]); if (sv < smin) smin = sv; }
+      }
+      let r = d[i], g = d[i + 1], b = d[i + 2], al = 1;
+      if (dp <= 2 && fn) {                                                         // soft edge: how far from the backdrop to the object
+        const F = [fr / fn, fg / fn, fb / fn], L = ln ? [lr / ln, lg / ln, lb / ln] : B;
+        const v = [F[0] - L[0], F[1] - L[1], F[2] - L[2]], den = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+        if (den > 1600) {
+          al = clamp((((r - L[0]) * v[0] + (g - L[1]) * v[1] + (b - L[2]) * v[2]) / den - 0.08) / 0.75, 0, 1); al = al * al * (3 - 2 * al);
+          if (dp === 2) al = Math.max(al, 0.5);
+          if (al > 0 && al < 1) { r = (r - (1 - al) * L[0]) / al; g = (g - (1 - al) * L[1]) / al; b = (b - (1 - al) * L[2]) / al; }
+        }
+      }
+      // no more of K's hue than the least key-like colour of the object close by; un-mixing never overshoots below it
+      const lim = fn ? Math.max(0, smin) : 0, s = spill(r, g, b);
+      if (s > lim) { const k = s - lim; r -= k * u[0]; g -= k * u[1]; b -= k * u[2]; }
+      else if (al < 1 && fn && s < smin) { const k = s - smin; r -= k * u[0]; g -= k * u[1]; b -= k * u[2]; }
+      out[i] = r; out[i + 1] = g; out[i + 2] = b; out[i + 3] = Math.round(al * 255);
+    }
+    // (e) mixes of K and the object further in: F is the least key-like pixel in a 9 x 9 square (two passes)
+    const sp = new Float32Array(N), ix = new Int32Array(N), iy = new Int32Array(N), mixA = new Float32Array(N), mixF = new Int32Array(N), MR = O.mixRadius;
+    for (let p = 0, i = 0; p < N; p++, i += 4) sp[p] = bg[p] ? 1e9 : spill(d[i], d[i + 1], d[i + 2]);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let bi = y * W + x; for (let xx = Math.max(0, x - MR); xx <= Math.min(W - 1, x + MR); xx++) if (sp[y * W + xx] < sp[bi]) bi = y * W + xx; ix[y * W + x] = bi;
+    }
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let bi = ix[y * W + x]; for (let yy = Math.max(0, y - MR); yy <= Math.min(H - 1, y + MR); yy++) { const c = ix[yy * W + x]; if (sp[c] < sp[bi]) bi = c; } iy[y * W + x] = bi;
+    }
+    for (let p = 0, i = 0; p < N; p++, i += 4) {
+      if (bg[p] || dist[p] <= O.band || ang[p] >= O.mixAngle || rat[p] <= O.darkMin) continue;
+      const fi = iy[p], j = fi * 4; if (sp[p] < Math.max(0, sp[fi]) + 8) continue;
+      const v = [d[j] - B[0], d[j + 1] - B[1], d[j + 2] - B[2]], den = v[0] * v[0] + v[1] * v[1] + v[2] * v[2]; if (den < 3600) continue;
+      const a = ((d[i] - B[0]) * v[0] + (d[i + 1] - B[1]) * v[1] + (d[i + 2] - B[2]) * v[2]) / den;
+      if (a <= 0 || a >= 1 || Math.hypot(B[0] + a * v[0] - d[i], B[1] + a * v[1] - d[i + 1], B[2] + a * v[2] - d[i + 2]) > O.mixResidual) continue;
+      mixA[p] = a; mixF[p] = fi + 1;
+    }
+    for (let p = 0; p < N; p++) {                    // only a run of them, or one touching the edge band (not a lone pixel)
+      if (!mixF[p]) continue; const x = p % W; let ok = false;
+      for (let dy = -1; dy <= 1 && !ok; dy++) for (let dx = -1; dx <= 1 && !ok; dx++) {
+        const r = p + dy * W + dx; if ((!dx && !dy) || x + dx < 0 || x + dx >= W || r < 0 || r >= N) continue;
+        if (mixF[r] || dist[r] <= O.band) ok = true;
+      }
+      if (!ok) continue;
+      const i = p * 4, j = (mixF[p] - 1) * 4;
+      let al = clamp((mixA[p] - 0.08) / 0.75, 0, 1); al = al * al * (3 - 2 * al);
+      out[i] = d[j]; out[i + 1] = d[j + 1]; out[i + 2] = d[j + 2]; out[i + 3] = Math.round(al * 255);
+    }
+    // specks: small loose pieces left in the backdrop go (the subject is the one big piece)
+    const lab = new Int32Array(N), sizes = [];
+    for (let p0 = 0; p0 < N; p0++) {
+      if (lab[p0] || out[p0 * 4 + 3] <= 8) continue; const id = sizes.length + 1; let h = 0, t = 0; lab[p0] = id; q[t++] = p0;
+      while (h < t) step4(q[h++], r => { if (!lab[r] && out[r * 4 + 3] > 8) { lab[r] = id; q[t++] = r; } });
+      sizes.push(t);
+    }
+    let main = 0; sizes.forEach(s => { if (s > main) main = s; });
+    const speck = Math.max(16, Math.min(400, main * 0.0005));
+    for (let p = 0; p < N; p++) if (lab[p] && sizes[lab[p] - 1] < main && sizes[lab[p] - 1] <= speck) out[p * 4 + 3] = 0;
+    return out;
+  }
+  async function cutOutPicture(picture, lenient) {
+    const im = await loadImage(picture);
     const W = im.naturalWidth, H = im.naturalHeight;
-    if (W * H > 24e6) throw new Error('That photo is very large; please use one under 24 megapixels.');
+    if (W * H > 24e6) throw cutErr('large');
     const c = document.createElement('canvas'); c.width = W; c.height = H; const ctx = c.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(im, 0, 0); const img = ctx.getImageData(0, 0, W, H); const d = img.data;
     // background colour = the most common (quantised) border colour
@@ -3431,7 +3907,26 @@
     for (let y = 0; y < H; y++) { scan(y * W * 4); scan((y * W + W - 1) * 4); }
     const B = [sr / sn, sg / sn, sb / sn];
     const border = 2 * (W + H);
-    if (best / border < 0.35) throw new Error('The photo edges are not one plain colour, so the background was left alone.');
+    if (lenient) {
+      // not a photo of the pop (an AI drawing on a flat colour, any upload): a flat backdrop with a little noise can
+      // fall on both sides of the colour steps counted above, so every border pixel close to that colour counts,
+      // and the backdrop colour is their mean
+      let nr = 0, ng = 0, nb = 0, nn = 0;
+      const near = i => { if ((d[i] - B[0]) ** 2 + (d[i + 1] - B[1]) ** 2 + (d[i + 2] - B[2]) ** 2 <= 256) { nr += d[i]; ng += d[i + 1]; nb += d[i + 2]; nn++; } };
+      for (let x = 0; x < W; x++) { near(x * 4); near(((H - 1) * W + x) * 4); }
+      for (let y = 0; y < H; y++) { near(y * W * 4); near((y * W + W - 1) * 4); }
+      if (nn > best) { best = nn; B[0] = nr / nn; B[1] = ng / nn; B[2] = nb / nn; }
+    }
+    if (best / border < 0.35) throw cutErr('edges');
+    // a strong flat colour (an AI drawing's green, blue or magenta key): cut by hue, so shadows, closed-in gaps and
+    // hairline leaks go too (keyedMatte). White, grey and pale backdrops, and the pop's own photos, go on below.
+    const keyed = lenient && W * H <= 6e6 ? keyedMatte(d, W, H, B) : null;
+    if (keyed) {
+      let gone = 0; for (let i = 3; i < keyed.length; i += 4) if (keyed[i] === 0) gone++;
+      if (gone < W * H * 0.05) throw cutErr('none');
+      d.set(keyed); ctx.putImageData(img, 0, 0);
+      return cropToSubject(c, d, W, H);
+    }
     // spread of the background (noise) sets the tolerance: very tight for a flat studio background,
     // so pale parts of the product (a white stick) are never mistaken for background
     let vs = 0, vn = 0;
@@ -3480,7 +3975,7 @@
     }
     let removed = 0;
     for (let p = 0; p < N; p++) if (bg[p]) removed++;
-    if (removed < N * 0.05) throw new Error('No plain background found around the pop.');
+    if (removed < N * 0.05) throw cutErr('none');
     // ---- JPEG fringe. A flat-backdrop JPEG leaves blotches of almost-backdrop colour along the pop's edge
     // (compression ringing, up to ~8 px). They are pale (close to the backdrop colour), thin and attached to
     // the cleared backdrop. A pale part of the pop itself (a white stick on a white sweep) is pale too, but
@@ -3587,17 +4082,37 @@
     if (drop.some(Boolean)) for (let p = 0; p < N; p++) if (lab[p] && drop[lab[p] - 1]) out[p * 4 + 3] = 0;
     d.set(out);
     ctx.putImageData(img, 0, 0);
-    // crop away the now-empty margins (the pop itself is untouched; only empty space goes)
+    return cropToSubject(c, d, W, H);
+  }
+  // crop away the now-empty margins of a cut-out canvas (the subject itself is untouched; only empty space goes)
+  function cropToSubject(c, d, W, H) {
     let x0 = W, y0 = H, x1 = -1, y1 = -1;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[(y * W + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 < 0) throw cutErr('empty');                                     // (nothing but backdrop)
     const pad = 6; x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(W - 1, x1 + pad); y1 = Math.min(H - 1, y1 + pad);
     const cw = x1 - x0 + 1, chh = y1 - y0 + 1;
     const c2 = document.createElement('canvas'); c2.width = cw; c2.height = chh;
     c2.getContext('2d').drawImage(c, x0, y0, cw, chh, 0, 0, cw, chh);
-    const src = c2.toDataURL('image/png');
+    return { dataURL: c2.toDataURL('image/png'), w: cw, h: chh, x0, y0, fromW: W, fromH: H };
+  }
+  // the pop's own button: the cut-out becomes a new picture of the same kind (the original stays, so Undo works)
+  async function removePlainBackground(id) {
+    const a = ASSETS[id]; let r;
+    try { r = await cutOutPicture(a.src); } catch (e) { throw e && e.why ? new Error(CUT_WHY[e.why][0]) : e; }
     const nid = uid(a.kind || 'pop');
-    registerAsset({ id: nid, src, w: cw, h: chh, name: a.name + ' (cut out)', short: (a.short || a.name).slice(0, 12) + ' · cut', kind: a.kind || 'pop', opaque: false });
+    registerAsset({ id: nid, src: r.dataURL, w: r.w, h: r.h, name: a.name + ' (cut out)', short: (a.short || a.name).slice(0, 12) + ' · cut', kind: a.kind || 'pop', opaque: false });
     return nid;
+  }
+  // The same remover for any picture (an added element's, or one the AI panel hands over). It never throws: the
+  // answer is the cut-out ({ cut: true }), or the picture as it came with the reason in plain words.
+  async function cutOutPlainBackground(dataURL) {
+    const src = String(dataURL || ''); let pw = 0, ph = 0;
+    const kept = note => ({ dataURL: src, w: pw, h: ph, cut: false, note });
+    if (!/^data:image\/(png|jpeg|webp);base64,/i.test(src)) return kept('That is not a PNG, JPG or WebP picture.');
+    try { const im = await loadImage(src); pw = im.naturalWidth; ph = im.naturalHeight; } catch (e) { return kept('The picture could not be read.'); }
+    if (!(await edgeOpaque(src))) return kept('This picture already has a see-through background, so nothing was removed.');
+    try { const r = await cutOutPicture(src, true); return { dataURL: r.dataURL, w: r.w, h: r.h, cut: true, note: '', x0: r.x0, y0: r.y0, fromW: r.fromW, fromH: r.fromH }; }
+    catch (e) { return kept(e && e.why ? e.message : 'The background could not be removed (' + (e && e.message || e) + ').'); }
   }
 
   /* =========================================================================================
@@ -3800,6 +4315,7 @@
     s.addEventListener('pointerleave', () => { if (!drag && ui.hover) { ui.hover = null; drawSelection(); } });
     s.addEventListener('dblclick', e => {
       const t = e.target.closest && e.target.closest('[data-el]'); if (!t) return;
+      if (isPic(curPanel().els[t.getAttribute('data-el')])) return;        // (a picture has no words to edit: the Delete key must stay its own)
       const ta = $('#inspector textarea, #inspector input[type=text]'); if (ta) { ta.focus(); ta.select && ta.select(); }
     });
     $('#stage-wrap').addEventListener('wheel', e => {
@@ -3808,11 +4324,17 @@
     }, { passive: false });
     $('#modal-bg').addEventListener('click', e => { if (e.target.id === 'modal-bg' || (e.target.closest && e.target.closest('[data-close]'))) closeModal(); });
     $('#statusbar').addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-focus]'); if (b) focusEl(b.getAttribute('data-focus'), b.getAttribute('data-side')); });
+    document.addEventListener('pointerdown', e => { if (ui.addMenu && !(e.target.closest && e.target.closest('.layer-add'))) closeAddMenu(); });   // the Add element menu closes on a click elsewhere
     document.addEventListener('keydown', e => {
       const tag = (e.target && e.target.tagName) || '';
       const typing = /INPUT|TEXTAREA|SELECT/.test(tag) || (e.target && e.target.isContentEditable);
       const mod = e.ctrlKey || e.metaKey;
-      if (e.key === 'Escape') { if ($('#modal-bg').classList.contains('on')) closeModal(); else if (!typing) select(null); return; }
+      if (e.key === 'Escape') {
+        if ($('#modal-bg').classList.contains('on')) closeModal();
+        else if (ui.addMenu) { closeAddMenu(); const b = $('#add-el'); if (b) b.focus(); }
+        else if (!typing) select(null);
+        return;
+      }
       if (mod && (e.key === 's' || e.key === 'S')) { e.preventDefault(); saveDesignFile(); return; }
       if (typing) return;
       if (mod && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
@@ -3820,6 +4342,15 @@
       if (e.altKey) return;   // Alt+arrows belong to the browser (back / forward)
       // arrow keys on the 3D view turn the pack there; they must never move anything in the print artwork
       if (e.defaultPrevented || (e.target && e.target.closest && e.target.closest('#mock-view'))) return;
+      // an added element: Delete / Backspace take it out, Ctrl+D duplicates it. Never with a dialog open or from
+      // inside the AI panel, and never a built-in layer (those are hidden with the eye, not deleted).
+      const del = !mod && (e.key === 'Delete' || e.key === 'Backspace'), dup = mod && !e.shiftKey && (e.key === 'd' || e.key === 'D');
+      if (del || dup) {
+        if ($('#modal-bg').classList.contains('on') || (e.target && e.target.closest && e.target.closest('#gpu-drawer')) || isLayoutView() || !state.sel) return;
+        if (isPic(curPanel().els[state.sel])) { e.preventDefault(); if (e.repeat) return; if (del) removePicture(state.sel, state.side); else duplicatePicture(state.sel, state.side); }
+        else if (del && !e.repeat && state.sel !== 'background') toast('Built-in layers stay in the design: hide one with the eye in Layers.');
+        return;
+      }
       const step = e.shiftKey ? 5 : 0.5;
       const dirs = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
       if (dirs[e.key] && state.sel) { e.preventDefault(); nudge(dirs[e.key][0], dirs[e.key][1]); }
@@ -3858,7 +4389,7 @@
     await nextFrame();
     layoutAndRender();
     init3D();
-    const lostN = Object.keys(state.lost).filter(k => state.lost[k]).length;
+    const lostN = Object.keys(state.lost).reduce((s, k) => s + (Number(state.lost[k]) || 0), 0);   // (elements: how many)
     if (restored && lostN) toast('Your last design was restored, but ' + (lostN > 1 ? lostN + ' pictures' : 'a picture') + ' could not be. See the note above the design.', true);
     else if (restored) toast('Welcome back: your last design was restored');
     window.MPStudio.ready = true;
@@ -3892,17 +4423,22 @@
     export3D, update3D: () => update3D(true),
     ensureFonts: () => ensureFonts(state.model, 8000),
     set: (path, v) => { setP(path, v); commit(); afterModelReplaced(false); },
-    geom: (key, side) => { const v = panelView(state.model, side || state.side); const el = v.els[key]; if (!el) return null; const g = key === 'logo' ? logoGeometry(el) : textGeometry(el, elText(key, el)); return { cap: g.cap, fs: g.fs, lh: g.lh, lines: g.lines.map(l => ({ t: l.t, x1: l.x1, x2: l.x2, base: l.base })) }; },
+    geom: (key, side) => { const v = panelView(state.model, side || state.side); const el = v.els[key]; if (!el || isPic(el)) return null; const g = key === 'logo' ? logoGeometry(el) : textGeometry(el, elText(key, el)); return { cap: g.cap, fs: g.fs, lh: g.lh, lines: g.lines.map(l => ({ t: l.t, x1: l.x1, x2: l.x2, base: l.base })) }; },
     compare: (on, mode) => { ui.compare = !!on; if (mode) ui.compareMode = mode; syncToggles(); layoutAndRender(); },
     // for gpu.js (AI on your GPU): the studio's icons and toasts, one more picture, and AI background art set
     // behind a panel. Only the background changes: the logo, every word and the real pop stay on top, as they are.
     icon, toast,
-    addImageAsset: async (o) => {
-      const src = String((o && o.src) || '');
+    // (dataURL, { name, kind }) or ({ src, name, kind }) -> the new picture's id. kind 'element': a picture for an
+    // added element (its `opaque` says whether it still has a solid backdrop). A picture that comes in this way is
+    // never of kind 'pop': only the bundled photos and the user's own uploads are offered as the real pop.
+    addImageAsset: async (a, b) => {
+      const o = isObj(a) ? a : Object.assign({}, isObj(b) ? b : {}, { src: a });
+      const src = String(o.src || '');
       if (!/^data:image\/(png|jpeg|webp);base64,/i.test(src)) throw new Error('not a PNG, JPG or WebP picture');
-      const d = await imageSize(src); const kind = (o && o.kind) || 'image'; const nm = String((o && o.name) || 'Picture');
+      const d = await imageSize(src); const nm = String(o.name || 'Picture');
+      const kind = String(o.kind || 'image').replace(/[^a-z0-9]/gi, '').replace(/^pop$/i, '') || 'image';
       const id = uid(kind);
-      registerAsset({ id, src, w: d.w, h: d.h, name: nm, short: nm.length > 18 ? nm.slice(0, 17) + '…' : nm, kind, opaque: false });
+      registerAsset({ id, src, w: d.w, h: d.h, name: nm, short: nm.length > 18 ? nm.slice(0, 17) + '…' : nm, kind, opaque: kind === 'element' ? await edgeOpaque(src) : false });
       return id;
     },
     useBackgroundImage: (id, side) => {
@@ -3915,6 +4451,27 @@
       invalidate({ three: true, layers: true });
       return sd;
     },
+    // Elements (pictures of your own, added as layers), for gpu.js too. Each call that changes the design is one
+    // undo step, leaves the element selected (on its own panel) and redraws the stage, the layers and the 3D pack.
+    // `side` is optional everywhere: without it, the panel being edited is looked at first, then the other one.
+    get sel() { return state.sel; },                                      // the selected layer's key, or null
+    elements: side => {                                                    // the picture elements, top layer first
+      const out = [];
+      (side === 'front' || side === 'back' ? [side] : ['front', 'back']).forEach(sd => {
+        const P = state.model.panels[sd];
+        P.order.slice().reverse().forEach(k => { const el = P.els[k]; if (isPic(el)) out.push({ key: k, side: sd, name: infoOf(k, el).label, ai: el.ai ? clone(el.ai) : null, src: el.src }); });
+      });
+      return out;
+    },
+    addElement: (assetId, o) => addPicture(assetId, o),                    // o: { name, ai, side, w } -> the new key
+    elementPicture: (key, side) => {                                       // the element's own pixels, or null
+      const f = findPic(key, side); const a = f && ASSETS[f.el.src];
+      return a ? { dataURL: a.src, w: a.w, h: a.h, name: infoOf(key, f.el).label, ai: f.el.ai ? clone(f.el.ai) : null, side: f.side } : null;
+    },
+    replaceElementPicture: (key, assetId, meta, side) => replacePicture(key, assetId, meta, side),   // true, or false if it is gone
+    duplicateElement: (key, side) => duplicatePicture(key, side),          // the copy's key, or null
+    deleteElement: (key, side) => deletePicture(key, side),                // true, or false if it was not there
+    cutOutPlainBackground,                                                 // (dataURL) -> Promise of { dataURL, w, h, cut, note }
   };
   boot().catch(e => {
     console.error('[label-studio] could not start:', e);
