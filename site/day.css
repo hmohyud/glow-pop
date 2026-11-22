@@ -84,6 +84,7 @@
 .day__hud { display: none; }
 
 @media (min-width: 700px) {
+  .day__intro { max-width: 820px; }   /* (the heading starts at the postcards' edge) */
   .pc { max-width: 820px; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); padding: 12px; }
   .pc__front { min-height: 320px; }
   .pc__time { left: 14px; bottom: 14px; }
@@ -102,7 +103,7 @@
 .is-pinned .day__layer--haze  { opacity: calc(.7 * clamp(0, 1 - max((var(--p, 0) - .5) / .17, (.5 - var(--p, 0)) / .17), 1)); }
 .is-pinned .day__layer--dusk  { opacity: calc(.92 * clamp(0, 1 - max((var(--p, 0) - .835) / .17, (.835 - var(--p, 0)) / .17), 1)); }
 /* the sun crosses on an arc and is gone by night; the moon comes up as it goes */
-.is-pinned .day__sun { left: calc(10% + var(--p, 0) * 86%); top: 26%; top: calc(74% - sin(var(--p, 0) * 150deg + 12deg) * 56%); opacity: clamp(0, calc((.8 - var(--p, 0)) * 7), 1); }
+.is-pinned .day__sun { left: calc(10% + var(--p, 0) * 86%); top: 26%; top: calc(87% - sin(var(--p, 0) * 225deg) * 69%); opacity: clamp(0, calc((.84 - var(--p, 0)) * 25), 1); }   /* up out of the sea, and back into it by 19:10 */
 .is-pinned .day__moon { opacity: clamp(0, calc((var(--p, 0) - .78) * 6), 1); translate: 0 calc((1 - clamp(0, (var(--p, 0) - .78) * 6, 1)) * 40px); }
 
 .is-pinned .day__track {
@@ -119,7 +120,7 @@
 .is-pinned .pc__front { min-height: min(46vh, 380px); }
 
 .is-pinned .day__hud {
-  position: absolute; z-index: 2; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 18px; width: min(680px, calc(100% - 2 * var(--gutter))); padding: 10px 22px 10px 20px;
+  position: absolute; z-index: 2; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 18px; width: min(680px, calc(100% - 2 * max(var(--gutter), 196px))); padding: 10px 22px 10px 20px;   /* (clear of the Design archive pill at the lower left on a narrow window) */
   translate: -50% 0; border-radius: var(--r-pill); background: rgba(255, 253, 248, .86); -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .7) inset, 0 12px 26px -16px rgba(74, 13, 46, .5); color: var(--ink);
 }
@@ -131,3 +132,16 @@
 
 @media (forced-colors: active) { .pc { border: 1px solid CanvasText; } .pc__time { border: 1px solid CanvasText; } }
 @media print { .day__sky, .day__hud, .day__cue { display: none !important; } }
+
+.day.is-pinned { scroll-margin-top: calc(-1 * (var(--nav-h) + 12px)); }   /* the header's Ritual link lands with the frame filling the window */
+.day__intro { --em: var(--accent-display); }   /* the title's italic words over the sky: the deeper display pink, as .sugar and .menu */
+@media print {
+  .day.is-pinned { height: auto; }
+  .is-pinned .day__pin { position: relative; height: auto; padding: var(--section-y, 72px) var(--gutter); overflow: visible; }
+  .is-pinned .day__track { position: relative; top: auto; bottom: auto; display: grid; gap: 28px; justify-items: center; width: auto; max-width: var(--maxw); margin-inline: auto; padding: 0; transform: none !important; }
+  .is-pinned .day__intro { width: 100%; max-width: 820px; }
+  .is-pinned .pc { width: 100%; max-width: 820px; break-inside: avoid; }
+  .is-pinned .pc:nth-of-type(n) { rotate: none; translate: none; }
+  .is-pinned .pc__front { min-height: 320px; }
+}
+@media (forced-colors: active) { .is-pinned .day__hud { border: 1px solid CanvasText; } .day__dot { forced-color-adjust: none; background: Highlight; box-shadow: none; } .day__rail::before { background: CanvasText; } }
